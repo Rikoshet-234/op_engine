@@ -1,0 +1,8 @@
+script additions
+
+iterate_inventory_simple - такое же, как и iterate_inventory, но в фанктор итерации передается только один параметр, непосредственно сам итем.
+log1 - вывод в лог напрямую
+IsOPEngine() - проверка на новй движок
+GetEngineVersion() - версия движка
+
+

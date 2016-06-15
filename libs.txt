@@ -1,0 +1,14 @@
+xrCore	DX
+xrCDB	xrCore
+xrLua	xrCore, LuaBind, Boost
+xrSound	xrCore, Xiph libs, EAX, DX, OpenAL
+xrParticles	n/a
+xrNetServer	xrCore, DX, Boost
+xrXMLParser	n/a
+XR_3DA	xrCore, DX, xrLua\src, LuaBind, Boost, Xiph libs, OpenAL (*.lib only)
+ODE	n/a
+xrCPU_Pipe	xrCore, DX
+xrGameSpy	n/a
+xrRender_R2	xrCore, DX
+xrRender_R1	xrCore, DX
+xrGame	xrCore, DX, xrLua\src, LuaBind, Boost, Loki

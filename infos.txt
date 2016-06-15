@@ -1,0 +1,36 @@
+========
+smart_terrains.script:
+≈сли в €вном виде таблицы нет, то при апдейте перебираютс€ все смарты на предмет прописанных им условий и на предмет доступных работ, и если такое будет найдено - назначаетс€ в этот смарт.
+≈сли в таблице есть - перебираютс€ только смарты из таблицы, провер€ютс€ услови€, при которых доступно, и если такие есть - оп€ть же провер€ютс€ по услови€м.
+
+¬от как-то так.
+≈сли хотите загнать непис€ в конкретный смарт, то, во-первых, надо убрать проверку условий в smart_terrain.smart_terrain_accepts_obj(), затем занести его в smart_terrain.exclusives[], и вызвать obj:brain_update()
+
+ѕри этом *_gulag.load_job() должен возвращать доступную работу дл€ данного непис€ (то есть, см. *idle, *timeout, predicate). 
+======
+¬ модели болта назначен материал objects\small_metal_trash, дл€ которого в ShaderEditor звук коллизии включен только дл€ пары с default_object и objects\barrel.
+
+=====
+uiinventorywnd2.cpp :
+bool CUIInventoryWnd::OnItemSelected(CUICellItem* itm)
+{
+SetCurrentItem (itm);
+CGameObject* GO = (CGameObject*)itm->m_pData;
+Actor()->callback(GameObject::eItemClicked)(GO->lua_game_object() );
+return false;
+}
+в game_object_space.h в список добавил:
+eItemClicked,
+в script_game_object_script.cpp:
+value("on_item_clicked", int(GameObject::eItemClicked) )
+bind_stalker.script:
+ 
+actor_binder:net_destroy()
+self.object:set_callback(callback.on_item_clicked, nil)
+actor_binder:reinit()
+self.object:set_callback(callback.on_item_clicked, self.on_item_clicked, self)
+Ќу и сама функци€:
+ 
+function actor_binder:on_item_clicked(obj)
+news_manager.send_tip(db.actor, "ћы кликнули на предмет:")
+end 
