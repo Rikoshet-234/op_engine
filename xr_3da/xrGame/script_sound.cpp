@@ -46,7 +46,6 @@ void CScriptSound::Play			(CScriptGameObject *object, float delay, int flags)
 {
 	if (!m_sound._handle())
 	{
-		Msg(fmt::format("* WARNING: CScriptSound::Play There is no sound {0}", *m_caSoundToPlay).c_str());
 		return;
 	}
 //	THROW3						(m_sound._handle(),"There is no sound",*m_caSoundToPlay);
@@ -58,7 +57,6 @@ void CScriptSound::PlayAtPos		(CScriptGameObject *object, const Fvector &positio
 {
 	if (!m_sound._handle())
 	{
-		Msg(fmt::format("* WARNING: CScriptSound::PlayAtPos There is no sound {0}", *m_caSoundToPlay).c_str());
 		return;
 	}
 //	THROW3						(m_sound._handle(),"There is no sound",*m_caSoundToPlay);
@@ -70,7 +68,6 @@ void CScriptSound::PlayNoFeedback	(CScriptGameObject *object,	u32 flags/*!< Loop
 {
 	if (!m_sound._handle())
 	{
-		Msg(fmt::format("* WARNING: CScriptSound::PlayNoFeedback There is no sound {0}", *m_caSoundToPlay).c_str());
 		return;
 	}
 //	THROW3						(m_sound._handle(),"There is no sound",*m_caSoundToPlay);

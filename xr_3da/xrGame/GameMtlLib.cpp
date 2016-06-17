@@ -3,7 +3,7 @@
 #pragma hdrstop
 
 #include "GameMtlLib.h"
-#include "../../xrShared/ExpandedCmdParams.h"
+#include "../../xrCore/OPFuncs/ExpandedCmdParams.h"
 
 CGameMtlLibrary GMLib;
 

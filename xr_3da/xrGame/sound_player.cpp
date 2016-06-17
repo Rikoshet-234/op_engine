@@ -16,6 +16,7 @@
 #include "profiler.h"
 #include "sound_collection_storage.h"
 #include "object_broker.h"
+#include "../../xrCore/OPFuncs/ExpandedCmdParams.h"
 
 CSoundPlayer::CSoundPlayer			(CObject *object)
 {
@@ -171,7 +172,8 @@ void CSoundPlayer::play				(u32 internal_type, u32 max_start_time, u32 min_start
 	VERIFY						(m_sounds.end() != I);
 	CSoundCollectionParamsFull	&sound = (*I).second.first;
 	if ((*I).second.second->m_sounds.empty()) {
-		Msg("CSoundPlayer::play, There are no sounds in sound collection \"%s\" with internal type %d (sound_script = %d)",*sound.m_sound_prefix,internal_type,StalkerSpace::eStalkerSoundScript);
+		if (OPFuncs::Dumper->isParamSet(OPFuncs::ExpandedCmdParams::KnownParams::dSoundPrefixNotPresent))
+			Msg("* WARNING CSoundPlayer CSoundPlayer::play, There are no sounds in sound collection \"%s\" with internal type %d (sound_script = %d)",*sound.m_sound_prefix,internal_type,StalkerSpace::eStalkerSoundScript);
 		return;
 	}
 
@@ -262,7 +264,8 @@ CSoundPlayer::CSoundCollection::CSoundCollection	(const CSoundCollectionParams &
 	}
 //#ifdef DEBUG
 	if (m_sounds.empty())
-		Msg							("* WARNING CSoundPlayer::CSoundCollection  There are no sounds with prefix %s",*params.m_sound_prefix);
+		if (OPFuncs::Dumper->isParamSet(OPFuncs::ExpandedCmdParams::KnownParams::dSoundPrefixNotPresent))
+			Msg							("* WARNING CSoundPlayer::CSoundCollection  There are no sounds with prefix %s",*params.m_sound_prefix);
 //#endif
 }
 

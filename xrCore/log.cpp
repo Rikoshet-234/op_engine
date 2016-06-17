@@ -8,8 +8,8 @@
 #include "log.h"
 
 #include "fmt/format.h"
-#include "../xrShared/xrsUtils.h"
-#include "../xrShared/ExpandedCmdParams.h"
+#include "OPFuncs/ExpandedCmdParams.h"
+#include "OPFuncs/utils.h"
 
 
 extern BOOL					LogExecCB		= TRUE;
@@ -217,7 +217,7 @@ void CreateLog			(BOOL nl)
 			R_ASSERT2(result,"Can't convert FILETIME to SYSTEMTIME.");
 			
 			std::string strTime=fmt::format("{0}_{1:0>2}_{2:0>2}-{3:0>2}_{4:0>2}_{5:0>2}",systemTime.wYear,systemTime.wMonth,systemTime.wDay,systemTime.wHour,systemTime.wMinute,systemTime.wSecond);
-			std::string	newLogFileName=fmt::format("{0}_{1}_{2}.log",xrsUtils::tolower(Core.ApplicationName),xrsUtils::tolower(Core.UserName),strTime);
+			std::string	newLogFileName=fmt::format("{0}_{1}_{2}.log",OPFuncs::tolower(Core.ApplicationName),OPFuncs::tolower(Core.UserName),strTime);
 			string_path fullNewLogFileName;
 			FS.update_path	(fullNewLogFileName,"$logs$",newLogFileName.c_str());
 			MoveFile(logFName,fullNewLogFileName);

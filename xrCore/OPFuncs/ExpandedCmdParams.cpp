@@ -5,7 +5,7 @@
 
 namespace OPFuncs
 {
-	XRSHARED_EXPORT ExpandedCmdParams* Dumper=new ExpandedCmdParams();
+	XRCORE_API ExpandedCmdParams* Dumper=new ExpandedCmdParams();
 	
 	ExpandedCmdParams::ExpandedCmdParams()
 	{
@@ -21,6 +21,7 @@ namespace OPFuncs
 		("-dumpml",KnownParams::dMapLoad)
 		("-dumpmle",KnownParams::dMapLoadErrors)
 		("-dumpfs",KnownParams::dFileSystem)
+		("-dumpspnp",KnownParams::dSoundPrefixNotPresent)
 		("-slt",KnownParams::pShowLogTime);
 	}
 	
@@ -34,7 +35,7 @@ namespace OPFuncs
 		} 
 		for (ParamsMap::iterator it = knownCmdParams.begin(); it != knownCmdParams.end(); ++it)
 		{
-			if (cmdLine.find(it->first)!= std::string::npos)
+			if (dumpAll || cmdLine.find(it->first)!= std::string::npos)
 			{
 				paramFlags.set(it->second,TRUE);
 			}

@@ -10,20 +10,11 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="lua_tools.h" />
     <ClInclude Include="xrShared.h" />
-    <ClInclude Include="xrsUtils.h" />
-    <ClInclude Include="ExpandedCmdParams.h" />
-    <ClInclude Include="lua_functions.h" />
-    <ClInclude Include="op_engine_version.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="LoadStrings.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="lua_tools.cpp" />
-    <ClCompile Include="xrsUtils.cpp" />
-    <ClCompile Include="ExpandedCmdParams.cpp" />
-    <ClCompile Include="lua_functions.cpp" />
-    <ClCompile Include="op_engine_version.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="xrShared.rc">

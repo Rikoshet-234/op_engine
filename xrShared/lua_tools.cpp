@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "lua_tools.h"
 
-#include "../xrCore/xrCore.h"
-
 lua_State* g_game_lua = nullptr;
 
 XRSHARED_EXPORT LPCSTR get_lua_traceback(lua_State *L, int depth)

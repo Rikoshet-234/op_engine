@@ -1,13 +1,15 @@
 #include "stdafx.h"
+
 #include "op_engine_version.h"
 
 #include "fmt/format.h"
-#include "resource.h"
+#include "../../xrShared/resource.h"
 #include "LoadStrings.h"
+
 
 namespace OPFuncs
 {
-	XRSHARED_EXPORT std::string GetOPEngineVersion()
+	XRCORE_API std::string GetOPEngineVersion()
 	{
 		std::string resDllFile="xrShared.dll";
 		HMODULE xrSharedDllHeader = LoadLibrary(resDllFile.c_str());

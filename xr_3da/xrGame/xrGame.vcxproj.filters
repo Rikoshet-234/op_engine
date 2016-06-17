@@ -2293,6 +2293,9 @@
     <Filter Include="UI\Tutorial">
       <UniqueIdentifier>{97053354-bb17-4f42-b415-db33a1d7c838}</UniqueIdentifier>
     </Filter>
+    <Filter Include="OPFuncs">
+      <UniqueIdentifier>{15463ffe-ed9f-40f4-8033-aac62541ece6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mt_config.h">
@@ -6558,6 +6561,9 @@
     <ClInclude Include="ui\UIGameTutorial.h">
       <Filter>UI\Tutorial</Filter>
     </ClInclude>
+    <ClInclude Include="OPFuncs\lua_functions.h">
+      <Filter>OPFuncs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -9706,6 +9712,9 @@
     </ClCompile>
     <ClCompile Include="ui\UIGameTutorialVideoItem.cpp">
       <Filter>UI\Tutorial</Filter>
+    </ClCompile>
+    <ClCompile Include="OPFuncs\lua_functions.cpp">
+      <Filter>OPFuncs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

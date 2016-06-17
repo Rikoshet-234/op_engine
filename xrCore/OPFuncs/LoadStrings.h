@@ -1,4 +1,3 @@
-#include <string>
 #include <Windows.h>
 
 // Assigns the uID string resource to wsDest, returns length (0 if no resource)

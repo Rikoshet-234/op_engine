@@ -11,7 +11,7 @@
 #include "xrServer_Objects.h"
 #include "xrmessages.h"
 #include "../../xrNetServer/net_utils.h"
-#include "../../xrShared/ExpandedCmdParams.h"
+#include "../../xrCore/OPFuncs/ExpandedCmdParams.h"
 
 #ifdef AI_COMPILER
 #	include "factory_api.h"

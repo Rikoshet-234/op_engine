@@ -12,7 +12,7 @@
 #include "script_engine.h"
 #include "object_item_script.h"
 
-#include "../../xrShared/ExpandedCmdParams.h"
+#include "../../xrCore/OPFuncs/ExpandedCmdParams.h"
 
 void CObjectFactory::register_script_class	(LPCSTR client_class, LPCSTR server_class, LPCSTR clsid, LPCSTR script_clsid)
 {

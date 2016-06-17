@@ -229,7 +229,8 @@ bool CScriptGameObject::CheckObjectVisibility(const CScriptGameObject *tpLuaGame
 {
 	CEntityAlive		*entity_alive = smart_cast<CEntityAlive*>(&object());
 	if (entity_alive && !entity_alive->g_Alive()) {
-		ai().script_engine().script_log	(ScriptStorage::eLuaMessageTypeError,"CScriptGameObject : cannot check visibility of dead object!");
+		ai().script_engine().script_log	(ScriptStorage::eLuaMessageTypeError, 
+			fmt::format("CScriptGameObject : cannot check visibility of dead object [{0}]!",*entity_alive->cName()).c_str());
 		return			(false);
 	}
 

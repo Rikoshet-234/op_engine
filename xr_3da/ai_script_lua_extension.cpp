@@ -10,7 +10,6 @@
 #include "stdafx.h"
 #include "ai_script_lua_extension.h"
 #include "ai_script_space.h"
-#include "../xrShared/lua_tools.h"
 
 #ifndef ENGINE_BUILD
 	#include "ai_space.h"

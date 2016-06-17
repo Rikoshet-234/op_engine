@@ -2,8 +2,8 @@
 #include "lua_functions.h"
 
 #include <luabind/luabind.hpp>
-#include "op_engine_version.h"
 #include "../xr_3da/xrGame/inventory_space.h"
+#include "../xrCore/OPFuncs/op_engine_version.h"
 
 
 
@@ -28,7 +28,7 @@ namespace OPFuncs
 	}
 
 
-	XRSHARED_EXPORT void registerLuaOPFuncs(lua_State *L)
+	void registerLuaOPFuncs(lua_State *L)
 	{
 		luabind::module(L)
 			[

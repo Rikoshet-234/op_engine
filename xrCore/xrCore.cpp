@@ -6,7 +6,8 @@
 #include <mmsystem.h>
 #include <objbase.h>
 #include "xrCore.h"
-#include "../xrShared/op_engine_version.h"
+#include "OPFuncs/op_engine_version.h"
+
 #pragma comment(lib,"winmm.lib")
 
 #ifdef DEBUG

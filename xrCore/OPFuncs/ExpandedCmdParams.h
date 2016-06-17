@@ -1,17 +1,34 @@
 ﻿#ifndef ExpandedCmdParamsH
 #define ExpandedCmdParamsH
 
-#include "xrShared.h"
-
-//#include "../xrCore/_flags.h"
-
-
-
 namespace OPFuncs
 {
+	template <typename TKey,typename TValue>
+	class createMap
+	{
+	private:
+		std::map<TKey,TValue> _map;
+	public:
+		createMap(const TKey& key, const TValue& val)
+		{
+			_map[key] = val;
+		}
+
+		createMap<TKey, TValue>& operator()(const TKey& key, const TValue& val)
+		{
+			_map[key] = val;
+			return *this;
+		}
+
+		operator std::map<TKey, TValue>()
+		{
+			return _map;
+		}
+	};
+
 	typedef std::map<std::string, int> ParamsMap;
 
-	class XRSHARED_EXPORT ExpandedCmdParams
+	class XRCORE_API ExpandedCmdParams
 	{
 		public:
 			enum KnownParams
@@ -27,7 +44,8 @@ namespace OPFuncs
 				dMapLoad				=1<<8	, //показывать загрузку карт
 				dMapLoadErrors			=1<<9	,//показывать ошибки при загрузке карт
 				dFileSystem				=1<<10	,//показывать загрузку игровых архивов
-				pShowLogTime			=1<<11	//показывать время в логе
+				dSoundPrefixNotPresent  =1<<11	, //показывать отсутсвующие звуки для звуковых префиксов 
+				pShowLogTime			=1<<15	//показывать время в логе
 				//-dumpall добавляет все параметры
 			};	
 			
@@ -40,7 +58,7 @@ namespace OPFuncs
 			ParamsMap knownCmdParams;
 	};
 
-	extern XRSHARED_EXPORT ExpandedCmdParams* Dumper;
+	extern XRCORE_API ExpandedCmdParams* Dumper;
 }
 
 #endif

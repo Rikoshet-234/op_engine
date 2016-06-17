@@ -32,7 +32,7 @@
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v110</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -52,18 +52,25 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>y:\bin_new_debug\</OutDir>
+    <OutDir>y:\bin_$(Configuration)\</OutDir>
     <IntDir>x:\intermediate\$(Configuration)\$(ProjectName)\</IntDir>
     <IncludePath>S:\SDK\boost_1_30_0;S:\SDK\luabind\luabind;S:\SDK\fmt;S:\xrCore;S:\xrLua\src;$(IncludePath)</IncludePath>
-    <LibraryPath>X:\libraries;$(LibraryPath)</LibraryPath>
-    <IgnoreImportLibrary>true</IgnoreImportLibrary>
+    <LibraryPath>x:\libraries_$(Configuration)\;s:\SDK\fmt\_build\fmt\Release\;$(LibraryPath)</LibraryPath>
+    <IgnoreImportLibrary>false</IgnoreImportLibrary>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_C++11|Win32'">
-    <OutDir>y:\bin_new_debug\</OutDir>
+    <OutDir>y:\bin_$(Configuration)\</OutDir>
     <IntDir>x:\intermediate\$(Configuration)\$(ProjectName)\</IntDir>
     <IncludePath>S:\SDK\fmt;S:\xrCore;S:\xrLua\src;$(IncludePath)</IncludePath>
     <LibraryPath>X:\libraries;$(LibraryPath)</LibraryPath>
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>y:\bin_$(Configuration)\</OutDir>
+    <IntDir>x:\intermediate\$(Configuration)\$(ProjectName)\</IntDir>
+    <TargetExt>.dll</TargetExt>
+    <IncludePath>S:\SDK\boost_1_30_0;S:\SDK\luabind\luabind;S:\SDK\fmt;S:\xrCore;S:\xrLua\src;$(IncludePath)</IncludePath>
+    <LibraryPath>x:\libraries_$(Configuration)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -88,8 +95,12 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ImportLibrary>x:\libraries\$(ProjectName).lib</ImportLibrary>
-      <AdditionalDependencies>xrLua.lib;xrCore.lib;fmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImportLibrary>x:\libraries_$(Configuration)\$(ProjectName).lib</ImportLibrary>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>
+      </ModuleDefinitionFile>
+      <LinkStatus>
+      </LinkStatus>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_C++11|Win32'">
@@ -116,45 +127,55 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ImportLibrary>x:\libraries\$(ProjectName).lib</ImportLibrary>
+      <ImportLibrary>x:\libraries_$(Configuration)\$(ProjectName).lib</ImportLibrary>
       <AdditionalDependencies>xrLua.lib;xrCore.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>xrShared.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
+      <ExceptionHandling>false</ExceptionHandling>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <PreprocessorDefinitions>XRSHARED_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <TreatLinkerWarningAsErrors>false</TreatLinkerWarningAsErrors>
+      <AdditionalDependencies>xrLua.lib;xrCore.lib;fmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImportLibrary>x:\libraries_$(Configuration)\$(ProjectName).lib</ImportLibrary>
+      <ModuleDefinitionFile>xrShared.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="ExpandedCmdParams.cpp" />
-    <ClCompile Include="lua_functions.cpp" />
     <ClCompile Include="lua_tools.cpp" />
-    <ClCompile Include="op_engine_version.cpp" />
     <ClCompile Include="stdafx.cpp" />
-    <ClCompile Include="xrsUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ExpandedCmdParams.h" />
-    <ClInclude Include="lua_functions.h" />
     <ClInclude Include="lua_tools.h" />
-    <ClInclude Include="op_engine_version.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="LoadStrings.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="xrShared.h" />
-    <ClInclude Include="xrsUtils.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="xrShared.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SDK\fmt\_build\fmt\fmt.vcxproj">
+      <Project>{5816bc48-44df-3b35-8217-b2b5a87effaf}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\xrCore\xrCore.vcxproj">
+      <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\xrLua\xrLua.vcxproj">
+      <Project>{9ace5473-6d68-4b96-ac42-b39eaba0fe1f}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

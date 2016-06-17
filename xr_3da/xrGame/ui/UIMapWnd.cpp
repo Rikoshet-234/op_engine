@@ -17,7 +17,7 @@
 #include "map_hint.h"
 
 #include "../HUDManager.h"
-#include "../../../xrShared/ExpandedCmdParams.h"
+#include "../../../xrCore/OPFuncs/ExpandedCmdParams.h"
 
 #include <dinput.h>				//remove me !!!
 #include "../../xr_input.h"		//remove me !!!
@@ -333,7 +333,7 @@ void CUIMapWnd::SetTargetMap			(CUICustomMap* m, const Fvector2& pos, bool bZoom
 		Fvector2	_p;gm->GetAbsolutePos(_p);
 		m_tgtCenter.sub					(_p);
 		m_tgtCenter.div					(gm->GetCurrentZoom());
- 	}else{
+	}else{
 
 		if(bZoomIn && fsimilar(GlobalMap()->GetCurrentZoom(), GlobalMap()->GetMinZoom(),EPS_L ))
 			SetZoom(GlobalMap()->GetMaxZoom());

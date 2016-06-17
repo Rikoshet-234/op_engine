@@ -3,11 +3,9 @@
 
 #pragma once
 
-#include "xrShared.h"
-
 namespace OPFuncs
 {
-	XRSHARED_EXPORT std::string GetOPEngineVersion();
+	XRCORE_API std::string GetOPEngineVersion();
 }
 
 #endif

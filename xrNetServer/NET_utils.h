@@ -21,12 +21,12 @@ class	NET_Packet
 {
 public:
 
-    void            construct( const void* data, unsigned size )
-                    {
-                        memcpy( B.data, data, size );
-                        B.count = size;
-                    }
-                    
+	void            construct( const void* data, unsigned size )
+					{
+						memcpy( B.data, data, size );
+						B.count = size;
+					}
+					
 	NET_Buffer		B;
 	u32				r_pos;
 	u32				timeReceive;
@@ -117,8 +117,8 @@ public:
 	}
 	IC void w_stringZ			( shared_str& p )
 	{
-    	if (*p)	w(*p,(u32)xr_strlen(p)+1);
-        else	w_u8(0);
+		if (*p)	w(*p,(u32)xr_strlen(p)+1);
+		else	w_u8(0);
 	}
 	IC void w_matrix			(Fmatrix& M)
 	{
@@ -277,7 +277,7 @@ public:
 		size_t	len		= xr_strlen(data);
 		r		(S,(u32)len+1);
 	}
-    
+	
 	IC void		r_stringZ		( xr_string& dest )
 	{
 		dest		= LPCSTR(&B.data[r_pos]);
@@ -285,10 +285,10 @@ public:
 	}
 
 	void 		r_stringZ		(shared_str& dest)
-    {
-        dest		= LPCSTR(&B.data[r_pos]);
-        r_advance	(dest.size()+1);
-    }
+	{
+		dest		= LPCSTR(&B.data[r_pos]);
+		r_advance	(dest.size()+1);
+	}
 
 	IC void		r_matrix		(Fmatrix& M)
 	{

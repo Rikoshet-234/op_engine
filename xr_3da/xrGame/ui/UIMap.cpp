@@ -7,7 +7,7 @@
 #include "UIMap.h"
 #include "UIMapWnd.h"
 #include "../../xr_input.h"		//remove me !!!
-#include "../../../xrShared/ExpandedCmdParams.h"
+#include "../../../xrCore/OPFuncs/ExpandedCmdParams.h"
 
 const u32			activeLocalMapColor			= 0xffffffff;//0xffc80000;
 const u32			inactiveLocalMapColor		= 0xffffffff;//0xff438cd1;
@@ -292,11 +292,11 @@ void CUIGlobalMap::MoveWndDelta(const Fvector2& d)
 
 float CUIGlobalMap::CalcOpenRect(const Fvector2& center_point, Frect& map_desired_rect, float tgt_zoom)
 {
-    Fvector2                    new_center_pt;
+	Fvector2                    new_center_pt;
 	// calculate desired rect in new zoom
-    map_desired_rect.set		(0.0f,0.0f, BoundRect().width()*tgt_zoom,BoundRect().height()*tgt_zoom);
+	map_desired_rect.set		(0.0f,0.0f, BoundRect().width()*tgt_zoom,BoundRect().height()*tgt_zoom);
 	// calculate center point in new zoom (center_point is in identity global map space)
-    new_center_pt.set           (center_point.x*tgt_zoom,center_point.y*tgt_zoom);
+	new_center_pt.set           (center_point.x*tgt_zoom,center_point.y*tgt_zoom);
 	// get vis width & height
 	Frect vis_abs_rect			= m_mapWnd->ActiveMapRect();
 	float vis_w					= vis_abs_rect.width();

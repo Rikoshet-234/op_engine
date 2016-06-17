@@ -10,7 +10,7 @@
 #include "script_engine.h"
 #include "ai_space.h"
 #include "script_debugger.h"
-#include "../../xrShared/lua_functions.h"
+#include "OPFuncs/lua_functions.h"
 
 using namespace luabind;
 

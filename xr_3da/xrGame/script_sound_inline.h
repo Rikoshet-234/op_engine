@@ -12,7 +12,6 @@ IC	u32	CScriptSound::Length				()
 {
 	if (!m_sound._handle())
 	{
-		Msg(fmt::format("* WARNING: CScriptSound::Length There is no sound {0}", *m_caSoundToPlay).c_str());
 		return 0;
 	}
 	//VERIFY					(m_sound._handle());
@@ -44,7 +43,6 @@ IC	void CScriptSound::SetMinDistance		(const float fMinDistance)
 	//VERIFY				(m_sound._handle());
 	if (!m_sound._handle())
 	{
-		Msg(fmt::format("* WARNING: CScriptSound::SetMinDistance There is no sound {0}", *m_caSoundToPlay).c_str());
 		m_sound.set_range(0,0);
 		return;
 	}
@@ -56,7 +54,6 @@ IC	void CScriptSound::SetMaxDistance		(const float fMaxDistance)
 	//VERIFY				(m_sound._handle());
 	if (!m_sound._handle())
 	{
-		Msg(fmt::format("* WARNING: CScriptSound::SetMaxDistance There is no sound {0}", *m_caSoundToPlay).c_str());
 		m_sound.set_range(0,0);
 		return;
 	}
@@ -68,7 +65,6 @@ IC	const float	CScriptSound::GetFrequency	() const
 	//VERIFY				(m_sound._handle());
 	if (!m_sound._handle())
 	{
-		Msg(fmt::format("* WARNING: CScriptSound::GetFrequency There is no sound {0}", *m_caSoundToPlay).c_str());
 		return 0;
 	}
 	return				(m_sound.get_params()->freq);
@@ -79,7 +75,6 @@ IC	const float CScriptSound::GetMinDistance() const
 	//VERIFY				(m_sound._handle());
 	if (!m_sound._handle())
 	{
-		Msg(fmt::format("* WARNING: CScriptSound::GetMinDistance There is no sound {0}", *m_caSoundToPlay).c_str());
 		return 0;
 	}
 	return				(m_sound.get_params()->min_distance);
@@ -90,7 +85,6 @@ IC	const float CScriptSound::GetMaxDistance() const
 	//VERIFY				(m_sound._handle());
 	if (!m_sound._handle())
 	{
-		Msg(fmt::format("* WARNING: CScriptSound::GetMaxDistance There is no sound {0}", *m_caSoundToPlay).c_str());
 		return 0;
 	}
 	return				(m_sound.get_params()->max_distance);
@@ -101,7 +95,6 @@ IC	const float	CScriptSound::GetVolume		() const
 	//VERIFY				(m_sound._handle());
 	if (!m_sound._handle())
 	{
-		Msg(fmt::format("* WARNING: CScriptSound::GetVolume There is no sound {0}", *m_caSoundToPlay).c_str());
 		return 0;
 	}
 	return				(m_sound.get_params()->volume);
@@ -112,7 +105,6 @@ IC	bool CScriptSound::IsPlaying			() const
 
 	if (!m_sound._handle())
 	{
-		Msg(fmt::format("* WARNING: CScriptSound::IsPlaying There is no sound {0}", *m_caSoundToPlay).c_str());
 		return false;
 	}
 	return				(!!m_sound._feedback());
@@ -143,7 +135,6 @@ IC	void CScriptSound::SetPosition			(const Fvector &position)
 	//VERIFY				(m_sound._handle());
 	if (!m_sound._handle())
 	{
-		Msg(fmt::format("* WARNING: CScriptSound::SetPosition There is no sound {0}", *m_caSoundToPlay).c_str());
 		m_sound.set_position(Fvector().set(0,0,0));
 		return;
 	}
@@ -155,7 +146,6 @@ IC	void CScriptSound::SetFrequency			(float frequency)
 	//VERIFY				(m_sound._handle());
 	if (!m_sound._handle())
 	{
-		Msg(fmt::format("* WARNING: CScriptSound::SetFrequency There is no sound {0}", *m_caSoundToPlay).c_str());
 		m_sound.set_frequency(0);
 		return;
 	}
@@ -167,7 +157,6 @@ IC	void CScriptSound::SetVolume			(float volume)
 	//VERIFY				(m_sound._handle());
 	if (!m_sound._handle())
 	{
-		Msg(fmt::format("* WARNING: CScriptSound::SetVolume There is no sound {0}", *m_caSoundToPlay).c_str());
 		m_sound.set_volume(0);
 		return;
 	}

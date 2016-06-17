@@ -12,7 +12,7 @@
 #include "object_factory.h"
 #include "script_process.h"
 #include "../../xrShared/lua_tools.h"
-#include "../../xrShared/ExpandedCmdParams.h"
+#include "../../xrCore/OPFuncs/ExpandedCmdParams.h"
 
 #ifdef USE_DEBUGGER
 #	include "script_debugger.h"

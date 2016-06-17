@@ -2,7 +2,7 @@
 #pragma hdrstop
 #include "TextureDescrManager.h"
 #include "ETextureParams.h"
-#include "../xrShared/ExpandedCmdParams.h"
+#include "../xrCore/OPFuncs/ExpandedCmdParams.h"
 
 // eye-params
 float					r__dtex_range	= 50;

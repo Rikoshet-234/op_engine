@@ -20,7 +20,7 @@
 #include "CopyProtection.h"
 #include "Text_Console.h"
 #include <process.h>
-#include "../xrShared/ExpandedCmdParams.h"
+#include "../xrCore/OPFuncs/ExpandedCmdParams.h"
 
 //---------------------------------------------------------------------
 ENGINE_API CInifile* pGameIni		= NULL;

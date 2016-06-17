@@ -70,6 +70,9 @@
     <Filter Include="Compression\lzo">
       <UniqueIdentifier>{3157c574-ced6-4b1b-a39a-efad2f1beb5e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="OPFuncs">
+      <UniqueIdentifier>{94215a01-0ab1-4402-9a2b-46d9c593c30f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FTimer.cpp">
@@ -250,6 +253,15 @@
       <Filter>Compression\lzo</Filter>
     </ClCompile>
     <ClCompile Include="xrSyncronize.cpp" />
+    <ClCompile Include="OPFuncs\ExpandedCmdParams.cpp">
+      <Filter>OPFuncs</Filter>
+    </ClCompile>
+    <ClCompile Include="OPFuncs\op_engine_version.cpp">
+      <Filter>OPFuncs</Filter>
+    </ClCompile>
+    <ClCompile Include="OPFuncs\utils.cpp">
+      <Filter>OPFuncs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FTimer.h">
@@ -520,6 +532,18 @@
       <Filter>Compression\lzo</Filter>
     </ClInclude>
     <ClInclude Include="xrSyncronize.h" />
+    <ClInclude Include="OPFuncs\ExpandedCmdParams.h">
+      <Filter>OPFuncs</Filter>
+    </ClInclude>
+    <ClInclude Include="OPFuncs\op_engine_version.h">
+      <Filter>OPFuncs</Filter>
+    </ClInclude>
+    <ClInclude Include="OPFuncs\LoadStrings.h">
+      <Filter>OPFuncs</Filter>
+    </ClInclude>
+    <ClInclude Include="OPFuncs\utils.h">
+      <Filter>OPFuncs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="xrCore.rc">

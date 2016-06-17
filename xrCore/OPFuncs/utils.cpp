@@ -1,19 +1,19 @@
 #include "stdafx.h"
 
-#include "xrsUtils.h"
+#include "utils.h"
 
 #include <algorithm>
 #include <string> 
 
-namespace xrsUtils {
-	XRSHARED_EXPORT std::string tolower(const char * str)
+namespace OPFuncs {
+	XRCORE_API std::string tolower(const char * str)
 	{
 		std::string result(str);
 		std::transform(result.begin(), result.end(), result.begin(), ::tolower);
 		return result;
 	}
 
-	XRSHARED_EXPORT std::string toupper(const char * str)
+	XRCORE_API std::string toupper(const char * str)
 	{
 		std::string result(str);
 		std::transform(result.begin(), result.end(), result.begin(), ::toupper);

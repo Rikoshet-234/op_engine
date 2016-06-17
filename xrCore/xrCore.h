@@ -17,7 +17,7 @@
 	#if defined(_CPPUNWIND)
 		#error Please disable exceptions...
 	#endif
-//	#define _HAS_EXCEPTIONS		1	// STL
+	//#define _HAS_EXCEPTIONS		0	// STL
 	#define XRAY_EXCEPTIONS		0	// XRAY
 	#define LUABIND_NO_EXCEPTIONS
 	#define BOOST_NO_EXCEPTIONS
@@ -36,7 +36,7 @@
 // *** disable exceptions for both STLport and VC7.1 STL
 // #define _STLP_NO_EXCEPTIONS	1
 // #if XRAY_EXCEPTIONS
- 	#define _HAS_EXCEPTIONS		1	// force STL again
+	#define _HAS_EXCEPTIONS		1	// force STL again
 // #endif
 */
 
@@ -67,11 +67,11 @@
 
 #ifndef DEBUG
 	#ifdef _DEBUG
-    	#define DEBUG
-    #endif
+		#define DEBUG
+	#endif
 	#ifdef MIXED
-    	#define DEBUG
-    #endif
+		#define DEBUG
+	#endif
 #endif
 
 #ifdef XRCORE_STATIC
@@ -117,25 +117,25 @@
 	#define MODULE_NAME 		"xrCoreB.dll"
 
 	// function redefinition
-    #define fabsf(a) fabs(a)
-    #define sinf(a) sin(a)
-    #define asinf(a) asin(a)
-    #define cosf(a) cos(a)
-    #define acosf(a) acos(a)
-    #define tanf(a) tan(a)
-    #define atanf(a) atan(a)
-    #define sqrtf(a) sqrt(a)
-    #define expf(a) ::exp(a)
-    #define floorf floor
-    #define atan2f atan2
-    #define logf log
+	#define fabsf(a) fabs(a)
+	#define sinf(a) sin(a)
+	#define asinf(a) asin(a)
+	#define cosf(a) cos(a)
+	#define acosf(a) acos(a)
+	#define tanf(a) tan(a)
+	#define atanf(a) atan(a)
+	#define sqrtf(a) sqrt(a)
+	#define expf(a) ::exp(a)
+	#define floorf floor
+	#define atan2f atan2
+	#define logf log
 	// float redefine
 	#define _PC_24 PC_24
 	#define _PC_53 PC_53
 	#define _PC_64 PC_64
 	#define _RC_CHOP RC_CHOP
 	#define _RC_NEAR RC_NEAR
-    #define _MCW_EM MCW_EM
+	#define _MCW_EM MCW_EM
 #else
 	#define ALIGN(a)		__declspec(align(a))
 	#include <sys\utime.h>
@@ -159,7 +159,7 @@
 #ifdef _M_AMD64
 #pragma warning (disable : 4512 )
 #endif
-       
+	   
 // stl
 #pragma warning (push)
 #pragma warning (disable:4702)
@@ -203,31 +203,31 @@
 
 // stl ext
 struct XRCORE_API xr_rtoken{
-    shared_str	name;
-    int	   	id;
-           	xr_rtoken	(LPCSTR _nm, int _id){name=_nm;id=_id;}
+	shared_str	name;
+	int	   	id;
+			xr_rtoken	(LPCSTR _nm, int _id){name=_nm;id=_id;}
 public:
-    void	rename		(LPCSTR _nm)		{name=_nm;}
-    bool	equal		(LPCSTR _nm)		{return (0==xr_strcmp(*name,_nm));}
+	void	rename		(LPCSTR _nm)		{name=_nm;}
+	bool	equal		(LPCSTR _nm)		{return (0==xr_strcmp(*name,_nm));}
 };
 
 #pragma pack (push,1)
 struct XRCORE_API xr_shortcut{
-    enum{
-        flShift	= 0x20,
-        flCtrl	= 0x40,
-        flAlt	= 0x80,
-    };
-    union{
-    	struct{
-            u8	 	key;
-            Flags8	ext;
-        };
-        u16		hotkey;
-    };
-                xr_shortcut		(u8 k, BOOL a, BOOL c, BOOL s):key(k){ext.assign(u8((a?flAlt:0)|(c?flCtrl:0)|(s?flShift:0)));}
-                xr_shortcut		(){ext.zero();key=0;}
-    bool		similar			(const xr_shortcut& v)const{return ext.equal(v.ext)&&(key==v.key);}
+	enum{
+		flShift	= 0x20,
+		flCtrl	= 0x40,
+		flAlt	= 0x80,
+	};
+	union{
+		struct{
+			u8	 	key;
+			Flags8	ext;
+		};
+		u16		hotkey;
+	};
+				xr_shortcut		(u8 k, BOOL a, BOOL c, BOOL s):key(k){ext.assign(u8((a?flAlt:0)|(c?flCtrl:0)|(s?flShift:0)));}
+				xr_shortcut		(){ext.zero();key=0;}
+	bool		similar			(const xr_shortcut& v)const{return ext.equal(v.ext)&&(key==v.key);}
 };
 #pragma pack (pop)
 

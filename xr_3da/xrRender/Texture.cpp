@@ -9,7 +9,7 @@
 #include <d3dx9.h>
 #pragma warning(default:4995)
 
-#include "../../xrShared/ExpandedCmdParams.h"
+#include "../../xrCore/OPFuncs/ExpandedCmdParams.h"
 
 // #include "std_classes.h"
 // #include "xr_avi.h"
