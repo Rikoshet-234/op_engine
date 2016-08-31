@@ -127,7 +127,7 @@ IC	typename CPlanner::CConditionEvaluator &CPlanner::evaluator		(const _conditio
 TEMPLATE_SPECIALIZATION
 IC	typename CPlanner::_action_id_type CPlanner::current_action_id	() const
 {
-	VERIFY					(initialized());
+	//VERIFY					(initialized());
 	return					(m_current_action_id);
 }
 

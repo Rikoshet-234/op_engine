@@ -11,12 +11,21 @@ bool xrServer::Process_event_reject	(NET_Packet& P, const ClientID sender, const
 #ifdef MORE_SPAM
 	Msg("sv reject. id_parent %s id_entity %s [%d]",ent_name_safe(id_parent).c_str(),ent_name_safe(id_entity).c_str(), Device.dwFrame);
 #endif
-	R_ASSERT			(e_parent && e_entity);
+
+	if (!(e_parent && e_entity))
+	{
+		std::string parent=ent_name_safe(id_parent).c_str();
+		std::string entity=ent_name_safe(id_entity).c_str();
+		Msg("~ WARNING: invalid server entitys combination e_parent (%s) & e_entity (%s)",parent.c_str(),entity.c_str());
+		return false;
+		//FATAL("ENGINE Crush. See log for detail.");
+	}
+
 	game->OnDetach		(id_parent,id_entity);
 
 	if (0xffff == e_entity->ID_Parent) 
 	{
-		Msg	("~ ERROR: can't detach independant object. entity[%s:%d], parent[%s:%d], section[%s]",
+		Msg	("~ WARNING: can't detach independant object. entity[%s:%d], parent[%s:%d], section[%s]",
 			e_entity->name_replace(),id_entity,e_parent->name_replace(),id_parent, *e_entity->s_name);
 		return			(false);
 	}

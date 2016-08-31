@@ -275,9 +275,9 @@ void CALifeUpdateManager::load			(LPCSTR game_name, bool no_assert, bool new_onl
 		new_game						(game_name);
 	}
 
-//#ifdef MORE_SPAM
+#ifdef DEBUG
 	Msg									("* Loading alife simulator is successfully completed (%7.3f Mb)",float(Memory.mem_usage() - memory_usage)/1048576.0);
-//#endif
+#endif
 	g_pGamePersistent->LoadTitle		("st_server_connecting");
 }
 

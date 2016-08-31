@@ -324,6 +324,7 @@ bool CUIXmlInit::Init3tButton(CUIXml& xml_doc, const char* path, int index, CUI3
 	float shadowOffsetX	= xml_doc.ReadAttribFlt(path, index, "shadow_offset_x", 0);
 	float shadowOffsetY	= xml_doc.ReadAttribFlt(path, index, "shadow_offset_y", 0);
 
+	
 	pWnd->SetShadowOffset(Fvector2().set(shadowOffsetX, shadowOffsetY));
 
 	// init hint static
@@ -707,6 +708,13 @@ bool CUIXmlInit::InitFont(CUIXml &xml_doc, LPCSTR path, int index, u32 &color, C
 	return true;
 }
 
+//bool tabindex_pred( CUITabButton* k1,  CUITabButton* k2) 
+//{
+//	bool res=k1->m_tabIndex < k2->m_tabIndex;
+//	return res;
+//}
+
+
 bool CUIXmlInit::InitTabControl(CUIXml &xml_doc, LPCSTR path, int index, CUITabControl *pWnd)
 {
 	R_ASSERT3				(xml_doc.NavigateToNode(path,index), "XML node not found", path);
@@ -722,14 +730,23 @@ bool CUIXmlInit::InitTabControl(CUIXml &xml_doc, LPCSTR path, int index, CUITabC
 	xml_doc.SetLocalRoot	(tab_node);
 
 	CUITabButton* newButton;
+	//xr_vector<CUITabButton*> buttons;
 
 	for (int i = 0; i < tabsCount; ++i)
 	{
 		newButton = radio ? xr_new<CUIRadioButton>() : xr_new<CUITabButton>();
 		status &= Init3tButton(xml_doc, "button", i, newButton);
+		//newButton->m_tabIndex=xml_doc.ReadAttribInt("button", i, "tab_index", -1);
+		//buttons.push_back(newButton);
 		pWnd->AddItem(newButton);
 	}
 	
+	/*std::sort(buttons.begin(),buttons.end(),tabindex_pred);
+	for (xr_vector<CUITabButton*>::iterator it = buttons.begin(); it != buttons.end();++it)
+	{
+		pWnd->AddItem(*it);	
+	}*/
+
 	xml_doc.SetLocalRoot(xml_doc.GetRoot());
 
 	return status;

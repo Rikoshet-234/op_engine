@@ -78,7 +78,7 @@ void CSpaceRestrictionComposition::initialize	()
 	u32							n = _GetItemCount(*m_space_restrictors);
 	VERIFY						(n);
 	if (n == 1) {
-#ifdef DEBUG		
+#ifdef VERIFY_RESTRICTORS		
 		m_correct				= true;
 		check_restrictor_type	();
 #endif
@@ -146,12 +146,12 @@ void CSpaceRestrictionComposition::initialize	()
 
 	process_borders				();
 
-#ifdef DEBUG
+#ifdef VERIFY_RESTRICTORS
 	test_correctness			();
 #endif
 }
 
-#ifdef DEBUG
+#ifdef VERIFY_RESTRICTORS
 void CSpaceRestrictionComposition::test_correctness()
 {
 	m_correct					= true;

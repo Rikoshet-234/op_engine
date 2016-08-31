@@ -68,12 +68,12 @@
     <_ProjectFileVersion>11.0.61030.0</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>y:\bin_$(Configuration)\</OutDir>
+    <OutDir>y:\bin_Debug\</OutDir>
     <IntDir>x:\intermediate\$(Configuration)\$(ProjectName)\</IntDir>
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>S:\SDK\fmt;S:\SDK\eax\Include;S:\SDK\Xiph\Include;S:\SDK\dx9sdk\dx9sdk\include;S:\SDK\OpenAL\Include;S:\xrCore;$(IncludePath)</IncludePath>
-    <LibraryPath>S:\SDK\eax;x:\libraries_$(Configuration)\;S:\SDK\OpenAL\libs;S:\SDK\eax\Include;S:\SDK\Xiph\Libs;$(LibraryPath)</LibraryPath>
+    <IncludePath>S:\SDK\eax\Include;S:\SDK\Xiph\Include;S:\SDK\dx9sdk\dx9sdk\include;S:\SDK\OpenAL\Include;S:\xrCore;$(IncludePath)</IncludePath>
+    <LibraryPath>S:\SDK\eax;x:\libraries_Debug\;S:\SDK\OpenAL\libs;S:\SDK\eax\Include;S:\SDK\Xiph\Libs;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_C++11|Win32'">
     <OutDir>y:\bin_$(Configuration)\</OutDir>
@@ -84,9 +84,11 @@
     <LibraryPath>S:\SDK\eax;X:\libraries;S:\SDK\OpenAL\libs;S:\SDK\eax\Include;S:\SDK\Xiph\Libs;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>y:\bin_$(Configuration)\</OutDir>
+    <OutDir>y:\bin_Release\</OutDir>
     <IntDir>x:\intermediate\$(Configuration)\$(ProjectName)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>S:\SDK\eax\Include;S:\SDK\Xiph\Include;S:\SDK\dx9sdk\dx9sdk\include;S:\SDK\OpenAL\Include;S:\xrCore;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>S:\SDK\eax;x:\libraries_Release\;S:\SDK\OpenAL\libs;S:\SDK\eax\Include;S:\SDK\Xiph\Libs;$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSDK_LibraryPath_x86);</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
     <OutDir>y:\bin_$(Configuration)\</OutDir>
@@ -131,7 +133,7 @@
       <MapExports>false</MapExports>
       <SubSystem>Windows</SubSystem>
       <LargeAddressAware>true</LargeAddressAware>
-      <ImportLibrary>x:\libraries_$(Configuration)\$(ProjectName).lib</ImportLibrary>
+      <ImportLibrary>x:\libraries_Debug\$(ProjectName).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <TreatLinkerWarningAsErrors>false</TreatLinkerWarningAsErrors>
@@ -222,7 +224,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
-      <ImportLibrary>x:\libraries_$(Configuration)\$(ProjectName).lib</ImportLibrary>
+      <ImportLibrary>x:\libraries_Release\$(ProjectName).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
   </ItemDefinitionGroup>

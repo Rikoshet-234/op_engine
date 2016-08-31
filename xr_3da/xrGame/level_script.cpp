@@ -28,6 +28,7 @@
 #include "map_manager.h"
 #include "map_location.h"
 #include "phworld.h"
+#include <OPFuncs/utils.h>
 
 using namespace luabind;
 
@@ -210,9 +211,20 @@ void map_change_spot_hint(u16 id, LPCSTR spot_type, LPCSTR text)
 	ml->SetHint			(text);
 }
 
+
 void map_remove_object_spot(u16 id, LPCSTR spot_type)
 {
 	Level().MapManager().RemoveMapLocation(spot_type, id);
+}
+
+template<typename T> 
+XRCORE_API OPFuncs::STR2INT_ERROR str2int(T &, char const *);
+
+void map_remove_object_spot(LPCSTR id, LPCSTR spot_type)
+{
+	u16 convId=0;
+	R_ASSERT3(OPFuncs::str2int<u16>(convId,id)== OPFuncs::STR2INT_ERROR::SUCCESS,"Invalid ID value for map spot",id);
+	map_remove_object_spot(convId,spot_type);
 }
 
 u16 map_has_object_spot(u16 id, LPCSTR spot_type)
@@ -584,7 +596,8 @@ void CLevel::script_register(lua_State *L)
 
 		def("map_add_object_spot_ser",			map_add_object_spot_ser),
 		def("map_add_object_spot",				map_add_object_spot),
-		def("map_remove_object_spot",			map_remove_object_spot),
+		def("map_remove_object_spot",			(void (*) (LPCSTR, LPCSTR)) &map_remove_object_spot),
+		def("map_remove_object_spot",			(void (*) (u16, LPCSTR)) &map_remove_object_spot),
 		def("map_has_object_spot",				map_has_object_spot),
 		def("map_change_spot_hint",				map_change_spot_hint),
 

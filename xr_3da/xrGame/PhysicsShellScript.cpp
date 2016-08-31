@@ -29,8 +29,10 @@ void CPhysicsShell::script_register(lua_State *L)
 			.def("unblock_breaking",			&CPhysicsShell::UnblockBreaking)
 			.def("is_breaking_blocked",			&CPhysicsShell::IsBreakingBlocked)
 			.def("is_breakable",				&CPhysicsShell::isBreakable)
-			.def("get_linear_vel",				&CPhysicsShell::get_LinearVel)
-			.def("get_angular_vel",				&CPhysicsShell::get_AngularVel)
+			.def("get_linear_vel",				(void (CPhysicsShell::*)(Fvector&))(&CPhysicsShell::get_LinearVel))
+			//.def("get_linear_vel",				&CPhysicsShell::get_LinearVel)
+			.def("get_angular_vel",				(void (CPhysicsShell::*)(Fvector&))(&CPhysicsShell::get_AngularVel))
+			//.def("get_angular_vel",				&CPhysicsShell::get_AngularVel)
 		];
 }
 

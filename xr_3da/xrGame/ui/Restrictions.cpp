@@ -31,7 +31,11 @@ u32 get_rank(const shared_str &section)
 		}
 	}
 
-	R_ASSERT3	(res!=-1,"cannot find rank for", section.c_str());
+	if (res==-1)
+	{
+		Msg("Cannot find rank for %s, set to 0", section.c_str());
+		res=0;
+	}
 	return		res;
 }
 

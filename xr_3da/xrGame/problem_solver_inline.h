@@ -86,8 +86,10 @@ IC	bool CProblemSolverAbstract::actual			() const
 	for ( ; I != E; ++I) {
 		if ((*i).first < (*I).condition())
 			i				= std::lower_bound(i,e,(*I).condition(),evaluators().value_comp());
+#ifdef MORE_VERIFY_PROP_COND
 		VERIFY				(i != e);
 		VERIFY				((*i).first == (*I).condition());
+#endif
 		if ((*i).second->evaluate() != (*I).value())
 			return			(false);
 	}

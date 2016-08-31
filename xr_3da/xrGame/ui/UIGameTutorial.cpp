@@ -9,6 +9,8 @@
 #include "../script_engine.h"
 #include "../ai_space.h"
 
+#include <log.h>
+
 void CUISequenceItem::Load(CUIXml* xml, int idx)
 {
 	XML_NODE* _stored_root			= xml->GetLocalRoot();
@@ -27,7 +29,9 @@ void CUISequenceItem::Load(CUIXml* xml, int idx)
 	for(j=0; j<f_num; ++j){
 		str							= xml->Read(xml->GetLocalRoot(), "function_on_start", j, NULL);
 		functor_exists				= ai().script_engine().functor(str ,m_start_lua_functions[j]);
-		THROW3						(functor_exists, "Cannot find script function described in tutorial item ", str);
+		if (!functor_exists)
+			Msg("! ERROR Cannot find script function described in tutorial item in function_on_start [%s]",str);
+		//THROW3						(functor_exists, "Cannot find script function described in tutorial item ", str);
 	}
 	
 	f_num							= xml->GetNodesNum(xml->GetLocalRoot(),"function_on_stop");
@@ -35,7 +39,9 @@ void CUISequenceItem::Load(CUIXml* xml, int idx)
 	for(j=0; j<f_num; ++j){
 		str							= xml->Read(xml->GetLocalRoot(), "function_on_stop", j, NULL);
 		functor_exists				= ai().script_engine().functor(str ,m_stop_lua_functions[j]);
-		THROW3						(functor_exists, "Cannot find script function described in tutorial item ", str);
+		if (!functor_exists)
+			Msg("! ERROR Cannot find script function described in tutorial item in function_on_stop [%s]",str);
+		//THROW3						(functor_exists, "Cannot find script function described in tutorial item ", str);
 	}
 
 	xml->SetLocalRoot				(_stored_root);

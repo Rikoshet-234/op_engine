@@ -7,8 +7,6 @@
 
 #define CFS_CompressMark	(1ul << 31ul)
 
-#include "fmt/format.h"
-
 XRCORE_API void VerifyPath	(LPCSTR path);
 
 #ifdef DEBUG
@@ -34,7 +32,7 @@ public:
 	}
 	virtual	~IWriter	()
 	{
-        R_ASSERT3	(chunk_pos.empty(),"Opened chunk not closed.",*fName);
+		R_ASSERT3	(chunk_pos.empty(),"Opened chunk not closed.",*fName);
 	}
 
 	// kernel
@@ -66,7 +64,7 @@ public:
 	IC void			w_ivector3(const Ivector3 &v)	{	w(&v,sizeof(Ivector3));	}
 	IC void			w_ivector2(const Ivector2 &v)	{	w(&v,sizeof(Ivector2));	}
 
-    // quant writing functions
+	// quant writing functions
 	IC void 		w_float_q16	(float a, float min, float max)
 	{
 		VERIFY		(a>=min && a<=max);
@@ -167,14 +165,14 @@ public:
 		u16	val 	= r_u16();
 		float A		= (float(val)*(max-min))/65535.f + min;		// floating-point-error possible
 		VERIFY		((A >= min-EPS_S) && (A <= max+EPS_S));
-        return A;
+		return A;
 	}
 	IC float		r_float_q8	(float min, float max)
 	{
 		u8 val		= r_u8();
 		float	A	= (float(val)/255.0001f) *(max-min) + min;	// floating-point-error possible
 		VERIFY		((A >= min) && (A <= max));
-        return	A;
+		return	A;
 	}
 	IC float		r_angle16	()			{ return r_float_q16(0,PI_MUL_2);	}
 	IC float		r_angle8	()			{ return r_float_q8	(0,PI_MUL_2);	}
@@ -210,6 +208,36 @@ public:
 		return 0;
 	}
 	
+	IC	u32 		find_chunk_safe	(u32 ID, bool &errorFlag,BOOL* bCompressed = 0)	
+	{
+		u32	dwSize=0;
+		u32 dwType=0;
+		errorFlag=false;
+		rewind();
+		auto length = (u32)impl().length();
+		u32 readedSize=0;
+		while ( (u32)impl().tell() + 8 <= length)
+		{
+			dwType = r_u32();
+			dwSize = r_u32();
+			readedSize+=dwSize;
+			if ((readedSize>length) || (impl().tell()+dwSize > length))
+			{
+				errorFlag=true;
+				return dwSize;
+			}
+			if ((dwType&(~CFS_CompressMark)) == ID) {
+				
+				VERIFY	((u32)impl().tell() + dwSize <= (u32)impl().length());
+				if (bCompressed) *bCompressed = dwType&CFS_CompressMark;
+				return dwSize;
+			}
+			else	impl().advance(dwSize);
+		}
+		return 0;
+	}
+
+
 	IC	BOOL		r_chunk		(u32 ID, void *dest)	// чтение XR Chunk'ов (4b-ID,4b-size,??b-data)
 	{
 		u32	dwSize = find_chunk(ID);
@@ -264,14 +292,28 @@ protected:
 public:
 	IC int			elapsed		()	const		{	return Size-Pos;		};
 	IC int			tell		()	const		{	return Pos;				};
-	IC void			seek		(int ptr)		{	Pos=ptr; VERIFY((Pos<=Size) && (Pos>=0));};
+	IC void			seek		(int ptr)
+												{
+													Pos=ptr; 
+													if (!(Pos<=Size && Pos>=0))
+													{
+														string64 str;
+														sprintf_s(str,"Invalid position FS.seek() Pos:%d Size:%d",Pos,Size);
+														Debug.fatal(DEBUG_INFO,str);
+													}
+													//VERIFY((Pos<=Size) && (Pos>=0));
+												};
 	IC int			length		()	const		{	return Size;			};
 	IC void*		pointer		()	const		{	return &(data[Pos]);	};
 	IC void			advance		(int cnt)		{	
 													Pos+=cnt;
-													VERIFY2((Pos<=Size) && (Pos>=0),
-															fmt::format("Pos:{0} Size:{1}",Pos,Size)
-															);
+													if (!(Pos<=Size && Pos>=0))
+													{
+														string64 str;
+														sprintf_s(str,"Invalid position FS.advance() Pos:%d Size:%d",Pos,Size);
+														Debug.fatal(DEBUG_INFO,str);
+													}
+													//VERIFY2((Pos<=Size) && (Pos>=0),str);
 												};
 
 public:

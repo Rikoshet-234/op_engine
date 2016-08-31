@@ -26,6 +26,7 @@
 #include <luabind/detail/stack_utils.hpp>
 #include <luabind/luabind.hpp>
 #include <utility>
+#include "../xrShared/lua_tools.h"
 
 using namespace luabind::detail;
 
@@ -439,9 +440,9 @@ int luabind::detail::class_rep::operator_dispatcher(lua_State* L)
 	{
 		if (is_class_object(L, 1 + i))
 		{
-            int nargs = lua_gettop(L);
+			int nargs = lua_gettop(L);
 
-            lua_pushvalue(L, lua_upvalueindex(1));
+			lua_pushvalue(L, lua_upvalueindex(1));
 			lua_gettable(L, 1 + i);
 
 			if (lua_isnil(L, -1))
@@ -452,18 +453,20 @@ int luabind::detail::class_rep::operator_dispatcher(lua_State* L)
 
 			lua_insert(L, 1); // move the function to the bottom
 
-            nargs = lua_toboolean(L, lua_upvalueindex(2)) ? 1 : nargs;
+			nargs = lua_toboolean(L, lua_upvalueindex(2)) ? 1 : nargs;
 
-            if (lua_toboolean(L, lua_upvalueindex(2))) // remove trailing nil
-                lua_remove(L, 3);
+			if (lua_toboolean(L, lua_upvalueindex(2))) // remove trailing nil
+				lua_remove(L, 3);
 
-            lua_call(L, nargs, 1);
-            return 1;
+			lua_call(L, nargs, 1);
+			return 1;
 		}
 	}
 
 	lua_pop(L, lua_gettop(L));
-	lua_pushstring(L, "No such operator defined");
+	string_class msg( "! ERROR: No such operator defined");
+	msg += get_lua_traceback(L,4);
+	lua_pushstring(L, msg.c_str());
 	lua_error(L);
 
 	return 0;
@@ -563,10 +566,10 @@ int luabind::detail::class_rep::constructor_dispatcher(lua_State* L)
 #ifndef LUABIND_NO_EXCEPTIONS
 
 	}
-    
-    catch(const error&)
-    {
-    }
+	
+	catch(const error&)
+	{
+	}
 	catch(const std::exception& e)
 	{
 		lua_pushstring(L, e.what());
@@ -598,7 +601,7 @@ int luabind::detail::class_rep::constructor_dispatcher(lua_State* L)
 	upvalues:
 	1: method_rep* method, points to the method_rep that this dispatcher is to call
 	2: boolean force_static, is true if this is to be a static call
-       and false if it is a normal call (= virtual if possible).
+	   and false if it is a normal call (= virtual if possible).
 
 	stack:
 	1: object_rep* self, points to the object the call is being made on
@@ -707,10 +710,10 @@ int luabind::detail::class_rep::function_dispatcher(lua_State* L)
 
 		const overload_rep& o = rep->overloads()[match_index];
 
-        if (force_static_call && !o.has_static())
+		if (force_static_call && !o.has_static())
 		{
 			lua_pushstring(L, "pure virtual function called");
-        }
+		}
 		else
 		{
 #if 0
@@ -718,16 +721,16 @@ int luabind::detail::class_rep::function_dispatcher(lua_State* L)
 			o.get_signature		(L, str);
 			OutputDebugString	((((xr_string("__function__") + rep->crep->name()) + "::") + rep->name + str + "\n").c_str());
 #endif
-	        return o.call(L, force_static_call != 0);
+			return o.call(L, force_static_call != 0);
 		}
 
 #ifndef LUABIND_NO_EXCEPTIONS
 
 	}
-    catch(const error&)
-    {
-    }
-    catch(const std::exception& e)
+	catch(const error&)
+	{
+	}
+	catch(const std::exception& e)
 	{
 		lua_pushstring(L, e.what());
 	}
@@ -791,7 +794,7 @@ namespace
 	string_class member_to_string(luabind::object const& e)
 	{
 #if !defined(LUABIND_NO_ERROR_CHECKING)
-        using namespace luabind;
+		using namespace luabind;
 		lua_State* L = e.lua_state();
 		LUABIND_CHECK_STACK(L);
 
@@ -839,9 +842,9 @@ namespace
 			return s.str();
 		}
 
-        return to_string(e);
+		return to_string(e);
 #else
-        return "";
+		return "";
 #endif
 	}
 }
@@ -898,9 +901,9 @@ void luabind::detail::class_rep::add_base_class(const luabind::detail::class_rep
 
 	for (methods_t::const_iterator i = bcrep->m_methods.begin();
 		i != bcrep->m_methods.end(); ++i)
-    {
+	{
 		add_method(*i);
-    }
+	}
 
 	// import all getters from the base
 #ifndef USE_NATIVE_LUA_STRINGS
@@ -1144,10 +1147,10 @@ int luabind::detail::class_rep::super_callback(lua_State* L)
 #ifndef LUABIND_NO_EXCEPTIONS
 
 		}
-        catch(const error&)
-        {
-        }
-        catch(const std::exception& e)
+		catch(const error&)
+		{
+		}
+		catch(const std::exception& e)
 		{
 			lua_pushstring(L, e.what());
 		}
@@ -1705,12 +1708,12 @@ void luabind::detail::class_rep::add_method(luabind::detail::method_rep const& f
 
 	typedef std::vector<detail::overload_rep> overloads_t;
 
-    for (overloads_t::const_iterator j = fun.overloads().begin();
+	for (overloads_t::const_iterator j = fun.overloads().begin();
 		j != fun.overloads().end(); ++j)
-    {
-        detail::overload_rep o = *j;
-        m->add_overload(o);
-    }
+	{
+		detail::overload_rep o = *j;
+		m->add_overload(o);
+	}
 }
 
 // this function will add all the overloads in method rep to

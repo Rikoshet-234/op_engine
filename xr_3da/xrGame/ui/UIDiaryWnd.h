@@ -73,6 +73,6 @@ public:
 			void		AddNews					();
 			void		MarkNewsAsRead			(bool status);
 	virtual void		Show					(bool status);
-
+	void        AddDiaryArticle            (shared_str, bool bReaded);
 };
 

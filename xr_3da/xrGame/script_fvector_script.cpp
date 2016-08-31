@@ -9,6 +9,7 @@
 #include "pch_script.h"
 #include "script_fvector.h"
 
+
 using namespace luabind;
 
 #pragma optimize("s",on)
@@ -21,6 +22,7 @@ void CScriptFvector::script_register(lua_State *L)
 			.def_readwrite("y",					&Fvector::y)
 			.def_readwrite("z",					&Fvector::z)
 			.def(								constructor<>())
+			.def("str",							(LPCSTR	   (Fvector::*)(const Fvector &))(&Fvector::str))
 			.def("set",							(Fvector & (Fvector::*)(float,float,float))(&Fvector::set),																return_reference_to(_1))
 			.def("set",							(Fvector & (Fvector::*)(const Fvector &))(&Fvector::set),																return_reference_to(_1))
 			.def("add",							(Fvector & (Fvector::*)(float))(&Fvector::add),																			return_reference_to(_1))

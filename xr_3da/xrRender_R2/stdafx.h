@@ -25,7 +25,7 @@
 #include "..\igame_level.h"
 #include "..\blenders\blender.h"
 #include "..\blenders\blender_clsid.h"
-#include "..\psystem.h"
+#include "..\xrParticles\psystem.h"
 #include "..\xrRender\xrRender_console.h"
 #include "r2.h"
 

@@ -11,6 +11,8 @@
 #define TEMPLATE_SPECIALIZATION template<typename _world_property>
 #define CConditionStateAbstract CConditionState<_world_property>
 
+#include "../../build_defines.h"
+
 TEMPLATE_SPECIALIZATION
 IC	CConditionStateAbstract::CConditionState	()
 {
@@ -32,7 +34,9 @@ IC	const xr_vector<typename CConditionStateAbstract::COperatorCondition> &CCondi
 TEMPLATE_SPECIALIZATION
 IC	void CConditionStateAbstract::add_condition_back	(const COperatorCondition &condition)
 {
+#ifndef IGNORE_CRITICAL_ECONDITIONS
 	THROW					(m_conditions.empty() || (m_conditions.back().condition() < condition.condition()));
+#endif
 	m_conditions.push_back	(condition);
 	m_hash					^= condition.hash_value();
 }
@@ -41,7 +45,9 @@ TEMPLATE_SPECIALIZATION
 IC	void CConditionStateAbstract::add_condition	(const COperatorCondition &condition)
 {
 	xr_vector<COperatorCondition>::iterator	I = std::lower_bound(m_conditions.begin(),m_conditions.end(),condition);
+#ifndef IGNORE_CRITICAL_ECONDITIONS	
 	THROW2					((I == m_conditions.end()) || ((*I).condition() != condition.condition()),std::to_string(condition.condition()).c_str());
+#endif	
 	m_conditions.insert		(I,condition);
 	m_hash					^= condition.hash_value();
 }
@@ -50,7 +56,9 @@ TEMPLATE_SPECIALIZATION
 IC	void CConditionStateAbstract::remove_condition	(const typename COperatorCondition::_condition_type &condition)
 {
 	xr_vector<COperatorCondition>::iterator	I = std::lower_bound(m_conditions.begin(),m_conditions.end(),COperatorCondition(condition,COperatorCondition::_value_type(0)));
+#ifndef IGNORE_CRITICAL_ECONDITIONS	
 	THROW					((I != m_conditions.end()) && ((*I).condition() == condition));
+#endif	
 	m_hash					^= (*I).hash_value();
 	m_conditions.erase		(I);
 }

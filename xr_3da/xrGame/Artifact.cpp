@@ -11,6 +11,7 @@
 #include "phworld.h"
 #include "restriction_space.h"
 #include "../IGame_Persistent.h"
+#include "../../build_defines.h"
 
 #define	FASTMODE_DISTANCE (50.f)	//distance to camera from sphere, when zone switches to fast update sequence
 
@@ -88,6 +89,8 @@ void CArtefact::Load(LPCSTR section)
 
 
 	{
+		m_art_additional_weight=READ_IF_EXISTS(pSettings,r_float,section,"additional_weight",0);
+
 		m_fHealthRestoreSpeed = pSettings->r_float		(section,"health_restore_speed"		);
 		m_fRadiationRestoreSpeed = pSettings->r_float	(section,"radiation_restore_speed"	);
 		m_fSatietyRestoreSpeed = pSettings->r_float		(section,"satiety_restore_speed"	);
@@ -312,7 +315,7 @@ void CArtefact::UpdateXForm()
 
 		// Get access to entity and its visual
 		CEntityAlive*		E		= smart_cast<CEntityAlive*>(H_Parent());
-        
+		
 		if(!E)				return	;
 
 		const CInventoryOwner	*parent = smart_cast<const CInventoryOwner*>(E);
@@ -600,9 +603,9 @@ void SArtefactActivation::SpawnAnomaly()
 		object->Spawn_Write			(P,TRUE);
 		Level().Send				(P,net_flags(TRUE));
 		F_entity_Destroy			(object);
-//. #ifdef DEBUG
+#ifdef MORE_SPAWN
 		Msg("artefact [%s] spawned a zone [%s] at [%f]", *m_af->cName(), zone_sect, Device.fTimeGlobal);
-//. #endif
+#endif
 }
 
 shared_str clear_brackets(LPCSTR src)

@@ -21,7 +21,7 @@ str_value*	str_container::dock		(str_c value)
 	// calc len
 	u32		s_len				= xr_strlen(value);
 	u32		s_len_with_zero		= (u32)s_len+1;
-	VERIFY3	(HEADER+s_len_with_zero < 4096,"str_c great by 4096",value);
+	VERIFY3	(HEADER+s_len_with_zero < 8192,"str_c great by 8192",value);
 
 	// setup find structure
 	string16	header;
@@ -71,32 +71,20 @@ str_value*	str_container::dock		(str_c value)
 void		str_container::clean	()
 {
 	cs.Enter	();
-	for (auto it = container.begin(); it != container.end(); )	
-	{
-		auto	sv		= *it;
-		auto	curr	= it++;
-
-		if (!sv->dwReference)	
+	cdb::iterator	it	= container.begin	();
+	cdb::iterator	end	= container.end		();
+	for (; it!=end; )	{
+		str_value*	sv = *it;
+		if (0==sv->dwReference)	
 		{
-			auto	len_flag = (sv->dwLength == xr_strlen(sv->value) );
-			if (!len_flag)
-			{
-				Msg("! WARNING! xrCore:str_container::clean: string len[%d] corruption", sv->dwLength);
-			}
-			else
-			{
-				auto	crc_flag = (sv->dwCRC == crc32(sv->value,sv->dwLength) );
-				if (!crc_flag)
-				{
-					Msg("! WARNING! xrCore:str_container::clean: string crc[%d] corruption", sv->dwCRC);
-				}
-				else
-				{
-					xr_free(sv); // Очищать будем заведомо корректную память.
-				}
-			}
-			container.erase(curr); // Скорее всего тут будет утечка на проблемных строках, которые не очищаются.
-		} 
+			cdb::iterator	i_current	= it;
+			cdb::iterator	i_next		= ++it;
+			xr_free			(sv);
+			container.erase	(i_current);
+			it							= i_next;
+		} else {
+			it++;
+		}
 	}
 
 	if (container.empty() )
@@ -154,6 +142,18 @@ u32			str_container::stat_economy		()
 
 str_container::~str_container		()
 {
+cdb::iterator	it	= container.begin	();
+	cdb::iterator	end	= container.end		();
+	u32 unref = 0;
+	for (; it != end; it++)	{
+		str_value*	sv = *it;
+		if (sv->dwReference > 0)
+			unref++;			
+		sv->dwReference = 0;		
+	}
+
 	clean	();
+	if (unref > 0)
+		Msg ("! #LEAK: unreferenced shared strings = %d", unref);
 	//R_ASSERT(container.empty());
 }

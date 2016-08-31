@@ -8,7 +8,6 @@
 #include "UITabControl.h"
 #include "UITaskDescrWnd.h"
 #include "UI3tButton.h"
-#include "../HUDManager.h"
 #include "../level.h"
 #include "../actor.h"
 #include "../gametaskmanager.h"
@@ -19,6 +18,7 @@
 #include "UITaskItem.h"
 #include "../alife_registry_wrappers.h"
 #include "../encyclopedia_article.h"
+#include "../xrCore/log.h"
 
 CUIEventsWnd::CUIEventsWnd			()
 {
@@ -76,15 +76,15 @@ void CUIEventsWnd::Init				()
 	xml_init.InitTabControl			(uiXml, "main_wnd:left_frame:filter_tab", 0, m_TaskFilter);
 	m_TaskFilter->SetWindowName		("filter_tab");
 	Register						(m_TaskFilter);
-    AddCallback						("filter_tab",TAB_CHANGED,CUIWndCallback::void_function(this,&CUIEventsWnd::OnFilterChanged));
+	AddCallback						("filter_tab",TAB_CHANGED,CUIWndCallback::void_function(this,&CUIEventsWnd::OnFilterChanged));
 /*
-    m_primary_or_all_filter_btn		= xr_new<CUI3tButton>(); m_primary_or_all_filter_btn->SetAutoDelete(true);
+	m_primary_or_all_filter_btn		= xr_new<CUI3tButton>(); m_primary_or_all_filter_btn->SetAutoDelete(true);
 	m_UILeftFrame->AttachChild		(m_primary_or_all_filter_btn);
 	xml_init.Init3tButton			(uiXml, "main_wnd:left_frame:primary_or_all", 0, m_primary_or_all_filter_btn);
 
 	Register						(m_primary_or_all_filter_btn);
 	m_primary_or_all_filter_btn->	SetWindowName("btn_primary_or_all");
-    AddCallback						("btn_primary_or_all",BUTTON_CLICKED,boost::bind(&CUIEventsWnd::OnFilterChanged,this,_1,_2));
+	AddCallback						("btn_primary_or_all",BUTTON_CLICKED,boost::bind(&CUIEventsWnd::OnFilterChanged,this,_1,_2));
 */
    m_currFilter						= eActiveTask;
    SetDescriptionMode				(true);
@@ -96,7 +96,7 @@ void CUIEventsWnd::Update			()
 {
 	if(m_flags.test(flNeedReload) ){
 		ReloadList(false);
-		m_flags.set(flNeedReload,FALSE );
+		m_flags.set(flNeedReload,false );
 	}
 	inherited::Update		();
 }
@@ -121,7 +121,20 @@ void CUIEventsWnd::OnFilterChanged			(CUIWindow* w, void*)
 
 void CUIEventsWnd::Reload					()
 {
-		m_flags.set(flNeedReload,TRUE );
+		m_flags.set(flNeedReload,true );
+}
+
+
+bool uitask_title_pred( CUITaskItem* k1,  CUITaskItem* k2) 
+{
+	bool res=k1->GameTask()->m_Title < k2->GameTask()->m_Title;
+	return res;
+}
+
+bool task_title_pred( CGameTask* k1,  CGameTask* k2) 
+{
+	bool res=k1->m_Title < k2->m_Title;
+	return res;
 }
 
 void CUIEventsWnd::ReloadList(bool bClearOnly)
@@ -132,8 +145,10 @@ void CUIEventsWnd::ReloadList(bool bClearOnly)
 	if(!g_actor)				return;
 	GameTasks& tasks			= Actor()->GameTaskManager().GameTasks();
 	GameTasks::iterator it		= tasks.begin();
-	CGameTask* task				= NULL;
-	
+	CGameTask* task				= nullptr;
+
+	xr_vector<CGameTask*> tempTasks;
+	bool sortNeed=false;
 	for(;it!=tasks.end();++it)
 	{
 		task					= (*it).game_task;
@@ -141,7 +156,6 @@ void CUIEventsWnd::ReloadList(bool bClearOnly)
 		R_ASSERT				(task->m_Objectives.size() > 0);
 
 		if( !Filter(task) )		continue;
-		CUITaskItem* pTaskItem	= NULL;
 /*
 		if(task->m_Objectives[0].TaskState()==eTaskUserDefined)
 		{
@@ -151,20 +165,35 @@ void CUIEventsWnd::ReloadList(bool bClearOnly)
 			m_ListWnd->AddWindow			(pTaskItem,true);
 		}else
 */
-		for (u16 i = 0; i < task->m_Objectives.size(); ++i)
-		{
-			if(i==0){
-				pTaskItem					= xr_new<CUITaskRootItem>(this);
-			}else{
-				pTaskItem					= xr_new<CUITaskSubItem>(this);
-			}
-			pTaskItem->SetGameTask			(task, i);
-			m_ListWnd->AddWindow			(pTaskItem,true);
-		}
-
+		tempTasks.push_back(task);
+		if (task->m_isCycle && m_currFilter==eCycleTask)
+				sortNeed=true;
 	}
 
+	if (tempTasks.size()>0)
+	{
+		if (sortNeed)
+			std::sort(tempTasks.begin(),tempTasks.end(),task_title_pred);
+		xr_vector<CGameTask*>::iterator it = tempTasks.begin();
+		for (;it != tempTasks.end();++it)
+		{
+			CGameTask* forUITask=*it;
+			CUITaskItem* pTaskItem	= nullptr;
+			for (u16 i = 0; i < forUITask->m_Objectives.size(); ++i)
+			{
+				if(i==0){
+					pTaskItem					= xr_new<CUITaskRootItem>(this);
+				}else{
+					pTaskItem					= xr_new<CUITaskSubItem>(this);
+				}
+				pTaskItem->SetGameTask			(forUITask, i);
+				m_ListWnd->AddWindow			(pTaskItem,true);
+			}
+		}
+	}
 }
+
+
 
 void CUIEventsWnd::Show(bool status)
 {
@@ -179,15 +208,18 @@ void CUIEventsWnd::Show(bool status)
 bool CUIEventsWnd::Filter(CGameTask* t)
 {
 	ETaskState task_state		= t->m_Objectives[0].TaskState();
+
 //	bool bprimary_only			= m_primary_or_all_filter_btn->GetCheck();
 
 	return (false/*m_currFilter==eOwnTask && task_state==eTaskUserDefined*/ )		||
 			( 
 			  ( true/*!bprimary_only || (bprimary_only && t->m_is_task_general)*/ )	&&
 				(
-					(m_currFilter==eAccomplishedTask	&& task_state==eTaskStateCompleted )||
+					(m_currFilter==eCycleTask			&& t->m_isCycle && task_state==eTaskStateInProgress ) ||
+					(m_currFilter==eAccomplishedTask	&& task_state==eTaskStateCompleted ) ||
 					(m_currFilter==eFailedTask			&& task_state==eTaskStateFail )||
-					(m_currFilter==eActiveTask			&& task_state==eTaskStateInProgress )
+					(m_currFilter==eActiveTask			&& task_state==eTaskStateInProgress && !t->m_isCycle) 
+					
 				)
 			);
 }

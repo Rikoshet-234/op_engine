@@ -7,7 +7,6 @@
 #include "resource.h"
 #include "log.h"
 
-#include "fmt/format.h"
 #include "OPFuncs/ExpandedCmdParams.h"
 #include "OPFuncs/utils.h"
 
@@ -205,21 +204,29 @@ void CreateLog			(BOOL nl)
 		FS.update_path	(logFName,"$logs$",logFName);
 	if (!no_log){
 		
-		HANDLE h=CreateFile(logFName,0,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_READONLY | FILE_FLAG_NO_BUFFERING, NULL);
+		HANDLE h=CreateFile(logFName,0,0, nullptr,OPEN_EXISTING,FILE_ATTRIBUTE_READONLY | FILE_FLAG_NO_BUFFERING, nullptr);
 		if (h!=INVALID_HANDLE_VALUE )
 		{
 			FILETIME creationTime,lastAccessTime,lastWriteTime;
 			int result=GetFileTime( h, &creationTime, &lastAccessTime, &lastWriteTime );
 			R_ASSERT3(result,"Can't obtain information about file:",logFName);
 			CloseHandle(h);
+
 			SYSTEMTIME systemTime;
-			result = FileTimeToSystemTime( &lastWriteTime, &systemTime );
-			R_ASSERT2(result,"Can't convert FILETIME to SYSTEMTIME.");
+			FILETIME localFiletime;
+			result=FileTimeToLocalFileTime(&lastWriteTime, &localFiletime);
+			R_ASSERT2(result,"Can't convert FILETIME to LOCALFILETIME.");
+			result = FileTimeToSystemTime( &localFiletime, &systemTime );
+			R_ASSERT2(result,"Can't convert LOCALTIME to SYSTEMTIME.");
 			
-			std::string strTime=fmt::format("{0}_{1:0>2}_{2:0>2}-{3:0>2}_{4:0>2}_{5:0>2}",systemTime.wYear,systemTime.wMonth,systemTime.wDay,systemTime.wHour,systemTime.wMinute,systemTime.wSecond);
-			std::string	newLogFileName=fmt::format("{0}_{1}_{2}.log",OPFuncs::tolower(Core.ApplicationName),OPFuncs::tolower(Core.UserName),strTime);
+			string1024 strTime;
+			sprintf_s(strTime,"%04d_%02d_%02d-%02d_%02d_%02d",systemTime.wYear,systemTime.wMonth,systemTime.wDay,systemTime.wHour,systemTime.wMinute,systemTime.wSecond);
+			string1024 newLogFileName;
+			sprintf_s(newLogFileName,"%s_%s_%s.log",OPFuncs::tolower(Core.ApplicationName).c_str(),OPFuncs::tolower(Core.UserName).c_str(),strTime);
+			//std::string strTime=shared_str().sprintf("%04d_%02d_%02d-%02d_%02d_%02d",systemTime.wYear,systemTime.wMonth,systemTime.wDay,systemTime.wHour,systemTime.wMinute,systemTime.wSecond).c_str();
+			//std::string	newLogFileName=shared_str().sprintf("%s_%s_%s.log",OPFuncs::tolower(Core.ApplicationName).c_str(),OPFuncs::tolower(Core.UserName).c_str(),strTime).c_str();
 			string_path fullNewLogFileName;
-			FS.update_path	(fullNewLogFileName,"$logs$",newLogFileName.c_str());
+			FS.update_path	(fullNewLogFileName,"$logs$",newLogFileName);
 			MoveFile(logFName,fullNewLogFileName);
 		}
 		

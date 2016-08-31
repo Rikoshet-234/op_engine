@@ -19,6 +19,7 @@ class CUIEventsWnd	:public CUIWindow, public CUIWndCallback{
 	enum ETaskFilters{	eActiveTask			=	0,
 						eAccomplishedTask,
 						eFailedTask,
+						eCycleTask,
 //.						eOwnTask,
 						eMaxTask};
 	enum EEventWndFlags{
@@ -35,6 +36,7 @@ class CUIEventsWnd	:public CUIWindow, public CUIWndCallback{
 	CUITaskDescrWnd*			m_UITaskInfoWnd;
 	CUIScrollView*				m_ListWnd;
 	CUITabControl*				m_TaskFilter;
+
 
 	bool						Filter					(CGameTask* t);
 	void __stdcall				OnFilterChanged			(CUIWindow*,void*);

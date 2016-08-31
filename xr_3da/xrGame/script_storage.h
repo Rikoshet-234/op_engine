@@ -44,9 +44,9 @@ protected:
 			void				reinit						();
 
 public:
-#ifdef DEBUG
+//#ifdef DEBUG
 			void				print_stack					();
-#endif
+//#endif
 
 public:
 								CScriptStorage				();
@@ -64,10 +64,10 @@ public:
 	static	bool				print_output				(lua_State *L,		LPCSTR	caScriptName,		int		iErorCode = 0);
 	static	void				print_error					(lua_State *L,		int		iErrorCode);
 
-#ifdef DEBUG
+//#ifdef DEBUG
 public:
 			void				flush_log					();
-#endif // DEBUG
+//#endif // DEBUG
 };
 
 #include "script_storage_inline.h"

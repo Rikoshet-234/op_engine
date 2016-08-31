@@ -34,6 +34,7 @@ LPCSTR af_item_sect_names[] = {
 	"chemical_burn_immunity",
 	"explosion_immunity",
 	"fire_wound_immunity",
+	"additional_weight"
 };
 
 LPCSTR af_item_param_names[] = {
@@ -52,6 +53,7 @@ LPCSTR af_item_param_names[] = {
 	"ui_inv_outfit_chemical_burn_protection",	// "(chemical_burn_imm)",
 	"ui_inv_outfit_explosion_protection",		// "(explosion_imm)",
 	"ui_inv_outfit_fire_wound_protection",		// "(fire_wound_imm)",
+	"ui_inv_additional_weight"
 };
 
 LPCSTR af_actor_param_names[]={
@@ -83,6 +85,7 @@ bool CUIArtefactParams::Check(const shared_str& af_section)
 {
 	return !!pSettings->line_exist(af_section, "af_actor_properties");
 }
+
 #include "../string_table.h"
 void CUIArtefactParams::SetInfo(const shared_str& af_section)
 {
@@ -103,7 +106,13 @@ void CUIArtefactParams::SetInfo(const shared_str& af_section)
 			if					(fis_zero(_val))				continue;
 			
 			_val				= (_val/_actor_val)*100.0f;
-		}else
+		}
+		else if (i==_item_additional_weight)
+		{
+			_val=READ_IF_EXISTS(pSettings,r_float,af_section,af_item_sect_names[i],0);
+			if (_val==0 ||fis_zero(_val) ) continue;
+		} 
+		else 
 		{
 			shared_str _sect	= pSettings->r_string(af_section, "hit_absorbation_sect");
 			_val				= pSettings->r_float(_sect, af_item_sect_names[i]);
@@ -126,7 +135,17 @@ void CUIArtefactParams::SetInfo(const shared_str& af_section)
 
 		if(i==_item_bleeding_restore_speed || i==_item_radiation_restore_speed)
 			_color = (_val>0)?"%c[red]":"%c[green]";
-
+		if (i==_item_additional_weight)
+		{
+			_color = (_val<0)?"%c[red]":"%c[green]";
+			if ((_val>0 && _val<1) || (_val<0 && _val>-1))
+			{
+				_val=_val*1000;
+				_sn=CStringTable().translate("ui_inv_aw_gr").c_str();
+			}
+			else
+				_sn=CStringTable().translate("ui_inv_aw_kg").c_str();
+		}
 
 		sprintf_s					(	_buff, "%s %s %+.0f %s", 
 									CStringTable().translate(af_item_param_names[i]).c_str(), 

@@ -20,8 +20,7 @@ struct HUD_SOUND
 		float* volume = NULL,
 		float* delay = NULL);
 
-	static void		LoadSound		(	LPCSTR section, LPCSTR line,
-		HUD_SOUND& hud_snd,  int type = sg_SourceType);
+	static void		LoadSound		(	LPCSTR section, LPCSTR line,HUD_SOUND& hud_snd,  int type = sg_SourceType,bool required=true);
 
 	static void		DestroySound	(	HUD_SOUND& hud_snd);
 

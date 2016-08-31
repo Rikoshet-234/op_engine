@@ -539,36 +539,48 @@ void CLocatorAPI::_initialize	(u32 flags, LPCSTR target_folder, LPCSTR fs_name)
 		append_path		("$app_root$",Core.ApplicationPath,0,FALSE);
 	}
 
+	std::string actual_fs_ltx_path="";
+
 	if (m_Flags.is(flTargetFolderOnly))
 		append_path	("$fs_root$", "", 0, FALSE);
 	else
 	{ //find nearest fs.ltx and set fs_root correctly
 		fs_ltx					= (fs_name && fs_name[0])?fs_name:FSLTX;
-		pFSltx						= r_open(fs_ltx); 
 		
-		if (!pFSltx && m_Flags.is(flScanAppRoot) )
-			pFSltx			= r_open("$app_root$",fs_ltx); 
+		string_path tmpAppPath	= "";
+		strcpy_s				(tmpAppPath,sizeof(tmpAppPath), Core.ApplicationPath);
+		if (xr_strlen(tmpAppPath))
+		{
+			tmpAppPath[xr_strlen(tmpAppPath)-1] = 0;
+			if (strrchr(tmpAppPath, '\\'))
+				*(strrchr(tmpAppPath, '\\')+1) = 0;
+
+			append_path				("$fs_root$", tmpAppPath, 0, FALSE);
+		}else
+			append_path				("$fs_root$", "", 0, FALSE);
+
+		actual_fs_ltx_path=get_path("$fs_root$")->m_Path;
+		pFSltx							= r_open("$fs_root$",fs_ltx); 
 
 		if (!pFSltx)
 		{
-			string_path tmpAppPath	= "";
-			strcpy_s				(tmpAppPath,sizeof(tmpAppPath), Core.ApplicationPath);
-			if (xr_strlen(tmpAppPath))
+			// open fsgame.ltx from exe running directory
+			pFSltx						= r_open(fs_ltx); 
+			actual_fs_ltx_path=Core.ApplicationPath;
+			// open fsgame.ltx from user data directory
+			if (!pFSltx && m_Flags.is(flScanAppRoot) )
 			{
-				tmpAppPath[xr_strlen(tmpAppPath)-1] = 0;
-				if (strrchr(tmpAppPath, '\\'))
-					*(strrchr(tmpAppPath, '\\')+1) = 0;
-
-				append_path				("$fs_root$", tmpAppPath, 0, FALSE);
-			}else
-				append_path				("$fs_root$", "", 0, FALSE);
-
-			pFSltx							= r_open("$fs_root$",fs_ltx); 
+				actual_fs_ltx_path=get_path("$app_root$")->m_Path;
+				pFSltx			= r_open("$app_root$",fs_ltx); 
+			}
 		}
-		 else
-			append_path					("$fs_root$", "", 0, FALSE);
+		 /*else
+			append_path					("$fs_root$", "", 0, FALSE);*/
+		// open fsgame.ltx root game directory
 			
-		Log								("using fs-ltx",fs_ltx);
+		string512 msg;
+		sprintf_s(msg,"using fs-ltx %s%s",actual_fs_ltx_path.c_str(),fs_ltx);
+		Log								(msg);
 	}
 
 	//-----------------------------------------------------------
@@ -1385,7 +1397,13 @@ bool CLocatorAPI::path_exist(LPCSTR path)
 FS_Path* CLocatorAPI::append_path(LPCSTR path_alias, LPCSTR root, LPCSTR add, BOOL recursive)
 {
 	VERIFY			(root/**&&root[0]/**/);
-	VERIFY			(false==path_exist(path_alias));
+	//VERIFY			(false==path_exist(path_alias));
+	if (path_exist(path_alias))
+	{
+		string512 error;
+		sprintf_s(error,"Path alias [%s] already exists in aliases",path_alias);
+		R_ASSERT2(false,error);
+	}
 	FS_Path* P		= xr_new<FS_Path>(root,add,LPCSTR(0),LPCSTR(0),0);
 	bNoRecurse		= !recursive;
 	Recurse			(P->m_Path);

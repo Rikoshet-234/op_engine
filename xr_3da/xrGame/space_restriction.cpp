@@ -13,6 +13,7 @@
 #include "level_graph.h"
 #include "space_restriction_base.h"
 #include "profiler.h"
+#include "../../build_defines.h"
 
 const float dependent_distance = 100.f;
 
@@ -244,14 +245,17 @@ void CSpaceRestriction::initialize					()
 	m_in_space_restriction			= m_space_restriction_manager->restriction(m_in_restrictions);
 	
 	if (!m_out_space_restriction && !m_in_space_restriction) {
-		m_initialized				= true;
+		m_initialized				=  !m_out_restrictions.size() && !m_in_restrictions.size(); // случай пустого ограничения?
 		return;
 	}
 
 	if (m_out_space_restriction && !m_out_space_restriction->initialized())
+	{
 		m_out_space_restriction->initialize();
+		m_initialized |= m_out_space_restriction->initialized();
+	}
 
-#ifdef DEBUG
+#ifdef VERIFY_RESTRICTORS
 	if (m_out_space_restriction) {
 		if (!m_out_space_restriction->object().correct()) {
 			Msg						("~ BAD out restrictions combination :");
@@ -260,11 +264,13 @@ void CSpaceRestriction::initialize					()
 	}
 #endif
 
-
 	if (m_in_space_restriction && !m_in_space_restriction->initialized())
-		m_in_space_restriction->initialize();
+	{
+		m_in_space_restriction->initialize();  // problem here?
+		m_initialized |= m_in_space_restriction->initialized();
+	}
 
-	if ((m_out_space_restriction && !m_out_space_restriction->initialized()) || (m_in_space_restriction && !m_in_space_restriction->initialized()))
+	if (!m_initialized)
 		return;
 
 	if (m_out_space_restriction)

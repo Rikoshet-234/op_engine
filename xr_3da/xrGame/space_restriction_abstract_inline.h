@@ -19,12 +19,18 @@ IC	const xr_vector<u32> &CSpaceRestrictionAbstract::border						()
 {
 	if (!initialized())
 		initialize();
-	THROW											(initialized());
+#ifdef VERIFY_RESTRICTORS
+	if (!initialized())
+	{
+		Msg("CSpaceRestrictionAbstract::border [%s] has invalid initialization!",*name());
+		FATAL("ENGINE Crush! See log for details.");
+	}
+#endif
 #ifdef CHECK_RESTRICTORS_BEMPTY
-  #ifdef MORE_SPAM
-	Msg(shared_str().sprintf("CSpaceRestrictionAbstract::border %s",*name()).c_str());
-  #endif
-	R_ASSERT3(!m_border.empty(),"CSpaceRestrictionAbstract::border Space restrictor has no border!",*name());
+	if (m_border.empty())
+	{
+		Msg("CSpaceRestrictionAbstract::border Space restrictor [%s] has no border!",*name());		
+	}
 #endif
 	return											(m_border);
 }

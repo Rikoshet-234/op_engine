@@ -73,6 +73,7 @@ public:
 	xr_vector<luabind::functor<bool> >	m_lua_functions_on_complete;
 	xr_vector<luabind::functor<bool> >	m_lua_functions_on_fail;
 
+
 // for scripting access
 	void					SetDescription_script	(LPCSTR _descr);
 	void					SetArticleID_script		(LPCSTR _id);
@@ -121,6 +122,8 @@ public:
 	ALife::_TIME_ID			m_FinishTime;
 	ALife::_TIME_ID			m_TimeToComplete;
 	u32						m_priority;
+	bool					m_removeCompleted;
+	bool					m_isCycle;
 
 // for scripting access
 	void					Load_script				(LPCSTR _id);

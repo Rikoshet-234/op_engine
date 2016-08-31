@@ -80,7 +80,6 @@ CInventoryItem::CInventoryItem()
 	m_flags.set			(Fruck,TRUE);
 	m_flags.set			(FRuckDefault,TRUE);
 	m_pCurrentInventory	= NULL;
-
 	SetDropManual		(FALSE);
 
 	m_flags.set			(FCanTake,TRUE);
@@ -153,7 +152,7 @@ void CInventoryItem::Load(LPCSTR section)
 	m_flags.set					(FAllowSprint,READ_IF_EXISTS	(pSettings, r_bool, section,"sprint_allowed",			TRUE));
 	m_fControlInertionFactor	= READ_IF_EXISTS(pSettings, r_float,section,"control_inertion_factor",	1.0f);
 	m_icon_name					= READ_IF_EXISTS(pSettings, r_string,section,"icon_name",				NULL);
-
+	m_iconInfo.Load(section,true);
 }
 
 
@@ -1075,7 +1074,7 @@ bool	CInventoryItem::CanTrade() const
 	bool res = true;
 #pragma todo("Dima to Andy : why CInventoryItem::CanTrade can be called for the item, which doesn't have owner?")
 	if(m_pCurrentInventory)
-		res = inventory_owner().AllowItemToTrade(this,m_eItemPlace);
+		res = inventory_owner().AllowItemToTrade(this,m_eItemPlace);	
 
 	return (res && m_flags.test(FCanTrade) && !IsQuestItem());
 }
@@ -1102,20 +1101,20 @@ float CInventoryItem::GetKillMsgHeight	() const
 
 int  CInventoryItem::GetGridWidth			() const 
 {
-	return pSettings->r_u32(m_object->cNameSect(), "inv_grid_width");
+	return m_iconInfo.getWidth();
 }
 
 int  CInventoryItem::GetGridHeight			() const 
 {
-	return pSettings->r_u32(m_object->cNameSect(), "inv_grid_height");
+	return m_iconInfo.getHeight();
 }
 int  CInventoryItem::GetXPos				() const 
 {
-	return pSettings->r_u32(m_object->cNameSect(), "inv_grid_x");
+	return m_iconInfo.getX();
 }
 int  CInventoryItem::GetYPos				() const 
 {
-	return pSettings->r_u32(m_object->cNameSect(), "inv_grid_y");
+	return m_iconInfo.getY();
 }
 
 bool CInventoryItem::IsNecessaryItem(CInventoryItem* item)		

@@ -249,8 +249,8 @@ void CWeaponMagazined::UnloadMagazine(bool spawn_ammo)
 		xr_map<LPCSTR, u16>::iterator l_it;
 		for(l_it = l_ammo.begin(); l_ammo.end() != l_it; ++l_it) 
 		{
-            if(!xr_strcmp(*l_cartridge.m_ammoSect, l_it->first)) 
-            { 
+			if(!xr_strcmp(*l_cartridge.m_ammoSect, l_it->first)) 
+			{ 
 				 ++(l_it->second); 
 				 break; 
 			}
@@ -627,7 +627,7 @@ void CWeaponMagazined::switch2_Fire	()
 	m_bFireSingleShot = true;
 	m_iShotNum = 0;
 
-    if((OnClient() || Level().IsDemoPlay())&& !IsWorking())
+	if((OnClient() || Level().IsDemoPlay())&& !IsWorking())
 		FireStart();
 
 /*	if(SingleShotMode())
@@ -735,12 +735,12 @@ bool CWeaponMagazined::CanAttach(PIItem pIItem)
 				 m_eScopeStatus == ALife::eAddonAttachable &&
 				(m_flagsAddOnState&CSE_ALifeItemWeapon::eWeaponAddonScope) == 0 &&
 				(m_sScopeName == pIItem->object().cNameSect()) )
-       return true;
+	   return true;
 	else if(	pSilencer &&
 				m_eSilencerStatus == ALife::eAddonAttachable &&
 				(m_flagsAddOnState&CSE_ALifeItemWeapon::eWeaponAddonSilencer) == 0 &&
 				(m_sSilencerName == pIItem->object().cNameSect()) )
-       return true;
+	   return true;
 	else if (	pGrenadeLauncher &&
 				m_eGrenadeLauncherStatus == ALife::eAddonAttachable &&
 				(m_flagsAddOnState&CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher) == 0 &&
@@ -755,15 +755,15 @@ bool CWeaponMagazined::CanDetach(const char* item_section_name)
 	if( m_eScopeStatus == CSE_ALifeItemWeapon::eAddonAttachable &&
 	   0 != (m_flagsAddOnState&CSE_ALifeItemWeapon::eWeaponAddonScope) &&
 	   (m_sScopeName	== item_section_name))
-       return true;
+	   return true;
 	else if(m_eSilencerStatus == CSE_ALifeItemWeapon::eAddonAttachable &&
 	   0 != (m_flagsAddOnState&CSE_ALifeItemWeapon::eWeaponAddonSilencer) &&
 	   (m_sSilencerName == item_section_name))
-       return true;
+	   return true;
 	else if(m_eGrenadeLauncherStatus == CSE_ALifeItemWeapon::eAddonAttachable &&
 	   0 != (m_flagsAddOnState&CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher) &&
 	   (m_sGrenadeLauncherName == item_section_name))
-       return true;
+	   return true;
 	else
 		return inherited::CanDetach(item_section_name);
 }
@@ -816,7 +816,7 @@ bool CWeaponMagazined::Attach(PIItem pIItem, bool b_send_event)
 		return true;
 	}
 	else
-        return inherited::Attach(pIItem, b_send_event);
+		return inherited::Attach(pIItem, b_send_event);
 }
 
 

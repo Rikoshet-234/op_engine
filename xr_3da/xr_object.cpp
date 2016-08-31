@@ -89,7 +89,17 @@ void CObject::setVisible			(BOOL _visible)
 	}
 }
 
-void	CObject::Center					(Fvector& C)	const	{ VERIFY2(renderable.visual,*cName()); renderable.xform.transform_tiny(C,renderable.visual->vis.sphere.P);	}
+void	CObject::Center					(Fvector& C)	const
+{
+	if (!renderable.visual)
+	{ 
+		LPCSTR vis_name = *NameVisual ? *NameVisual : "(null)";
+		Debug.fatal (DEBUG_INFO, "! WARN: CObject::Center() const, not set visual for object %s (#%d), NameVisual = %s ", Name_script(), ID(), vis_name);
+	}
+	VERIFY2(renderable.visual,*cName()); 
+	Fvector &pos = renderable.visual->vis.sphere.P;
+	renderable.xform.transform_tiny(C, pos);
+}
 float	CObject::Radius					()				const	{ VERIFY2(renderable.visual,*cName()); return renderable.visual->vis.sphere.R;								}
 const	Fbox&	CObject::BoundingBox	()				const	{ VERIFY2(renderable.visual,*cName()); return renderable.visual->vis.box;									}
 
@@ -174,7 +184,12 @@ BOOL CObject::net_Spawn			(CSE_Abstract* data)
 
 void CObject::net_Destroy		()
 {
-	VERIFY						(getDestroy());
+	if (!getDestroy())
+	{
+		Msg("! ERROR CObject::net_Destroy try destroy not marked for destroing object [%s]",*cName());
+		FATAL("Engine crash. Check log for details!");
+	}
+	//VERIFY						(getDestroy());
 	xr_delete					(collidable.model);
 	if (register_schedule())
 		shedule_unregister		();

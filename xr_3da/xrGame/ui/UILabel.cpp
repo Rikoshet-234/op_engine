@@ -57,3 +57,13 @@ void CUILabel::Update()
 		SetTextColor			(clr);
 	}
 }
+
+void CUILabel::SetText(const char* text)
+{
+	CUILinesOwner::SetText(text);
+}
+
+const char* CUILabel::GetText()
+{
+	return CUILinesOwner::GetText();
+}

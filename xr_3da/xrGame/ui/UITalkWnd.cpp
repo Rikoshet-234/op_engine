@@ -127,10 +127,18 @@ void CUITalkWnd::UpdateQuestions()
 	if(!m_pCurrentDialog)
 	{
 		m_pOurDialogManager->UpdateAvailableDialogs(m_pOthersDialogManager);
-		for(u32 i=0; i< m_pOurDialogManager->AvailableDialogs().size(); ++i)
+		int number=0;
+		for(u32 i=0; i< m_pOurDialogManager->AvailableDialogs().size(); ++i,++number)
 		{
 			const DIALOG_SHARED_PTR& phrase_dialog = m_pOurDialogManager->AvailableDialogs()[i];
-			AddQuestion(phrase_dialog->DialogCaption(), phrase_dialog->GetDialogID());
+
+			shared_str caption = phrase_dialog->DialogCaption();
+
+			if (!caption.size())
+				--number;
+
+
+			AddQuestion(caption, phrase_dialog->GetDialogID(),number);
 		}
 	}
 	else
@@ -147,12 +155,13 @@ void CUITalkWnd::UpdateQuestions()
 			//выбор доступных фраз из активного диалога
 			if( m_pCurrentDialog && !m_pCurrentDialog->allIsDummy() )
 			{			
+				int number=0;
 				for(PHRASE_VECTOR::const_iterator   it = m_pCurrentDialog->PhraseList().begin();
 					it != m_pCurrentDialog->PhraseList().end();
-					it++)
+				    ++it,++number)
 				{
 					CPhrase* phrase = *it;
-					AddQuestion(phrase->GetText(), phrase->GetID());
+					AddQuestion(phrase->GetText(), phrase->GetID(),number);
 				}
 			}
 			else
@@ -327,10 +336,10 @@ void CUITalkWnd::SayPhrase(const shared_str& phrase_id)
 
 //////////////////////////////////////////////////////////////////////////
 
-void CUITalkWnd::AddQuestion(const shared_str& text, const shared_str& value)
+void CUITalkWnd::AddQuestion(const shared_str& text, const shared_str& value,int number)
 {
 	if(text.size() == 0) return;
-	UITalkDialogWnd->AddQuestion(*CStringTable().translate(text),value.c_str());
+	UITalkDialogWnd->AddQuestion(*CStringTable().translate(text),value.c_str(),number);
 }
 
 //////////////////////////////////////////////////////////////////////////

@@ -26,6 +26,7 @@ class CDialogHolder :public ISheduled,public pureFrame
 	xr_vector<recvItem>										m_input_receivers;
 	xr_vector<dlgItem>										m_dialogsToRender;
 
+	Fvector2				m_lastDialogsMCPosition;
 
 	void					StartMenu						(CUIDialogWnd* pDialog, bool bDoHideIndicators);
 	void					StopMenu						(CUIDialogWnd* pDialog);

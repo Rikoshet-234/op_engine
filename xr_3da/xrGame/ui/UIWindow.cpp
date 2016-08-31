@@ -345,6 +345,7 @@ bool CUIWindow::OnMouse(float x, float y, EUIMessages mouse_action)
 	for(; it!=m_ChildWndList.rend(); ++it)
 	{
 		CUIWindow* w	= (*it);
+		if (!w) continue;
 		Frect wndRect	= w->GetWndRect();
 		if (wndRect.in(cursor_pos) )
 		{
@@ -634,6 +635,12 @@ void CUIWindow::SetParent(CUIWindow* pNewParent)
 	R_ASSERT( !(m_pParentWnd && m_pParentWnd->IsChild(this)) );
 
 	m_pParentWnd = pNewParent;
+}
+
+void CUIWindow::Show(bool status)
+{
+	SetVisible(status); 
+	Enable(status);
 }
 
 void CUIWindow::ShowChildren(bool show){

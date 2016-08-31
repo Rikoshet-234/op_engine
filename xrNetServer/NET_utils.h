@@ -47,7 +47,7 @@ public:
 		if (B.count + count >= NET_PacketSizeLimit)
 		{
 			LogPacketError("Oversized netpacket before write! [%i > %i]",B.count+count,NET_PacketSizeLimit);			
-			CHECK_OR_FAIL(false,"ENGINE CRASH: See details in log");
+			FATAL("ENGINE CRASH: See details in log");
 		};
 		CopyMemory(&B.data[B.count],p,count);
 		B.count		+= count;
@@ -55,7 +55,7 @@ public:
 		if (B.count >= NET_PacketSizeLimit)
 		{
 			LogPacketError("Oversized netpacket after write! [%i > %i]",B.count,NET_PacketSizeLimit);			
-			CHECK_OR_FAIL(false,"ENGINE CRASH: See details in log");
+			FATAL("ENGINE CRASH: See details in log");
 		};
 	}
 	IC void w_seek	(u32 pos, const void* p, u32 count)	// random write (only inside allocated region)
@@ -179,7 +179,7 @@ public:
 		if ((pos > B.count) && (B.count!=0 && pos!=0))
 		{
 			LogPacketError("Seek position went out of the buffer boundaries. pos=%i B.count=%i",pos,B.count);			
-			CHECK_OR_FAIL(false,"ENGINE CRASH: See details in log");
+			FATAL("ENGINE CRASH: See details in log");
 		};
 		r_pos		= pos;
 	}
@@ -194,7 +194,7 @@ public:
 		if (r_pos>B.count)
 		{
 			LogPacketError("Read position went out of the buffer boundaries. r_pos=%i B.count=%i",r_pos,B.count);			
-			CHECK_OR_FAIL(false,"ENGINE CRASH: See details in log");
+			FATAL("ENGINE CRASH: See details in log");
 		};
 	}
 	IC BOOL		r_eof			()
@@ -212,7 +212,7 @@ public:
 		if (r_pos>B.count)
 		{
 			LogPacketError("Read position went out of the buffer boundaries. r_pos=%i B.count=%i",r_pos,B.count);			
-			CHECK_OR_FAIL(false,"ENGINE CRASH: See details in log");
+			FATAL("ENGINE CRASH: See details in log");
 		};
 	}
 

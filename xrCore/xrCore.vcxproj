@@ -69,19 +69,19 @@
     <_ProjectFileVersion>11.0.61030.0</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>y:\bin_$(Configuration)\</OutDir>
+    <OutDir>y:\bin_Debug\</OutDir>
     <IntDir>x:\intermediate\$(Configuration)\$(ProjectName)\</IntDir>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>S:\SDK\fmt;S:\xrLua\src;S:\SDK\dx9sdk\dx9sdk\include;$(IncludePath)</IncludePath>
-    <LibraryPath>S:\SDK\fmt\_build\bin\Release;S:\SDK\dx9sdk\dx9sdk\lib;x:\libraries_$(Configuration)\;$(LibraryPath)</LibraryPath>
+    <IncludePath>S:\SDK\boost_1_30_0;S:\SDK\fmt;S:\xrLua\src;S:\SDK\dx9sdk\dx9sdk\include;$(IncludePath)</IncludePath>
+    <LibraryPath>x:\libraries_Debug\;S:\SDK\dx9sdk\dx9sdk\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>y:\bin_$(Configuration)\</OutDir>
+    <OutDir>y:\bin_Release\</OutDir>
     <IntDir>x:\intermediate\$(Configuration)\$(ProjectName)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>s:\SDK\fmt\_build\fmt\Release\;S:\xrLua\src;S:\SDK\dx9sdk\dx9sdk\include;$(IncludePath)</IncludePath>
-    <LibraryPath>S:\SDK\fmt\_build\bin\Release;S:\SDK\dx9sdk\dx9sdk\lib;x:\libraries_$(Configuration)\;$(LibraryPath)</LibraryPath>
+    <IncludePath>S:\xrLua\src;S:\SDK\dx9sdk\dx9sdk\include;$(IncludePath)</IncludePath>
+    <LibraryPath>S:\SDK\dx9sdk\dx9sdk\lib;x:\libraries_Release\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
     <OutDir>y:\bin_$(Configuration)\</OutDir>
@@ -132,10 +132,11 @@
       <MapExports>false</MapExports>
       <SubSystem>Windows</SubSystem>
       <LargeAddressAware>true</LargeAddressAware>
-      <ImportLibrary>x:\libraries_$(Configuration)\$(ProjectName).lib</ImportLibrary>
+      <ImportLibrary>x:\libraries_Debug\$(ProjectName).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
       <ModuleDefinitionFile>
       </ModuleDefinitionFile>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ProjectReference>
       <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>
@@ -181,10 +182,11 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
-      <ImportLibrary>x:\libraries_$(Configuration)\$(ProjectName).lib</ImportLibrary>
+      <ImportLibrary>x:\libraries_Release\$(ProjectName).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalDependencies>fmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>xrCore.def</ModuleDefinitionFile>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>
+      </ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
@@ -498,7 +500,6 @@
   <ItemGroup>
     <ClInclude Include="FTimer.h" />
     <ClInclude Include="OPFuncs\ExpandedCmdParams.h" />
-    <ClInclude Include="OPFuncs\LoadStrings.h" />
     <ClInclude Include="OPFuncs\op_engine_version.h" />
     <ClInclude Include="OPFuncs\utils.h" />
     <ClInclude Include="resource.h" />
@@ -605,9 +606,6 @@
     <ProjectReference Include="..\BugTrap\BugTrap.vcxproj">
       <Project>{e8cf1ada-264a-4127-86c2-fd7057d3792c}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\SDK\fmt\_build\fmt\fmt.vcxproj">
-      <Project>{5816bc48-44df-3b35-8217-b2b5a87effaf}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

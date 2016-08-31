@@ -11,6 +11,7 @@
 #include "script_thread.h"
 #include <stdarg.h>
 #include "doug_lea_memory_allocator.h"
+#include "../xrShared/lua_tools.h"
 
 LPCSTR	file_header_old = "\
 local function script_name() \
@@ -64,14 +65,14 @@ static void *lua_alloc_xr	(void *ud, void *ptr, size_t osize, size_t nsize) {
   (void)ud;
   (void)osize;
   if (nsize == 0) {
-    xr_free	(ptr);
-    return	NULL;
+	xr_free	(ptr);
+	return	NULL;
   }
   else
 #ifdef DEBUG_MEMORY_NAME
-    return Memory.mem_realloc		(ptr, nsize, "LUA");
+	return Memory.mem_realloc		(ptr, nsize, "LUA");
 #else // DEBUG_MEMORY_MANAGER
-    return Memory.mem_realloc		(ptr, nsize);
+	return Memory.mem_realloc		(ptr, nsize);
 #endif // DEBUG_MEMORY_MANAGER
 }
 #else // USE_DL_ALLOCATOR
@@ -105,11 +106,13 @@ CScriptStorage::~CScriptStorage		()
 
 void CScriptStorage::reinit	()
 {
+	g_game_lua=nullptr;
+	g_active_lua=nullptr;
 	if (m_virtual_machine)
 		lua_close			(m_virtual_machine);
 
 #ifndef USE_DL_ALLOCATOR
-	m_virtual_machine		= lua_newstate(lua_alloc_xr, NULL);
+	m_virtual_machine		= lua_newstate(lua_alloc_xr, nullptr);
 #else // USE_DL_ALLOCATOR
 	m_virtual_machine		= lua_newstate(lua_alloc_dl, NULL);
 #endif // USE_DL_ALLOCATOR
@@ -118,6 +121,7 @@ void CScriptStorage::reinit	()
 		Msg					("! ERROR : Cannot initialize script virtual machine!");
 		return;
 	}
+	g_game_lua=m_virtual_machine;
 	// initialize lua standard library functions 
 	luaopen_base			(lua()); 
 	luaopen_table			(lua());
@@ -375,8 +379,8 @@ bool CScriptStorage::do_file	(LPCSTR caScriptName, LPCSTR caNameSpaceName)
 #endif
 	if (0)	//.
 	{
-	    for (int i=0; lua_type(lua(), -i-1); i++)
-            Msg	("%2d : %s",-i-1,lua_typename(lua(), lua_type(lua(), -i-1)));
+		for (int i=0; lua_type(lua(), -i-1); i++)
+			Msg	("%2d : %s",-i-1,lua_typename(lua(), lua_type(lua(), -i-1)));
 	}
 
 	// because that's the first and the only call of the main chunk - there is no point to compile it
@@ -390,9 +394,9 @@ bool CScriptStorage::do_file	(LPCSTR caScriptName, LPCSTR caNameSpaceName)
 #endif
 	if (l_iErrorCode) {
 
-#ifdef DEBUG
+//#ifdef DEBUG
 		print_output(lua(),caScriptName,l_iErrorCode);
-#endif
+//#endif
 		lua_settop	(lua(),start);
 		return		(false);
 	}

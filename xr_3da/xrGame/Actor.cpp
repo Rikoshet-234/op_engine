@@ -82,7 +82,7 @@ static Fvector	vFootCenter;
 static Fvector	vFootExt;
 
 Flags32			psActorFlags={0};
-
+static			u32						g_activate_time = 0;
 
 
 CActor::CActor() : CEntityAlive()
@@ -220,6 +220,8 @@ CActor::~CActor()
 
 	xr_delete				(m_anims);
 	xr_delete				(m_vehicle_anims);
+
+	g_activate_time			= 0;
 }
 
 void CActor::reinit	()
@@ -238,6 +240,7 @@ void CActor::reinit	()
 	
 	set_input_external_handler					(0);
 	m_time_lock_accel							= 0;
+	g_activate_time								= 0;
 }
 
 void CActor::reload	(LPCSTR section)
@@ -429,6 +432,14 @@ void	CActor::Hit							(SHit* pHDS)
 	pHDS->aim_bullet = false;
 
 	SHit HDS = *pHDS;
+
+	u32 active_time = g_activate_time ? Device.dwTimeGlobal - g_activate_time : 10000;
+	if (HDS.hit_type == ALife::eHitTypeStrike && active_time < 10000)
+	{
+		Msg("##DBG: actor ignored strinke hit, due active_time = %d", active_time);
+		return;
+	}
+
 	if( HDS.hit_type<ALife::eHitTypeBurn || HDS.hit_type >= ALife::eHitTypeMax )
 	{
 		string256	err;
@@ -494,7 +505,7 @@ void	CActor::Hit							(SHit* pHDS)
 				S.set_volume(10.0f);
 				if(!m_sndShockEffector){
 					m_sndShockEffector = xr_new<SndShockEffector>();
-					m_sndShockEffector->Start(this, float(S._handle()->length_ms()), HDS.damage() );
+					m_sndShockEffector->Start(this, float(S._handle() ? S._handle()->length_ms():1.f), HDS.damage() );
 				}
 			}
 			else
@@ -554,7 +565,7 @@ void	CActor::Hit							(SHit* pHDS)
 			else 
 			{
 				//inherited::Hit		(hit_power,dir,who,element,position_in_bone_space, impulse, hit_type);
-				HDS.power = hit_power;
+				HDS.power = hit_power > 0 ? hit_power : 0;
 				inherited::Hit(&HDS);
 			};
 		}
@@ -586,7 +597,7 @@ void	CActor::Hit							(SHit* pHDS)
 			if (m_bWasBackStabbed) hit_power = (HDS.damage() == 0) ? 0 : 100000.0f;
 			else hit_power	= HitArtefactsOnBelt(HDS.damage(), HDS.hit_type);
 
-			HDS.power			= hit_power;
+			HDS.power			= hit_power > 0 ? hit_power : 0;
 			inherited::Hit		(&HDS);
 
 			if(OnServer() && !g_Alive() && HDS.hit_type==ALife::eHitTypeExplosion)
@@ -760,7 +771,7 @@ void CActor::Die(CObject* who)
 		};
 	};
 
-	cam_Set					(eacFreeLook);
+	cam_Set					(eacFirstEye); //eacFirstEye //eacFreeLook
 	mstate_wishful	&=		~mcAnyMove;
 	mstate_real		&=		~mcAnyMove;
 
@@ -795,6 +806,10 @@ void	CActor::SwitchOutBorder(bool new_border_state)
 
 void CActor::g_Physics(Fvector& _accel, float jump, float dt)
 {
+	static u32 updates = 0;
+	u32 active_time = g_activate_time ? Device.dwTimeGlobal - g_activate_time : 10000;
+	if (active_time < 1000 || updates++ < 10) return; // исключить приход хит-неожиданностей при запуске
+
 	// Correct accel
 	Fvector						accel;
 	accel.set					(_accel);
@@ -819,14 +834,21 @@ void CActor::g_Physics(Fvector& _accel, float jump, float dt)
 	if (Local() && g_Alive()) {
 		if (character_physics_support()->movement()->gcontact_Was)
 			Cameras().AddCamEffector		(xr_new<CEffectorFall> (character_physics_support()->movement()->gcontact_Power));
-		if (!fis_zero(character_physics_support()->movement()->gcontact_HealthLost))	{
+
+		float health_lost = character_physics_support()->movement()->gcontact_HealthLost;
+		if (!fis_zero(health_lost))	
+		{
 			const ICollisionDamageInfo* di=character_physics_support()->movement()->CollisionDamageInfo();
-			Fvector hdir;di->HitDir(hdir);
+			Fvector hdir;
+			di->HitDir(hdir);
+
+			hdir.y = 0;
+
 			SetHitInfo(this, NULL, 0, Fvector().set(0, 0, 0), hdir);
 			//				Hit	(m_PhysicMovementControl->gcontact_HealthLost,hdir,di->DamageInitiator(),m_PhysicMovementControl->ContactBone(),di->HitPos(),0.f,ALife::eHitTypeStrike);//s16(6 + 2*::Random.randI(0,2))
 			if (Level().CurrentControlEntity() == this)
 			{
-				SHit HDS = SHit(character_physics_support()->movement()->gcontact_HealthLost,hdir,di->DamageInitiator(),character_physics_support()->movement()->ContactBone(),di->HitPos(),0.f,di->HitType());
+				SHit HDS = SHit(health_lost,hdir,di->DamageInitiator(),character_physics_support()->movement()->ContactBone(),di->HitPos(),0.f,di->HitType());
 //				Hit(&HDS);
 
 				NET_Packet	l_P;
@@ -835,7 +857,11 @@ void CActor::g_Physics(Fvector& _accel, float jump, float dt)
 				HDS.weaponID = di->DamageInitiator()->ID();
 				HDS.Write_Packet(l_P);
 
-				u_EventSend	(l_P);
+				if (Device.dwFrame - last_hit_frame > 30)
+					u_EventSend	(l_P);
+				else
+					Msg("##DBG: collision hit ignored, last_hit_frame = %d, current frame = %d ", last_hit_frame, Device.dwFrame);
+				last_hit_frame = Device.dwFrame;
 			}
 		}
 	}
@@ -845,6 +871,7 @@ float g_fov = 67.5f;
 float CActor::currentFOV()
 {
 	CWeapon* pWeapon = smart_cast<CWeapon*>(inventory().ActiveItem());	
+
 
 	if (eacFirstEye == cam_active && pWeapon &&
 		pWeapon->IsZoomed() && (!pWeapon->ZoomTexture() ||
@@ -1191,6 +1218,7 @@ void CActor::shedule_Update	(u32 DT)
 
 	//для свойст артефактов, находящихся на поясе
 	UpdateArtefactsOnBelt						();
+	UpdtateOutfitInSlot			    			();
 	m_pPhysics_support->in_shedule_Update		(DT);
 	Check_for_AutoPickUp						();
 };
@@ -1438,12 +1466,26 @@ void CActor::OnItemDropUpdate ()
 {
 	CInventoryOwner::OnItemDropUpdate		();
 
-	TIItemContainer::iterator				I = inventory().m_all.begin();
-	TIItemContainer::iterator				E = inventory().m_all.end();
-	
-	for ( ; I != E; ++I)
-		if( !(*I)->IsInvalid() && !attached(*I))
-			attach(*I);
+	auto &list = inventory().m_all;
+	PIItem item = nullptr;
+	LPCSTR name = "NULL";
+	__try
+	{
+		TIItemContainer::iterator				I = list.begin();
+		TIItemContainer::iterator				E = list.end();
+		for (; I != E; ++I)
+		{
+			item = (*I);
+			name = item->Name();
+			if (!item->IsInvalid() && !attached(item))
+				attach(item);
+		}
+
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER)
+	{
+		Msg("!#EXCEPTION: catched in CActor::OnItemDropUpdate, item = 0x%p, name = %s ", (void*)item, (name ? name : "(null)"));
+	}
 }
 
 
@@ -1513,7 +1555,7 @@ void CActor::UpdateArtefactsOnBelt()
 			conditions().ChangeBleeding			(artefact->m_fBleedingRestoreSpeed*f_update_time);
 			conditions().ChangeHealth			(artefact->m_fHealthRestoreSpeed*f_update_time);
 			conditions().ChangePower			(artefact->m_fPowerRestoreSpeed*f_update_time);
-//			conditions().ChangeSatiety			(artefact->m_fSatietyRestoreSpeed*f_update_time);
+			conditions().ChangeSatiety			(artefact->m_fSatietyRestoreSpeed*f_update_time);
 			conditions().ChangeRadiation		(artefact->m_fRadiationRestoreSpeed*f_update_time);
 		}
 	}
@@ -1538,6 +1580,34 @@ float	CActor::HitArtefactsOnBelt		(float hit_power, ALife::EHitType hit_type)
 }
 
 
+void CActor::UpdtateOutfitInSlot()
+{
+	static float update_time = 0;
+
+	float f_update_time = 0;
+
+	if(update_time<0.100f)
+	{
+		update_time += conditions().fdelta_time();
+		return;
+	}
+	else
+	{
+		f_update_time	= update_time;
+		update_time		= 0.0f;
+	}
+
+	CCustomOutfit* outfit = GetOutfit();
+		if(outfit)
+		{
+			conditions().ChangeBleeding(outfit->m_fBleedingRestoreSpeed*f_update_time);
+			conditions().ChangeHealth(outfit->m_fHealthRestoreSpeed*f_update_time);
+			conditions().ChangePower(outfit->m_fPowerRestoreSpeed*f_update_time);
+			conditions().ChangeSatiety(outfit->m_fSatietyRestoreSpeed*f_update_time);
+			conditions().ChangeRadiation		(outfit->m_fRadiationRestoreSpeed*f_update_time);
+		}
+
+}
 
 void	CActor::SetZoomRndSeed		(s32 Seed)
 {
@@ -1655,6 +1725,7 @@ bool CActor::can_attach			(const CInventoryItem *inventory_item) const
 	if (!item || /*!item->enabled() ||*/ !item->can_be_attached())
 		return			(false);
 
+
 	//можно ли присоединять объекты такого типа
 	if( m_attach_item_sections.end() == std::find(m_attach_item_sections.begin(),m_attach_item_sections.end(),inventory_item->object().cNameSect()) )
 		return false;
@@ -1688,6 +1759,7 @@ float		CActor::GetMass				()
 {
 	return g_Alive()?character_physics_support()->movement()->GetMass():m_pPhysicsShell?m_pPhysicsShell->getMass():0; 
 }
+
 
 bool CActor::is_on_ground()
 {

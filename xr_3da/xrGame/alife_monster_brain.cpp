@@ -108,7 +108,13 @@ IC	CSE_ALifeSmartZone &CALifeMonsterBrain::smart_terrain	()
 void CALifeMonsterBrain::process_task			()
 {
 	CALifeSmartTerrainTask			*task = smart_terrain().task(&object());
-	THROW3							(task,"smart terrain returned nil task, while npc is registered in it",smart_terrain().name_replace());
+	//THROW3							(task,"smart terrain returned nil task, while npc is registered in it",smart_terrain().name_replace());
+	if (!task)
+	{
+		Msg("! ERROR smart returned [%s] nil task, while npc [%s] is registered in it.",smart_terrain().name_replace(),object().name_replace());
+		FATAL("ENGINE Crush. See log for details.");
+	}
+
 	movement().path_type			(MovementManager::ePathTypeGamePath);
 	movement().detail().target		(*task);
 }

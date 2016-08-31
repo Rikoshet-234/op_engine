@@ -77,6 +77,7 @@ void CScriptEngine::lua_error			(lua_State *L)
 	LPCSTR traceback = get_lua_traceback(L, 1);
 	const char *error = lua_tostring(L, -1);
 	Debug.fatal(DEBUG_INFO, "LUA error: %s \n %s ", error ? error : "NULL", traceback);
+
 #else
 	throw					lua_tostring(L,-1);
 #endif
@@ -125,12 +126,14 @@ void CScriptEngine::setup_callbacks		()
 	lua_atpanic							(lua(),CScriptEngine::lua_panic);
 }
 
-#	include "script_thread.h"
+#include "script_thread.h"
 void CScriptEngine::lua_hook_call		(lua_State *L, lua_Debug *dbg)
 {
+#ifdef DEBUG
 	if (ai().script_engine().current_thread())
 		ai().script_engine().current_thread()->script_hook(L,dbg);
 	else
+#endif
 		ai().script_engine().m_stack_is_ready	= true;
 }
 
@@ -161,8 +164,8 @@ void CScriptEngine::setup_auto_load		()
 
 void CScriptEngine::init				()
 {
+	g_active_lua=nullptr;
 	CScriptStorage::reinit				();
-
 	luabind::open						(lua());
 	setup_callbacks						();
 	export_classes						(lua());
@@ -240,19 +243,24 @@ void CScriptEngine::process_file_if_exists	(LPCSTR file_name, bool warn_if_not_e
 	string_path				S,S1;
 	if (m_reload_modules || (*file_name && !namespace_loaded(file_name))) {
 		FS.update_path		(S,"$game_scripts$",strconcat(sizeof(S1),S1,file_name,".script"));
-		if (!warn_if_not_exist && !FS.exist(S)) {
+		if (!warn_if_not_exist && !FS.exist(S) ) {
 #	ifndef XRSE_FACTORY_EXPORTS
+		#	ifdef DEBUG
 			if (psAI_Flags.test(aiNilObjectAccess))
+		#endif
 #	endif
 			{
-				print_stack			();
-				Msg					("* trying to access variable %s, which doesn't exist, or to load script %s, which doesn't exist too",file_name,S1);
+				if (OPFuncs::Dumper->isParamSet(OPFuncs::ExpandedCmdParams::KnownParams::dScriptNotExistsVariable))
+				{
+					print_stack			();
+					Msg					("* trying to access variable %s, which doesn't exist, or to load script %s, which doesn't exist too",file_name,S1);
+				}
 				m_stack_is_ready	= true;
 			}
 			add_no_file		(file_name,string_length);
 			return;
 		}
-		if (OPFuncs::Dumper->isParamSet(OPFuncs::ExpandedCmdParams::KnownParams::dScriptsLoad))
+		if (OPFuncs::Dumper->isParamSet(OPFuncs::ExpandedCmdParams::KnownParams::dScriptLoad))
 			Msg("CScriptEngine::process_file_if_exists, loading script %s",S1);
 		m_reload_modules	= false;
 		load_file_into_namespace(S,*file_name ? file_name : "_G");

@@ -162,9 +162,6 @@
     <ClInclude Include="resource.h">
       <Filter>General\Resources</Filter>
     </ClInclude>
-    <ClInclude Include="psystem.h">
-      <Filter>Interfaces</Filter>
-    </ClInclude>
     <ClInclude Include="IInputReceiver.h">
       <Filter>Interfaces\Input</Filter>
     </ClInclude>
@@ -894,6 +891,12 @@
       <Filter>General\Resources</Filter>
     </Image>
     <Image Include="ui_splash3.bmp">
+      <Filter>General\Resources</Filter>
+    </Image>
+    <Image Include="op_load_screen_cl.bmp">
+      <Filter>General\Resources</Filter>
+    </Image>
+    <Image Include="op_load_screen_ne.bmp">
       <Filter>General\Resources</Filter>
     </Image>
   </ItemGroup>

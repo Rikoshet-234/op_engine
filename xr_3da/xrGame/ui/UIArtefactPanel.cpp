@@ -32,18 +32,20 @@ void CUIArtefactPanel::InitIcons(const xr_vector<const CArtefact*>& artefacts)
 		it != artefacts.end(); it++)
 	{
 		const CArtefact* artefact = *it;
-		Frect rect;
-		rect.left = float(artefact->GetXPos()*INV_GRID_WIDTH);
-		rect.top = float(artefact->GetYPos()*INV_GRID_HEIGHT);
-		rect.right = rect.left + artefact->GetGridWidth()*INV_GRID_WIDTH;
-		rect.bottom = rect.top + artefact->GetGridHeight()*INV_GRID_HEIGHT;
+		//Frect rect;
+		//rect.left = float(artefact->GetXPos()*INV_GRID_WIDTH);
+		//rect.top = float(artefact->GetYPos()*INV_GRID_HEIGHT);
+		//rect.right = rect.left + artefact->GetGridWidth()*INV_GRID_WIDTH;
+		//rect.bottom = rect.top + artefact->GetGridHeight()*INV_GRID_HEIGHT;
+		//m_vRects.push_back(rect);
+		Frect rect=artefact->GetIconInfo().getOriginalRect();
 		m_vRects.push_back(rect);
 	}
 }
 
 void CUIArtefactPanel::Draw(){
 	const float iIndent = 1.0f;
-	      float x = 0.0f;
+		  float x = 0.0f;
 		  float y = 0.0f;
 		  float iHeight;
 		  float iWidth;
@@ -68,7 +70,7 @@ void CUIArtefactPanel::Draw(){
 		m_si.SetPos(x, y);
 		x = x + iIndent + iWidth;
 
-        m_si.Render();
+		m_si.Render();
 	}
 
 	CUIWindow::Draw();

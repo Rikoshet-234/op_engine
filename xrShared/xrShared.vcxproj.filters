@@ -10,15 +10,9 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="lua_tools.h" />
     <ClInclude Include="xrShared.h" />
-    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="lua_tools.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="xrShared.rc">
-      <Filter>Файлы ресурсов</Filter>
-    </ResourceCompile>
   </ItemGroup>
 </Project>

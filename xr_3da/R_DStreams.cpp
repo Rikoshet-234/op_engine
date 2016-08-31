@@ -4,11 +4,12 @@
 #include "ResourceManager.h"
 #include "R_DStreams.h"
 
+XRCORE_API LPCSTR  BuildStackTrace();
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-int		rsDVB_Size			= 512+1024;
+int		rsDVB_Size			= 4096;
 int		rsDIB_Size			= 512;
 
 void _VertexStream::Create	()
@@ -41,7 +42,13 @@ void* _VertexStream::Lock	( u32 vl_Count, u32 Stride, u32& vOffset )
 
 	// Ensure there is enough space in the VB for this data
 	u32	bytes_need		= vl_Count*Stride;
-	R_ASSERT			((bytes_need<=mSize) && vl_Count);
+	if (bytes_need > mSize)
+	{
+		Msg("! FATAL: _VertexStream::Lock, bytes_need = %d, mSize = %d, vl_Count = %d", bytes_need, mSize, vl_Count);
+		BuildStackTrace();
+		FATAL("Engine crush! See log for detail.");
+	}
+	//R_ASSERT			((bytes_need<=mSize) && vl_Count >0);
 
 	// Vertex-local info
 	u32 vl_mSize		= mSize/Stride;

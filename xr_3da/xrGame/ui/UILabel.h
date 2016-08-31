@@ -18,6 +18,9 @@ public:
 	virtual void			Init(float x, float y, float width, float height);
 	virtual void			Draw();
 	virtual void			Update			();
+	void			SetText(const char* text) override;
+
+	const char* GetText() override;
 
 	// own
 	CUILabel();

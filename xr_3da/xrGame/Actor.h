@@ -200,6 +200,7 @@ public:
 
 	//свойства артефактов
 	virtual void		UpdateArtefactsOnBelt	();
+	virtual void		UpdtateOutfitInSlot	(); 
 	virtual void		MoveArtefactBelt		(const CArtefact* artefact, bool on_belt);
 	virtual float		HitArtefactsOnBelt		(float hit_power, ALife::EHitType hit_type);
 	const xr_vector<const CArtefact*>& ArtefactsOnBelt() {return m_ArtefactsOnBelt;}
@@ -511,7 +512,7 @@ protected:
 	//косточки используемые при стрельбе
 	int									m_r_hand;
 	int									m_l_finger1;
-    int									m_r_finger2;
+	int									m_r_finger2;
 	int									m_head;
 
 	int									m_l_clavicle;

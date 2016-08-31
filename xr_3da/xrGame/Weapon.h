@@ -255,7 +255,7 @@ public:
 	virtual float				Weight			();		
 
 public:
-    virtual EHandDependence		HandDependence		()	const		{	return eHandDependence;}
+	virtual EHandDependence		HandDependence		()	const		{	return eHandDependence;}
 			bool				IsSingleHanded		()	const		{	return m_bIsSingleHanded; }
 
 public:
@@ -334,7 +334,7 @@ protected:
 	virtual void			Fire2End			();
 	virtual void			Reload				();
 			void			StopShooting		();
-    
+	
 
 	// обработка визуализации выстрела
 	virtual void			OnShot				(){};

@@ -11,6 +11,7 @@
 #include "inventory_space.h"
 #include "hit_immunity.h"
 #include "attachable_item.h"
+#include "ui/UIIconInfo.h"
 
 enum EHandDependence{
 	hdNone	= 0,
@@ -44,6 +45,7 @@ class CInventoryItem :
 {
 private:
 	typedef CAttachableItem inherited;
+	UIIconInfo m_iconInfo;
 protected:
 	enum EIIFlags{				FdropManual			=(1<<0),
 								FCanTake			=(1<<1),
@@ -95,7 +97,7 @@ public:
 
 	virtual void				OnH_B_Chield		();
 	virtual void				OnH_A_Chield		();
-    virtual void				OnH_B_Independent	(bool just_before_destroy);
+	virtual void				OnH_B_Independent	(bool just_before_destroy);
 	virtual void				OnH_A_Independent	();
 
 	virtual void				save				(NET_Packet &output_packet);
@@ -130,6 +132,7 @@ public:
 	virtual void				OnMoveToBelt		() {};
 	virtual void				OnMoveToRuck		() {};
 					
+			UIIconInfo			GetIconInfo() const {return m_iconInfo;}
 			int					GetGridWidth		() const ;
 			int					GetGridHeight		() const ;
 			const shared_str&	GetIconName			() const		{return m_icon_name;};

@@ -90,8 +90,14 @@ BOOL CHangingLamp::net_Spawn(CSE_Abstract* DC)
 	if (Visual()){
 		CKinematics* K		= smart_cast<CKinematics*>(Visual());
 		R_ASSERT			(Visual()&&smart_cast<CKinematics*>(Visual()));
-		light_bone			= K->LL_BoneID	(*lamp->light_main_bone);	VERIFY(light_bone!=BI_NONE);
-		ambient_bone		= K->LL_BoneID	(*lamp->light_ambient_bone);VERIFY(ambient_bone!=BI_NONE);
+		light_bone			= K->LL_BoneID	(*lamp->light_main_bone);	
+		R_ASSERT3(light_bone!=BI_NONE,"main_bone not found",lamp->name_replace());
+		ambient_bone		= K->LL_BoneID	(*lamp->light_ambient_bone);
+		if (ambient_bone==BI_NONE)
+		{
+			Msg("~ WARNING ambient_bone not found in %s. Replacing by main_bone",lamp->name_replace());
+			ambient_bone=light_bone;
+		}
 		collidable.model	= xr_new<CCF_Skeleton>				(this);
 	}
 	fBrightness				= lamp->brightness;

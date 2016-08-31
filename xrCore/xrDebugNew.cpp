@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "xrdebug.h"
+#include "xrDebug.h"
 
 #include "dxerr9.h"
 
@@ -172,6 +172,7 @@ XRCORE_API void LogStackTraceEx(struct _EXCEPTION_POINTERS *pExPtrs)
 		shared_str_initialized = ss_init;
 	}
 }
+
 
 u32 SimpleExceptionFilter (PEXCEPTION_POINTERS pExPtrs)
 {
@@ -402,6 +403,12 @@ void xrDebug::fail		(const char *e1, const char *e2, const char *e3, const char 
 	backend		(e1,e2,e3,e4,file,line,function,ignore_always);
 }
 
+void __cdecl xrDebug::fatal(const char *file, int line, const char *function, const char* description,const char* arguments)
+{
+	bool		ignore_always = true;
+	backend		("fatal error",description,arguments,nullptr,file,line,function,ignore_always);
+
+}
 void __cdecl xrDebug::fatal(const char *file, int line, const char *function, const char* F,...)
 {
 	string1024	buffer;

@@ -3,6 +3,7 @@
 
 #include "ui/xrUIXmlParser.h"
 #include "xr_level_controller.h"
+#include "../xrCore/OPFuncs/utils.h"
 
 #include <vector>
 #include <sstream>
@@ -71,7 +72,7 @@ void CStringTable::Load	(LPCSTR xml_file)
 		//VERIFY3					(pData->m_StringTable.find(string_name) == pData->m_StringTable.end(), "duplicate string table id", string_name);
 		if (!(pData->m_StringTable.find(string_name) == pData->m_StringTable.end()))
 		{
-			Msg("WARNING: duplicate string table id %s. Ignoring.", string_name);
+			Msg("! WARNING: duplicate string table id %s. Ignoring.", string_name);
 		};
 
 		LPCSTR string_text		= uiXml.Read(uiXml.GetRoot(), "string:text", i,  NULL);
@@ -79,7 +80,7 @@ void CStringTable::Load	(LPCSTR xml_file)
 		if (lstrlen(string_text)>fixedSize) //winsor
 		{
 			//split long text into more lines	
-			Msg("Text in '%s' too long,splitted.",string_name);
+			//Msg("Text in '%s' too long,splitted.",string_name);
 			std::string string_value(string_text);
 			std::vector<std::string> newIds;
 			while(string_value.length()>fixedSize || string_value.length()!=0)
@@ -98,8 +99,10 @@ void CStringTable::Load	(LPCSTR xml_file)
 		{
 			if(m_bWriteErrorsToLog && string_text)
 				Msg("[string table] '%s' no translation in '%s'", string_name, *(pData->m_sLanguage));
-
-			VERIFY3						(string_text, "string table entry does not has a text", string_name);
+			if (!string_text)
+			{
+				FATAL2("string table entry does not has a text",string_name);
+			}
 
 			STRING_VALUE str_val		= ParseLine(string_text, string_name, true);
 
@@ -174,11 +177,16 @@ STRING_VALUE CStringTable::translate (const STRING_ID& str_id) const
 	{
 		if(m_bWriteErrorsToLog && *str_id != NULL && xr_strlen(*str_id)>0)
 			Msg("[string table] '%s' has no entry", *str_id);
-		return str_id;
+
+		if (str_id==nullptr)
+			return str_id;
+		std::string resStr(str_id.c_str());
+		if (resStr.front()=='"' && resStr.back()=='"') 
+			OPFuncs::trimq(resStr);
+		return resStr.c_str();
+		//return str_id;
 	}
 
-	#pragma todo(winsor  -  verify long string_table text from game!!!)
-	//winsor - united splited long text data
 	bool splited=false;
 	std::string value(res.c_str());
 	std::string unitedValue;
@@ -192,7 +200,7 @@ STRING_VALUE CStringTable::translate (const STRING_ID& str_id) const
 	};
 	if (splited)
 	{
-		Msg("%s united from parts",str_id);
+		//Msg("%s united from parts",str_id);
 		return unitedValue.c_str();
 	}
 	else

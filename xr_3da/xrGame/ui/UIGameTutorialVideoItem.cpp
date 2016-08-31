@@ -6,6 +6,9 @@
 #include "../object_broker.h"
 #include "../../xr_input.h"
 #include "../xr_level_controller.h"
+#include "../ui_base.h"
+#include "../UICursor.h"
+#include "../xrCore/log.h"
 
 extern ENGINE_API BOOL bShowPauseString;
 
@@ -21,6 +24,7 @@ CUISequenceVideoItem::CUISequenceVideoItem(CUISequencer* owner):CUISequenceItem(
 	m_delay					= 0.f;
 	m_time_start			= 0;
 	m_sync_time				= 0;
+	CursorPresent=GetUICursor()->IsVisible();
 }
 
 CUISequenceVideoItem::~CUISequenceVideoItem()
@@ -28,6 +32,7 @@ CUISequenceVideoItem::~CUISequenceVideoItem()
 	m_sound[0].stop			();
 	m_sound[1].stop			();
 	delete_data				(m_wnd);
+
 }
 
 bool CUISequenceVideoItem::IsPlaying()
@@ -98,6 +103,8 @@ void CUISequenceVideoItem::Load(CUIXml* xml, int idx)
 void CUISequenceVideoItem::Update()
 {
 	// deferred start
+	/*if (GetUICursor()->IsVisible())
+		GetUICursor()->Hide();*/
 	if (Device.dwTimeContinual>=m_time_start){
 		if (m_flags.test(etiDelayed)){
 			m_owner->MainWnd()->AttachChild	(m_wnd);
@@ -165,6 +172,9 @@ void CUISequenceVideoItem::Start()
 		CUIWindow* w			= m_owner->MainWnd()->FindChild("back");
 		if (w)					w->Show(true);
 	}
+	if (CursorPresent)
+		GetUICursor()->Hide();
+
 }
 
 bool CUISequenceVideoItem::Stop	(bool bForce)
@@ -190,6 +200,8 @@ bool CUISequenceVideoItem::Stop	(bool bForce)
 	if(m_flags.test(etiNeedPauseSound))
 		Device.Pause			(FALSE, FALSE, TRUE, "videoitem_stop");
 
+	if (CursorPresent)
+		GetUICursor()->Show();
 	inherited::Stop				();
 	return true;
 }

@@ -18,16 +18,16 @@
 CUIItemInfo::CUIItemInfo()
 {
 	UIItemImageSize.set			(0.0f,0.0f);
-	UICondProgresBar			= NULL;
-	UICondition					= NULL;
-	UICost						= NULL;
-	UIWeight					= NULL;
-	UIItemImage					= NULL;
-	UIDesc						= NULL;
-	UIWpnParams					= NULL;
-	UIArtefactParams			= NULL;
-	UIName						= NULL;
-	m_pInvItem					= NULL;
+	UICondProgresBar			= nullptr;
+	UICondition					= nullptr;
+	UICost						= nullptr;
+	UIWeight					= nullptr;
+	UIItemImage					= nullptr;
+	UIDesc						= nullptr;
+	UIWpnParams					= nullptr;
+	UIArtefactParams			= nullptr;
+	UIName						= nullptr;
+	m_pInvItem					= nullptr;
 	m_b_force_drawing			= false;
 }
 
@@ -127,7 +127,7 @@ void CUIItemInfo::Init(LPCSTR xml_name){
 void CUIItemInfo::Init(float x, float y, float width, float height, LPCSTR xml_name)
 {
 	inherited::Init	(x, y, width, height);
-    Init			(xml_name);
+	Init			(xml_name);
 }
 
 bool				IsGameTypeSingle();
@@ -184,20 +184,25 @@ void CUIItemInfo::InitItem(CInventoryItem* pInvItem)
 		// Загружаем картинку
 		UIItemImage->SetShader				(InventoryUtilities::GetEquipmentIconsShader());
 
-		int iGridWidth						= pInvItem->GetGridWidth();
+		/*int iGridWidth						= pInvItem->GetGridWidth();
 		int iGridHeight						= pInvItem->GetGridHeight();
 		int iXPos							= pInvItem->GetXPos();
-		int iYPos							= pInvItem->GetYPos();
+		int iYPos							= pInvItem->GetYPos();*/
 
-		UIItemImage->GetUIStaticItem().SetOriginalRect(	float(iXPos*INV_GRID_WIDTH), float(iYPos*INV_GRID_HEIGHT),
-														float(iGridWidth*INV_GRID_WIDTH),	float(iGridHeight*INV_GRID_HEIGHT));
+		Frect rect = pInvItem->GetIconInfo().getOriginalRect();
+
+
+		//UIItemImage->GetUIStaticItem().SetOriginalRect(	float(iXPos*INV_GRID_WIDTH), float(iYPos*INV_GRID_HEIGHT),
+		//												float(iGridWidth*INV_GRID_WIDTH),	float(iGridHeight*INV_GRID_HEIGHT));
+		UIItemImage->GetUIStaticItem().SetOriginalRect(rect);
 		UIItemImage->TextureOn				();
 		UIItemImage->ClipperOn				();
 		UIItemImage->SetStretchTexture		(true);
 		Frect v_r							= {	0.0f, 
 												0.0f, 
-												float(iGridWidth*INV_GRID_WIDTH),	
-												float(iGridHeight*INV_GRID_HEIGHT)};
+												rect.width(),rect.height()};
+												//float(iGridWidth*INV_GRID_WIDTH),	
+												//float(iGridHeight*INV_GRID_HEIGHT)};
 		if(UI()->is_16_9_mode())
 			v_r.x2 /= 1.328f;
 

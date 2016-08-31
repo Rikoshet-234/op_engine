@@ -231,7 +231,19 @@ void CPHElement::SetTransform(const Fmatrix &m0){
 	VERIFY2(_valid(m0),"invalid_form_in_set_transform");
 	Fvector mc;
 	CPHGeometryOwner::get_mc_vs_transform(mc,m0);
-	VERIFY_BOUNDARIES2(mc,phBoundaries,PhysicsRefObject(),"mass	center	in set transform");
+	CPhysicsShellHolder *shell=PhysicsRefObject();
+	//VERIFY_BOUNDARIES2(mc,phBoundaries,shell,"mass center	in set transform");
+//#ifdef DEBUG
+//	if(!valid_pos(mc,phBoundaries))
+//	{
+//		Msg(" %s	\n", "mass center in set transform");
+//		Msg(" pos: %f,%f,%f, seems to be invalid", mc.x,mc.y,mc.z);
+//		Msg("Level box: %f,%f,%f-%f,%f,%f,",phBoundaries.x1,phBoundaries.y1,phBoundaries.z1,phBoundaries.x2,phBoundaries.y2,phBoundaries.z2);
+//		Msg("Object: %s",*(shell->Name()));
+//		Msg("Visual: %s",*(shell->cNameVisual()));
+//		return;
+//	}
+//#endif
 	dBodySetPosition(m_body,mc.x,mc.y,mc.z);
 	Fmatrix33 m33;
 	m33.set(m0);

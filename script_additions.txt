@@ -2,7 +2,8 @@ script additions
 
 iterate_inventory_simple - такое же, как и iterate_inventory, но в фанктор итерации передается только один параметр, непосредственно сам итем.
 log1 - вывод в лог напрямую
-IsOPEngine() - проверка на новй движок
+IsOPEngine() - проверка на новый движок
 GetEngineVersion() - версия движка
+alife():object() - можно передавать GameObject. если объект==nil - будет вылет. на выходе - аналогично alife():object(ID)
 
 

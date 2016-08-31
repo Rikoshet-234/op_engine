@@ -72,13 +72,13 @@ void CUIOutfitInfo::Update(CCustomOutfit* outfit)
 {
 	m_outfit				= outfit;
 
-    SetItem(ALife::eHitTypeBurn,		false);
+	SetItem(ALife::eHitTypeBurn,		false);
 	SetItem(ALife::eHitTypeShock,		false);
 	SetItem(ALife::eHitTypeStrike,		false);
 	SetItem(ALife::eHitTypeWound,		false);
 	SetItem(ALife::eHitTypeRadiation,	false);
 	SetItem(ALife::eHitTypeTelepatic,	false);
-    SetItem(ALife::eHitTypeChemicalBurn,false);
+	SetItem(ALife::eHitTypeChemicalBurn,false);
 	SetItem(ALife::eHitTypeExplosion,	false);
 	SetItem(ALife::eHitTypeFireWound,	false);
 }

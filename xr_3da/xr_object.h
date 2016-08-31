@@ -77,6 +77,8 @@ public:
 		void							MakeMeCrow_internal	();
 		void							MakeMeCrow			();
 
+	ICF LPCSTR							Name_script         () const			{ return this ? NameObject.c_str() : "NULL"; }
+
 	ICF	void							IAmNotACrowAnyMore	()					{ Props.crow = false;	}
 	virtual BOOL						AlwaysTheCrow		()					{ return FALSE; }
 

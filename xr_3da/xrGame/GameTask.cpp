@@ -27,19 +27,19 @@ using namespace luabind;
 
 ALife::_STORY_ID	story_id	(LPCSTR story_id)
 {
-	int res=
-							(
-		object_cast<int>(
-			luabind::object(
-				luabind::get_globals(
-					ai().script_engine().lua()
-				)
-				["story_ids"]
-			)
-			[story_id]
-		)
-	);
-	return ALife::_STORY_ID(res);
+	luabind::object storyIds=luabind::get_globals(ai().script_engine().lua())["story_ids"];
+	R_ASSERT2(storyIds.type()!=LUA_TNIL,"Invalid story_ids in LUA globals!");
+
+	std::string storyIdLowerName(story_id);
+	std::transform(storyIdLowerName.begin(),storyIdLowerName.end(),storyIdLowerName.begin(),::tolower);
+
+	boost::optional<int> storyId=object_cast_nothrow<int>(storyIds[storyIdLowerName.c_str()]);
+	if (!storyId)
+	{
+		Msg("! ERROR Cannot get story id [%s] from story_ids registry",story_id);
+		return INVALID_STORY_ID;
+	}
+	return ALife::_STORY_ID(*storyId);
 }
 
 u16 storyId2GameId	(ALife::_STORY_ID id)
@@ -67,11 +67,15 @@ CGameTask::CGameTask(const TASK_ID& id)
 	m_FinishTime	= 0;
 	m_Title			= NULL;
 	m_priority		= u32(-1);
+	m_isCycle			=false;
+	m_removeCompleted=false;
 	Load			(id);
 }
 
 CGameTask::CGameTask()
 {
+	m_isCycle			=false;
+	m_removeCompleted=false;
 	m_ReceiveTime	= 0;
 	m_FinishTime	= 0;
 	m_Title			= NULL;
@@ -92,6 +96,10 @@ void CGameTask::Load(const TASK_ID& id)
 	g_gameTaskXml->SetLocalRoot		(task_node);
 	m_Title							= g_gameTaskXml->Read(g_gameTaskXml->GetLocalRoot(), "title", 0, NULL);
 	m_priority						= g_gameTaskXml->ReadAttribInt(g_gameTaskXml->GetLocalRoot(), "prio", -1);
+	int removeInt=g_gameTaskXml->ReadAttribInt(g_gameTaskXml->GetLocalRoot(), "remove", -1);
+	int cycleInt=g_gameTaskXml->ReadAttribInt(g_gameTaskXml->GetLocalRoot(), "cycle", -1);
+	m_removeCompleted = removeInt==-1 ? false : (removeInt==1) ? true : false;
+	m_isCycle = cycleInt==-1 ? false : (cycleInt==1) ? true : false;
 #ifdef DEBUG
 	if(m_priority == u32(-1))
 	{
@@ -154,7 +162,9 @@ void CGameTask::Load(const TASK_ID& id)
 		bool b1,b2;
 		b1								= (0==objective.map_location.size());
 		b2								= (NULL==object_story_id);
-		VERIFY3							(b1==b2,"check [map_location_type] and [object_story_id] fields in objective definition for: ",*objective.description);
+		if (!(b1==b2))
+				Msg("! ERROR check [map_location_type] and [object_story_id] fields in objective definition for: %s",*objective.description);
+			//	VERIFY3							(b1==b2,"check [map_location_type] and [object_story_id] fields in objective definition for: ",*objective.description);
 		
 //.
 		objective.object_id				= u16(-1);
@@ -203,7 +213,9 @@ void CGameTask::Load(const TASK_ID& id)
 		for(j=0; j<info_num; ++j){
 			str							= g_gameTaskXml->Read(l_root, "function_complete", j, NULL);
 			functor_exists				= ai().script_engine().functor(str ,objective.m_complete_lua_functions[j]);
-			THROW3						(functor_exists, "Cannot find script function described in task objective  ", str);
+			if (!functor_exists)
+				Msg						("! ERROR Cannot find script function in task [%s] objective function_complete [%s]",*id, str);
+			//THROW3						(functor_exists, "Cannot find script function described in task objective  ", str);
 		}
 
 
@@ -213,7 +225,9 @@ void CGameTask::Load(const TASK_ID& id)
 		for(j=0; j<info_num; ++j){
 			str							= g_gameTaskXml->Read(l_root, "function_fail", j, NULL);
 			functor_exists				= ai().script_engine().functor(str ,objective.m_fail_lua_functions[j]);
-			THROW3						(functor_exists, "Cannot find script function described in task objective  ", str);
+			if (!functor_exists)
+				Msg						("! ERROR Cannot find script function in task [%s] objective function_fail [%s]",*id, str);
+			//THROW3						(functor_exists, "Cannot find script function described in task objective  ", str);
 		}
 
 //------function_on_complete
@@ -222,7 +236,9 @@ void CGameTask::Load(const TASK_ID& id)
 		for(j=0; j<info_num; ++j){
 			str							= g_gameTaskXml->Read(l_root, "function_call_complete", j, NULL);
 			functor_exists				= ai().script_engine().functor(str ,objective.m_lua_functions_on_complete[j]);
-			THROW3						(functor_exists, "Cannot find script function described in task objective  ", str);
+			if (!functor_exists)
+				Msg						("! ERROR Cannot find script function in task [%s] objective function_call_complete [%s]",*id, str);
+			//THROW3						(functor_exists, "Cannot find script function described in task objective  ", str);
 		}
 
 
@@ -232,7 +248,8 @@ void CGameTask::Load(const TASK_ID& id)
 		for(j=0; j<info_num; ++j){
 			str							= g_gameTaskXml->Read(l_root, "function_call_fail", j, NULL);
 			functor_exists				= ai().script_engine().functor(str ,objective.m_lua_functions_on_fail[j]);
-			THROW3						(functor_exists, "Cannot find script function described in task objective  ", str);
+			if (!functor_exists)
+				Msg						("! ERROR Cannot find script function in task [%s] objective function_call_fail [%s]",*id, str);
 		}
 
 		g_gameTaskXml->SetLocalRoot		(task_node);
@@ -256,26 +273,26 @@ bool CGameTask::HasInProgressObjective()
 }
 
 SGameTaskObjective::SGameTaskObjective		(CGameTask* parent, int _idx)
-:description		(NULL),
+:task_state			(eTaskStateInProgress),
+parent				(parent),
+idx					(_idx),
+description		(NULL),
 article_id			(NULL),
 map_location		(NULL),
 object_id			(u16(-1)),
-task_state			(eTaskStateInProgress),
-def_location_enabled(true),
-parent				(parent),
-idx					(_idx)
+def_location_enabled(true)
 {
 }
 
 SGameTaskObjective::SGameTaskObjective()
-:description		(NULL),
+:task_state			(eTaskStateInProgress),
+parent				(NULL),
+idx					(0),
+description		(NULL),
 article_id			(NULL),
 map_location		(NULL),
 object_id			(u16(-1)),
-task_state			(eTaskStateInProgress),
-def_location_enabled(true),
-parent				(NULL),
-idx					(0)
+def_location_enabled(true)
 {
 }
 
@@ -288,19 +305,39 @@ CMapLocation* SGameTaskObjective::LinkedMapLocation		()
 void SGameTaskObjective::SetTaskState		(ETaskState new_state)
 {
 	task_state = new_state;
-	if( (new_state==eTaskStateFail) || (new_state==eTaskStateCompleted) ){
-
-		if( task_state==eTaskStateFail ){
-				SendInfo				(m_infos_on_fail);
-				CallAllFuncs			(m_lua_functions_on_fail);
-		}else
-		if( task_state==eTaskStateCompleted ){
-				SendInfo				(m_infos_on_complete);
-				CallAllFuncs			(m_lua_functions_on_complete);
-		}
-		//callback for scripters
-		ChangeStateCallback();
+	xr_vector<shared_str> infos;
+	xr_vector<luabind::functor<bool>> functors;
+	switch(task_state)
+	{
+	case eTaskStateFail: 
+		infos=m_infos_on_fail;
+		functors=m_lua_functions_on_fail;
+		break;
+	case eTaskStateCompleted: 
+		infos=m_infos_on_complete;
+		functors=m_lua_functions_on_complete;
+		break;
+	//case eTaskStateInProgress: return;
+	//case eTaskStateDummy: return;
+	default: return;
 	}
+	SendInfo(infos);
+	CallAllFuncs(functors);
+	ChangeStateCallback();
+
+	//if( (new_state==eTaskStateFail) || (new_state==eTaskStateCompleted) ){
+
+	//	if( task_state==eTaskStateFail ){
+	//			SendInfo				(m_infos_on_fail);
+	//			CallAllFuncs			(m_lua_functions_on_fail);
+	//	}else
+	//	if( task_state==eTaskStateCompleted ){
+	//			SendInfo				(m_infos_on_complete);
+	//			CallAllFuncs			(m_lua_functions_on_complete);
+	//	}
+	//	//callback for scripters
+	//	ChangeStateCallback();
+	//}
 }
 
 ETaskState SGameTaskObjective::UpdateState	()

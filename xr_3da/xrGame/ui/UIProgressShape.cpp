@@ -22,6 +22,8 @@ void CUIProgressShape::SetPos(float pos){
 }
 
 void CUIProgressShape::SetPos(int pos, int max){
+	if (max==0)
+		max=1;
 	m_stage					= float(pos)/float(max);
 	if (m_bText)
 	{

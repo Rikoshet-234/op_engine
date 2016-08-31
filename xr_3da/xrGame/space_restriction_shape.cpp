@@ -36,7 +36,7 @@ struct CBorderMergePredicate {
 };
 
 
-#ifdef DEBUG
+#ifdef VERIFY_RESTRICTORS
 struct CShapeTestPredicate {
 	CSpaceRestrictionShape			*m_restriction;
 
@@ -96,7 +96,7 @@ void CSpaceRestrictionShape::fill_shape		(const CCF_Shape::shape_def &shape)
 	}
 	ai().level_graph().iterate_vertices(start,dest,CBorderMergePredicate(this));
 
-#ifdef DEBUG
+#ifdef VERIFY_RESTRICTORS
 	ai().level_graph().iterate_vertices(start,dest,CShapeTestPredicate(this));
 #endif
 }
@@ -123,16 +123,16 @@ void CSpaceRestrictionShape::build_border	()
 	}
 
 	process_borders					();
-#ifdef CHECK_RESTRICTORS_BEMPTY
+#ifdef VERIFY_RESTRICTORS
 	VERIFY3							(!border().empty(),"space restrictor has no border",*m_restrictor->cName());
 #endif 
 
-#ifdef DEBUG
-	//test_correctness				();
+#ifdef VERIFY_RESTRICTORS
+	test_correctness				();
 #endif
 }
 
-#ifdef DEBUG
+#ifdef VERIFY_RESTRICTORS
 void CSpaceRestrictionShape::test_correctness	()
 {
 	m_correct					= true;

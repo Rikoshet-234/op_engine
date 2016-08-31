@@ -8,7 +8,7 @@
 
 #pragma once
 
-#ifdef DEBUG
+#ifdef VERIFY_RESTRICTORS
 IC	bool CSpaceRestrictionBase::correct	() const
 {
 	return	(m_correct);

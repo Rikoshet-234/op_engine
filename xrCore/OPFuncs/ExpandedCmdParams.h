@@ -35,9 +35,9 @@ namespace OPFuncs
 			{
 				dTHMLoad				=1<<0	, //показывать имя thm файла при загрузке 
 				dFileSystemVars			=1<<1	, //показывать вычитанные переменные FS $__$
-				dClassScriptRegister	=1<<2	,//показывать детали о регистрации классов
+				dScriptClassRegister	=1<<2	,//показывать детали о регистрации классов
 				dMaterialsLoad			=1<<3	,//показыват детали о загрузке материалов
-				dScriptsLoad			=1<<4	,//показываает процесс загрузки скриптов
+				dScriptLoad			=1<<4	,//показываает процесс загрузки скриптов
 			    dSpawnRegistryLoad		=1<<5	,//показывать загрузку spawn registry
 				dAlifeObjectRegister	=1<<6	,  //показывать добавление объектов в alife story registry
 				dTextureLoad			=1<<7	,   //показывать загрузку текстур
@@ -45,7 +45,9 @@ namespace OPFuncs
 				dMapLoadErrors			=1<<9	,//показывать ошибки при загрузке карт
 				dFileSystem				=1<<10	,//показывать загрузку игровых архивов
 				dSoundPrefixNotPresent  =1<<11	, //показывать отсутсвующие звуки для звуковых префиксов 
+				dScriptNotExistsVariable		=1<<12	, //показывать ошибки LUA по отсутсвующим переменным
 				pShowLogTime			=1<<15	//показывать время в логе
+
 				//-dumpall добавляет все параметры
 			};	
 			

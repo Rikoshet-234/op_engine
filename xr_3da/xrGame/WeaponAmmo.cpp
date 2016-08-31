@@ -22,7 +22,6 @@ CCartridge::CCartridge()
 	m_kAirRes = 0.0f;
 	m_buckShot = 1;
 	m_impair = 1.f;
-
 	bullet_material_idx = u16(-1);
 }
 
@@ -38,6 +37,7 @@ void CCartridge::Load(LPCSTR section, u8 LocalAmmoType)
 	m_kAP					= READ_IF_EXISTS(pSettings, r_float, section, "k_ap", 0.0f);
 	m_u8ColorID				= READ_IF_EXISTS(pSettings, r_u8, section, "tracer_color_ID", 0);
 	
+
 	if (pSettings->line_exist(section, "k_air_resistance"))
 		m_kAirRes				=  pSettings->r_float(section, "k_air_resistance");
 	else

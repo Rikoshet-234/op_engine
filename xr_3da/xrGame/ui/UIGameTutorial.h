@@ -13,6 +13,7 @@ protected:
 	bool					m_bActive;
 	bool					m_bPlayEachItem;
 	bool					GrabInput			();
+
 public:
 	IInputReceiver*			m_pStoredInputReceiver;
 							CUISequencer		();
@@ -132,6 +133,7 @@ class CUISequenceVideoItem: public CUISequenceItem
 	CUIStatic*				m_wnd;
 	u32						m_time_start;
 	u32						m_sync_time;
+	bool					CursorPresent;
 public:
 							CUISequenceVideoItem(CUISequencer* owner);
 	virtual					~CUISequenceVideoItem();

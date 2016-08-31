@@ -28,7 +28,7 @@ void CObjectFactory::register_script_class	(LPCSTR client_class, LPCSTR server_c
 		ai().script_engine().script_log	(eLuaMessageTypeError,"Cannot register class %s",server_class);
 		return;
 	}
-	if (OPFuncs::Dumper->isParamSet(OPFuncs::ExpandedCmdParams::KnownParams::dClassScriptRegister))		
+	if (OPFuncs::Dumper->isParamSet(OPFuncs::ExpandedCmdParams::KnownParams::dScriptClassRegister))		
 		Msg("CObjectFactory::register_script_class, client=%s server=%s clsid=%s sclsid=%s",client_class,server_class,clsid,script_clsid);
 	add							(
 		xr_new<CObjectItemScript>(
@@ -49,7 +49,7 @@ void CObjectFactory::register_script_class			(LPCSTR unknown_class, LPCSTR clsid
 		ai().script_engine().script_log	(eLuaMessageTypeError,"Cannot register class %s",unknown_class);
 		return;
 	}
-	if (OPFuncs::Dumper->isParamSet(OPFuncs::ExpandedCmdParams::KnownParams::dClassScriptRegister))		
+	if (OPFuncs::Dumper->isParamSet(OPFuncs::ExpandedCmdParams::KnownParams::dScriptClassRegister))		
 		Msg("CObjectFactory::register_script_class, unknown_class=%s clsid=%s sclsid=%s",unknown_class,clsid,script_clsid);
 	add							(
 		xr_new<CObjectItemScript>(

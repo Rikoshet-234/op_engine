@@ -204,7 +204,7 @@ EListType CUIInventoryWnd::GetType(CUIDragDropListEx* l)
 void CUIInventoryWnd::PlaySnd(eInventorySndAction a)
 {
 	if (sounds[a]._handle())
-        sounds[a].play					(NULL, sm_2D);
+		sounds[a].play					(NULL, sm_2D);
 }
 
 CUIInventoryWnd::~CUIInventoryWnd()
@@ -304,7 +304,7 @@ void CUIInventoryWnd::Show()
 		string256 _path;		
 		if (GameID() != GAME_DEATHMATCH){
 			if (1==team)
-		        sprintf_s(_path, "ui_hud_status_green_0%d", rank+1);
+				sprintf_s(_path, "ui_hud_status_green_0%d", rank+1);
 			else
 				sprintf_s(_path, "ui_hud_status_blue_0%d", rank+1);
 		}

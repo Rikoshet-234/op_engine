@@ -7,6 +7,7 @@
 #include <objbase.h>
 #include "xrCore.h"
 #include "OPFuncs/op_engine_version.h"
+#include "OPFuncs/ExpandedCmdParams.h"
 
 #pragma comment(lib,"winmm.lib")
 
@@ -90,6 +91,9 @@ void xrCore::_initialize	(LPCSTR _ApplicationName, LogCallback cb, BOOL init_fs,
 		xr_FS				= xr_new<CLocatorAPI>	();
 
 		xr_EFS				= xr_new<EFS_Utils>		();
+
+		OPFuncs::Dumper = xr_new<OPFuncs::ExpandedCmdParams>();
+		OPFuncs::Dumper->ParseCmdParams(Params);
 //.		R_ASSERT			(co_res==S_OK);
 	}
 	if (init_fs){
@@ -110,9 +114,11 @@ void xrCore::_initialize	(LPCSTR _ApplicationName, LogCallback cb, BOOL init_fs,
 		if (0!=strstr(Params,"-file_activity"))	 flags |= CLocatorAPI::flDumpFileActivity;
 	#endif
 #endif
+
 		FS._initialize		(flags,0,fs_fname);
+
 		Msg					("'%s' build %d, %s","xrCore",build_id, build_date);
-		Msg					("%s\n",OPFuncs::GetOPEngineVersion());
+		Msg					("%s\n",OPFuncs::GetOPEngineVersion().c_str());
 		EFS._initialize		();
 #ifdef DEBUG
 	#ifndef	_EDITOR
@@ -135,6 +141,7 @@ void xrCore::_destroy		()
 	if (0==init_counter){
 		FS._destroy			();
 		EFS._destroy		();
+		xr_delete(OPFuncs::Dumper);
 		xr_delete			(xr_FS);
 		xr_delete			(xr_EFS);
 

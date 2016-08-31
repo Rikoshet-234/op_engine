@@ -29,7 +29,7 @@ namespace PAPI{
 						~ParticleActions()						{clear();				}
 		IC void			clear			()
         {
-			for (PAVecIt it=actions.begin(); it!=actions.end(); it++) 
+			for (PAVecIt it=actions.begin(); it!=actions.end(); ++it) 
 				xr_delete(*it);
 			actions.clear();
 		}
@@ -38,9 +38,12 @@ namespace PAPI{
 		IC PAVecIt		begin			()						{return	actions.begin();}
 		IC PAVecIt		end				()						{return actions.end();	}
         IC int			size			()						{return actions.size();	}
+		IC int			capacity		()						{return actions.capacity();	}
+		IC PAVec		actions_data	()						{return actions;}
         IC void			resize			(int cnt)        		{actions.resize(cnt);	}
         void			copy			(ParticleActions* src);
 	};
 };
 //---------------------------------------------------------------------------
 #endif
+

@@ -6564,6 +6564,12 @@
     <ClInclude Include="OPFuncs\lua_functions.h">
       <Filter>OPFuncs</Filter>
     </ClInclude>
+    <ClInclude Include="OPFuncs\utils.h">
+      <Filter>OPFuncs</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\UIIconInfo.h">
+      <Filter>UI\Common\ItemInfo</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -9715,6 +9721,12 @@
     </ClCompile>
     <ClCompile Include="OPFuncs\lua_functions.cpp">
       <Filter>OPFuncs</Filter>
+    </ClCompile>
+    <ClCompile Include="OPFuncs\utils.cpp">
+      <Filter>OPFuncs</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIIconInfo.cpp">
+      <Filter>UI\Common\ItemInfo</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

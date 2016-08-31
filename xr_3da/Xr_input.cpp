@@ -203,10 +203,10 @@ bool CInput::get_dik_name(int dik, LPSTR dest_str, int dest_sz)
 		return					false;
 
 	size_t cnt					= wcstombs(dest_str, wct, dest_sz);
-//.	Msg("dik_name for[%d], is w[%S] ch[%s]", dik, wct, dest_str);
+	//Msg("dik_name for[%d], is w[%S] ch[%s]", dik, wct, dest_str);
 	if(cnt==-1)
 	{
-		Msg("! cant convert dik_name for dik[%d], prop=[%S]", dik, wct);
+		//Msg("! cant convert dik_name for dik[%d], prop=[%S]", dik, wct);
 		return					false;
 	}
 	return						(cnt!=-1);

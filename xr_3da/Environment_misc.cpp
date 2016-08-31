@@ -297,13 +297,21 @@ void	CEnvironment::mods_load			()
 	string_path							path;
 	if (FS.exist(path,"$level$","level.env_mod"))	
 	{
+		Msg	("* Loading environment modificator: %s",path);
 		IReader*	fs	= FS.r_open		(path);
 		u32			id	= 0;
 		while		(fs->find_chunk(id))	
 		{
-			CEnvModifier		E;
-			E.load				(fs);
-			Modifiers.push_back	(E);
+			if (fs->elapsed()>=19 * sizeof(float)) //19 floats to read from CEnvModifier::load
+			{
+				CEnvModifier		E;
+				E.load				(fs);
+				Modifiers.push_back	(E);
+			}
+			else
+			{
+				Msg("! ERROR CEnvironment::mods_load: %s is malformed!", path);
+			}
 			id					++;
 		}
 		FS.r_close	(fs);

@@ -5,8 +5,8 @@
 
 namespace OPFuncs
 {
-	XRCORE_API ExpandedCmdParams* Dumper=new ExpandedCmdParams();
-	
+	extern XRCORE_API ExpandedCmdParams* Dumper=nullptr;
+
 	ExpandedCmdParams::ExpandedCmdParams()
 	{
 		knownCmdParams = createMap<std::string,int>
@@ -14,14 +14,15 @@ namespace OPFuncs
 		("-dumpfsv",KnownParams::dFileSystemVars)
 		("-dumpmtr",KnownParams::dMaterialsLoad)
 		("-dumptl",KnownParams::dTextureLoad)
-		("-dumpslp",KnownParams::dScriptsLoad)
+		("-dumpslp",KnownParams::dScriptLoad)
 		("-dumpsrl",KnownParams::dSpawnRegistryLoad)
-		("-dumpcsr",KnownParams::dClassScriptRegister)
+		("-dumpcsr",KnownParams::dScriptClassRegister)
 		("-dumpaor",KnownParams::dAlifeObjectRegister)
 		("-dumpml",KnownParams::dMapLoad)
 		("-dumpmle",KnownParams::dMapLoadErrors)
 		("-dumpfs",KnownParams::dFileSystem)
 		("-dumpspnp",KnownParams::dSoundPrefixNotPresent)
+		("-dumpsnv",KnownParams::dScriptNotExistsVariable)
 		("-slt",KnownParams::pShowLogTime);
 	}
 	

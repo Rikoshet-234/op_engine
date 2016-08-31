@@ -114,13 +114,13 @@
     <_ProjectFileVersion>11.0.61030.0</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>y:\bin_$(Configuration)\</OutDir>
+    <OutDir>y:\bin_Debug\</OutDir>
     <IntDir>x:\intermediate\$(Configuration)\$(ProjectName)\</IntDir>
     <ExtensionsToDeleteOnClean>*.idb%3b*.obj%3b*.ilk%3b*.pdb%3b*.tlb%3b*.tli%3b*.tlh%3b*.tmp%3b*.rsp%3b*.bat%3b$(TargetPath)</ExtensionsToDeleteOnClean>
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>S:\SDK\fmt;S:\xrCore;S:\SDK\Xiph\Include;S:\SDK\boost_1_30_0;S:\SDK\luabind\luabind;S:\xrLua\src;S:\SDK\dx9sdk\dx9sdk\include;$(IncludePath)</IncludePath>
-    <LibraryPath>x:\libraries_$(Configuration)\;S:\SDK\OpenAL\libs;S:\SDK\Xiph\Libs;S:\SDK\dx9sdk\dx9sdk\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>S:\xrCore;S:\SDK\Xiph\Include;S:\SDK\boost_1_30_0;S:\SDK\luabind\luabind;S:\xrLua\src;S:\SDK\dx9sdk\dx9sdk\include;$(IncludePath)</IncludePath>
+    <LibraryPath>x:\libraries_Debug\;S:\SDK\OpenAL\libs;S:\SDK\Xiph\Libs;S:\SDK\dx9sdk\dx9sdk\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_C++11|Win32'">
     <OutDir>y:\bin_$(Configuration)\</OutDir>
@@ -137,9 +137,11 @@
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>y:\bin_$(Configuration)\</OutDir>
+    <OutDir>y:\bin_Release\</OutDir>
     <IntDir>x:\intermediate\$(Configuration)\$(ProjectName)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>S:\xrCore;S:\SDK\Xiph\Include;S:\SDK\boost_1_30_0;S:\SDK\luabind\luabind;S:\xrLua\src;S:\SDK\dx9sdk\dx9sdk\include;$(IncludePath)</IncludePath>
+    <LibraryPath>x:\libraries_Release\;S:\SDK\OpenAL\libs;S:\SDK\Xiph\Libs;S:\SDK\dx9sdk\dx9sdk\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Dedicated|Win32'">
     <OutDir>y:\bin_$(Configuration)\</OutDir>
@@ -212,7 +214,7 @@
       <MapExports>false</MapExports>
       <SubSystem>Windows</SubSystem>
       <LargeAddressAware>true</LargeAddressAware>
-      <ImportLibrary>x:\libraries_$(Configuration)\$(ProjectName).lib</ImportLibrary>
+      <ImportLibrary>x:\libraries_Debug\$(ProjectName).lib</ImportLibrary>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
   </ItemDefinitionGroup>
@@ -386,7 +388,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
-      <ImportLibrary>x:\libraries_$(Configuration)\$(ProjectName).lib</ImportLibrary>
+      <ImportLibrary>x:\libraries_Release\$(ProjectName).lib</ImportLibrary>
       <FixedBaseAddress>false</FixedBaseAddress>
     </Link>
   </ItemDefinitionGroup>
@@ -559,7 +561,6 @@
     <ClInclude Include="trivial_encryptor.h" />
     <ClInclude Include="x_ray.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="psystem.h" />
     <ClInclude Include="IInputReceiver.h" />
     <ClInclude Include="xr_input.h" />
     <ClInclude Include="ISheduled.h" />
@@ -863,6 +864,8 @@
     <ResourceCompile Include="resource.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="op_load_screen_cl.bmp" />
+    <Image Include="op_load_screen_ne.bmp" />
     <Image Include="stalker.ico">
       <DeploymentContent>true</DeploymentContent>
     </Image>

@@ -2,6 +2,10 @@
 #include "xrSheduler.h"
 #include "xr_object.h"
 #include "../build_defines.h"
+#include "../xrShared/lua_tools.h"
+#include "xrGame/ai_space.h"
+#include "xrGame/script_storage_space.h"
+#include "xrGame/script_engine.h"
 
 float			psShedulerCurrent		= 10.f	;
 float			psShedulerTarget		= 10.f	;
@@ -302,6 +306,10 @@ void CSheduler::ProcessStep			()
 #ifndef DEBUG_SCHEDULER2
 		}
 		catch(...) {
+			if (g_game_lua)
+			{
+				Msg(get_lua_traceback(g_game_lua,3));
+			}
 			Msg						("Scheduler tried to update object %s",*T.scheduled_name);
 			FlushLog				();
 			T.Object				= 0;
@@ -377,6 +385,10 @@ void CSheduler::ProcessStep			()
 #ifndef DEBUG_SCHEDULER2
 		}
 		catch(...) {
+			if (g_game_lua)
+			{
+				Msg(get_lua_traceback(g_game_lua,3));
+			}
 			Msg						("Scheduler tried to update object %s",*T.scheduled_name);
 			FlushLog				();
 			T.Object				= 0;

@@ -229,7 +229,7 @@ void CStepManager::reload_foot_bones()
 	for (u32 i = 0; i < MAX_LEGS_COUNT; i++) 
 		if (m_foot_bones[i] != BI_NONE) count++;
 
-	VERIFY(count == m_legs_count);
+	//VERIFY(count == m_legs_count);
 }
 
 float CStepManager::get_blend_time()

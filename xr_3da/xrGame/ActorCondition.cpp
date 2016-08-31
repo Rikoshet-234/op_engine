@@ -16,6 +16,7 @@
 #include "script_callback_ex.h"
 #include "object_broker.h"
 #include "weapon.h"
+#include "artifact.h"
 
 #define MAX_SATIETY					1.0f
 #define START_SATIETY				0.5f
@@ -270,6 +271,17 @@ bool CActorCondition::IsCantWalkWeight()
 		CCustomOutfit* outfit	= m_object->GetOutfit();
 		if(outfit)
 			max_w += outfit->m_additional_weight;
+		
+		TIItemContainer::iterator it=object().inventory().m_belt.begin();
+		TIItemContainer::iterator ite=object().inventory().m_belt.end();
+		for(;it!=ite;++it)
+		{
+			CArtefact* artefact=smart_cast<CArtefact*>(*it);
+			if (artefact)
+			{
+				max_w+=artefact->m_art_additional_weight;
+			}
+		}
 
 		if( object().inventory().TotalWeight() > max_w )
 		{

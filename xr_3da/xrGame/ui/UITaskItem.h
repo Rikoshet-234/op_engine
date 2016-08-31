@@ -2,6 +2,7 @@
 #include "UIDialogWnd.h"
 #include "UIListItem.h"
 #include "UIWndCallback.h"
+#include <string>
 
 class CGameTask;
 class CUIStatic;
@@ -17,6 +18,10 @@ class CUITaskItem :public CUIListItem, public CUIWndCallback
 protected:
 	CGameTask*				m_GameTask;
 	u16						m_TaskObjectiveIdx;
+	
+	std::string		m_captionBeginStr;
+	std::string		m_captionEndStr;
+
 	void __stdcall	OnItemClicked			(CUIWindow*, void*);
 	void					Init			();
 public:
@@ -42,6 +47,8 @@ protected:
 	CUIStatic*		m_captionTime;
 	CUIStatic*		m_remTimeStatic;
 	CUI3tButton*	m_switchDescriptionBtn;
+
+
 	bool			m_curr_descr_mode;
 	void			Init					();
 public:	

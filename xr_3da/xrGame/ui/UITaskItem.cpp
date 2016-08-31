@@ -13,6 +13,10 @@
 #include "../level.h"
 #include "../actor.h"
 #include "../gametaskmanager.h"
+#include "../date_time.h"
+#include "../xrCore/_types.h"
+#include "../xr_time.h"
+#include "../xrCore/log.h"
 
 CUITaskItem::CUITaskItem			(CUIEventsWnd* w)
 :m_GameTask			(NULL),
@@ -46,6 +50,11 @@ void CUITaskItem::Init				()
 	SetWindowName					("job_item");
 	Register						(this);
 	AddCallback						("job_item",BUTTON_CLICKED,CUIWndCallback::void_function(this,&CUITaskItem::OnItemClicked));
+
+	std::string prefixStr("ui_st_time_qbegin");
+	m_captionBeginStr=CStringTable().translate(prefixStr.c_str()).c_str();
+	prefixStr="ui_st_time_qend";
+	m_captionEndStr=CStringTable().translate(prefixStr.c_str()).c_str();
 }
 
 void CUITaskItem::OnItemClicked(CUIWindow*, void*)
@@ -107,14 +116,15 @@ void CUITaskRootItem::SetGameTask(CGameTask* gt, u16 obj_idx)
 
 	m_captionStatic->SetText		(*stbl.translate(m_GameTask->m_Title));
 	m_captionStatic->AdjustHeightToText	();
-	
-	xr_string	txt ="";
-	txt			+= *(InventoryUtilities::GetDateAsString(gt->m_ReceiveTime, InventoryUtilities::edpDateToDay));
-	txt			+= " ";
-	txt			+= *(InventoryUtilities::GetTimeAsString(gt->m_ReceiveTime, InventoryUtilities::etpTimeToMinutes));
 
-	m_captionTime->SetText		(txt.c_str());
+	string512 result;
+	std::string dateStr(InventoryUtilities::GetDateAsString(gt->m_ReceiveTime, InventoryUtilities::edpDateToDay).c_str());
+	std::string timeStr(InventoryUtilities::GetTimeAsString(gt->m_ReceiveTime, InventoryUtilities::etpTimeToMinutes).c_str());
+	sprintf_s(result,"%s %s %s",m_captionBeginStr.c_str(),dateStr.c_str(),timeStr.c_str());
+	m_captionTime->SetText		(result);
+
 	m_captionTime->SetWndPos(m_captionTime->GetWndPos().x,m_captionStatic->GetWndPos().y+m_captionStatic->GetHeight()+3.0f);
+	m_captionTime->Show(false);
 
 	float h = _max	(m_taskImage->GetWndPos().y+m_taskImage->GetHeight(),m_captionTime->GetWndPos().y+m_captionTime->GetHeight());
 	h	= _max(h,m_switchDescriptionBtn->GetWndPos().y+m_switchDescriptionBtn->GetHeight());
@@ -141,6 +151,7 @@ void CUITaskRootItem::SetGameTask(CGameTask* gt, u16 obj_idx)
 
 		_height			= _max(_height, _pos.y+m_remTimeStatic->GetWndSize().y);
 		SetHeight		(_height);
+		m_captionTime->Show(true);
 	}
 }
 
@@ -160,10 +171,36 @@ void CUITaskRootItem::Update		()
 
 	if(m_remTimeStatic->IsShown())
 	{
-		string512									buff, buff2;
-		InventoryUtilities::GetTimePeriodAsString	(buff, sizeof(buff), Level().GetGameTime(), GameTask()->m_TimeToComplete);
-		sprintf_s										(buff2,"%s %s", *CStringTable().translate("ui_st_time_remains"), buff);
-		m_remTimeStatic->SetText					(buff2);
+
+		float diffTime=xrTime(GameTask()->m_TimeToComplete).diffSec(Level().GetGameTime());
+
+		int _mins=static_cast<int>(ceil(diffTime/60));
+		int _hours=static_cast<int>(ceil(diffTime/(60*60)));
+		int _days=static_cast<int>(ceil(diffTime/(60*60*24)));
+		
+		std::string elapsedCaption="";
+		if (_days>0)
+		{
+			elapsedCaption=std::to_string(_days)+" "+ CStringTable().translate("ui_st_days").c_str();
+		} else if(_hours>0)
+		{
+			elapsedCaption=std::to_string(_hours)+" "+ CStringTable().translate("ui_st_hours").c_str();
+		} else if (_mins >0 )
+		{
+			elapsedCaption=std::to_string(_mins)+" "+ CStringTable().translate("ui_st_mins").c_str(); 
+		}
+		string256 elapsedString;
+		if (!elapsedCaption.empty())
+		{
+			sprintf_s(elapsedString,"%s %s",CStringTable().translate("ui_st_time_remains").c_str(),elapsedCaption.c_str());
+		}
+		string256						timeCaption;
+		u32 years, months, days, hours, minutes, seconds, milliseconds;
+		split_time						(GameTask()->m_TimeToComplete, years, months, days, hours, minutes, seconds, milliseconds);
+		sprintf_s						(timeCaption,"%s %02i/%02i/%04i %02i:%02i", m_captionEndStr.c_str(), days, months, years, hours, minutes);
+
+		m_captionTime->SetText(timeCaption);
+		m_remTimeStatic->SetText(elapsedString);
 	
 	}
 }

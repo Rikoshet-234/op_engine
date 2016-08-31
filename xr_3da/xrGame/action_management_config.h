@@ -6,6 +6,7 @@
 //	Description : Action management configuration file
 ////////////////////////////////////////////////////////////////////////////
 
+#include "../build_defines.h"
 #pragma once
 
 #ifdef DEBUG

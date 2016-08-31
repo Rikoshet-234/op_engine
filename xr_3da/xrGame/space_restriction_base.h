@@ -15,7 +15,7 @@ private:
 	typedef CSpaceRestrictionAbstract		inherited;
 
 public:
-#ifdef DEBUG
+#ifdef VERIFY_RESTRICTORS
 	xr_vector<u32>		m_test_storage;
 	bool				m_correct;
 #endif
@@ -32,7 +32,7 @@ public:
 	virtual	Fsphere		sphere				() const = 0;
 
 public:
-#ifdef DEBUG
+#ifdef VERIFY_RESTRICTORS
 	IC		bool		correct				() const;
 #endif
 };

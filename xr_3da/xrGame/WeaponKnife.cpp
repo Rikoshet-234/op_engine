@@ -24,9 +24,19 @@ CWeaponKnife::CWeaponKnife() : CWeapon("KNIFE")
 }
 CWeaponKnife::~CWeaponKnife()
 {
+	HUD_SOUND::DestroySound(sndShow);
+	HUD_SOUND::DestroySound(sndHide);
 	HUD_SOUND::DestroySound(m_sndShot);
-
 }
+
+void CWeaponKnife::StopHUDSounds()
+{
+	HUD_SOUND::StopSound(sndShow);
+	HUD_SOUND::StopSound(sndHide);
+	HUD_SOUND::StopSound(m_sndShot);
+	inherited::StopHUDSounds();
+}
+
 
 void CWeaponKnife::Load	(LPCSTR section)
 {
@@ -45,8 +55,10 @@ void CWeaponKnife::Load	(LPCSTR section)
 	animGet				(mhud_attack_e,	pSettings->r_string(*hud_sect,"anim_shoot1_end"));
 	animGet				(mhud_attack2_e,pSettings->r_string(*hud_sect,"anim_shoot2_end"));
 
-	HUD_SOUND::LoadSound(section,"snd_shoot"		, m_sndShot		, ESoundTypes(SOUND_TYPE_WEAPON_SHOOTING)		);
-	
+	HUD_SOUND::LoadSound(section,"snd_shoot"	, m_sndShot		, ESoundTypes(SOUND_TYPE_WEAPON_SHOOTING));
+	HUD_SOUND::LoadSound(section,"snd_draw"		, sndShow		, ESoundTypes(SOUND_TYPE_ITEM_TAKING|SOUND_TYPE_WEAPON),false);
+	HUD_SOUND::LoadSound(section,"snd_holster"	, sndHide		, ESoundTypes(SOUND_TYPE_ITEM_HIDING|SOUND_TYPE_WEAPON),false);
+
 	knife_material_idx =  GMLib.GetMaterialIdx(KNIFE_MATERIAL_NAME);
 }
 
@@ -223,14 +235,17 @@ void CWeaponKnife::switch2_Hiding	()
 
 void CWeaponKnife::switch2_Hidden()
 {
+	PlaySound	(sndHide,get_LastFP());
 	signal_HideComplete		();
 	m_bPending = false;
 }
 
 void CWeaponKnife::switch2_Showing	()
 {
+	PlaySound	(sndShow,get_LastFP());
 	VERIFY(GetState()==eShowing);
 	m_pHUD->animPlay		(random_anim(mhud_show), FALSE, this, GetState());
+
 //	m_bPending				= true;
 }
 

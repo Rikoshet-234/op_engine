@@ -263,7 +263,7 @@ CSoundPlayer::CSoundCollection::CSoundCollection	(const CSoundCollectionParams &
 		}
 	}
 //#ifdef DEBUG
-	if (m_sounds.empty())
+	if (m_sounds.empty()) {}
 		if (OPFuncs::Dumper->isParamSet(OPFuncs::ExpandedCmdParams::KnownParams::dSoundPrefixNotPresent))
 			Msg							("* WARNING CSoundPlayer::CSoundCollection  There are no sounds with prefix %s",*params.m_sound_prefix);
 //#endif

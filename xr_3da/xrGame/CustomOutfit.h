@@ -6,7 +6,7 @@ struct SBoneProtections;
 
 class CCustomOutfit: public CInventoryItemObject {
 private:
-    typedef	CInventoryItemObject inherited;
+	typedef	CInventoryItemObject inherited;
 public:
 									CCustomOutfit		(void);
 	virtual							~CCustomOutfit		(void);
@@ -44,6 +44,12 @@ protected:
 public:
 	float							m_additional_weight;
 	float							m_additional_weight2;
+	float					        m_fHealthRestoreSpeed;
+	float 					        m_fRadiationRestoreSpeed;
+	float 					        m_fSatietyRestoreSpeed;
+	float					        m_fPowerRestoreSpeed;
+	float					        m_fBleedingRestoreSpeed; 
+
 	shared_str						m_NightVisionSect;
 	virtual u32						ef_equipment_type		() const;
 	virtual	BOOL					BonePassBullet			(int boneID);

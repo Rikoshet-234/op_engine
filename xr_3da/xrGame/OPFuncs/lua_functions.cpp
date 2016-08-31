@@ -34,7 +34,7 @@ namespace OPFuncs
 			[
 				luabind::def("get_actor_slots_count",&get_actor_slots_count),
 				luabind::def("IsOPEngine", &lua_IsOPEngine),
-				luabind::def("log1", static_cast<void(*)(LPCSTR)>(&Log)),
+				luabind::def("engine_log", static_cast<void(*)(LPCSTR)>(&Log)),
 				luabind::def("GetOPEngineVersion",&lua_GetOPEngineVersion)
 			];
 	}

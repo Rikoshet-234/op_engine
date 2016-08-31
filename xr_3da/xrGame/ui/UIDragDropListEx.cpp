@@ -25,8 +25,8 @@ CUIDragDropListEx::CUIDragDropListEx()
 	SetCellSize					(Ivector2().set(50,50));
 	SetCellsCapacity			(Ivector2().set(0,0));
 
-	AttachChild					(m_container);
-	AttachChild					(m_vScrollBar);
+	CUIWindow::AttachChild					(m_container);
+	CUIWindow::AttachChild					(m_vScrollBar);
 
 	m_vScrollBar->SetWindowName	("scroll_v");
 	Register					(m_vScrollBar);
@@ -273,9 +273,12 @@ void CUIDragDropListEx::ReinitScroll()
 		m_vScrollBar->Enable		( h1 > h2 );
 
 		m_vScrollBar->SetRange		(0, _max(0,iFloor(h1-h2)) );
-		m_vScrollBar->SetScrollPos	(0);
 		m_vScrollBar->SetStepSize	(CellSize().y/3);
 		m_vScrollBar->SetPageSize	(iFloor(GetWndSize().y/float(CellSize().y)));
+
+
+		m_vScrollBar->SetScrollPos(m_vScrollBar->GetScrollPos());
+
 		m_container->SetWndPos		(0,0);
 }
 
@@ -323,6 +326,12 @@ void CUIDragDropListEx::SetCellSize(const Ivector2 new_sz)
 int CUIDragDropListEx::ScrollPos()
 {
 	return m_vScrollBar->GetScrollPos();
+}
+
+void CUIDragDropListEx::SetScrollPos(int iPos)
+{
+	m_vScrollBar->SetScrollPos(iPos);
+	m_vScrollBar->Refresh();
 }
 
 void CUIDragDropListEx::SetItem(CUICellItem* itm) //auto

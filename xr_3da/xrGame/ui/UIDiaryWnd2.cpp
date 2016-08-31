@@ -35,6 +35,15 @@ CUIDiaryWnd::~CUIDiaryWnd()
 	delete_data(m_oldSectionImage);
 }
 
+void CUIDiaryWnd::AddDiaryArticle            (shared_str article_id, bool bReaded)
+{
+	m_ArticlesDB.resize(m_ArticlesDB.size() + 1);
+	CEncyclopediaArticle*& a = m_ArticlesDB.back();
+	a = xr_new<CEncyclopediaArticle>();
+	a->Load(article_id);
+	CreateTreeBranch(a->data()->group,a->data()->name, m_SrcListWnd, m_ArticlesDB.size()-1, m_pTreeRootFont, m_uTreeRootColor, m_pTreeItemFont, m_uTreeItemColor, bReaded);
+}
+
 void CUIDiaryWnd::Show(bool status)
 {
 	inherited::Show		(status);
@@ -66,7 +75,7 @@ void CUIDiaryWnd::Init()
 	xml_init.InitTabControl			(uiXml, "main_wnd:left_frame:left_frame_header:filter_tab", 0, m_FilterTab);
 	m_FilterTab->SetWindowName		("filter_tab");
 	Register						(m_FilterTab);
-    AddCallback						("filter_tab",TAB_CHANGED,CUIWndCallback::void_function(this,&CUIDiaryWnd::OnFilterChanged));
+	AddCallback						("filter_tab",TAB_CHANGED,CUIWndCallback::void_function(this,&CUIDiaryWnd::OnFilterChanged));
 
 	m_UIAnimation					= xr_new<CUIAnimatedStatic>(); m_UIAnimation->SetAutoDelete(true);
 	xml_init.InitAnimatedStatic		(uiXml, "main_wnd:left_frame:left_frame_header:anim_static", 0, m_UIAnimation);
@@ -81,7 +90,7 @@ void CUIDiaryWnd::Init()
 	xml_init.InitListWnd			(uiXml, "main_wnd:left_frame:work_area:src_list", 0, m_SrcListWnd);
 	m_SrcListWnd->SetWindowName		("src_list");
 	Register						(m_SrcListWnd);
-    AddCallback						("src_list",LIST_ITEM_CLICKED,CUIWndCallback::void_function(this,&CUIDiaryWnd::OnSrcListItemClicked));
+	AddCallback						("src_list",LIST_ITEM_CLICKED,CUIWndCallback::void_function(this,&CUIDiaryWnd::OnSrcListItemClicked));
 
 	xml_init.InitFont				(uiXml, "main_wnd:left_frame:work_area:src_list:tree_item_font", 0, m_uTreeItemColor, m_pTreeItemFont);
 	R_ASSERT						(m_pTreeItemFont);
@@ -194,16 +203,8 @@ void CUIDiaryWnd::LoadJournalTab			(ARTICLE_DATA::EArticleType _type)
 		for(; it != Actor()->encyclopedia_registry->registry().objects_ptr()->end(); it++)
 		{
 			if (_type == it->article_type)
-				
 			{
-				m_ArticlesDB.resize(m_ArticlesDB.size() + 1);
-				CEncyclopediaArticle*& a = m_ArticlesDB.back();
-				a = xr_new<CEncyclopediaArticle>();
-				a->Load(it->article_id);
-
-				bool bReaded = false;
-				CreateTreeBranch(a->data()->group, a->data()->name, m_SrcListWnd, m_ArticlesDB.size()-1, 
-					m_pTreeRootFont, m_uTreeRootColor, m_pTreeItemFont, m_uTreeItemColor, bReaded);
+				AddDiaryArticle(it->article_id,it->readed);
 			}
 		}
 	}
@@ -250,6 +251,22 @@ void CUIDiaryWnd::OnSrcListItemClicked	(CUIWindow* w,void* p)
 		article_info->Init			("encyclopedia_item.xml","encyclopedia_wnd:objective_item");
 		article_info->SetArticle	(m_ArticlesDB[pSelItem->GetValue()]);
 		m_DescrView->AddWindow		(article_info, true);
+		if (!pSelItem->IsArticleReaded())
+		{
+			if(Actor()->encyclopedia_registry->registry().objects_ptr())
+			{
+				for(ARTICLE_VECTOR::iterator it = Actor()->encyclopedia_registry->registry().objects().begin();
+					it != Actor()->encyclopedia_registry->registry().objects().end(); it++)
+				{
+					if (ARTICLE_DATA::eJournalArticle == it->article_type &&
+						m_ArticlesDB[pSelItem->GetValue()]->Id() == it->article_id)
+					{
+						it->readed = true;
+						break;
+					}
+				}
+			}
+		}
 	}
 }
 

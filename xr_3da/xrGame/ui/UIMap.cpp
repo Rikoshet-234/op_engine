@@ -367,7 +367,7 @@ void CUILevelMap::Init	(shared_str name, CInifile& gameLtx, LPCSTR sh_name)
 	Fvector4 tmp = gameLtx.r_fvector4(MapName(),"global_rect");
 	m_GlobalRect.set(tmp.x, tmp.y, tmp.z, tmp.w);
 
-	if (OPFuncs::Dumper->isParamSet(OPFuncs::ExpandedCmdParams::KnownParams::dMaterialsLoad))
+	if (OPFuncs::Dumper->isParamSet(OPFuncs::ExpandedCmdParams::KnownParams::dMapLoadErrors))
 	{
 		float kw = m_GlobalRect.width	()	/	BoundRect().width		();
 		float kh = m_GlobalRect.height	()	/	BoundRect().height	();

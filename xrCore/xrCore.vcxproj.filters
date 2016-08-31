@@ -253,13 +253,13 @@
       <Filter>Compression\lzo</Filter>
     </ClCompile>
     <ClCompile Include="xrSyncronize.cpp" />
-    <ClCompile Include="OPFuncs\ExpandedCmdParams.cpp">
-      <Filter>OPFuncs</Filter>
-    </ClCompile>
     <ClCompile Include="OPFuncs\op_engine_version.cpp">
       <Filter>OPFuncs</Filter>
     </ClCompile>
     <ClCompile Include="OPFuncs\utils.cpp">
+      <Filter>OPFuncs</Filter>
+    </ClCompile>
+    <ClCompile Include="OPFuncs\ExpandedCmdParams.cpp">
       <Filter>OPFuncs</Filter>
     </ClCompile>
   </ItemGroup>
@@ -532,16 +532,13 @@
       <Filter>Compression\lzo</Filter>
     </ClInclude>
     <ClInclude Include="xrSyncronize.h" />
-    <ClInclude Include="OPFuncs\ExpandedCmdParams.h">
-      <Filter>OPFuncs</Filter>
-    </ClInclude>
     <ClInclude Include="OPFuncs\op_engine_version.h">
       <Filter>OPFuncs</Filter>
     </ClInclude>
-    <ClInclude Include="OPFuncs\LoadStrings.h">
+    <ClInclude Include="OPFuncs\utils.h">
       <Filter>OPFuncs</Filter>
     </ClInclude>
-    <ClInclude Include="OPFuncs\utils.h">
+    <ClInclude Include="OPFuncs\ExpandedCmdParams.h">
       <Filter>OPFuncs</Filter>
     </ClInclude>
   </ItemGroup>

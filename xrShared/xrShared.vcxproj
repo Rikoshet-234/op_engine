@@ -52,10 +52,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>y:\bin_$(Configuration)\</OutDir>
+    <OutDir>y:\bin_Debug\</OutDir>
     <IntDir>x:\intermediate\$(Configuration)\$(ProjectName)\</IntDir>
     <IncludePath>S:\SDK\boost_1_30_0;S:\SDK\luabind\luabind;S:\SDK\fmt;S:\xrCore;S:\xrLua\src;$(IncludePath)</IncludePath>
-    <LibraryPath>x:\libraries_$(Configuration)\;s:\SDK\fmt\_build\fmt\Release\;$(LibraryPath)</LibraryPath>
+    <LibraryPath>x:\libraries_Debug\;$(LibraryPath)</LibraryPath>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_C++11|Win32'">
@@ -66,11 +66,11 @@
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>y:\bin_$(Configuration)\</OutDir>
+    <OutDir>y:\bin_Release\</OutDir>
     <IntDir>x:\intermediate\$(Configuration)\$(ProjectName)\</IntDir>
     <TargetExt>.dll</TargetExt>
-    <IncludePath>S:\SDK\boost_1_30_0;S:\SDK\luabind\luabind;S:\SDK\fmt;S:\xrCore;S:\xrLua\src;$(IncludePath)</IncludePath>
-    <LibraryPath>x:\libraries_$(Configuration)\;$(LibraryPath)</LibraryPath>
+    <IncludePath>S:\SDK\boost_1_30_0;S:\SDK\luabind\luabind;S:\xrCore;S:\xrLua\src;$(IncludePath)</IncludePath>
+    <LibraryPath>x:\libraries_Release\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -92,10 +92,11 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <FloatingPointModel>Fast</FloatingPointModel>
       <BrowseInformation />
+      <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ImportLibrary>x:\libraries_$(Configuration)\$(ProjectName).lib</ImportLibrary>
+      <ImportLibrary>x:\libraries_Debug\$(ProjectName).lib</ImportLibrary>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>
       </ModuleDefinitionFile>
@@ -148,9 +149,10 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <TreatLinkerWarningAsErrors>false</TreatLinkerWarningAsErrors>
-      <AdditionalDependencies>xrLua.lib;xrCore.lib;fmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ImportLibrary>x:\libraries_$(Configuration)\$(ProjectName).lib</ImportLibrary>
-      <ModuleDefinitionFile>xrShared.def</ModuleDefinitionFile>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <ImportLibrary>x:\libraries_Release\$(ProjectName).lib</ImportLibrary>
+      <ModuleDefinitionFile>
+      </ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -159,17 +161,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="lua_tools.h" />
-    <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="xrShared.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="xrShared.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\SDK\fmt\_build\fmt\fmt.vcxproj">
-      <Project>{5816bc48-44df-3b35-8217-b2b5a87effaf}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\xrCore\xrCore.vcxproj">
       <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
     </ProjectReference>

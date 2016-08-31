@@ -20,7 +20,7 @@
 #include "CopyProtection.h"
 #include "Text_Console.h"
 #include <process.h>
-#include "../xrCore/OPFuncs/ExpandedCmdParams.h"
+#include "../xrCore/OPFuncs/op_engine_version.h"
 
 //---------------------------------------------------------------------
 ENGINE_API CInifile* pGameIni		= NULL;
@@ -573,7 +573,8 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance,
 					 int       nCmdShow)
 {
 //	foo();
-	OPFuncs::Dumper->ParseCmdParams(lpCmdLine);
+						
+	
 #ifndef DEDICATED_SERVER
 
 	// Check for virtual memory
@@ -606,7 +607,8 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance,
 	SetThreadAffinityMask		(GetCurrentThread(),1);
 
 	// Title window
-	logoWindow					= CreateDialog(GetModuleHandle(NULL),	MAKEINTRESOURCE(IDD_STARTUP), 0, logDlgProc );
+	logoWindow					= CreateDialog(GetModuleHandle(NULL),	MAKEINTRESOURCE(IDD_STARTUP_OP), 0, logDlgProc );
+
 	SetWindowPos				(
 		logoWindow,
 #ifndef DEBUG

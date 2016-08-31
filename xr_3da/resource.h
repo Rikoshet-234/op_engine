@@ -6,12 +6,17 @@
 #define IDD_STARTUP                     106
 #define IDI_ICON1                       111
 #define IDB_BITMAP2                     116
+#define IDB_BITMAP_OP_NE                118
+#define IDB_BITMAP_OP_CL                119
+#define IDD_STARTUP_OP                  120
 #define IDC_LIST                        1000
 #define IDC_FILE                        1001
 #define IDC_LINE                        1002
 #define IDC_DESC                        1003
 #define IDSTOP                          1004
 #define IDC_STACK                       1006
+#define IDC_STATIC2                     1008
+#define IDC_VER_LABEL                   1008
 #define RC_VIRT_MEM_ERROR               2071
 #define RC_VIRT_MEM_TEXT                2072
 
@@ -19,9 +24,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        118
+#define _APS_NEXT_RESOURCE_VALUE        121
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1007
+#define _APS_NEXT_CONTROL_VALUE         1009
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

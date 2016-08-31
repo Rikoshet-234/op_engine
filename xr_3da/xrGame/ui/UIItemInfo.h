@@ -1,5 +1,6 @@
 #pragma once
 #include "uiwindow.h"
+#include "UIOutfitInfo.h"
 
 
 class CInventoryItem;

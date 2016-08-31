@@ -118,6 +118,8 @@ namespace PAPI{
 		PAVortexID,			// 
         PATurbulenceID,     //
         PAScatterID, 	    //
+		Last=PAScatterID,
+		First=PAAvoidID,
 		action_enum_force_dword = u32(-1)
 	};
     struct ParticleAction;
@@ -152,7 +154,9 @@ namespace PAPI{
         // action
         virtual ParticleAction*		CreateAction		(PActionEnum type)=0;
         virtual u32					LoadActions			(int alist_id, IReader& R)=0;
+		virtual u32					LoadActions			(int alist_id, IReader& R,std::string defName)=0;
         virtual void				SaveActions			(int alist_id, IWriter& W)=0;
+		virtual bool CheckActionsList()=0;
     };
 
     PARTICLES_API IParticleManager* ParticleManager		();

@@ -12,6 +12,7 @@
 #include "alife_object_registry.h"
 #include "alife_story_registry.h"
 #include "script_engine.h"
+#include "script_storage.h"
 #include "xrServer_Objects_ALife_Monsters.h"
 #include "restriction_space.h"
 #include "alife_graph_registry.h"
@@ -19,6 +20,8 @@
 #include "alife_registry_container.h"
 #include "xrServer.h"
 #include "level.h"
+#include "../xrShared/lua_tools.h"
+#include "script_game_object.h"
 
 using namespace luabind;
 
@@ -38,6 +41,17 @@ CSE_ALifeDynamicObject *alife_object		(const CALifeSimulator *self, ALife::_OBJE
 {
 	VERIFY			(self);
 	return			(self->objects().object(object_id,true));
+}
+
+CSE_ALifeDynamicObject *alife_object		(const CALifeSimulator *self, CScriptGameObject* object)
+{
+	VERIFY			(self);
+	if (object==nullptr)
+	{
+		ai().script_engine().print_stack();
+		FATAL("Input object is nil!");
+	}
+	return			(self->objects().object(u16(object->ID()),true));
 }
 
 bool valid_object_id						(const CALifeSimulator *self, ALife::_OBJECT_ID object_id)
@@ -84,26 +98,31 @@ void generate_story_ids		(
 {
 	result.clear			();
 
-    CInifile				*Ini = pGameIni;
-    
-    LPCSTR					N,V;
+	CInifile				*Ini = pGameIni;
+	
+	LPCSTR					N,V;
 	u32 					k;
 	shared_str				temp;
-    LPCSTR					section = section_name;
-    R_ASSERT				(Ini->section_exist(section));
+	LPCSTR					section = section_name;
+	R_ASSERT				(Ini->section_exist(section));
 
 	for (k = 0; Ini->r_line(section,k,&N,&V); ++k) {
 		temp				= Ini->r_string_wb(section,N);
-		
+
 		R_ASSERT3			(!strchr(*temp,' '),invalid_id_description,*temp);
 		R_ASSERT2			(xr_strcmp(*temp,INVALID_ID_STRING),invalid_id_redefinition);
-		
+
+		std::string storyIdName(temp.c_str());
+		std::transform(storyIdName.begin(),storyIdName.end(),storyIdName.begin(),::tolower);
+
+
 		STORY_PAIRS::const_iterator	I = result.begin();
 		STORY_PAIRS::const_iterator	E = result.end();
 		for ( ; I != E; ++I)
-			R_ASSERT3		((*I).first != temp,duplicated_id_description,*temp);
+			R_ASSERT3		((*I).first != storyIdName.c_str(),duplicated_id_description,storyIdName.c_str());
+			//R_ASSERT3		((*I).first != temp,duplicated_id_description,*temp);
 		
-		result.push_back	(std::make_pair(*temp,atoi(N)));
+		result.push_back	(std::make_pair(storyIdName.c_str(),atoi(N)));
 	}
 
 	result.push_back		(std::make_pair(INVALID_ID_STRING,INVALID_ID));
@@ -349,6 +368,7 @@ void CALifeSimulator::script_register			(lua_State *L)
 			.def("valid_object_id",			&valid_object_id)
 			.def("level_id",				&get_level_id)
 			.def("level_name",				&get_level_name)
+			.def("object",					(CSE_ALifeDynamicObject *(*) (const CALifeSimulator *,CScriptGameObject*))(alife_object))
 			.def("object",					(CSE_ALifeDynamicObject *(*) (const CALifeSimulator *,ALife::_OBJECT_ID))(alife_object))
 			.def("object",					(CSE_ALifeDynamicObject *(*) (const CALifeSimulator *,LPCSTR))(alife_object))
 			.def("object",					(CSE_ALifeDynamicObject *(*) (const CALifeSimulator *,ALife::_OBJECT_ID, bool))(alife_object))
@@ -427,9 +447,9 @@ void CALifeSimulator::script_register			(lua_State *L)
 
 #if 0//def DEBUG
 struct dummy {
-    int count;
-    lua_State* state;
-    int ref;
+	int count;
+	lua_State* state;
+	int ref;
 };
 
 void CALifeSimulator::validate			()

@@ -38,6 +38,8 @@
 #include "../string_table.h"
 #include "../clsid_game.h"
 #include "UIArtefactPanel.h"
+#include "../../CustomHUD.h"
+#include <cmath>
 
 #ifdef DEBUG
 #	include "../attachable_item.h"
@@ -315,6 +317,11 @@ void CUIMainIngameWnd::SetMPChatLog(CUIWindow* pChat, CUIWindow* pLog){
 	m_pMPLogWnd  = pLog;
 }
 
+double round(double number)
+{
+	return number < 0.0 ? ceil(number - 0.5) : floor(number + 0.5);
+}
+
 void CUIMainIngameWnd::SetAmmoIcon (const shared_str& sect_name)
 {
 	if ( !sect_name.size() )
@@ -325,7 +332,9 @@ void CUIMainIngameWnd::SetAmmoIcon (const shared_str& sect_name)
 
 	UIWeaponIcon.Show			(true);
 	//properties used by inventory menu
-	float iGridWidth			= pSettings->r_float(sect_name, "inv_grid_width");
+	UIIconInfo iconInfo(sect_name);
+	Frect rect = iconInfo.getOriginalRect();
+	/*float iGridWidth			= pSettings->r_float(sect_name, "inv_grid_width");
 	float iGridHeight			= pSettings->r_float(sect_name, "inv_grid_height");
 
 	float iXPos				= pSettings->r_float(sect_name, "inv_grid_x");
@@ -334,11 +343,14 @@ void CUIMainIngameWnd::SetAmmoIcon (const shared_str& sect_name)
 	UIWeaponIcon.GetUIStaticItem().SetOriginalRect(	(iXPos		 * INV_GRID_WIDTH),
 													(iYPos		 * INV_GRID_HEIGHT),
 													(iGridWidth	 * INV_GRID_WIDTH),
-													(iGridHeight * INV_GRID_HEIGHT));
+													(iGridHeight * INV_GRID_HEIGHT));*/
+	UIWeaponIcon.GetUIStaticItem().SetOriginalRect(rect);
 	UIWeaponIcon.SetStretchTexture(true);
 
 	// now perform only width scale for ammo, which (W)size >2
 	// all others ammo (1x1, 1x2) will be not scaled (original picture)
+	int iGridWidth = static_cast<int>(round(rect.width()));
+
 	float w = ((iGridWidth>2)?1.6f:iGridWidth)*INV_GRID_WIDTH*0.9f;
 	float h = INV_GRID_HEIGHT*0.9f;//1 cell
 
@@ -891,11 +903,19 @@ bool CUIMainIngameWnd::OnKeyboardPress(int dik)
 		case DIK_NUMPADMINUS:
 			//.HideAll();
 			HUD().GetUI()->HideGameIndicators();
+			if (!psHUD_Flags.is(HUD_MIN_CROSSHAIR))
+			{
+				HUD().GetUI()->HideCrosshair();	
+			}
+			
+
 			return true;
 			break;
 		case DIK_NUMPADPLUS:
 			//.ShowAll();
 			HUD().GetUI()->ShowGameIndicators();
+			HUD().GetUI()->ShowCrosshair();
+
 			return true;
 			break;
 		}
@@ -1221,9 +1241,9 @@ void test_key	(int dik)
 	static u32 _weigth	= FW_BOLD;
 	static BOOL _italic = FALSE;
 
-    hr = D3DXCreateFont( HW.pDevice, _height, _width, _weigth, 1, _italic, DEFAULT_CHARSET, 
-                         OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, 
-                         "Times New Roman", &g_pTestFont );
+	hr = D3DXCreateFont( HW.pDevice, _height, _width, _weigth, 1, _italic, DEFAULT_CHARSET, 
+						 OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, 
+						 "Times New Roman", &g_pTestFont );
 
 
 	D3DXCreateSprite( HW.pDevice, &g_pTextSprite );
@@ -1273,7 +1293,7 @@ void test_draw	()
 
 
 		RECT rc;
-        g_pTextSprite->Begin( D3DXSPRITE_ALPHABLEND | D3DXSPRITE_SORT_TEXTURE );
+		g_pTextSprite->Begin( D3DXSPRITE_ALPHABLEND | D3DXSPRITE_SORT_TEXTURE );
 
 		rc.left   = 50;
 		rc.top    = 150;

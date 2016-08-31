@@ -164,7 +164,14 @@ void CGameTaskManager::SetTaskState(CGameTask* t, u16 objective_num, ETaskState 
 	}
 	
 	if(0 == objective_num && eTaskStateCompleted == state || eTaskStateFail == state)
+	{
 		t->m_FinishTime = Level().GetGameTime();
+		if (t->m_removeCompleted && objective_num==0 && state!=eTaskStateFail)
+		{
+			//Msg("task need to remove [%s]",t->m_ID.c_str());
+			RemoveTask(t->m_ID);
+		}
+	}
 
 
 	CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
@@ -226,6 +233,27 @@ void CGameTaskManager::UpdateTasks						()
 		UpdateActiveTask	();
 }
 
+void CGameTaskManager::RemoveTask(const TASK_ID& id)
+{
+	CGameTask* task				= HasGameTask(id);
+	if (nullptr==task)
+	{
+		Msg("~ WARNING actor does not has task [%s]", *id);	
+		return;
+	}
+	if (ActiveTask()==task)
+	{
+		if (GameTasks().size()>1)
+			SetActiveTask(GameTasks().front().task_id,1);
+	}
+
+	GameTasks().erase(std::remove_if(
+		GameTasks().begin(),
+		GameTasks().end(),
+		[task](SGameTaskKey& key) {return key.game_task->m_ID==task->m_ID;}
+	),GameTasks().end());
+
+}
 
 void CGameTaskManager::UpdateActiveTask				()
 {

@@ -77,7 +77,12 @@ void CScriptGameObject::set_sound_mask	(u32 sound_mask)
 	else {
 		CEntityAlive			*entity_alive = smart_cast<CEntityAlive*>(monster);
 		if (entity_alive) {
-			VERIFY2				(entity_alive->g_Alive(),"Stalkers talk after death??? Say why??");
+			if (!entity_alive->g_Alive())
+			{
+				//Msg("~ WARNING Stalkers [%s] talk after death??? Say why??",entity_alive->Name_script());
+				ai().script_engine().script_log	(ScriptStorage::eLuaMessageTypeError,"~ Stalkers [%s] talk after death??? Say why??",entity_alive->Name_script());
+				return;
+			}
 		}
 		monster->sound().set_sound_mask(sound_mask);
 	}

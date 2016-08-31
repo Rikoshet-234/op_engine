@@ -26,6 +26,9 @@
 #include "mathutils.h"
 #include "object_broker.h"
 #include "../igame_persistent.h"
+#include "ai_space.h"
+#include "script_engine.h"
+#include "../ai_script_lua_space.h"
 
 #define WEAPON_REMOVE_TIME		60000
 #define ROTATION_TIME			0.25f
@@ -373,7 +376,7 @@ void CWeapon::Load		(LPCSTR section)
 		m_iScopeY = pSettings->r_s32(section,"scope_y");
 	}
 
-    
+	
 	if(m_eSilencerStatus == ALife::eAddonAttachable)
 	{
 		m_sSilencerName = pSettings->r_string(section,"silencer_name");
@@ -381,7 +384,7 @@ void CWeapon::Load		(LPCSTR section)
 		m_iSilencerY = pSettings->r_s32(section,"silencer_y");
 	}
 
-    
+	
 	if(m_eGrenadeLauncherStatus == ALife::eAddonAttachable)
 	{
 		m_sGrenadeLauncherName = pSettings->r_string(section,"grenade_launcher_name");
@@ -475,8 +478,27 @@ BOOL CWeapon::net_Spawn		(CSE_Abstract* DC)
 	m_ammoType						= E->ammo_type;
 	SetState						(E->wpn_state);
 	SetNextState					(E->wpn_state);
-	
+	if (m_ammoTypes.size()==0)
+	{
+		Msg("! ERROR invalid configuration for [%s]",E->name_replace());
+		FATAL("Engine crush. See log for details.");
+	}
+	if (m_ammoTypes.size()<=m_ammoType)
+	{
+		Msg("~ WARNING CWeapon::net_Spawn invalid ammoType for [%s], try to recovery.",E->name_replace());
+		m_ammoType=0;
+	}
 	m_DefaultCartridge.Load(*m_ammoTypes[m_ammoType], u8(m_ammoType));	
+	//Msg("[%s]: Magazine size [%d] Ammo Elapsed [%d]",E->name_replace(),iMagazineSize,iAmmoElapsed);
+	if (iAmmoElapsed>iMagazineSize)
+	{
+		
+		Msg("~ WARNING CWeapon::net_Spawn invalid ammoElapsed for [%s], try to recovery.",E->name_replace());
+		iAmmoElapsed=iMagazineSize;
+		if (m_fCondition>1.0f && iMagazineSize>0)
+			m_fCondition=0.3f;
+	}
+
 	if(iAmmoElapsed) 
 	{
 		m_fCurrentCartirdgeDisp = m_DefaultCartridge.m_kDisp;
@@ -829,14 +851,14 @@ bool CWeapon::Action(s32 cmd, u32 flags)
 					}
 				}
 			} 
-            return true;
+			return true;
 
 	case kWPN_ZOOM:
 		if(IsZoomEnabled())
 			{
-                if(flags&CMD_START && !IsPending())
+				if(flags&CMD_START && !IsPending())
 					OnZoomIn();
-                else if(IsZoomed())
+				else if(IsZoomed())
 					OnZoomOut();
 				return true;
 			}else 
@@ -927,7 +949,7 @@ int CWeapon::GetAmmoCurrent(bool use_item_to_spawn) const
 	if(m_pCurrentInventory->ModifyFrame()<=m_dwAmmoCurrentCalcFrame)
 		return l_count + iAmmoCurrent;
 
- 	m_dwAmmoCurrentCalcFrame = Device.dwFrame;
+	m_dwAmmoCurrentCalcFrame = Device.dwFrame;
 	iAmmoCurrent = 0;
 
 	for(int i = 0; i < (int)m_ammoTypes.size(); ++i) 

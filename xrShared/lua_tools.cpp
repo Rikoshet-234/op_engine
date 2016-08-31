@@ -1,18 +1,21 @@
 #include "stdafx.h"
 #include "lua_tools.h"
 
-lua_State* g_game_lua = nullptr;
+XRSHARED_EXPORT lua_State* g_game_lua=nullptr;	
+XRSHARED_EXPORT lua_State* g_active_lua=nullptr;	
 
 XRSHARED_EXPORT LPCSTR get_lua_traceback(lua_State *L, int depth)
 {
-	if (L) g_game_lua = L;
+	if (L)  g_active_lua = L;
+	if (!L) L = g_active_lua;
+	if (!L) return "Lua STATE = NULL";
 
-	static char  buffer[32768]; // global buffer
+	static char  buffer[32768]; 
+	Memory.mem_fill(buffer, 0, sizeof(buffer));
 	int top = lua_gettop(L);
 	// alpet: Lua traceback added
 	lua_getfield(L, LUA_GLOBALSINDEX, "debug");
 	lua_getfield(L, -1, "traceback");
-	//lua_pop(L,-2); 
 	lua_pushstring(L, "\t");
 	lua_pushinteger(L, 1);
 

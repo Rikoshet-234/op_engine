@@ -24,7 +24,7 @@
 #include "trade_parameters.h"
 #include "purchase_list.h"
 #include "clsid_game.h"
-
+#include "Artifact.h"
 #include "alife_object_registry.h"
 
 #include "CustomOutfit.h"
@@ -320,6 +320,17 @@ float  CInventoryOwner::MaxCarryWeight () const
 	if(outfit)
 		ret += outfit->m_additional_weight2;
 
+	TIItemContainer::const_iterator I=inventory().m_belt.begin();
+	TIItemContainer::const_iterator E=inventory().m_belt.end();
+	for(;I!=E;++I)
+	{
+		CArtefact* artefact=smart_cast<CArtefact*>(*I);
+		if (artefact)
+		{
+			ret+=artefact->m_art_additional_weight;
+		}
+	}
+
 	return ret;
 }
 
@@ -452,7 +463,7 @@ void CInventoryOwner::OnItemSlot	(CInventoryItem *inventory_item, EItemPlace pre
 
 CInventoryItem* CInventoryOwner::GetCurrentOutfit() const
 {
-    return inventory().m_slots[OUTFIT_SLOT].m_pIItem;
+	return inventory().m_slots[OUTFIT_SLOT].m_pIItem;
 }
 
 void CInventoryOwner::on_weapon_shot_start		(CWeapon *weapon)

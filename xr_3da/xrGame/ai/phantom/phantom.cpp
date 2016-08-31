@@ -305,7 +305,8 @@ void CPhantom::PsyHit(const CObject *object, float value)
 	HS.whoID			= (ID());					// own			//	P.w_u16			(object->ID());							
 	HS.weaponID			= (ID());					// own			//	P.w_u16			(object->ID());							
 	HS.dir				= (Fvector().set(0.f,1.f,0.f));		// direction	//	P.w_dir			(Fvector().set(0.f,1.f,0.f));			
-	HS.power			= (value);							// hit value	//	P.w_float		(value);								
+	float hitPower = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(value)));
+	HS.power			= (hitPower);							// hit value	//	P.w_float		(value);								
 	HS.boneID			= (BI_NONE);						// bone			//	P.w_s16			(BI_NONE);								
 	HS.p_in_bone_space	= (Fvector().set(0.f,0.f,0.f));						//	P.w_vec3		(Fvector().set(0.f,0.f,0.f));			
 	HS.impulse			= (0.f);											//	P.w_float		(0.f);									

@@ -181,7 +181,6 @@ void CMainMenu::Activate	(bool bActivate)
 			CCameraManager::ResetPP			();
 		};
 		Device.seqRender.Add				(this, 4); // 1-console 2-cursor 3-tutorial
-
 	}else{
 		m_deactivated_frame					= Device.dwFrame;
 		m_Flags.set							(flActive,				FALSE);

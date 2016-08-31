@@ -7,8 +7,7 @@
 
 #include "HudSound.h"
 
-void HUD_SOUND::LoadSound(	LPCSTR section, LPCSTR line, 
-							HUD_SOUND& hud_snd, int type)
+void HUD_SOUND::LoadSound(	LPCSTR section, LPCSTR line, HUD_SOUND& hud_snd, int type,bool required)
 {
 	hud_snd.m_activeSnd		= NULL;
 	hud_snd.sounds.clear	();
@@ -24,7 +23,8 @@ void HUD_SOUND::LoadSound(	LPCSTR section, LPCSTR line,
 		sprintf_s		(sound_line,"%s%d",line,++k);
 	}//while
 
-	R_ASSERT3				(!hud_snd.sounds.empty(), "there is no sounds for:", section);
+	if (required)
+		R_ASSERT3				(!hud_snd.sounds.empty(), "there is no sounds for:", section);
 }
 
 void  HUD_SOUND::LoadSound(LPCSTR section, LPCSTR line, 

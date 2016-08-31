@@ -144,7 +144,7 @@ public:
 	virtual bool			IsEnabled			()												{return m_bIsEnabled;}
 
 	//убрать/показать окно и его дочерние окна
-	virtual void			Show				(bool status)									{SetVisible(status); Enable(status); }
+	virtual void Show(bool status);
 	IC		bool			IsShown				()												{return this->GetVisible();}
 			void			ShowChildren		(bool show);
 	
