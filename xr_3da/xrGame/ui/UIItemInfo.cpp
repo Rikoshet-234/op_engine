@@ -190,10 +190,6 @@ void CUIItemInfo::InitItem(CInventoryItem* pInvItem)
 		int iYPos							= pInvItem->GetYPos();*/
 
 		Frect rect = pInvItem->GetIconInfo().getOriginalRect();
-
-
-		//UIItemImage->GetUIStaticItem().SetOriginalRect(	float(iXPos*INV_GRID_WIDTH), float(iYPos*INV_GRID_HEIGHT),
-		//												float(iGridWidth*INV_GRID_WIDTH),	float(iGridHeight*INV_GRID_HEIGHT));
 		UIItemImage->GetUIStaticItem().SetOriginalRect(rect);
 		UIItemImage->TextureOn				();
 		UIItemImage->ClipperOn				();
@@ -201,8 +197,6 @@ void CUIItemInfo::InitItem(CInventoryItem* pInvItem)
 		Frect v_r							= {	0.0f, 
 												0.0f, 
 												rect.width(),rect.height()};
-												//float(iGridWidth*INV_GRID_WIDTH),	
-												//float(iGridHeight*INV_GRID_HEIGHT)};
 		if(UI()->is_16_9_mode())
 			v_r.x2 /= 1.328f;
 
