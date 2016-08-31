@@ -334,16 +334,6 @@ void CUIMainIngameWnd::SetAmmoIcon (const shared_str& sect_name)
 	//properties used by inventory menu
 	UIIconInfo iconInfo(sect_name);
 	Frect rect = iconInfo.getOriginalRect();
-	/*float iGridWidth			= pSettings->r_float(sect_name, "inv_grid_width");
-	float iGridHeight			= pSettings->r_float(sect_name, "inv_grid_height");
-
-	float iXPos				= pSettings->r_float(sect_name, "inv_grid_x");
-	float iYPos				= pSettings->r_float(sect_name, "inv_grid_y");
-
-	UIWeaponIcon.GetUIStaticItem().SetOriginalRect(	(iXPos		 * INV_GRID_WIDTH),
-													(iYPos		 * INV_GRID_HEIGHT),
-													(iGridWidth	 * INV_GRID_WIDTH),
-													(iGridHeight * INV_GRID_HEIGHT));*/
 	UIWeaponIcon.GetUIStaticItem().SetOriginalRect(rect);
 	UIWeaponIcon.SetStretchTexture(true);
 
