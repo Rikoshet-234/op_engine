@@ -5,6 +5,7 @@
 
 namespace OPFuncs {
 	void registerLuaOPFuncs(lua_State *L);
+	bool luaFunctionExist(lua_State *L,std::string functionPath);
 }
 
 #endif

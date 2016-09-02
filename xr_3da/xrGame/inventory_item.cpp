@@ -6,7 +6,8 @@
 //	Description : Inventory item
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "pch_script.h"
+#include <regex>
 #include "inventory_item.h"
 #include "inventory_item_impl.h"
 #include "inventory.h"
@@ -22,12 +23,19 @@
 #include "ai_object_location.h"
 #include "object_broker.h"
 #include "../igame_persistent.h"
+#include "ai_space.h"
+#include "script_engine.h"
+#include "script_game_object.h"
+#include "OPFuncs/lua_functions.h"
+
 
 #ifdef DEBUG
 #	include "debug_renderer.h"
 #endif
 
 #define ITEM_REMOVE_TIME		30000
+#define SCRIPT_DESCRIPTION_LINE "script_description"
+
 struct net_update_IItem {	u32					dwTimeStamp;
 SPHNetState			State;};
 struct net_updateData{
@@ -72,6 +80,54 @@ net_updateData* CInventoryItem::NetSync()
 	return m_net_updateData;
 }
 
+void replaceAll(std::string& str, const std::string& from, const std::string& to) {
+	if(from.empty())
+		return;
+	size_t start_pos = 0;
+	while((start_pos = str.find(from, start_pos)) != std::string::npos) {
+		str.replace(start_pos, from.length(), to);
+		start_pos += to.length(); 
+	}
+}
+
+std::string CInventoryItem::ParseDescription() const
+{
+	std::string desc(m_Description.c_str());
+	std::regex regExp("%(\\S+)%");
+	for(std::sregex_iterator it = std::sregex_iterator(desc.begin(), desc.end(), regExp); it != std::sregex_iterator();++it )
+	{
+
+		std::string funcName=(*it).str(1);
+		if (!funcName.empty())
+		{
+			//bool present=OPFuncs::luaFunctionExist(ai().script_engine().lua(),funcName);
+			luabind::functor<LPCSTR> textFunc;
+			bool result	= ai().script_engine().functor(funcName.c_str(),textFunc);
+			if (!result)
+			{
+				Msg("! ERROR function [%s] not exist for [%s] in description [%s]",funcName.c_str(),m_object->cNameSect().c_str(),descriptionVar.c_str());
+				break;
+			}
+			try
+			{
+				LPCSTR funcResult=textFunc(m_object->lua_game_object());
+				if (!funcResult)
+				{
+					Msg("! ERROR function [%s] not return correct value! Ignoring.",funcName.c_str());
+					break;
+				}
+				replaceAll(desc,(*it).str(),funcResult);
+			}
+			catch (...)
+			{
+				Msg("! ERROR function [%s] not return correct value! Ignoring.",funcName.c_str());
+				break;
+			}
+		}
+	}
+	return desc;
+}
+
 CInventoryItem::CInventoryItem() 
 {
 	m_net_updateData	= NULL;
@@ -91,6 +147,7 @@ CInventoryItem::CInventoryItem()
 
 	m_eItemPlace		= eItemPlaceUndefined;
 	m_Description		= "";
+	scriptDescriptionFunctorName="";
 }
 
 CInventoryItem::~CInventoryItem() 
@@ -135,7 +192,10 @@ void CInventoryItem::Load(LPCSTR section)
 
 	// Description
 	if ( pSettings->line_exist(section, "description") )
-		m_Description = CStringTable().translate( pSettings->r_string(section, "description") );
+	{
+		descriptionVar=pSettings->r_string(section, "description");
+		m_Description = CStringTable().translate(descriptionVar.c_str());
+	}
 
 	m_flags.set(Fbelt,			READ_IF_EXISTS(pSettings, r_bool, section, "belt",				FALSE));
 	m_flags.set(FRuckDefault,	READ_IF_EXISTS(pSettings, r_bool, section, "default_to_ruck",	TRUE));
@@ -153,6 +213,15 @@ void CInventoryItem::Load(LPCSTR section)
 	m_fControlInertionFactor	= READ_IF_EXISTS(pSettings, r_float,section,"control_inertion_factor",	1.0f);
 	m_icon_name					= READ_IF_EXISTS(pSettings, r_string,section,"icon_name",				NULL);
 	m_iconInfo.Load(section,true);
+	if (pSettings->line_exist(section,SCRIPT_DESCRIPTION_LINE))
+	{
+		scriptDescriptionFunctorName=pSettings->r_string(section,SCRIPT_DESCRIPTION_LINE);
+		bool result	= ai().script_engine().functor(scriptDescriptionFunctorName.c_str(),scriptDescriptionFunctor);
+		if (!result)
+		{
+			Msg("! ERROR script_description function [%s] not valid for [%s]",scriptDescriptionFunctorName.c_str(),section);
+		}
+	}
 }
 
 
@@ -181,6 +250,36 @@ const char* CInventoryItem::Name()
 const char* CInventoryItem::NameShort() 
 {
 	return *m_nameShort;
+}
+
+shared_str CInventoryItem::GetItemDescription() const
+{
+	std::string parsedDescription=ParseDescription();
+	if (!scriptDescriptionFunctorName.empty())
+	{
+		if (scriptDescriptionFunctor.is_valid())
+		{
+			try
+			{
+				LPCSTR returnData=scriptDescriptionFunctor(m_object->lua_game_object());
+				if (!returnData)
+				{
+					Msg("! ERROR functor [%s] not execute or not return any correct value",scriptDescriptionFunctorName.c_str());
+				}
+				else
+					return shared_str().sprintf("%s%s",returnData,parsedDescription.c_str());
+			}
+			catch (...)
+			{
+				Msg("! ERROR functor [%s] not execute or not return any correct value",scriptDescriptionFunctorName.c_str());
+			}
+		}
+		else
+		{
+			Msg("! ERROR functor [%s] not valid! and can't execute!",scriptDescriptionFunctorName.c_str());
+		}
+	}
+	return parsedDescription.c_str();
 }
 
 bool CInventoryItem::Useful() const

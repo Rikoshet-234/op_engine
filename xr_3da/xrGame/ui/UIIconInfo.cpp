@@ -9,7 +9,6 @@ void UIIconInfo::Load(const shared_str itemSection,bool raise)
 	{
 		std::string strCoords	= pSettings->r_string(itemSection,"inv_grid_icon");
 		int itemsParsed=std::sscanf(strCoords.c_str(),"%i,%i,%i,%i",&x,&y,&w,&h);
-		Log("itemsParsed ",itemsParsed);
 		if (itemsParsed!=4 && raise)
 		{
 			Debug.fatal(DEBUG_INFO,"Invalid format for inv_grid_icon",itemSection.c_str());

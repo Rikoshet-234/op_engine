@@ -173,7 +173,7 @@ void CUIItemInfo::InitItem(CInventoryItem* pInvItem)
 			pItem->SetFont						(m_desc_info.pDescFont);
 			pItem->SetWidth						(UIDesc->GetDesiredChildWidth());
 			pItem->SetTextComplexMode			(true);
-			pItem->SetText						(*pInvItem->ItemDescription());
+			pItem->SetText						(*pInvItem->GetItemDescription());
 			pItem->AdjustHeightToText			();
 			UIDesc->AddWindow					(pItem, true);
 		}

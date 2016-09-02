@@ -7,11 +7,12 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
-
+#include <luabind/luabind.hpp>
 #include "inventory_space.h"
 #include "hit_immunity.h"
 #include "attachable_item.h"
 #include "ui/UIIconInfo.h"
+
 
 enum EHandDependence{
 	hdNone	= 0,
@@ -46,6 +47,10 @@ class CInventoryItem :
 private:
 	typedef CAttachableItem inherited;
 	UIIconInfo m_iconInfo;
+	std::string ParseDescription() const;
+	std::string scriptDescriptionFunctorName;
+	std::string descriptionVar;
+	luabind::functor<LPCSTR> scriptDescriptionFunctor;
 protected:
 	enum EIIFlags{				FdropManual			=(1<<0),
 								FCanTake			=(1<<1),
@@ -72,7 +77,8 @@ public:
 	virtual LPCSTR				Name				();
 	virtual LPCSTR				NameShort			();
 //.	virtual LPCSTR				NameComplex			();
-	shared_str					ItemDescription		() { return m_Description; }
+	shared_str					GetItemDescription() const;
+
 	virtual void				GetBriefInfo		(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count) {};
 	
 	virtual void				OnEvent				(NET_Packet& P, u16 type);
@@ -124,9 +130,7 @@ public:
 	shared_str					m_name;
 	shared_str					m_nameShort;
 	shared_str					m_nameComplex;
-
 	EItemPlace					m_eItemPlace;
-
 
 	virtual void				OnMoveToSlot		() {};
 	virtual void				OnMoveToBelt		() {};
