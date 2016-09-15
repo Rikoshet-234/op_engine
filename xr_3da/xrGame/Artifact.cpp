@@ -597,7 +597,8 @@ void SArtefactActivation::SpawnAnomaly()
 		AlifeZone->assign_shapes	(&_shape,1);
 		AlifeZone->m_maxPower		= zone_power;
 		AlifeZone->m_owner_id		= m_owner_id;
-		AlifeZone->m_space_restrictor_type	= RestrictionSpace::eRestrictorTypeNone;
+		//AlifeZone->m_space_restrictor_type	= RestrictionSpace::eRestrictorTypeNone;
+		AlifeZone->m_space_restrictor_type	= RestrictionSpace::eDefaultRestrictorTypeNone;
 
 		NET_Packet					P;
 		object->Spawn_Write			(P,TRUE);

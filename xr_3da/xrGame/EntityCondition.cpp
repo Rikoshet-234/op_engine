@@ -290,23 +290,24 @@ void CEntityCondition::UpdateCondition()
 
 
 
-float CEntityCondition::HitOutfitEffect(float hit_power, ALife::EHitType hit_type, s16 element, float AP)
+float CEntityCondition::HitOutfitEffect(SHit *pHDS)
 {
 	CInventoryOwner* pInvOwner		= smart_cast<CInventoryOwner*>(m_object);
-	if(!pInvOwner)					return hit_power;
+	if(!pInvOwner)					return pHDS->power;
 
 	CCustomOutfit* pOutfit			= (CCustomOutfit*)pInvOwner->inventory().m_slots[OUTFIT_SLOT].m_pIItem;
-	if(!pOutfit)					return hit_power;
+	if(!pOutfit)					return pHDS->power;
 
-	float new_hit_power				= hit_power;
+	float new_hit_power				= pHDS->power;
 
-	if (hit_type == ALife::eHitTypeFireWound)
-		new_hit_power				= pOutfit->HitThruArmour(hit_power, element, AP);
+	//увеличить изношенность костюма до попадания в цель
+	pOutfit->Hit					(pHDS);
+
+	if (pHDS->hit_type == ALife::eHitTypeFireWound)
+		new_hit_power				= pOutfit->HitThruArmour( pHDS);
 	else
-		new_hit_power				*= pOutfit->GetHitTypeProtection(hit_type,element);
+		new_hit_power				*= pOutfit->GetHitTypeProtection(pHDS);
 	
-	//увеличить изношенность костюма
-	pOutfit->Hit					(hit_power, hit_type);
 
 	return							new_hit_power;
 }
@@ -365,7 +366,7 @@ CWound* CEntityCondition::ConditionHit(SHit* pHDS)
 
 	float hit_power_org = pHDS->damage();
 	float hit_power = hit_power_org;
-	hit_power = HitOutfitEffect(hit_power, pHDS->hit_type, pHDS->boneID, pHDS->ap);
+	hit_power = HitOutfitEffect(pHDS);
 
 	bool bAddWound = true;
 	switch(pHDS->hit_type)

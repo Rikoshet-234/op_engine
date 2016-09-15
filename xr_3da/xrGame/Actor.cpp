@@ -491,9 +491,7 @@ void	CActor::Hit							(SHit* pHDS)
 		last_hit_frame = Device.dwFrame;
 	};
 
-	if(	!g_dedicated_server	&& 
-		!sndHit[HDS.hit_type].empty()			&& 
-		(ALife::eHitTypeTelepatic != HDS.hit_type))
+	if(	!g_dedicated_server	&& 		!sndHit[HDS.hit_type].empty()			&& 		(ALife::eHitTypeTelepatic != HDS.hit_type))
 	{
 		ref_sound& S = sndHit[HDS.hit_type][Random.randI(sndHit[HDS.hit_type].size())];
 		bool b_snd_hit_playing = sndHit[HDS.hit_type].end() != std::find_if(sndHit[HDS.hit_type].begin(), sndHit[HDS.hit_type].end(), playing_pred());
@@ -1586,7 +1584,7 @@ void CActor::UpdtateOutfitInSlot()
 
 	float f_update_time = 0;
 
-	if(update_time<0.100f)
+	if(update_time<ARTEFACTS_UPDATE_TIME)
 	{
 		update_time += conditions().fdelta_time();
 		return;

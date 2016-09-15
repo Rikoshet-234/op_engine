@@ -1087,32 +1087,37 @@ void CUIMainIngameWnd::UpdatePickUpItem	()
 		return;
 	};
 
+	if (UIPickUpItemIcon.IsShown() ) return;
 
 	shared_str sect_name	= m_pPickUpItem->object().cNameSect();
 
 	//properties used by inventory menu
-	int m_iGridWidth	= pSettings->r_u32(sect_name, "inv_grid_width");
+	/*int m_iGridWidth	= pSettings->r_u32(sect_name, "inv_grid_width");
 	int m_iGridHeight	= pSettings->r_u32(sect_name, "inv_grid_height");
 
 	int m_iXPos			= pSettings->r_u32(sect_name, "inv_grid_x");
-	int m_iYPos			= pSettings->r_u32(sect_name, "inv_grid_y");
+	int m_iYPos			= pSettings->r_u32(sect_name, "inv_grid_y");*/
+	UIIconInfo iconInfo=m_pPickUpItem->GetIconInfo();
+	int m_iGridWidth	= iconInfo.getWidth();
+	int m_iGridHeight	= iconInfo.getHeight();
 
-	float scale_x = m_iPickUpItemIconWidth/
-		float(m_iGridWidth*INV_GRID_WIDTH);
+	/*int m_iXPos			= iconInfo.getX();
+	int m_iYPos			= iconInfo.getY();*/
 
-	float scale_y = m_iPickUpItemIconHeight/
-		float(m_iGridHeight*INV_GRID_HEIGHT);
+	float scale_x = m_iPickUpItemIconWidth/float(m_iGridWidth*INV_GRID_WIDTH);
+
+	float scale_y = m_iPickUpItemIconHeight/float(m_iGridHeight*INV_GRID_HEIGHT);
 
 	scale_x = (scale_x>1) ? 1.0f : scale_x;
 	scale_y = (scale_y>1) ? 1.0f : scale_y;
 
 	float scale = scale_x<scale_y?scale_x:scale_y;
 
-	UIPickUpItemIcon.GetUIStaticItem().SetOriginalRect(
-		float(m_iXPos * INV_GRID_WIDTH),
+	UIPickUpItemIcon.GetUIStaticItem().SetOriginalRect(iconInfo.getOriginalRect());
+		/*float(m_iXPos * INV_GRID_WIDTH),
 		float(m_iYPos * INV_GRID_HEIGHT),
 		float(m_iGridWidth * INV_GRID_WIDTH),
-		float(m_iGridHeight * INV_GRID_HEIGHT));
+		float(m_iGridHeight * INV_GRID_HEIGHT));*/
 
 	UIPickUpItemIcon.SetStretchTexture(true);
 

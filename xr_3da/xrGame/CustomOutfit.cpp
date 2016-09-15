@@ -83,9 +83,9 @@ void CCustomOutfit::Load(LPCSTR section)
 	m_full_icon_name								= pSettings->r_string(section,"full_icon_name");
 }
 
-void CCustomOutfit::Hit(float hit_power, ALife::EHitType hit_type)
+void CCustomOutfit::Hit(SHit *pHDS)
 {
-	hit_power *= m_HitTypeK[hit_type];
+	float hit_power=pHDS->power*m_HitTypeK[pHDS->hit_type];
 	ChangeCondition(-hit_power);
 }
 
@@ -94,16 +94,17 @@ float CCustomOutfit::GetDefHitTypeProtection(ALife::EHitType hit_type)
 	return 1.0f - m_HitTypeProtection[hit_type]*GetCondition();
 }
 
-float CCustomOutfit::GetHitTypeProtection(ALife::EHitType hit_type, s16 element)
+float CCustomOutfit::GetHitTypeProtection(SHit *pHDS)
 {
-	float fBase = m_HitTypeProtection[hit_type]*GetCondition();
-	float bone = m_boneProtection->getBoneProtection(element);
+	float fBase = m_HitTypeProtection[pHDS->hit_type]*GetCondition();
+	float bone = m_boneProtection->getBoneProtection(pHDS->boneID);
 	return 1.0f - fBase*bone;
 }
 
-float	CCustomOutfit::HitThruArmour(float hit_power, s16 element, float AP)
+float	CCustomOutfit::HitThruArmour(SHit *pHDS)
 {
-	float BoneArmour = m_boneProtection->getBoneArmour(element)*GetCondition()*(1-AP);	
+	float hit_power = pHDS->power;
+	float BoneArmour = m_boneProtection->getBoneArmour(pHDS->boneID)*GetCondition()*(1-pHDS->ap);	
 	float NewHitPower = hit_power - BoneArmour;
 	if (NewHitPower < hit_power*m_boneProtection->m_fHitFrac) return hit_power*m_boneProtection->m_fHitFrac;
 	return NewHitPower;

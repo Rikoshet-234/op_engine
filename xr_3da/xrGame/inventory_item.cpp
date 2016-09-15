@@ -90,17 +90,20 @@ void replaceAll(std::string& str, const std::string& from, const std::string& to
 	}
 }
 
+#include <cctype>
+#include <algorithm>
+
 std::string CInventoryItem::ParseDescription() const
 {
 	std::string desc(m_Description.c_str());
-	std::regex regExp("%(\\S+)%");
+	std::regex regExp("%([a-zA-Z\\.0-9]+)%");
 	for(std::sregex_iterator it = std::sregex_iterator(desc.begin(), desc.end(), regExp); it != std::sregex_iterator();++it )
 	{
-
 		std::string funcName=(*it).str(1);
-		if (!funcName.empty())
+		Log(funcName.c_str());
+		//bool isNameCorrect=std::find_if(funcName.begin(),funcName.end(),[](char c) { return std::isalpha(c) || c=='.'; })!=funcName.end();
+		if (!funcName.empty() /*&& isNameCorrect*/)
 		{
-			//bool present=OPFuncs::luaFunctionExist(ai().script_engine().lua(),funcName);
 			luabind::functor<LPCSTR> textFunc;
 			bool result	= ai().script_engine().functor(funcName.c_str(),textFunc);
 			if (!result)
