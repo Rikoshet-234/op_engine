@@ -191,7 +191,7 @@ void CUITradeWnd::InitTrade(CInventoryOwner* pOur, CInventoryOwner* pOthers)
 		
 	m_pTrade							= pOur->GetTrade();
 	m_pOthersTrade						= pOur->GetTrade()->GetPartnerTrade();
-    	
+		
 	EnableAll							();
 
 	UpdateLists							(eBoth);
@@ -499,7 +499,7 @@ void CUITradeWnd::UpdateLists(EListType mode)
 
 	if(mode==eBoth||mode==e1st){
 		ruck_list.clear					();
-   		m_pInv->AddAvailableItems		(ruck_list, true);
+		m_pInv->AddAvailableItems		(ruck_list, true);
 		std::sort						(ruck_list.begin(),ruck_list.end(),InventoryUtilities::GreaterRoomInRuck);
 		FillList						(ruck_list, m_uidata->UIOurBagList, true);
 	}

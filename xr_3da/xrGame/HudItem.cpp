@@ -281,6 +281,25 @@ void CHudItem::OnH_B_Independent	(bool just_before_destroy)
 void CHudItem::OnH_A_Independent	()
 {
 }
+void CHudItem::animGet	(MotionSVec& lst, LPCSTR prefix,LPCSTR section,LPCSTR param)
+{
+	const MotionID		&M = m_pHUD->animGet(prefix);
+	if (M)				lst.push_back(M);
+	for (int i=0; i<MAX_ANIM_COUNT; ++i)
+	{
+		string128		sh_anim;
+		sprintf_s			(sh_anim,"%s%d",prefix,i);
+		const MotionID	&M = m_pHUD->animGet(sh_anim);
+		if (M)			lst.push_back(M);
+	}
+	if (lst.empty())
+	{
+		Msg("! ERROR Empty animation [%s] for [%s] in param [%s]",prefix,section,param);
+		FATAL("ENGINE Crush! See log for detail.");
+	}
+	
+}
+
 void CHudItem::animGet	(MotionSVec& lst, LPCSTR prefix)
 {
 	const MotionID		&M = m_pHUD->animGet(prefix);

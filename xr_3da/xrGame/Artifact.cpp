@@ -63,7 +63,7 @@ CArtefact::CArtefact(void)
 {
 	shedule.t_min				= 20;
 	shedule.t_max				= 50;
-	m_sParticlesName			= NULL;
+	m_sParticlesName			= nullptr;
 	m_pTrailLight				= NULL;
 	m_activationObj				= NULL;
 }
@@ -78,7 +78,11 @@ void CArtefact::Load(LPCSTR section)
 
 
 	if (pSettings->line_exist(section, "particles"))
+	{
 		m_sParticlesName	= pSettings->r_string(section, "particles");
+		if (m_sParticlesName=="")
+			Msg("! WARNING particles param present, but is empty in [%s]",section);
+	}
 
 	m_bLightsEnabled		= !!pSettings->r_bool(section, "lights_enabled");
 	if(m_bLightsEnabled){
@@ -112,7 +116,7 @@ void CArtefact::Load(LPCSTR section)
 BOOL CArtefact::net_Spawn(CSE_Abstract* DC) 
 {
 	BOOL result = inherited::net_Spawn(DC);
-	if (*m_sParticlesName) 
+	if (*m_sParticlesName && m_sParticlesName!="") 
 	{Fvector dir;
 		dir.set(0,1,0);
 		CParticlesPlayer::StartParticles(m_sParticlesName,dir,ID(),-1, false);
@@ -157,7 +161,7 @@ void CArtefact::OnH_A_Chield()
 	StopLights();
 	if (GameID() == GAME_SINGLE)
 	{
-		if (*m_sParticlesName) 
+		if (*m_sParticlesName && m_sParticlesName!="") 
 		{	
 			CParticlesPlayer::StopParticles(m_sParticlesName, BI_NONE, true);
 		}
@@ -178,7 +182,7 @@ void CArtefact::OnH_B_Independent(bool just_before_destroy)
 	inherited::OnH_B_Independent(just_before_destroy);
 
 	StartLights();
-	if (*m_sParticlesName) 
+	if (*m_sParticlesName  && m_sParticlesName!="") 
 	{
 		Fvector dir;
 		dir.set(0,1,0);

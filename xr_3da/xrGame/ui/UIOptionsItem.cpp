@@ -47,7 +47,7 @@ void CUIOptionsItem::GetOptIntegerValue(int& val, int& min, int& max)
 void CUIOptionsItem::SaveOptIntegerValue(int val)
 {
 	string512			command;
-	sprintf_s				(command, "%s %d", m_entry.c_str(), val);
+	sprintf_s				(command,512, "%s %d", m_entry.c_str(), val);
 	Console->Execute	(command);
 }
 
@@ -59,7 +59,7 @@ void CUIOptionsItem::GetOptFloatValue(float& val, float& min, float& max)
 void CUIOptionsItem::SaveOptFloatValue(float val)
 {
 	string512			command;
-	sprintf_s				(command, "%s %f", m_entry.c_str(), val);
+	sprintf_s				(command,512, "%s %f", m_entry.c_str(), val);
 	Console->Execute	(command);
 }
 

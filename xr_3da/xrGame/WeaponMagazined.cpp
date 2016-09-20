@@ -89,10 +89,10 @@ void CWeaponMagazined::Load	(LPCSTR section)
 	animGet				(mhud.mhud_shots,	pSettings->r_string(*hud_sect, "anim_shoot"));
 
 	if(pSettings->line_exist(*hud_sect,"anim_idle_sprint"))
-		animGet				(mhud.mhud_idle_sprint,	pSettings->r_string(*hud_sect, "anim_idle_sprint"));
+		animGet				(mhud.mhud_idle_sprint,pSettings->r_string(*hud_sect, "anim_idle_sprint"),*hud_sect,"anim_idle_sprint");
 
 	if(IsZoomEnabled())
-		animGet				(mhud.mhud_idle_aim,		pSettings->r_string(*hud_sect, "anim_idle_aim"));
+		animGet				(mhud.mhud_idle_aim,pSettings->r_string(*hud_sect, "anim_idle_aim"),*hud_sect,"anim_idle_aim");
 	
 
 	//звуки и партиклы глушителя, еслит такой есть

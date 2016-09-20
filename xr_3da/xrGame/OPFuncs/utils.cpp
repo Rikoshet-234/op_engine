@@ -13,4 +13,22 @@ namespace OPFuncs
 		sprintf_s(strFmr,"ObjName [%s] SectionName [%s] IngameName [%s]",objName,secName,usName);
 		return strFmr;
 	}
+
+	void splitString(const std::string &s, char delim, std::vector<std::string> &elems) 
+	{
+		std::stringstream ss;
+		ss.str(s);
+		std::string item;
+		while (getline(ss, item, delim)) {
+			elems.push_back(item);
+		}
+	}
+
+
+	std::vector<std::string> splitString(const std::string &s, char delim) 
+	{
+		std::vector<std::string> elems;
+		splitString(s, delim, elems);
+		return elems;
+	}
 }

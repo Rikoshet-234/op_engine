@@ -51,6 +51,7 @@
 #endif // DEBUG
 
 #include "hudmanager.h"
+#include "OPFuncs/utils.h"
 
 string_path		g_last_saved_game;
 
@@ -108,7 +109,7 @@ extern BOOL		b_death_anim_velocity;
 int g_AI_inactive_time = 0;
 Flags32 g_uCommonFlags;
 enum E_COMMON_FLAGS{
-	flAiUseTorchDynamicLights = 1
+	flAiUseTorchDynamicLights	= 1
 };
 
 CUIOptConCom g_OptConCom;
@@ -188,8 +189,6 @@ public:
 
 
 
-
-
 #ifdef DEBUG
 class CCC_ALifePath : public IConsole_Command {
 public:
@@ -219,6 +218,81 @@ public:
 	}
 };
 #endif // DEBUG
+
+void moveInfos(LPCSTR args,bool add)
+{
+	std::vector<std::string> listIds=OPFuncs::splitString(args,',');
+	if (listIds.size()>0)
+	{
+		CActor* Actor =smart_cast<CActor*>(Level().CurrentEntity());
+		if(!Actor) return;
+		std::vector<std::string>::iterator lit=listIds.begin();
+		for(lit;lit!=listIds.end();++lit)
+		{
+			Actor->TransferInfo(lit->c_str(), add);
+		}
+	}
+}
+
+struct CCC_RemoveInfos : public IConsole_Command {
+	CCC_RemoveInfos(LPCSTR N) : IConsole_Command(N)  {bEmptyArgsHandled = false;};
+
+	void Execute(LPCSTR args) override
+	{
+		if (!ai().get_alife()) {
+			Msg				("! ALife simulator is needed to perform specified command!");
+			return;
+		}
+		moveInfos(args,false);
+	}
+
+	void	Info	(TInfo& I) override
+	{
+		strcpy_s(I," remove info portions from actor, list divided by comma "); 
+	}
+};
+
+struct CCC_GiveInfos : public IConsole_Command {
+	CCC_GiveInfos(LPCSTR N) : IConsole_Command(N)  {bEmptyArgsHandled = false;};
+
+	void Execute(LPCSTR args) override
+	{
+		if (!ai().get_alife()) {
+			Msg				("! ALife simulator is needed to perform specified command!");
+			return;
+		}
+		moveInfos(args,true);
+	}
+
+	void	Info	(TInfo& I) override
+	{
+		strcpy_s(I," give to actor info portions, list divided by comma "); 
+	}
+};
+
+class CCC_DumpInfos : public IConsole_Command {
+public:
+	CCC_DumpInfos	(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = true; };
+	virtual void	Execute				(LPCSTR args) {
+
+		if (!ai().get_alife()) {
+			Log						("! ERROR ALife simulator has not been started yet");
+			return;
+		}
+
+		CActor* A =smart_cast<CActor*>(Level().CurrentEntity());
+		if(A)
+
+			A->DumpInfo(args);
+	}
+
+	void	Info	(TInfo& I) override
+	{
+		strcpy_s(I,"dumps all infoportions that actor have"); 
+	}
+};
+
+
 
 class CCC_ALifeTimeFactor : public IConsole_Command {
 public:
@@ -626,8 +700,6 @@ public:
 	  }
 };
 
-
-#ifndef MASTER_GOLD
 class CCC_Script : public IConsole_Command {
 public:
 	CCC_Script(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = true; };
@@ -636,7 +708,7 @@ public:
 		S[0]		= 0;
 		sscanf		(args ,"%s",S);
 		if (!xr_strlen(S))
-			Log("* Specify script name!");
+			Log("* ERROR Specify script name to run!");
 		else {
 			// rescan pathes
 			FS_Path* P = FS.get_path("$game_scripts$");
@@ -654,11 +726,14 @@ public:
 	CCC_ScriptCommand	(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = true; };
 	virtual void	Execute				(LPCSTR args) {
 		if (!xr_strlen(args))
-			Log("* Specify string to run!");
+			Log("* ERROR Specify string to run!");
 		else {
 #if 1
 			if (ai().script_engine().script_process(ScriptEngine::eScriptProcessorLevel))
+			{
+				
 				ai().script_engine().script_process(ScriptEngine::eScriptProcessorLevel)->add_script(args,true,true);
+			}
 #else
 			string4096		S;
 			shared_str		m_script_name = "console command";
@@ -679,7 +754,7 @@ public:
 		}
 	}
 };
-#endif // MASTER_GOLD
+
 
 #ifdef DEBUG
 
@@ -785,19 +860,6 @@ public:
 	}
 };
 
-class CCC_DumpInfos : public IConsole_Command {
-public:
-	CCC_DumpInfos	(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = true; };
-	virtual void	Execute				(LPCSTR args) {
-		CActor* A =smart_cast<CActor*>(Level().CurrentEntity());
-		if(A)
-			A->DumpInfo();
-	}
-	virtual void	Info	(TInfo& I)		
-	{
-		strcpy_s(I,"dumps all infoportions that actor have"); 
-	}
-};
 #include "map_manager.h"
 class CCC_DumpMap : public IConsole_Command {
 public:
@@ -1046,6 +1108,14 @@ struct CCC_JumpToLevel : public IConsole_Command {
 
 #include "GamePersistent.h"
 
+//#include "ui/UIInventoryWnd.h"
+//class CCC_TexTest : public IConsole_Command {
+//public:
+//	CCC_TexTest(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = true; };
+//	virtual void Execute(LPCSTR args) {
+//		texName=args;		
+//	}
+//};
 
 class CCC_MainMenu : public IConsole_Command {
 public:
@@ -1380,8 +1450,6 @@ void CCC_RegisterCommands()
 	CMD1(CCC_LoadLastSave,		"load_last_save"		);		// load last saved game from ...
 	CMD1(CCC_FlushLog,			"flush"					);		// flush log
 	CMD1(CCC_ClearLog,			"clear_log"					);
-	CMD3(CCC_Mask,				"hud_weapon",			&psHUD_Flags,	HUD_WEAPON);
-	CMD3(CCC_Mask,				"hud_info",				&psHUD_Flags,	HUD_INFO);
 	// hud
 	psHUD_Flags.set(HUD_CROSSHAIR,		true);
 	psHUD_Flags.set(HUD_WEAPON,			true);
@@ -1389,11 +1457,19 @@ void CCC_RegisterCommands()
 	psHUD_Flags.set(HUD_INFO,			true);
 	psHUD_Flags.set(HUD_MIN_CROSSHAIR,	true);
 	psHUD_Flags.set(HUD_DIALOG_NUMBERED,true);
-
+	CMD3(CCC_Mask,				"hud_weapon",			&psHUD_Flags,	HUD_WEAPON);
+	CMD3(CCC_Mask,				"hud_info",				&psHUD_Flags,	HUD_INFO);
 	CMD3(CCC_Mask,				"hud_crosshair",		&psHUD_Flags,	HUD_CROSSHAIR);
 	CMD3(CCC_Mask,				"hud_crosshair_dist",	&psHUD_Flags,	HUD_CROSSHAIR_DIST);
 	CMD3(CCC_Mask,				"hud_min_crosshair",	&psHUD_Flags,	HUD_MIN_CROSSHAIR);
 	CMD3(CCC_Mask,				"dialog_numbered",		&psHUD_Flags,	HUD_DIALOG_NUMBERED);
+	//CMD1(CCC_TexTest,			"textest");
+
+	psActorFlags.set(AF_INV_SHOW_EXT_DESC,true);
+	psActorFlags.set(AF_INV_SHOW_SELECTED,true);
+	CMD3(CCC_Mask,				"inv_extdesc",		&psActorFlags,	AF_INV_SHOW_EXT_DESC);
+	CMD3(CCC_Mask,				"inv_showselected",		&psActorFlags,	AF_INV_SHOW_SELECTED);
+
 	CMD1(CCC_DemoPlay,			"demo_play"				);
 	CMD1(CCC_DemoRecord,		"demo_record"			);
 	CMD1(CCC_PHFps,				"ph_frequency"																					);
@@ -1409,6 +1485,11 @@ void CCC_RegisterCommands()
 
 	CMD3(CCC_Mask,		"ai_use_torch_dynamic_lights",	&g_uCommonFlags, flAiUseTorchDynamicLights);
 	CMD1(CCC_GSCheckForUpdates, "check_for_updates");
+	CMD1(CCC_DumpInfos,				"dump_infos");
+	CMD1(CCC_GiveInfos,				"give_infos");
+	CMD1(CCC_RemoveInfos,			"remove_infos");
+	CMD1(CCC_Script,		"run_script");
+	CMD1(CCC_ScriptCommand,	"run_string");
 
 
 #ifndef MASTER_GOLD
@@ -1430,11 +1511,6 @@ void CCC_RegisterCommands()
 	CMD3(CCC_Mask,				"mt_alife",				&g_mt_config,	mtALife);
 	CMD3(CCC_Mask,				"ai_ignore_actor",		&psAI_Flags,	aiIgnoreActor);
 
-	//CMD1(CCC_JumpToLevel,	"jump_to_level"		);
-	//CMD3(CCC_Mask,			"g_god",			&psActorFlags,	AF_GODMODE	);
-	//CMD3(CCC_Mask,			"g_unlimitedammo",	&psActorFlags,	AF_UNLIMITEDAMMO);
-	CMD1(CCC_Script,		"run_script");
-	CMD1(CCC_ScriptCommand,	"run_string");
 	CMD1(CCC_TimeFactor,	"time_factor");		
 	CMD1(CCC_StartTimeSingle,	"start_time_single");
 	CMD4(CCC_TimeFactorSingle,	"time_factor_single", &g_fTimeFactor, 0.f,flt_max);
@@ -1563,7 +1639,7 @@ void CCC_RegisterCommands()
 	CMD3(CCC_Mask,		"dbg_draw_ph_hit_anims"			,&ph_dbg_draw_mask1,phDbgHitAnims);
 	CMD3(CCC_Mask,		"dbg_draw_ph_ik_limits"			,&ph_dbg_draw_mask1,phDbgDrawIKLimits);
 	CMD4(CCC_Integer,	"string_table_error_msg",	&CStringTable::m_bWriteErrorsToLog,	0,	1);
-	CMD1(CCC_DumpInfos,				"dump_infos");
+
 	CMD1(CCC_DumpMap,				"dump_map");
 	CMD1(CCC_DumpCreatures,			"dump_creatures");
 	CMD1(CCC_DumpObjects,							"dump_all_objects");

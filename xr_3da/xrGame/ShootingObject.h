@@ -40,7 +40,7 @@ protected:
 	virtual void			LoadFireParams		(LPCSTR section, LPCSTR prefix);
 	virtual bool			SendHitAllowed		(CObject* pUser);
 	virtual void			FireBullet			(const Fvector& pos, 
-        										const Fvector& dir, 
+												const Fvector& dir, 
 												float fire_disp,
 												const CCartridge& cartridge,
 												u16 parent_id,
@@ -166,4 +166,7 @@ protected:
 	
 	//имя партиклов следа от пули
 	shared_str				m_sShotParticles;
+
+	ALife::EHitType		m_eHitType;
+
 };

@@ -59,6 +59,7 @@ public:
 			void		SetOriginalRect				(float x, float y, float width, float height)	{m_UIStaticItem.SetOriginalRect(x,y,width,height);}
 			void		SetHeadingPivot				(const Fvector2& p)			{m_UIStaticItem.SetHeadingPivot(p);}
 			void		SetMask						(CUIFrameWindow *pMask);
+	CUIFrameWindow*		GetMask						() const 		{return m_pMask;};
 	virtual void		SetTextureOffset			(float x, float y)			{ m_TextureOffset.set(x, y); }
 			Fvector2	GetTextureOffeset			() const					{ return m_TextureOffset; }
 			void		TextureOn					()							{ m_bTextureEnable = true; }

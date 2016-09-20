@@ -339,19 +339,14 @@ void CUIMainIngameWnd::SetAmmoIcon (const shared_str& sect_name)
 
 	// now perform only width scale for ammo, which (W)size >2
 	// all others ammo (1x1, 1x2) will be not scaled (original picture)
-	int iGridWidth = static_cast<int>(round(rect.width()));
-
-	float w = ((iGridWidth>2)?1.6f:iGridWidth)*INV_GRID_WIDTH*0.9f;
-	float h = INV_GRID_HEIGHT*0.9f;//1 cell
-
-	float x = UIWeaponIcon_rect.x1;
-	if	(iGridWidth<2)
-		x	+= ( UIWeaponIcon_rect.width() - w) / 2.0f;
-
-	UIWeaponIcon.SetWndPos	(x, UIWeaponIcon_rect.y1);
+	float iconWidth = (iconInfo.getWidth()>2 ? 1.6f : iconInfo.getWidth())*INV_GRID_WIDTH*0.8f;
+	float iconHeight = INV_GRID_HEIGHT*0.8f;//1 cell
 	
-	UIWeaponIcon.SetWidth	(w);
-	UIWeaponIcon.SetHeight	(h);
+	float xr=(UIWeaponIcon_rect.width()-iconWidth)/2.0f;
+	float yr=(UIWeaponIcon_rect.height()-iconHeight)/2.0f;
+	UIWeaponIcon.SetWndPos	(UIWeaponIcon_rect.x1+xr, UIWeaponIcon_rect.y1+yr);
+	UIWeaponIcon.SetWidth	(iconWidth);
+	UIWeaponIcon.SetHeight	(iconHeight);
 };
 
 void CUIMainIngameWnd::Update()
@@ -1091,40 +1086,28 @@ void CUIMainIngameWnd::UpdatePickUpItem	()
 
 	shared_str sect_name	= m_pPickUpItem->object().cNameSect();
 
-	//properties used by inventory menu
-	/*int m_iGridWidth	= pSettings->r_u32(sect_name, "inv_grid_width");
-	int m_iGridHeight	= pSettings->r_u32(sect_name, "inv_grid_height");
-
-	int m_iXPos			= pSettings->r_u32(sect_name, "inv_grid_x");
-	int m_iYPos			= pSettings->r_u32(sect_name, "inv_grid_y");*/
 	UIIconInfo iconInfo=m_pPickUpItem->GetIconInfo();
-	int m_iGridWidth	= iconInfo.getWidth();
-	int m_iGridHeight	= iconInfo.getHeight();
+	Frect rect=iconInfo.getOriginalRect();
 
-	/*int m_iXPos			= iconInfo.getX();
-	int m_iYPos			= iconInfo.getY();*/
-
-	float scale_x = m_iPickUpItemIconWidth/float(m_iGridWidth*INV_GRID_WIDTH);
-
-	float scale_y = m_iPickUpItemIconHeight/float(m_iGridHeight*INV_GRID_HEIGHT);
+	float scale_x = m_iPickUpItemIconWidth/rect.width();
+	float scale_y = m_iPickUpItemIconHeight/rect.height();
 
 	scale_x = (scale_x>1) ? 1.0f : scale_x;
 	scale_y = (scale_y>1) ? 1.0f : scale_y;
 
-	float scale = scale_x<scale_y?scale_x:scale_y;
+	float scale = (scale_x<scale_y?scale_x:scale_y);
 
 	UIPickUpItemIcon.GetUIStaticItem().SetOriginalRect(iconInfo.getOriginalRect());
-		/*float(m_iXPos * INV_GRID_WIDTH),
-		float(m_iYPos * INV_GRID_HEIGHT),
-		float(m_iGridWidth * INV_GRID_WIDTH),
-		float(m_iGridHeight * INV_GRID_HEIGHT));*/
-
 	UIPickUpItemIcon.SetStretchTexture(true);
 
-	UIPickUpItemIcon.SetWidth(m_iGridWidth*INV_GRID_WIDTH*scale);
-	UIPickUpItemIcon.SetHeight(m_iGridHeight*INV_GRID_HEIGHT*scale);
+	// Real Wolf: »справл€ем раст€гивание. 10.08.2014.
+	scale_x = Device.fASPECT  / 0.75f;
 
-	UIPickUpItemIcon.SetWndPos(m_iPickUpItemIconX + 
+	UIPickUpItemIcon.SetWidth(rect.width()*scale* scale_x*0.2f);
+	UIPickUpItemIcon.SetHeight(rect.height()*scale);
+
+	UIPickUpItemIcon.SetWndPos(
+		m_iPickUpItemIconX + 
 		(m_iPickUpItemIconWidth - UIPickUpItemIcon.GetWidth())/2,
 		m_iPickUpItemIconY + 
 		(m_iPickUpItemIconHeight - UIPickUpItemIcon.GetHeight())/2);

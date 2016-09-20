@@ -136,6 +136,8 @@ namespace CPU
 	XRCORE_API u64				qpc_overhead	= 0	;
 	XRCORE_API u32				qpc_counter		= 0	;
 	
+	XRCORE_API u32				cpu_counts		= 0	;
+
 	XRCORE_API _processor_info	ID;
 
 	XRCORE_API u64				QPC	()			{
@@ -161,6 +163,10 @@ namespace CPU
 			// Core.Fatal		("Fatal error: can't detect CPU/FPU.");
 			abort				();
 		}
+
+		SYSTEM_INFO sysinfo;
+		GetSystemInfo(&sysinfo);
+		cpu_counts = sysinfo.dwNumberOfProcessors;
 
 		// Timers & frequency
 		u64			start,end;
@@ -216,9 +222,9 @@ namespace CPU
 void _initialize_cpu	(void) 
 {
 //	Msg("* Detected CPU: %s %s, F%d/M%d/S%d, %.2f mhz, %d-clk 'rdtsc'",
-	Msg("* Detected CPU: %s %s, F%d/M%d/S%d",
+	Msg("* Detected CPU: %s %s, F%d/M%d/S%d Counts: %d",
 		CPU::ID.v_name,CPU::ID.model_name,
-		CPU::ID.family,CPU::ID.model,CPU::ID.stepping
+		CPU::ID.family,CPU::ID.model,CPU::ID.stepping,CPU::cpu_counts
 //		float(CPU::clk_per_second/u64(1000000)),
 //		u32(CPU::clk_overhead)	
 		);

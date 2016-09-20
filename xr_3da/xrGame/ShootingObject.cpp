@@ -23,7 +23,7 @@
 CShootingObject::CShootingObject(void)
 {
 	fTime							= 0;
- 	fTimeToFire						= 0;
+	fTimeToFire						= 0;
 	//fHitPower						= 0.0f;
 	fvHitPower.set(0.0f,0.0f,0.0f,0.0f);
 	m_fStartBulletSpeed				= 1000.f;
@@ -130,6 +130,9 @@ void CShootingObject::LoadFireParams	(LPCSTR section, LPCSTR prefix)
 	{
 		m_fTimeToAim		= pSettings->r_float	(section,strconcat(sizeof(full_name),full_name, prefix, "time_to_aim"));
 	}
+
+	LPCSTR	hit_type	= READ_IF_EXISTS (pSettings, r_string, section, "hit_type", "fire_wound");
+	m_eHitType= ALife::g_tfString2HitType(hit_type);
 }
 
 void CShootingObject::LoadLights		(LPCSTR section, LPCSTR prefix)
@@ -458,7 +461,7 @@ void CShootingObject::FireBullet(const Fvector& pos,
 
 	Level().BulletManager().AddBullet(	pos, dir, m_fStartBulletSpeed, l_fHitPower, 
 										fHitImpulse, parent_id, weapon_id, 
-										ALife::eHitTypeFireWound, fireDistance, cartridge, send_hit, aim_bullet);
+										m_eHitType, fireDistance, cartridge, send_hit, aim_bullet);
 }
 
 void CShootingObject::FireStart	()

@@ -203,7 +203,12 @@ void CStepManager::load_foot_bones	(CInifile::Sect &data)
 		const CInifile::Item& item	= *I;
 
 		u16 index = smart_cast<CKinematics*>(m_object->Visual())->LL_BoneID(*item.second);
-		VERIFY3(index != BI_NONE, "foot bone not found", *item.second);
+		if (index == BI_NONE)
+		{
+			Msg("! ERROR: Foot bone [%s] not found in [%s]",*item.second,m_object->Name());
+			//VERIFY3(index != BI_NONE, "foot bone not found", *item.second);	
+		}
+		
 
 		if (xr_strcmp(*item.first, "front_left") == 0) 			m_foot_bones[eFrontLeft]	= index;
 		else if (xr_strcmp(*item.first, "front_right")== 0)		m_foot_bones[eFrontRight]	= index;

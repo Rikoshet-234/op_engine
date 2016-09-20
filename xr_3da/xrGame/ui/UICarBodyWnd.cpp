@@ -135,7 +135,7 @@ void CUICarBodyWnd::Init()
 
 void CUICarBodyWnd::InitCarBody(CInventoryOwner* pOur, CInventoryBox* pInvBox)
 {
-    m_pOurObject									= pOur;
+	m_pOurObject									= pOur;
 	m_pOthersObject									= NULL;
 	m_pInventoryBox									= pInvBox;
 	m_pInventoryBox->m_in_use						= true;
@@ -153,7 +153,7 @@ void CUICarBodyWnd::InitCarBody(CInventoryOwner* pOur, CInventoryBox* pInvBox)
 void CUICarBodyWnd::InitCarBody(CInventoryOwner* pOur, CInventoryOwner* pOthers)
 {
 
-    m_pOurObject									= pOur;
+	m_pOurObject									= pOur;
 	m_pOthersObject									= pOthers;
 	m_pInventoryBox									= NULL;
 	
@@ -414,7 +414,7 @@ void CUICarBodyWnd::ActivatePropertiesBox()
 	CMedkit*				pMedkit			= smart_cast<CMedkit*>			(CurrentIItem());
 	CAntirad*				pAntirad		= smart_cast<CAntirad*>			(CurrentIItem());
 	CBottleItem*			pBottleItem		= smart_cast<CBottleItem*>		(CurrentIItem());
-    bool					b_show			= false;
+	bool					b_show			= false;
 	
 	LPCSTR _action				= NULL;
 	if(pMedkit || pAntirad)

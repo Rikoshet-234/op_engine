@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 class CInventory;
 
@@ -65,6 +66,9 @@ protected:
 	ref_sound					sounds					[eInvSndMax];
 	void						PlaySnd					(eInventorySndAction a);
 
+	CUIFrameWindow*			UIMask;
+
+
 	CUIStatic					UIBeltSlots;
 	CUIStatic					UIBack;
 	CUIStatic*					UIRankFrame;
@@ -103,6 +107,7 @@ protected:
 
 	CUIStatic					UIProgressBack;
 	CUIStatic					UIProgressBack_rank;
+
 	CUIProgressBar				UIProgressBarHealth;	
 	CUIProgressBar				UIProgressBarPsyHealth;
 	CUIProgressBar				UIProgressBarRadiation;

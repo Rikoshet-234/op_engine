@@ -182,7 +182,10 @@ void CInventoryItem::Load(LPCSTR section)
 	if (self)			self->spatial.type	|=	STYPE_VISIBLEFORAI;	
 
 	m_name				= CStringTable().translate( pSettings->r_string(section, "inv_name") );
-	m_nameShort			= CStringTable().translate( pSettings->r_string(section, "inv_name_short"));
+	if (pSettings->line_exist(section,"inv_name_short"))
+		m_nameShort			= CStringTable().translate( pSettings->r_string(section, "inv_name_short"));
+	else
+		m_nameShort="";
 
 //.	NameComplex			();
 	m_weight			= pSettings->r_float(section, "inv_weight");
@@ -197,6 +200,11 @@ void CInventoryItem::Load(LPCSTR section)
 	if ( pSettings->line_exist(section, "description") )
 	{
 		descriptionVar=pSettings->r_string(section, "description");
+		if (descriptionVar.empty())
+		{
+			Msg("! ERROR invalid description value for [%s]",section);
+			descriptionVar="INVALID_DESCRIPTION";
+		}
 		m_Description = CStringTable().translate(descriptionVar.c_str());
 	}
 

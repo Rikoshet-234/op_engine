@@ -85,20 +85,25 @@ void CCustomOutfit::Load(LPCSTR section)
 
 void CCustomOutfit::Hit(SHit *pHDS)
 {
-	float hit_power=pHDS->power*m_HitTypeK[pHDS->hit_type];
-	ChangeCondition(-hit_power);
+	float power=pHDS->power;
+	if (power <= 0) return;
+	ALife::EHitType hit_type = pHDS->hit_type;
+	power*=m_HitTypeK[hit_type];
+	ChangeCondition(-power);
 }
 
 float CCustomOutfit::GetDefHitTypeProtection(ALife::EHitType hit_type)
 {
-	return 1.0f - m_HitTypeProtection[hit_type]*GetCondition();
+	float result=1.0f - m_HitTypeProtection[hit_type]*GetCondition();
+	return result > 0.001f ? result : 0.001f;
 }
 
 float CCustomOutfit::GetHitTypeProtection(SHit *pHDS)
 {
 	float fBase = m_HitTypeProtection[pHDS->hit_type]*GetCondition();
 	float bone = m_boneProtection->getBoneProtection(pHDS->boneID);
-	return 1.0f - fBase*bone;
+	float result=1.0f - fBase*bone;
+	return result > 0 ? result : 0;
 }
 
 float	CCustomOutfit::HitThruArmour(SHit *pHDS)
@@ -107,7 +112,7 @@ float	CCustomOutfit::HitThruArmour(SHit *pHDS)
 	float BoneArmour = m_boneProtection->getBoneArmour(pHDS->boneID)*GetCondition()*(1-pHDS->ap);	
 	float NewHitPower = hit_power - BoneArmour;
 	if (NewHitPower < hit_power*m_boneProtection->m_fHitFrac) return hit_power*m_boneProtection->m_fHitFrac;
-	return NewHitPower;
+	return NewHitPower > 0 ? NewHitPower :0;
 };
 
 BOOL	CCustomOutfit::BonePassBullet					(int boneID)

@@ -44,7 +44,10 @@ CUIInventoryWnd*	g_pInvWnd = NULL;
 CUIInventoryWnd::CUIInventoryWnd()
 {
 	m_iCurrentActiveSlot				= NO_ACTIVE_SLOT;
+	
 	UIRank								= NULL;
+	UIMask=nullptr;
+
 	Init								();
 	SetCurrentItem						(NULL);
 
@@ -60,8 +63,17 @@ void CUIInventoryWnd::Init()
 	R_ASSERT3							(xml_result, "file parsing error ", uiXml.m_xml_file_name);
 
 	CUIXmlInit							xml_init;
+	
 
 	xml_init.InitWindow					(uiXml, "main", 0, this);
+
+	if (uiXml.NavigateToNode("mask_frame_window",0))
+	{
+		UIMask=xr_new<CUIFrameWindow>();
+		xml_init.InitFrameWindow			(uiXml, "mask_frame_window", 0, UIMask);
+		size_t color=						xml_init.GetColor(uiXml,"mask_frame_window:frame_color",0,0x00);
+		UIMask->SetColor(color);
+	}
 
 	AttachChild							(&UIBeltSlots);
 	xml_init.InitStatic					(uiXml, "belt_slots", 0, &UIBeltSlots);
@@ -184,6 +196,7 @@ void CUIInventoryWnd::Init()
 	::Sound->create						(sounds[eInvItemUse],		uiXml.Read("snd_item_use",		0,	NULL),st_Effect,sg_SourceType);
 
 	uiXml.SetLocalRoot					(stored_root);
+
 }
 
 EListType CUIInventoryWnd::GetType(CUIDragDropListEx* l)
@@ -209,6 +222,7 @@ void CUIInventoryWnd::PlaySnd(eInventorySndAction a)
 
 CUIInventoryWnd::~CUIInventoryWnd()
 {
+	xr_delete(UIMask);
 //.	ClearDragDrop(m_vDragDropItems);
 	ClearAllLists						();
 }

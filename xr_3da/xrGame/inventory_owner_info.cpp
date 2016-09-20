@@ -17,6 +17,7 @@
 #include "alife_registry_wrappers.h"
 #include "script_callback_ex.h"
 #include "game_object_space.h"
+#include "OPFuncs/utils.h"
 
 void  CInventoryOwner::OnEvent (NET_Packet& P, u16 type)
 {
@@ -89,21 +90,36 @@ bool CInventoryOwner::OnReceiveInfo(shared_str info_id) const
 
 	return true;
 }
-#ifdef DEBUG
-void CInventoryOwner::DumpInfo() const
+
+#include <algorithm>
+
+void CInventoryOwner::DumpInfo(shared_str ids) const
 {
 	KNOWN_INFO_VECTOR& known_info = m_known_info_registry->registry().objects();
-
-	Msg("------------------------------------------");	
-	Msg("Start KnownInfo dump for [%s]",Name());	
-	KNOWN_INFO_VECTOR_IT it = known_info.begin();
-	for(int i=0;it!=known_info.end();++it,++i){
-		Msg("known info[%d]:%s",i,*(*it).info_id);	
+	std::vector<std::string> listIds=OPFuncs::splitString(ids.c_str(),',');
+	Msg("Start KnownInfos dump for [%s]",Name());	
+	
+	if (listIds.size()>0)
+	{
+		std::vector<std::string>::iterator lit=listIds.begin();
+		for(lit;lit!=listIds.end();++lit)
+		{
+			KNOWN_INFO_VECTOR_IT search_it = std::find_if(known_info.begin(), known_info.end(), CFindByIDPred(lit->c_str()));
+			Msg("info %s%s",(*lit).c_str(),search_it!=known_info.end() ? " present" : " not present");		
+		}
+	}
+	else
+	{
+		KNOWN_INFO_VECTOR_IT it = known_info.begin();
+		for(int i=0;it!=known_info.end();++it,++i)
+		{
+			std::string info_id((*it).info_id.c_str());
+			Msg("known info[%d]:%s",i,*(*it).info_id);	
+		}
 	}
 	Msg("------------------------------------------");	
-
 }
-#endif
+
 
 void CInventoryOwner::OnDisableInfo(shared_str info_id) const
 {

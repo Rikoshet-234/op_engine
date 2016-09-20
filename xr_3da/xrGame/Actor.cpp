@@ -847,7 +847,17 @@ void CActor::g_Physics(Fvector& _accel, float jump, float dt)
 			if (Level().CurrentControlEntity() == this)
 			{
 				SHit HDS = SHit(health_lost,hdir,di->DamageInitiator(),character_physics_support()->movement()->ContactBone(),di->HitPos(),0.f,di->HitType());
-//				Hit(&HDS);
+				if (!(mstate_real&mcFall) && HDS.power > 1.0f)
+					HDS.power *= 0.5f;  // слишком большой хит, от обычного столкновения, возможно что-то прилетело от полтера
+				if (HDS.hit_type == ALife::eHitTypeRadiation)
+					HDS.power *= 0.001f; // alpet: защита от странных коллизий с нефонящими, но отравленными материалами
+				if (HDS.hit_type == ALife::eHitTypeChemicalBurn)
+				{
+					static HUD_SOUND m_buzzHit;
+					if (0 == m_buzzHit.sounds.size())
+						HUD_SOUND::LoadSound("zone_buzz", "hit_sound", m_buzzHit, SOUND_TYPE_ITEM);
+					HUD_SOUND::PlaySound(m_buzzHit, Position(), this, true);
+				}
 
 				NET_Packet	l_P;
 				HDS.GenHeader(GE_HIT, ID());
@@ -1598,11 +1608,12 @@ void CActor::UpdtateOutfitInSlot()
 	CCustomOutfit* outfit = GetOutfit();
 		if(outfit)
 		{
-			conditions().ChangeBleeding(outfit->m_fBleedingRestoreSpeed*f_update_time);
-			conditions().ChangeHealth(outfit->m_fHealthRestoreSpeed*f_update_time);
-			conditions().ChangePower(outfit->m_fPowerRestoreSpeed*f_update_time);
-			conditions().ChangeSatiety(outfit->m_fSatietyRestoreSpeed*f_update_time);
-			conditions().ChangeRadiation		(outfit->m_fRadiationRestoreSpeed*f_update_time);
+			float outfitCondition=outfit->GetCondition();
+			conditions().ChangeBleeding(outfit->m_fBleedingRestoreSpeed*outfitCondition*f_update_time);
+			conditions().ChangeHealth(outfit->m_fHealthRestoreSpeed*outfitCondition*f_update_time);
+			conditions().ChangePower(outfit->m_fPowerRestoreSpeed*outfitCondition*f_update_time);
+			conditions().ChangeSatiety(outfit->m_fSatietyRestoreSpeed*outfitCondition*f_update_time);
+			conditions().ChangeRadiation		(outfit->m_fRadiationRestoreSpeed*outfitCondition*f_update_time);
 		}
 
 }

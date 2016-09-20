@@ -15,6 +15,8 @@
 #include "UICellItem.h"
 #include "UIListBoxItem.h"
 #include "../CustomOutfit.h"
+#include "../string_table.h"
+
 
 
 void CUIInventoryWnd::EatItem(PIItem itm)
@@ -29,6 +31,42 @@ void CUIInventoryWnd::EatItem(PIItem itm)
 
 #include "../Medkit.h"
 #include "../Antirad.h"
+
+#define EMPTY_DESC "UNUSED" //omg wtf
+
+std::string getComplexString(std::string untranslatedString,PIItem item,std::string untranslatedString2="")
+{
+	std::string translateString=*CStringTable().translate(untranslatedString.c_str());
+	if (psActorFlags.test(AF_INV_SHOW_EXT_DESC))
+	{
+		std::string additionString;
+		if (item!=nullptr)
+		{
+			additionString=item->m_name.c_str();	
+			if ((item->m_nameShort!=nullptr) && (item->m_nameShort!="") && (item->m_nameShort!=EMPTY_DESC))
+				additionString=item->m_nameShort.c_str();
+		}
+		else
+			additionString=*CStringTable().translate(untranslatedString2.c_str());
+		return translateString+" "+additionString;
+	}
+	else
+		return translateString;
+}
+
+std::string getAddonInvName(std::string addonName)
+{
+	std::string name;
+	if (addonName.size()>0)
+	{
+		if (pSettings->line_exist(addonName.c_str(),"inv_name_short"))
+			name=pSettings->r_string(addonName.c_str(),"inv_name_short");
+		if ((name=="") && (name!=EMPTY_DESC))
+			name=pSettings->r_string(addonName.c_str(),"inv_name");
+	}
+	return name;
+}
+
 void CUIInventoryWnd::ActivatePropertiesBox()
 {
 	// Флаг-признак для невлючения пункта контекстного меню: Dreess Outfit, если костюм уже надет
@@ -46,33 +84,33 @@ void CUIInventoryWnd::ActivatePropertiesBox()
 	CSilencer*			pSilencer			= smart_cast<CSilencer*>		(CurrentIItem());
 	CGrenadeLauncher*	pGrenadeLauncher	= smart_cast<CGrenadeLauncher*>	(CurrentIItem());
 	CBottleItem*		pBottleItem			= smart_cast<CBottleItem*>		(CurrentIItem());
-    
+	
 	bool	b_show			= false;
 
 
 	if(!pOutfit && CurrentIItem()->GetSlot()!=NO_ACTIVE_SLOT && !m_pInv->m_slots[CurrentIItem()->GetSlot()].m_bPersistent && m_pInv->CanPutInSlot(CurrentIItem()))
 	{
-		UIPropertiesBox.AddItem("st_move_to_slot",  NULL, INVENTORY_TO_SLOT_ACTION);
+		UIPropertiesBox.AddItem(getComplexString("st_move_to_slot",CurrentIItem()).c_str(),  nullptr, INVENTORY_TO_SLOT_ACTION);
 		b_show			= true;
 	}
 	if(CurrentIItem()->Belt() && m_pInv->CanPutInBelt(CurrentIItem()))
 	{
-		UIPropertiesBox.AddItem("st_move_on_belt",  NULL, INVENTORY_TO_BELT_ACTION);
+		UIPropertiesBox.AddItem(getComplexString("st_move_on_belt",CurrentIItem()).c_str(),  nullptr, INVENTORY_TO_BELT_ACTION);
 		b_show			= true;
 	}
 
-	if(CurrentIItem()->Ruck() && m_pInv->CanPutInRuck(CurrentIItem()) && (CurrentIItem()->GetSlot()==u32(-1) || !m_pInv->m_slots[CurrentIItem()->GetSlot()].m_bPersistent) )
+	if(CurrentIItem()->Ruck() && m_pInv->CanPutInRuck(CurrentIItem()) && (CurrentIItem()->GetSlot()==size_t(-1) || !m_pInv->m_slots[CurrentIItem()->GetSlot()].m_bPersistent) )
 	{
 		if(!pOutfit)
-			UIPropertiesBox.AddItem("st_move_to_bag",  NULL, INVENTORY_TO_BAG_ACTION);
+			UIPropertiesBox.AddItem(getComplexString("st_move_to_bag",CurrentIItem()).c_str(),  nullptr, INVENTORY_TO_BAG_ACTION);
 		else
-			UIPropertiesBox.AddItem("st_undress_outfit",  NULL, INVENTORY_TO_BAG_ACTION);
+			UIPropertiesBox.AddItem(getComplexString("st_undress_outfit",pOutfit).c_str(),  nullptr, INVENTORY_TO_BAG_ACTION);
 		bAlreadyDressed = true;
 		b_show			= true;
 	}
 	if(pOutfit  && !bAlreadyDressed )
 	{
-		UIPropertiesBox.AddItem("st_dress_outfit",  NULL, INVENTORY_TO_SLOT_ACTION);
+		UIPropertiesBox.AddItem(getComplexString("st_dress_outfit",pOutfit).c_str(),  nullptr, INVENTORY_TO_SLOT_ACTION);
 		b_show			= true;
 	}
 	
@@ -81,17 +119,17 @@ void CUIInventoryWnd::ActivatePropertiesBox()
 	{
 		if(pWeapon->GrenadeLauncherAttachable() && pWeapon->IsGrenadeLauncherAttached())
 		{
-			UIPropertiesBox.AddItem("st_detach_gl",  NULL, INVENTORY_DETACH_GRENADE_LAUNCHER_ADDON);
+			UIPropertiesBox.AddItem(getComplexString("st_detach_gl",nullptr,getAddonInvName(pWeapon->GetGrenadeLauncherName().c_str())).c_str(),  nullptr, INVENTORY_DETACH_GRENADE_LAUNCHER_ADDON);
 		b_show			= true;
 		}
 		if(pWeapon->ScopeAttachable() && pWeapon->IsScopeAttached())
 		{
-			UIPropertiesBox.AddItem("st_detach_scope",  NULL, INVENTORY_DETACH_SCOPE_ADDON);
+			UIPropertiesBox.AddItem(getComplexString("st_detach_scope",nullptr,getAddonInvName(pWeapon->GetScopeName().c_str())).c_str(),  nullptr, INVENTORY_DETACH_SCOPE_ADDON);
 		b_show			= true;
 		}
 		if(pWeapon->SilencerAttachable() && pWeapon->IsSilencerAttached())
 		{
-			UIPropertiesBox.AddItem("st_detach_silencer",  NULL, INVENTORY_DETACH_SILENCER_ADDON);
+			UIPropertiesBox.AddItem(getComplexString("st_detach_silencer",nullptr,getAddonInvName(pWeapon->GetSilencerName().c_str())).c_str(),  nullptr, INVENTORY_DETACH_SILENCER_ADDON);
 		b_show			= true;
 		}
 		if(smart_cast<CWeaponMagazined*>(pWeapon) && IsGameTypeSingle())
@@ -101,7 +139,7 @@ void CUIInventoryWnd::ActivatePropertiesBox()
 			if(!b)
 			{
 				CUICellItem * itm = CurrentItem();
-				for(u32 i=0; i<itm->ChildsCount(); ++i)
+				for(size_t i=0; i<itm->ChildsCount(); ++i)
 				{
 					pWeapon		= smart_cast<CWeaponMagazined*>((CWeapon*)itm->Child(i)->m_pData);
 					if(pWeapon->GetAmmoElapsed())
@@ -113,7 +151,7 @@ void CUIInventoryWnd::ActivatePropertiesBox()
 			}
 
 			if(b){
-				UIPropertiesBox.AddItem("st_unload_magazine",  NULL, INVENTORY_UNLOAD_MAGAZINE);
+				UIPropertiesBox.AddItem(getComplexString("st_unload_magazine",pWeapon).c_str(),  nullptr, INVENTORY_UNLOAD_MAGAZINE);
 				b_show			= true;
 			}
 		}
@@ -126,14 +164,14 @@ void CUIInventoryWnd::ActivatePropertiesBox()
 		   m_pInv->m_slots[PISTOL_SLOT].m_pIItem->CanAttach(pScope))
 		 {
 			PIItem tgt = m_pInv->m_slots[PISTOL_SLOT].m_pIItem;
-			UIPropertiesBox.AddItem("st_attach_scope_to_pistol",  (void*)tgt, INVENTORY_ATTACH_ADDON);
+			UIPropertiesBox.AddItem(getComplexString("st_attach_scope_to_pistol",pScope).c_str(),  static_cast<void*>(tgt), INVENTORY_ATTACH_ADDON);
 			b_show			= true;
 		 }
 		 if(m_pInv->m_slots[RIFLE_SLOT].m_pIItem != NULL &&
 			m_pInv->m_slots[RIFLE_SLOT].m_pIItem->CanAttach(pScope))
 		 {
 			PIItem tgt = m_pInv->m_slots[RIFLE_SLOT].m_pIItem;
-			UIPropertiesBox.AddItem("st_attach_scope_to_rifle",  (void*)tgt, INVENTORY_ATTACH_ADDON);
+			UIPropertiesBox.AddItem(getComplexString("st_attach_scope_to_rifle",pScope).c_str(),  static_cast<void*>(tgt), INVENTORY_ATTACH_ADDON);
 			b_show			= true;
 		 }
 	}
@@ -143,14 +181,14 @@ void CUIInventoryWnd::ActivatePropertiesBox()
 		   m_pInv->m_slots[PISTOL_SLOT].m_pIItem->CanAttach(pSilencer))
 		 {
 			PIItem tgt = m_pInv->m_slots[PISTOL_SLOT].m_pIItem;
-			UIPropertiesBox.AddItem("st_attach_silencer_to_pistol",  (void*)tgt, INVENTORY_ATTACH_ADDON);
+			UIPropertiesBox.AddItem(getComplexString("st_attach_silencer_to_pistol",pSilencer).c_str(),  static_cast<void*>(tgt), INVENTORY_ATTACH_ADDON);
 			b_show			= true;
 		 }
 		 if(m_pInv->m_slots[RIFLE_SLOT].m_pIItem != NULL &&
 			m_pInv->m_slots[RIFLE_SLOT].m_pIItem->CanAttach(pSilencer))
 		 {
 			PIItem tgt = m_pInv->m_slots[RIFLE_SLOT].m_pIItem;
-			UIPropertiesBox.AddItem("st_attach_silencer_to_rifle",  (void*)tgt, INVENTORY_ATTACH_ADDON);
+			UIPropertiesBox.AddItem(getComplexString("st_attach_silencer_to_rifle",pSilencer).c_str(),  static_cast<void*>(tgt), INVENTORY_ATTACH_ADDON);
 			b_show			= true;
 		 }
 	}
@@ -160,7 +198,7 @@ void CUIInventoryWnd::ActivatePropertiesBox()
 			m_pInv->m_slots[RIFLE_SLOT].m_pIItem->CanAttach(pGrenadeLauncher))
 		 {
 			PIItem tgt = m_pInv->m_slots[RIFLE_SLOT].m_pIItem;
-			UIPropertiesBox.AddItem("st_attach_gl_to_rifle",  (void*)tgt, INVENTORY_ATTACH_ADDON);
+			UIPropertiesBox.AddItem(getComplexString("st_attach_gl_to_rifle",pGrenadeLauncher).c_str(),  static_cast<void*>(tgt), INVENTORY_ATTACH_ADDON);
 			b_show			= true;
 		 }
 
@@ -180,7 +218,7 @@ void CUIInventoryWnd::ActivatePropertiesBox()
 	}
 
 	if(_action){
-		UIPropertiesBox.AddItem(_action,  NULL, INVENTORY_EAT_ACTION);
+		UIPropertiesBox.AddItem(_action,  nullptr, INVENTORY_EAT_ACTION);
 		b_show			= true;
 	}
 
@@ -190,11 +228,11 @@ void CUIInventoryWnd::ActivatePropertiesBox()
 	if(!disallow_drop)
 	{
 
-		UIPropertiesBox.AddItem("st_drop", NULL, INVENTORY_DROP_ACTION);
+		UIPropertiesBox.AddItem("st_drop", nullptr, INVENTORY_DROP_ACTION);
 		b_show			= true;
 
 		if(CurrentItem()->ChildsCount())
-			UIPropertiesBox.AddItem("st_drop_all", (void*)33, INVENTORY_DROP_ACTION);
+			UIPropertiesBox.AddItem("st_drop_all", reinterpret_cast<void*>(33), INVENTORY_DROP_ACTION);
 	}
 
 	if(b_show)
@@ -219,25 +257,31 @@ void CUIInventoryWnd::ProcessPropertiesBoxClicked	()
 		switch(UIPropertiesBox.GetClickedItem()->GetTAG())
 		{
 		case INVENTORY_TO_SLOT_ACTION:	
+			CurrentItem()->SetMask(nullptr);
 			ToSlot(CurrentItem(), true);
 			break;
 		case INVENTORY_TO_BELT_ACTION:	
+			CurrentItem()->SetMask(nullptr);
 			ToBelt(CurrentItem(),false);
 			break;
 		case INVENTORY_TO_BAG_ACTION:	
+			CurrentItem()->SetMask(nullptr);
 			ToBag(CurrentItem(),false);
 			break;
 		case INVENTORY_DROP_ACTION:
 			{
+				CurrentItem()->SetMask(nullptr);
 				void* d = UIPropertiesBox.GetClickedItem()->GetData();
 				bool b_all = (d==(void*)33);
 
 				DropCurrentItem(b_all);
 			}break;
 		case INVENTORY_EAT_ACTION:
+			CurrentItem()->SetMask(nullptr);
 			EatItem(CurrentIItem());
 			break;
 		case INVENTORY_ATTACH_ADDON:
+			CurrentItem()->SetMask(nullptr);
 			AttachAddon((PIItem)(UIPropertiesBox.GetClickedItem()->GetData()));
 			break;
 		case INVENTORY_DETACH_SCOPE_ADDON:
@@ -256,7 +300,7 @@ void CUIInventoryWnd::ProcessPropertiesBoxClicked	()
 			{
 				CUICellItem * itm = CurrentItem();
 				(smart_cast<CWeaponMagazined*>((CWeapon*)itm->m_pData))->UnloadMagazine();
-				for(u32 i=0; i<itm->ChildsCount(); ++i)
+				for(size_t i=0; i<itm->ChildsCount(); ++i)
 				{
 					CUICellItem * child_itm			= itm->Child(i);
 					(smart_cast<CWeaponMagazined*>((CWeapon*)child_itm->m_pData))->UnloadMagazine();

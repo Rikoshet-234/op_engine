@@ -116,9 +116,9 @@ public:
 	virtual bool				HasInfo		(shared_str info_id) const;
 	virtual bool				GetInfo		(shared_str info_id, INFO_DATA&) const;
 
-	#ifdef DEBUG
-	void CInventoryOwner::DumpInfo() const;
-	#endif
+
+	void CInventoryOwner::DumpInfo(shared_str ) const;
+
 
 	CInfoPortionWrapper			*m_known_info_registry;
 
