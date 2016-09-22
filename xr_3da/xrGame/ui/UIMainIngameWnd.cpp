@@ -50,6 +50,7 @@
 #include "map_hint.h"
 #include "UIColorAnimatorWrapper.h"
 #include "../game_news.h"
+#include "UICellCustomItems.h"
 
 #ifdef DEBUG
 #	include "../debug_renderer.h"
@@ -1071,8 +1072,35 @@ void CUIMainIngameWnd::AnimateContacts(bool b_snd)
 
 void CUIMainIngameWnd::SetPickUpItem	(CInventoryItem* PickUpItem)
 {
-	m_pPickUpItem = PickUpItem;
+if (m_pPickUpItem != PickUpItem)
+	{
+		m_pPickUpItem = PickUpItem;
+		UIPickUpItemIcon.Show(false);
+		UIPickUpItemIcon.DetachAll();
+	}
 };
+
+typedef CUIWeaponCellItem::eAddonType eAddonType;
+
+CUIStatic* init_addon(CUIWeaponCellItem *cell_item,LPCSTR sect,float scale,float scale_x,eAddonType idx)
+{
+	CUIStatic *addon = xr_new<CUIStatic>();
+	addon->SetAutoDelete(true);
+
+	auto pos   = cell_item->get_addon_offset(idx); 
+	pos.x	  *= scale *scale_x; 
+	pos.y	  *= scale;
+	
+	UIIconInfo     params(sect);
+	Frect rect = params.getOriginalRect();			
+	addon->SetStretchTexture	(true);
+	addon->SetShader(GetEquipmentIconsShader());
+	addon->SetOriginalRect		(rect);
+	addon->SetWndRect			(pos.x, pos.y, rect.width() * scale * scale_x, rect.height() *scale);
+	addon->SetColor				(color_rgba(255,255,255,192));
+
+	return addon;
+}
 
 void CUIMainIngameWnd::UpdatePickUpItem	()
 {
@@ -1083,7 +1111,6 @@ void CUIMainIngameWnd::UpdatePickUpItem	()
 	};
 
 	if (UIPickUpItemIcon.IsShown() ) return;
-
 	shared_str sect_name	= m_pPickUpItem->object().cNameSect();
 
 	UIIconInfo iconInfo=m_pPickUpItem->GetIconInfo();
@@ -1096,14 +1123,14 @@ void CUIMainIngameWnd::UpdatePickUpItem	()
 	scale_y = (scale_y>1) ? 1.0f : scale_y;
 
 	float scale = (scale_x<scale_y?scale_x:scale_y);
-
+	UIPickUpItemIcon.GetUIStaticItem().SetShader(GetEquipmentIconsShader());
 	UIPickUpItemIcon.GetUIStaticItem().SetOriginalRect(iconInfo.getOriginalRect());
 	UIPickUpItemIcon.SetStretchTexture(true);
 
 	// Real Wolf: »справл€ем раст€гивание. 10.08.2014.
 	scale_x = Device.fASPECT  / 0.75f;
 
-	UIPickUpItemIcon.SetWidth(rect.width()*scale* scale_x*0.2f);
+	UIPickUpItemIcon.SetWidth(rect.width()*scale* scale_x);
 	UIPickUpItemIcon.SetHeight(rect.height()*scale);
 
 	UIPickUpItemIcon.SetWndPos(
@@ -1113,6 +1140,28 @@ void CUIMainIngameWnd::UpdatePickUpItem	()
 		(m_iPickUpItemIconHeight - UIPickUpItemIcon.GetHeight())/2);
 
 	UIPickUpItemIcon.SetColor(color_rgba(255,255,255,192));
+
+	if (auto wpn = m_pPickUpItem->cast_weapon())
+	{
+		auto cell_item = xr_new<CUIWeaponCellItem>(wpn);
+		if (wpn->SilencerAttachable() && wpn->IsSilencerAttached() )
+		{
+			auto sil = init_addon(cell_item, *wpn->GetSilencerName(), scale, scale_x, eAddonType::eSilencer);
+			UIPickUpItemIcon.AttachChild(sil);
+		}
+		if (wpn->ScopeAttachable() && wpn->IsScopeAttached() )
+		{
+			auto scope = init_addon(cell_item, *wpn->GetScopeName(), scale, scale_x, eAddonType::eScope);
+			UIPickUpItemIcon.AttachChild(scope);
+		}
+		if (wpn->GrenadeLauncherAttachable() && wpn->IsGrenadeLauncherAttached() )
+		{
+			auto launcher = init_addon(cell_item, *wpn->GetGrenadeLauncherName(), scale, scale_x, eAddonType::eLauncher);
+			UIPickUpItemIcon.AttachChild(launcher);
+		}
+		delete_data(cell_item);
+	}
+
 	UIPickUpItemIcon.Show(true);
 };
 

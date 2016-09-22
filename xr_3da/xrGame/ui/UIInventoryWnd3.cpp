@@ -61,7 +61,7 @@ std::string getAddonInvName(std::string addonName)
 	{
 		if (pSettings->line_exist(addonName.c_str(),"inv_name_short"))
 			name=pSettings->r_string(addonName.c_str(),"inv_name_short");
-		if ((name=="") && (name!=EMPTY_DESC))
+		if ((name=="") || (name==EMPTY_DESC))
 			name=pSettings->r_string(addonName.c_str(),"inv_name");
 	}
 	return name;

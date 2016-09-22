@@ -109,6 +109,7 @@ bool CUIWeaponCellItem::is_launcher()
 
 void CUIWeaponCellItem::CreateIcon(eAddonType t)
 {
+	if (GetIcon(t)) return;
 	m_addons[t]					= xr_new<CUIStatic>();	
 	m_addons[t]->SetAutoDelete	(true);
 	AttachChild					(m_addons[t]);

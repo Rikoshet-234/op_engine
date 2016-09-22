@@ -10,7 +10,7 @@
 #include "UI3tButton.h"
 #include "../level.h"
 #include "../actor.h"
-#include "../gametaskmanager.h"
+#include "../GametaskManager.h"
 #include "../gametask.h"
 #include "../map_manager.h"
 #include "../map_location.h"
@@ -133,7 +133,7 @@ bool uitask_title_pred( CUITaskItem* k1,  CUITaskItem* k2)
 
 bool task_title_pred( CGameTask* k1,  CGameTask* k2) 
 {
-	bool res=k1->m_Title < k2->m_Title;
+	bool res=k1->m_Title.c_str() < k2->m_Title.c_str();
 	return res;
 }
 
@@ -174,10 +174,11 @@ void CUIEventsWnd::ReloadList(bool bClearOnly)
 	{
 		if (sortNeed)
 			std::sort(tempTasks.begin(),tempTasks.end(),task_title_pred);
-		xr_vector<CGameTask*>::iterator it = tempTasks.begin();
-		for (;it != tempTasks.end();++it)
+		xr_vector<CGameTask*>::iterator itt = tempTasks.begin();
+		for (;itt != tempTasks.end();++itt)
 		{
-			CGameTask* forUITask=*it;
+			CGameTask* forUITask=*itt;
+			Msg(forUITask->m_Title.c_str());
 			CUITaskItem* pTaskItem	= nullptr;
 			for (u16 i = 0; i < forUITask->m_Objectives.size(); ++i)
 			{

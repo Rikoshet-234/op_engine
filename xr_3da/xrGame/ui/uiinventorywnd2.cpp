@@ -178,7 +178,7 @@ bool CUIInventoryWnd::ToSlot(CUICellItem* itm, bool force_place)
 		SendEvent_Item2Slot					(iitem);
 
 		SendEvent_ActivateSlot				(iitem);
-		
+		InventoryUtilities::UpdateWeight					(UIBagWnd, true);
 		return								true;
 	}else
 	{ // in case slot is busy
@@ -193,7 +193,7 @@ bool CUIInventoryWnd::ToSlot(CUICellItem* itm, bool force_place)
 
 		bool result							= ToBag(slot_cell, false);
 		VERIFY								(result);
-
+		InventoryUtilities::UpdateWeight					(UIBagWnd, true);
 		return ToSlot						(itm, false);
 	}
 }
@@ -223,6 +223,7 @@ bool CUIInventoryWnd::ToBag(CUICellItem* itm, bool b_use_cursor_pos)
 			new_owner->SetItem				(i);
 
 		SendEvent_Item2Ruck					(iitem);
+		InventoryUtilities::UpdateWeight					(UIBagWnd, true);
 		return true;
 	}
 	return false;

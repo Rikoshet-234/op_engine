@@ -14,6 +14,7 @@ protected:
 	MotionSVec			mhud_attack2;
 	MotionSVec			mhud_attack_e;
 	MotionSVec			mhud_attack2_e;
+	MotionSVec			mhud_idle_sprint;
 
 	HUD_SOUND			m_sndShot;
 	HUD_SOUND			sndShow;
@@ -32,6 +33,7 @@ protected:
 	virtual void		OnAnimationEnd				(u32 state);
 	virtual void		OnStateSwitch				(u32 S);
 
+	bool				TryPlayAnimIdle	();
 	void				state_Attacking				(float dt);
 
 	virtual void		KnifeStrike					(const Fvector& pos, const Fvector& dir);
@@ -66,7 +68,7 @@ public:
 
 
 	virtual bool		Action							(s32 cmd, u32 flags);
-
+	virtual void	onMovementChanged	(ACTOR_DEFS::EMoveCommand cmd);
 	virtual void		StartIdleAnim					();
 	virtual void		GetBriefInfo					(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count);
 

@@ -54,6 +54,8 @@ void CWeaponKnife::Load	(LPCSTR section)
 	animGet				(mhud_attack2,	pSettings->r_string(*hud_sect,"anim_shoot2_start"));
 	animGet				(mhud_attack_e,	pSettings->r_string(*hud_sect,"anim_shoot1_end"));
 	animGet				(mhud_attack2_e,pSettings->r_string(*hud_sect,"anim_shoot2_end"));
+	if(pSettings->line_exist(*hud_sect,"anim_idle_sprint"))
+		animGet				(mhud_idle_sprint,pSettings->r_string(*hud_sect, "anim_idle_sprint"));
 
 	HUD_SOUND::LoadSound(section,"snd_shoot"	, m_sndShot		, ESoundTypes(SOUND_TYPE_WEAPON_SHOOTING));
 	HUD_SOUND::LoadSound(section,"snd_draw"		, sndShow		, ESoundTypes(SOUND_TYPE_ITEM_TAKING|SOUND_TYPE_WEAPON),false);
@@ -173,7 +175,7 @@ void CWeaponKnife::OnAnimationEnd(u32 state)
 	case eFire: 
 	case eFire2: 
 		{
-            if(m_attackStart) 
+			if(m_attackStart) 
 			{
 				m_attackStart = false;
 				if(GetState()==eFire)
@@ -220,7 +222,6 @@ void CWeaponKnife::switch2_Attacking	(u32 state)
 void CWeaponKnife::switch2_Idle	()
 {
 	VERIFY(GetState()==eIdle);
-
 	m_pHUD->animPlay(random_anim(mhud_idle), TRUE, this, GetState());
 	m_bPending = false;
 }
@@ -256,10 +257,13 @@ void CWeaponKnife::FireStart()
 	SwitchState			(eFire);
 }
 
+
 void CWeaponKnife::Fire2Start () 
 {
 	inherited::Fire2Start();
 	SwitchState(eFire2);
+	if (ParentIsActor() )
+		g_actor->set_state_wishful(g_actor->get_state_wishful() & (~mcSprint) );
 }
 
 
@@ -268,7 +272,6 @@ bool CWeaponKnife::Action(s32 cmd, u32 flags)
 	if(inherited::Action(cmd, flags)) return true;
 	switch(cmd) 
 	{
-
 		case kWPN_ZOOM : 
 			if(flags&CMD_START) Fire2Start();
 			else Fire2End();
@@ -324,4 +327,19 @@ void CWeaponKnife::GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, 
 	str_name		= NameShort();
 	str_count		= "";
 	icon_sect_name	= *cNameSect();
+}
+
+void CWeaponKnife::onMovementChanged	(ACTOR_DEFS::EMoveCommand cmd)
+{
+//	if( (cmd == ACTOR_DEFS::mcSprint)&&(GetState()==eIdle)  )
+//		switch2_Idle();
+	CEntity::SEntityState st;
+	g_actor->g_State(st);
+	if (st.bSprint && st.fVelocity > 1) 
+	{
+		SetState(eIdle);
+		m_pHUD->animPlay(random_anim(mhud_idle_sprint), TRUE, this,  eIdle);
+	}
+	else
+		SwitchState(GetState() );
 }
