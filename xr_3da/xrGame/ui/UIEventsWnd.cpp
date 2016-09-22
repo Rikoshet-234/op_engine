@@ -133,8 +133,7 @@ bool uitask_title_pred( CUITaskItem* k1,  CUITaskItem* k2)
 
 bool task_title_pred( CGameTask* k1,  CGameTask* k2) 
 {
-	bool res=k1->m_Title.c_str() < k2->m_Title.c_str();
-	return res;
+	return  lstrcmpi(k1->m_Title.c_str(),k2->m_Title.c_str()) <0;
 }
 
 void CUIEventsWnd::ReloadList(bool bClearOnly)
@@ -178,7 +177,6 @@ void CUIEventsWnd::ReloadList(bool bClearOnly)
 		for (;itt != tempTasks.end();++itt)
 		{
 			CGameTask* forUITask=*itt;
-			Msg(forUITask->m_Title.c_str());
 			CUITaskItem* pTaskItem	= nullptr;
 			for (u16 i = 0; i < forUITask->m_Objectives.size(); ++i)
 			{
