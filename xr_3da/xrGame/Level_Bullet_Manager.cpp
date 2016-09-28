@@ -76,6 +76,7 @@ void SBullet::Init(const Fvector& position,
 	flags.skipped_frame					= 0;
 
 	targetID			= 0;	
+	m_ammoSect=cartridge.m_ammoSect;
 }
 
 //////////////////////////////////////////////////////////
@@ -447,8 +448,11 @@ void CBulletManager::CommitEvents			()	// @ the start of frame
 			{
 				if (E.bullet.flags.allow_sendhit && GameID() != GAME_SINGLE)
 					Game().m_WeaponUsageStatistic->OnBullet_Remove(&E.bullet);
-				m_Bullets[E.tgt_material] = m_Bullets.back();
-				m_Bullets.pop_back();
+				if (m_Bullets.size() > E.tgt_material) 
+				{
+					m_Bullets[E.tgt_material] = m_Bullets.back();
+					m_Bullets.pop_back();
+				}
 			}break;
 		}		
 	}

@@ -302,9 +302,9 @@ public:
 	IC						CEntityWrapper		() {}
 	virtual					~CEntityWrapper		() {}
 
-	virtual void			HitSignal			(float P, Fvector &local_dir,	CObject* who, s16 element)
+	virtual void			HitSignal			(float P, Fvector &local_dir,	SHit* pHit)
 	{
-		luabind::call_member<void>(this,"HitSignal",P,local_dir,who,element);
+		luabind::call_member<void>(this,"HitSignal",P,local_dir,pHit->who,pHit->boneID);
 	}
 
 	static	void			HitSignal_static	(CEntity *self, float P, Fvector &local_dir,	CObject* who, s16 element)

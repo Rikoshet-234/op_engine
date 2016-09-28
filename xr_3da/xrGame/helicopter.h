@@ -291,7 +291,7 @@ public:
 	virtual	void					Hit					(SHit* pHDS);
 	virtual void					PHHit				(float P,Fvector &dir, CObject *who,s16 element,Fvector p_in_object_space, float impulse, ALife::EHitType hit_type);
 	//CEntity
-	virtual void					HitSignal			(float P, Fvector &local_dir,	CObject* who, s16 element){;}
+	virtual void					HitSignal			(float P, Fvector &local_dir,	SHit* pHit){;}
 	virtual void					HitImpulse			(float P, Fvector &vWorldDir, 	Fvector& vLocalDir){;}
 	
 	virtual const Fmatrix&			get_ParticlesXFORM			();

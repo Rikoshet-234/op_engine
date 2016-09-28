@@ -386,7 +386,7 @@ void CAI_Crow::net_Import	(NET_Packet& P)
 	XFORM().setHPB		(yaw,pitch,bank);
 }
 //---------------------------------------------------------------------
-void CAI_Crow::HitSignal	(float /**HitAmount/**/, Fvector& /**local_dir/**/, CObject* who, s16 /**element/**/)
+void CAI_Crow::HitSignal	(float /**HitAmount/**/, Fvector& /**local_dir/**/, SHit* pHit)
 {
 	//bool				first_time = !!g_Alive(); 
 //	bool				first_time = !PPhysicsShell(); 

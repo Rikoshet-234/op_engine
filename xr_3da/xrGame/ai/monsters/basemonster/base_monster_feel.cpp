@@ -69,7 +69,7 @@ void CBaseMonster::feel_sound_new(CObject* who, int eType, CSound_UserDataPtr us
 	// register in sound memory
 	if (power >= db().m_fSoundThreshold) {
 		SoundMemory.HearSound(who,eType,Position,power,Device.dwTimeGlobal);
- 	}
+	}
 }
 #define MAX_LOCK_TIME 2.f
 
@@ -218,14 +218,14 @@ BOOL  CBaseMonster::feel_vision_isRelevant(CObject* O)
 	return TRUE;
 }
 
-void CBaseMonster::HitSignal(float amount, Fvector& vLocalDir, CObject* who, s16 element)
+void CBaseMonster::HitSignal(float amount, Fvector& vLocalDir, SHit* pHit)
 {
 	if (!g_Alive()) return;
 	
-	feel_sound_new(who,SOUND_TYPE_WEAPON_SHOOTING,0,who->Position(),1.f);
+	feel_sound_new(pHit->who,SOUND_TYPE_WEAPON_SHOOTING,nullptr,pHit->who->Position(),1.f);
 	if (g_Alive()) sound().play(MonsterSound::eMonsterSoundTakeDamage);
 
-	if (element < 0) return;
+	if (pHit->boneID < 0) return;
 
 	// Определить направление хита (перед || зад || лево || право)
 	float yaw,pitch;
@@ -240,7 +240,7 @@ void CBaseMonster::HitSignal(float amount, Fvector& vLocalDir, CObject* who, s16
 
 	anim().FX_Play	(hit_side, 1.0f);
 
-	HitMemory.add_hit	(who,hit_side);
+	HitMemory.add_hit	(pHit->who,hit_side);
 
 	Morale.on_hit		();
 
@@ -248,12 +248,12 @@ void CBaseMonster::HitSignal(float amount, Fvector& vLocalDir, CObject* who, s16
 		lua_game_object(), 
 		amount,
 		vLocalDir,
-		smart_cast<const CGameObject*>(who)->lua_game_object(),
-		element
+		smart_cast<const CGameObject*>(pHit->who)->lua_game_object(),
+		pHit->boneID
 	);
 
 	// если нейтрал - добавить как врага
-	CEntityAlive	*obj = smart_cast<CEntityAlive*>(who);
+	CEntityAlive	*obj = smart_cast<CEntityAlive*>(pHit->who);
 	if (obj && (tfGetRelationType(obj) == ALife::eRelationTypeNeutral)) EnemyMan.add_enemy(obj);
 }
 

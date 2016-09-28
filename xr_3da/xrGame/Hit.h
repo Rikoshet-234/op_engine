@@ -36,6 +36,7 @@ IC	ALife::EHitType		type					()		const	{VERIFY(is_valide());return hit_type;}
 	ALife::EHitType		hit_type																																				;
 	float				ap;
 	bool				aim_bullet;
+	shared_str			ammoSection;
 	//---------------------------------------------------
 	//GE_HIT_STATISTIC
 	u32					BulletID;

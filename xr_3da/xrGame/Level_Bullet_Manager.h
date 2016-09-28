@@ -56,6 +56,7 @@ struct SBullet
 	ref_sound		m_mtl_snd			;
 	//---------------------------------
 	u16				targetID			;
+	shared_str		m_ammoSect;
 	bool			operator	==		(u32 ID){return	ID == m_dwID;}
 public:
 					SBullet				();

@@ -15,12 +15,6 @@
 #include "../game_base_space.h"
 #include "../actor.h"
 
-#define BUY_MENU_TEXTURE "ui\\ui_mp_buy_menu"
-#define EQUIPMENT_ICONS  "ui\\ui_icon_equipment"
-#define CHAR_ICONS		 "ui\\ui_icons_npc"
-#define MAP_ICONS		 "ui\\ui_icons_map"
-#define MP_CHAR_ICONS	 "ui\\ui_models_multiplayer"
-
 const LPCSTR relationsLtxSection	= "game_relations";
 const LPCSTR ratingField			= "rating_names";
 const LPCSTR reputationgField		= "reputation_names";

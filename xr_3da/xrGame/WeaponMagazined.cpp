@@ -1233,6 +1233,7 @@ void CWeaponMagazined::GetBriefInfo(xr_string& str_name, xr_string& icon_sect_na
 
 
 	{
+	if (GetAmmoMagSize()!=0)
 		if (!unlimited_ammo())
 			sprintf_s			(sItemName, "%d/%d",AE,AC - AE);
 		else

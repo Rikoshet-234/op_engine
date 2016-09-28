@@ -25,6 +25,7 @@ SHit::SHit(float aPower,Fvector &adir,CObject *awho, u16 aelement, Fvector ap_in
 		BulletID				= 0										;
 		SenderID				= 0										;
 		aim_bullet				= AimBullet								;
+		ammoSection				=nullptr;
 }
 
 SHit::SHit()
@@ -53,6 +54,7 @@ void SHit::invalidate()
 	BulletID				= 0;
 	SenderID				= 0;
 	aim_bullet				= false									;
+	ammoSection=nullptr;
 }
 
 bool SHit::is_valide() const
@@ -87,6 +89,7 @@ void SHit::Read_Packet_Cont		(NET_Packet	Packet)
 	Packet.r_u16			(boneID);
 	Packet.r_vec3			(p_in_bone_space);
 	Packet.r_float			(impulse);
+	Packet.r_stringZ		(ammoSection);
 	if (IsGameTypeSingle())
 		aim_bullet				= Packet.r_u16()!=0;
 	else
@@ -113,6 +116,7 @@ void SHit::Write_Packet_Cont		(NET_Packet	&Packet)
 	Packet.w_u16		(boneID);
 	Packet.w_vec3		(p_in_bone_space);
 	Packet.w_float		(impulse);
+	Packet.w_stringZ	(ammoSection);
 	if (IsGameTypeSingle())
 		Packet.w_u16		(aim_bullet!=0);
 	Packet.w_u16		(u16(hit_type&0xffff));	

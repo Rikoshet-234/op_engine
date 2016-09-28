@@ -5,6 +5,12 @@
 
 class CUIStatic;
 
+#define BUY_MENU_TEXTURE "ui\\ui_mp_buy_menu"
+#define EQUIPMENT_ICONS  "ui\\ui_icon_equipment"
+#define CHAR_ICONS		 "ui\\ui_icons_npc"
+#define MAP_ICONS		 "ui\\ui_icons_map"
+#define MP_CHAR_ICONS	 "ui\\ui_models_multiplayer"
+
 //размеры сетки в текстуре инвентаря
 #define INV_GRID_WIDTH			50
 #define INV_GRID_HEIGHT			50

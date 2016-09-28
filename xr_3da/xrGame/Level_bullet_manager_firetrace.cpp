@@ -345,26 +345,6 @@ void CBulletManager::DynamicObjectHit	(CBulletManager::_event& E)
 				AddStatistic = true;
 			};
 		};
-/*		
-		NET_Packet		P;
-//		CGameObject::u_EventGen	(P,(AddStatistic)? GE_HIT_STATISTIC : GE_HIT,E.R.O->ID());
-		P.w_u16			(E.bullet.parent_id);
-		P.w_u16			(E.bullet.weapon_id);
-		P.w_dir			(original_dir);
-		P.w_float		(power);
-		P.w_s16			((s16)E.R.element);
-		P.w_vec3		(position_in_bone_space);
-		P.w_float		(impulse);
-		P.w_u16			(u16(E.bullet.hit_type));
-		if (E.bullet.hit_type == ALife::eHitTypeFireWound)
-			P.w_float	(E.bullet.ap);
-
-		if (AddStatistic)
-			P.w_u32(E.bullet.m_dwID);
-
-		CGameObject::u_EventSend (P);
-*/
-
 		SHit	Hit = SHit(	power, 
 							original_dir, 
 							NULL, 
@@ -379,11 +359,11 @@ void CBulletManager::DynamicObjectHit	(CBulletManager::_event& E)
 		Hit.whoID			= E.bullet.parent_id;
 		Hit.weaponID		= E.bullet.weapon_id;
 		Hit.BulletID		= E.bullet.m_dwID;
-
+		Hit.ammoSection		= E.bullet.m_ammoSect;
 		NET_Packet			np;
 		Hit.Write_Packet	(np);
 		
-//		Msg("Hit sended: %d[%d,%d]", Hit.whoID, Hit.weaponID, Hit.BulletID);
+		//Msg("Hit sended: %d[%d,%d] ammoSect:[%s]", Hit.whoID, Hit.weaponID, Hit.BulletID,Hit.ammoSection.c_str());
 		CGameObject::u_EventSend(np);
 	}
 }

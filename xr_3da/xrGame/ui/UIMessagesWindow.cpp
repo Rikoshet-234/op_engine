@@ -19,6 +19,7 @@
 #include "../InfoPortion.h"
 #include "../string_table.h"
 #include "../game_cl_artefacthunt.h"
+#include "UIInventoryUtilities.h"
 
 CUIMessagesWindow::CUIMessagesWindow(){
 	m_pChatLog = NULL;
@@ -82,28 +83,31 @@ void CUIMessagesWindow::AddIconedPdaMessage(LPCSTR textureName, Frect originalRe
 	pItem->UIIcon.InitTexture			(textureName);
 	//pItem->UIIcon.SetOriginalRect		(originalRect.left, originalRect.top, originalRect.right, originalRect.bottom);
 	
-	Msg("originalRect.right [%f] originalRect.bottom [%f]",originalRect.right,originalRect.bottom);
-	Msg("UIIcon width [%f] height [%f] before",pItem->UIIcon.GetWidth(),pItem->UIIcon.GetHeight());
-	pItem->UIIcon.SetStretchTexture(true);
-	float wIconWidth=pItem->UIIcon.GetWidth();
-	float wIconHeight=pItem->UIIcon.GetHeight();
-	float rectWidth=originalRect.right;
-	float rectHeight=originalRect.bottom;
-	Msg("rect w[%f] h[%f]",rectWidth,rectHeight);
-	float scaleWidth= wIconWidth/rectWidth;
-	float scaleHeight=wIconHeight/rectHeight;
-	scaleWidth=scaleWidth>1?1:scaleWidth;
-	scaleHeight=scaleHeight>1?1:scaleHeight;
-	Msg("scale w[%f] h[%f]",scaleWidth,scaleHeight);
-	float scale_x = Device.fASPECT  / 0.75f;
+	if (xr_strcmp(textureName,EQUIPMENT_ICONS)==0)
+	{
+		Msg("originalRect.right [%f] originalRect.bottom [%f]",originalRect.right,originalRect.bottom);
+		Msg("UIIcon width [%f] height [%f] before",pItem->UIIcon.GetWidth(),pItem->UIIcon.GetHeight());
+		pItem->UIIcon.SetStretchTexture(true);
+		float wIconWidth=pItem->UIIcon.GetWidth();
+		float wIconHeight=pItem->UIIcon.GetHeight();
+		float rectWidth=originalRect.right;
+		float rectHeight=originalRect.bottom;
+		Msg("rect w[%f] h[%f]",rectWidth,rectHeight);
+		float scaleWidth= wIconWidth/rectWidth;
+		float scaleHeight=wIconHeight/rectHeight;
+		scaleWidth=scaleWidth>1?1:scaleWidth;
+		scaleHeight=scaleHeight>1?1:scaleHeight;
+		Msg("scale w[%f] h[%f]",scaleWidth,scaleHeight);
+		float scale_x = Device.fASPECT  / 0.75f;
 
-	float scale = (scaleWidth<scaleHeight?scaleWidth:scaleHeight);
+		float scale = (scaleWidth<scaleHeight?scaleWidth:scaleHeight);
+
+		pItem->UIIcon.SetWidth(rectWidth * scale * scale_x);
+		pItem->UIIcon.SetHeight(rectHeight * scale);
+		Msg("UIIcon width [%f] height [%f] after",pItem->UIIcon.GetWidth(),pItem->UIIcon.GetHeight());
+	}
 
 	pItem->UIIcon.SetOriginalRect		(originalRect.left, originalRect.top, originalRect.right, originalRect.bottom);
-	pItem->UIIcon.SetWidth(rectWidth * scale * scale_x);
-	pItem->UIIcon.SetHeight(rectHeight * scale);
-	Msg("UIIcon width [%f] height [%f] after",pItem->UIIcon.GetWidth(),pItem->UIIcon.GetHeight());
-
 	pItem->UIMsgText.SetWndPos			(pItem->UIIcon.GetWidth(), pItem->UIMsgText.GetWndPos().y);
 	pItem->UIMsgText.AdjustHeightToText	();
 

@@ -27,7 +27,7 @@
 #include "../IGame_Persistent.h"
 #include "MainMenu.h"
 
-
+#undef EQUIPMENT_ICONS
 #define EQUIPMENT_ICONS "ui\\ui_mp_icon_kill"
 #define KILLEVENT_ICONS "ui\\ui_hud_mp_icon_death"
 #define RADIATION_ICONS "ui\\ui_mn_radiations_hard"

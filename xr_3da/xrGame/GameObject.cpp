@@ -28,6 +28,7 @@
 #include "game_level_cross_table.h"
 #include "animation_movement_controller.h"
 #include "game_object_space.h"
+#include "game_cl_base_weapon_usage_statistic.h"
 
 #ifdef DEBUG
 #	include "debug_renderer.h"
@@ -86,7 +87,7 @@ void CGameObject::reinit	()
 {
 	m_visual_callback.clear	();
 	if (!g_dedicated_server)
-        ai_location().reinit	();
+		ai_location().reinit	();
 
 	// clear callbacks	
 	for (CALLBACK_MAP_IT it = m_callbacks->begin(); it != m_callbacks->end(); ++it) it->second.clear();
@@ -141,39 +142,12 @@ void CGameObject::OnEvent		(NET_Packet& P, u16 type)
 	case GE_HIT:
 	case GE_HIT_STATISTIC:
 		{
-/*
-			u16				id,weapon_id;
-			Fvector			dir;
-			float			power, impulse;
-			s16				element;
-			Fvector			position_in_bone_space;
-			u16				hit_type;
-			float			ap = 0.0f;
-
-			P.r_u16			(id);
-			P.r_u16			(weapon_id);
-			P.r_dir			(dir);
-			P.r_float		(power);
-			P.r_s16			(element);
-			P.r_vec3		(position_in_bone_space);
-			P.r_float		(impulse);
-			P.r_u16			(hit_type);	//hit type
-			if ((ALife::EHitType)hit_type == ALife::eHitTypeFireWound)
-			{
-				P.r_float	(ap);
-			}
-
-			CObject*	Hitter = Level().Objects.net_Find(id);
-			CObject*	Weapon = Level().Objects.net_Find(weapon_id);
-
-			SHit	HDS = SHit(power, dir, Hitter, element, position_in_bone_space, impulse, (ALife::EHitType)hit_type, ap);
-*/
 			SHit	HDS;
 			HDS.PACKET_TYPE = type;
 			HDS.Read_Packet_Cont(P);
-//			Msg("Hit received: %d[%d,%d]", HDS.whoID, HDS.weaponID, HDS.BulletID);
 			CObject*	Hitter = Level().Objects.net_Find(HDS.whoID);
 			CObject*	Weapon = Level().Objects.net_Find(HDS.weaponID);
+			//Msg("Hit received: %d[%d,%d] ammo: [%s]", HDS.whoID, HDS.weaponID, HDS.BulletID,HDS.ammoSection.c_str());
 			HDS.who		= Hitter;
 			//-------------------------------------------------------
 			switch (HDS.PACKET_TYPE)
@@ -353,7 +327,7 @@ BOOL CGameObject::net_Spawn		(CSE_Abstract*	DC)
 				)
 				Position().y		= EPS_L + ai().level_graph().vertex_plane_y(*ai_location().level_vertex(),Position().x,Position().z);
 		}
- 		inherited::net_Spawn	(DC);
+		inherited::net_Spawn	(DC);
 	}
 
 	m_bObjectRemoved			= false;
@@ -520,7 +494,16 @@ void CGameObject::setup_parent_ai_locations(bool assign_position)
 
 	// get parent's position
 	if (assign_position && use_parent_ai_locations())
+	{
 		Position().set		(l_tpGameObject->Position());
+		//Fvector pos(l_tpGameObject->Position());		
+		//Fvector dir(l_tpGameObject->Direction());
+		//dir.setHP(dir.getH(), 0);
+		//pos.add(dir);  // чтобы не подпрыгнул владелец
+		//pos.y = pos.y + 0.7f;		
+		//Position().set(pos);
+		//Direction().set(dir);
+	}
 
 	// setup its ai locations
 	if (!UsedAI_Locations())
