@@ -29,6 +29,7 @@ void CWeaponBinoculars::Load	(LPCSTR section)
 	HUD_SOUND::LoadSound(section, "snd_zoomin",  sndZoomIn,		SOUND_TYPE_ITEM_USING);
 	HUD_SOUND::LoadSound(section, "snd_zoomout", sndZoomOut,	SOUND_TYPE_ITEM_USING);
 	m_bVision = !!pSettings->r_bool(section,"vision_present");
+	LoadFireModes(section);
 }
 
 
@@ -163,3 +164,23 @@ void CWeaponBinoculars::net_Relcase	(CObject *object)
 
 	m_binoc_vision->remove_links	(object);
 }
+
+int CWeaponBinoculars::GetCurrentFireMode()
+{
+	int fireMode=CWeaponCustomPistol::GetCurrentFireMode();
+	if (m_bHasDifferentFireModes)
+		fireMode=m_aFireModes[m_iCurFireMode];	
+	return fireMode;
+}
+
+void CWeaponBinoculars::FireEnd()
+{
+	CWeaponMagazined::FireEnd();
+}
+
+void CWeaponBinoculars::switch2_Fire()
+{
+	CWeaponMagazined::switch2_Fire();
+}
+
+

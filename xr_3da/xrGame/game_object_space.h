@@ -34,7 +34,7 @@ namespace GameObject {
 		eActionTypeParticle,
 		eActionTypeObject,
 
-		eActorSleep,
+			eActorSleep,
 
 		eHelicopterOnPoint,
 		eHelicopterOnHit,
@@ -49,6 +49,11 @@ namespace GameObject {
 		eTraderSoundEnd,
 
 		eInvBoxItemTake,
+
+		eOnActorWeaponFire,
+
+		eOnNPCWeaponFire,
+
 		eDummy = u32(-1),
 	};
 };

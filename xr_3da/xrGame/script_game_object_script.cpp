@@ -88,7 +88,11 @@ void CScriptGameObject::script_register(lua_State *L)
 				value("script_animation",			int(GameObject::eScriptAnimation)),
 				value("task_state",					int(GameObject::eTaskStateChange)),
 				value("take_item_from_box",			int(GameObject::eInvBoxItemTake)),
-				value("map_location_added",			int(GameObject::eMapLocationAdded))
+				value("map_location_added",			int(GameObject::eMapLocationAdded)),
+
+				value("on_npc_weapon_fire",			int(GameObject::eOnNPCWeaponFire)),
+
+				value("on_actor_weapon_fire",			int(GameObject::eOnActorWeaponFire))
 			],
 
 		def("buy_condition",				(void (*)(CScriptIniFile*,LPCSTR))(&::buy_condition)),

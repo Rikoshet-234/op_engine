@@ -257,31 +257,25 @@ void CUIInventoryWnd::ProcessPropertiesBoxClicked	()
 		switch(UIPropertiesBox.GetClickedItem()->GetTAG())
 		{
 		case INVENTORY_TO_SLOT_ACTION:	
-			CurrentItem()->SetMask(nullptr);
 			ToSlot(CurrentItem(), true);
 			break;
 		case INVENTORY_TO_BELT_ACTION:	
-			CurrentItem()->SetMask(nullptr);
 			ToBelt(CurrentItem(),false);
 			break;
 		case INVENTORY_TO_BAG_ACTION:	
-			CurrentItem()->SetMask(nullptr);
 			ToBag(CurrentItem(),false);
 			break;
 		case INVENTORY_DROP_ACTION:
 			{
-				CurrentItem()->SetMask(nullptr);
 				void* d = UIPropertiesBox.GetClickedItem()->GetData();
 				bool b_all = (d==(void*)33);
 
 				DropCurrentItem(b_all);
 			}break;
 		case INVENTORY_EAT_ACTION:
-			CurrentItem()->SetMask(nullptr);
 			EatItem(CurrentIItem());
 			break;
 		case INVENTORY_ATTACH_ADDON:
-			CurrentItem()->SetMask(nullptr);
 			AttachAddon((PIItem)(UIPropertiesBox.GetClickedItem()->GetData()));
 			break;
 		case INVENTORY_DETACH_SCOPE_ADDON:

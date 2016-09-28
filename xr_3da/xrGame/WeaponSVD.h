@@ -12,6 +12,7 @@ protected:
 	virtual void OnAnimationEnd (u32 state);
 public:
 	CWeaponSVD(void);
+	int				GetCurrentFireMode	() override	;
 	virtual ~CWeaponSVD(void);
 
 	DECLARE_SCRIPT_REGISTER_FUNCTION

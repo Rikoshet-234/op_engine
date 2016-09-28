@@ -7,6 +7,7 @@
 #include "../ai_space.h"
 #include "../script_engine.h"
 #include "../script_game_object.h"
+#include "../ui/UIInventoryUtilities.h"
 
 
 namespace OPFuncs
@@ -64,9 +65,44 @@ namespace OPFuncs
 				luabind::def("get_actor_slots_count",&get_actor_slots_count),
 				luabind::def("IsOPEngine", &lua_IsOPEngine),
 				luabind::def("engine_log", static_cast<void(*)(LPCSTR)>(&Log)),
-				luabind::def("GetOPEngineVersion",&lua_GetOPEngineVersion)
+				luabind::def("GetOPEngineVersion",&lua_GetOPEngineVersion),
+				luabind::def("get_weapon_vstatic",&GetWeaponStatic)
 			];
 	}
 
+	CUIStatic* GetWeaponStatic(CWeapon weapon)
+	{
+		UIIconInfo iconInfo(weapon.cNameSect().c_str());
+		CUIStatic *weaponStatic = xr_new<CUIStatic>();
+		weaponStatic->SetAutoDelete(true);
+		weaponStatic->SetStretchTexture	(true);
+		weaponStatic->SetShader(InventoryUtilities::GetEquipmentIconsShader());
+		weaponStatic->SetColor(color_rgba(255,255,255,192));
+		weaponStatic->GetUIStaticItem().SetShader(InventoryUtilities::GetEquipmentIconsShader());
+		weaponStatic->GetUIStaticItem().SetOriginalRect(iconInfo.getOriginalRect());
+		weaponStatic->ClipperOn();
+		return weaponStatic;
+
+
+		/*
+		auto cell_item = xr_new<CUIWeaponCellItem>(wpn);
+		if (wpn->SilencerAttachable() && wpn->IsSilencerAttached() )
+		{
+			auto sil = init_addon(cell_item, *wpn->GetSilencerName(), scale, scale_x, eAddonType::eSilencer);
+			UIPickUpItemIcon.AttachChild(sil);
+		}
+		if (wpn->ScopeAttachable() && wpn->IsScopeAttached() )
+		{
+			auto scope = init_addon(cell_item, *wpn->GetScopeName(), scale, scale_x, eAddonType::eScope);
+			UIPickUpItemIcon.AttachChild(scope);
+		}
+		if (wpn->GrenadeLauncherAttachable() && wpn->IsGrenadeLauncherAttached() )
+		{
+			auto launcher = init_addon(cell_item, *wpn->GetGrenadeLauncherName(), scale, scale_x, eAddonType::eLauncher);
+			UIPickUpItemIcon.AttachChild(launcher);
+		}
+		delete_data(cell_item);
+		*/
+	}
 }
  

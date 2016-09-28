@@ -99,7 +99,8 @@ void CUIDragDropListEx::CreateDragItem(CUICellItem* itm)
 {
 	R_ASSERT							(!m_drag_item);
 	m_drag_item							= itm->CreateDragItem();
-	GetParent()->SetCapture				(m_drag_item, true);
+	if ( m_drag_item )
+		GetParent()->SetCapture				(m_drag_item, true);
 }
 
 void CUIDragDropListEx::DestroyDragItem()
@@ -419,7 +420,8 @@ bool CUICellContainer::AddSimilar(CUICellItem* itm)
 	CUICellItem* i		= FindSimilar(itm);
 	R_ASSERT			(i!=itm);
 	R_ASSERT			(0==itm->ChildsCount());
-	if(i){	
+	if(i)
+	{	
 		i->PushChild			(itm);
 		itm->SetOwnerList		(m_pParentDragDropList);
 	}
@@ -549,8 +551,8 @@ void CUICellContainer::GetTexUVLT(Fvector2& uv, u32 col, u32 row)
 {
 	uv.set(0.0f,0.0f);
 
-//.	if( (col%2==1 && row%2==1)||(col%2==0 && row%2==0) )
-//.		uv.set(0.5f,0.0f);
+	//if( (col%2==1 && row%2==1)||(col%2==0 && row%2==0) )
+		//uv.set(0.5f,0.0f);
 }
 
 
@@ -740,9 +742,13 @@ void CUICellContainer::Draw()
 	if( GetCellsInRange(tgt_cells,m_cells_to_draw) ){
 		UI_CELLS_VEC_IT it = m_cells_to_draw.begin();
 		for(;it!=m_cells_to_draw.end();++it)
-			if( !(*it).Empty() && !(*it).m_item->m_b_already_drawn ){
-				(*it).m_item->Draw				();
+		{
+			CUICell& cell = (*it);
+			if( !cell.Empty() && /*!cell.m_item->m_b_already_drawn &&*/ (cell.m_item->m_drawn_frame != Device.dwFrame))
+			{
+				cell.m_item->Draw				();
 			}
+		}
 	}
 
 	UI()->PopScissor			();

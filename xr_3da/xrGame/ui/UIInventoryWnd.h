@@ -66,9 +66,6 @@ protected:
 	ref_sound					sounds					[eInvSndMax];
 	void						PlaySnd					(eInventorySndAction a);
 
-	CUIFrameWindow*			UIMask;
-
-
 	CUIStatic					UIBeltSlots;
 	CUIStatic					UIBack;
 	CUIStatic*					UIRankFrame;

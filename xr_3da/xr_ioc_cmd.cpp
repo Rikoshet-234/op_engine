@@ -505,6 +505,8 @@ void CCC_Register()
 	// General
 	CMD1(CCC_Help,		"help"					);
 	CMD1(CCC_Quit,		"quit"					);
+	CMD1(CCC_Quit,		"qqq"					);
+	CMD1(CCC_Quit,		"qq"					);
 	CMD1(CCC_Start,		"start"					);
 	CMD1(CCC_Disconnect,"disconnect"			);
 	CMD1(CCC_SaveCFG,	"cfg_save"				);

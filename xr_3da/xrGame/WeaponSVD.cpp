@@ -5,14 +5,23 @@ CWeaponSVD::CWeaponSVD(void) : CWeaponCustomPistol("SVD")
 {
 }
 
+int CWeaponSVD::GetCurrentFireMode()
+{
+	int fireMode=CWeaponCustomPistol::GetCurrentFireMode();
+	if (m_bHasDifferentFireModes)
+		fireMode=m_aFireModes[m_iCurFireMode];	
+	return fireMode;
+}
+
 CWeaponSVD::~CWeaponSVD(void)
 {
 }
 
 void CWeaponSVD::switch2_Fire	()
 {
+	//bWorking					= false;
+	bWorking					= true;
 	m_bFireSingleShot			= true;
-	bWorking					= false;
 	m_bPending					= true;
 	m_iShotNum					= 0;
 	m_bStopedAfterQueueFired	= false;

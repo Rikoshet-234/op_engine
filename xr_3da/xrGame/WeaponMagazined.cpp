@@ -16,6 +16,10 @@
 #include "level.h"
 #include "object_broker.h"
 #include "string_table.h"
+#include "game_object_space.h"
+#include "GameObject.h"
+#include "script_callback_ex.h"
+#include "script_game_object.h"
 
 CWeaponMagazined::CWeaponMagazined(LPCSTR name, ESoundTypes eSoundType) : CWeapon(name)
 {
@@ -109,8 +113,11 @@ void CWeaponMagazined::Load	(LPCSTR section)
 		m_iShootEffectorStart = pSettings->r_u8(section, "dispersion_start");
 	else
 		m_iShootEffectorStart = 0;
-	//  [7/20/2005]
-	//  [7/21/2005]
+	LoadFireModes(section);
+}
+
+void CWeaponMagazined::LoadFireModes(LPCSTR section)
+{
 	if (pSettings->line_exist(section, "fire_modes"))
 	{
 		m_bHasDifferentFireModes = true;
@@ -129,9 +136,7 @@ void CWeaponMagazined::Load	(LPCSTR section)
 	}
 	else
 		m_bHasDifferentFireModes = false;
-	//  [7/21/2005]
 }
-
 void CWeaponMagazined::FireStart		()
 {
 	if(IsValid() && !IsMisfire()) 
@@ -464,6 +469,11 @@ void CWeaponMagazined::UpdateSounds	()
 	if (sndEmptyClick.playing	())	sndEmptyClick.set_position	(get_LastFP());
 }
 
+LPCSTR bts(bool val)
+{
+	return val ? "true" : "false";
+}
+
 void CWeaponMagazined::state_Fire	(float dt)
 {
 	VERIFY(fTimeToFire>0.f);
@@ -493,7 +503,7 @@ void CWeaponMagazined::state_Fire	(float dt)
 	};
 		
 	VERIFY(!m_magazine.empty());
-//	Msg("%d && %d && (%d || %d) && (%d || %d)", !m_magazine.empty(), fTime<=0, IsWorking(), m_bFireSingleShot, m_iQueueSize < 0, m_iShotNum < m_iQueueSize);
+	//Msg("%d && %d && (%d || %d) && (%d || %d)", !m_magazine.empty(), fTime<=0, IsWorking(), m_bFireSingleShot, m_iQueueSize < 0, m_iShotNum < m_iQueueSize);
 	while (!m_magazine.empty() && fTime<=0 && (IsWorking() || m_bFireSingleShot) && (m_iQueueSize < 0 || m_iShotNum < m_iQueueSize))
 	{
 		m_bFireSingleShot = false;
@@ -506,17 +516,47 @@ void CWeaponMagazined::state_Fire	(float dt)
 		OnShot			();
 		static int i = 0;
 		if (i||m_iShotNum>m_iShootEffectorStart)
+		{
+			FireWeaponEvent(GameObject::ECallbackType::eOnActorWeaponFire, GameObject::ECallbackType::eOnNPCWeaponFire);	
 			FireTrace		(p1,d);
+		}
 		else
 			FireTrace		(m_vStartPos, m_vStartDir);
 	}
-	
 	if(m_iShotNum == m_iQueueSize)
 		m_bStopedAfterQueueFired = true;
 
 
 	UpdateSounds			();
 }
+
+void CWeaponMagazined::FireWeaponEvent(GameObject::ECallbackType actorCallbackType, GameObject::ECallbackType npcCallbackType)
+{
+	xr_string ammoType;
+	if (GetAmmoElapsed()==0 || m_magazine.empty())
+		ammoType=*m_ammoTypes[m_ammoType];
+	else
+		ammoType = *m_ammoTypes[m_magazine.back().m_LocalAmmoType];
+	if (g_actor)
+	{
+		if (smart_cast<CActor*>(H_Parent()))  // actor
+		{
+			Actor()->callback(actorCallbackType)(
+				lua_game_object(),  // The weapon as a game object.
+				ammoType.c_str()   // The caliber of the weapon.
+			);
+		}
+		else 
+		{
+			if (auto npc=smart_cast<CEntityAlive*>(H_Parent())) //npc
+				npc->callback(npcCallbackType)(
+				lua_game_object(),                                              // The weapon itself.
+				ammoType.c_str()                                               // The caliber of the weapon.
+			);
+		}
+	}
+}
+
 
 void CWeaponMagazined::state_Misfire	(float /**dt/**/)
 {
@@ -1124,7 +1164,8 @@ void	CWeaponMagazined::SetQueueSize			(int size)
 	if (m_iQueueSize == -1)
 		strcpy_s(m_sCurFireMode, " (A)");
 	else
-		sprintf_s(m_sCurFireMode, " (%d)", m_iQueueSize);
+		if (m_bHasDifferentFireModes)
+			sprintf_s(m_sCurFireMode, " (%d)", m_iQueueSize);
 };
 
 float	CWeaponMagazined::GetWeaponDeterioration	()
@@ -1184,6 +1225,9 @@ void CWeaponMagazined::GetBriefInfo(xr_string& str_name, xr_string& icon_sect_na
 
 	if ( HasFireModes() )
 		strcat_s(sItemName, GetCurrentFireModeStr());
+	else if (GetAmmoMagSize()!=0)
+		strcat_s(sItemName, " (1)");
+
 
 	str_name		= sItemName;
 

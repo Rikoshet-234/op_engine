@@ -193,7 +193,6 @@ void CMissile::UpdateCL()
 		OnStateSwitch(MS_PLAYING);
 	
 // alpet: поддержка анимации спринта для болтов
-	CActor	*actor = smart_cast<CActor*>(H_Parent());
 	u32		state = GetState();
 	bool	idle = ( MS_IDLE == state ) || ( MS_IDLE_SPRINT == state );	
 	if (idle && state != idle_state())

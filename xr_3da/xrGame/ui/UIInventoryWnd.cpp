@@ -46,7 +46,7 @@ CUIInventoryWnd::CUIInventoryWnd()
 	m_iCurrentActiveSlot				= NO_ACTIVE_SLOT;
 	
 	UIRank								= NULL;
-	UIMask=nullptr;
+	//UIMask=nullptr;
 
 	Init								();
 	SetCurrentItem						(NULL);
@@ -67,13 +67,16 @@ void CUIInventoryWnd::Init()
 
 	xml_init.InitWindow					(uiXml, "main", 0, this);
 
-	if (uiXml.NavigateToNode("mask_frame_window",0))
+	/*if (uiXml.NavigateToNode("mask_frame_window",0))
 	{
 		UIMask=xr_new<CUIFrameWindow>();
 		xml_init.InitFrameWindow			(uiXml, "mask_frame_window", 0, UIMask);
 		size_t color=						xml_init.GetColor(uiXml,"mask_frame_window:frame_color",0,0x00);
 		UIMask->SetColor(color);
-	}
+		UIMask->SetAutoDelete(true);
+		AttachChild(UIMask);
+		UIMask->Show(false);
+	}*/
 
 	AttachChild							(&UIBeltSlots);
 	xml_init.InitStatic					(uiXml, "belt_slots", 0, &UIBeltSlots);
@@ -222,7 +225,7 @@ void CUIInventoryWnd::PlaySnd(eInventorySndAction a)
 
 CUIInventoryWnd::~CUIInventoryWnd()
 {
-	xr_delete(UIMask);
+	//xr_delete(UIMask);
 //.	ClearDragDrop(m_vDragDropItems);
 	ClearAllLists						();
 }

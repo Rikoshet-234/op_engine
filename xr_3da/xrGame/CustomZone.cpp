@@ -652,7 +652,7 @@ BOOL CCustomZone::feel_touch_contact(CObject* O)
 		return		(FALSE);
 
 	CGameObject *object = smart_cast<CGameObject*>(O);
-    if (!object || !object->IsVisibleForZones())
+	if (!object || !object->IsVisibleForZones())
 		return		(FALSE);
 
 	if (!((CCF_Shape*)CFORM())->Contact(O))
@@ -686,19 +686,23 @@ float CCustomZone::Power(float dist)
 
 void CCustomZone::PlayIdleParticles()
 {
-	m_idle_sound.play_at_pos(0, Position(), true);
+	m_idle_sound.play_at_pos(nullptr, Position(), true);
 
-	if(*m_sIdleParticles)
+	if (m_sIdleParticles!=nullptr)
 	{
-		if (!m_pIdleParticles)
+		if (m_sIdleParticles.size()!=0)
 		{
-			m_pIdleParticles = CParticlesObject::Create(*m_sIdleParticles,FALSE);
+			if (!m_pIdleParticles)
+			{
+				m_pIdleParticles = CParticlesObject::Create(*m_sIdleParticles,FALSE);
+				m_pIdleParticles->UpdateParent(XFORM(),zero_vel);
+			}
 			m_pIdleParticles->UpdateParent(XFORM(),zero_vel);
+			m_pIdleParticles->Play();
 		}
-		m_pIdleParticles->UpdateParent(XFORM(),zero_vel);
-		m_pIdleParticles->Play();
+		else
+			Msg("~ WARNING idle_particles present, but empty in config for [%s]",this->cNameSect().c_str());
 	}
-
 	StartIdleLight	();
 }
 
@@ -755,11 +759,15 @@ void CCustomZone::UpdateIdleLight	()
 void CCustomZone::PlayBlowoutParticles()
 {
 	if(!m_sBlowoutParticles) return;
-
-	CParticlesObject* pParticles;
-	pParticles	= CParticlesObject::Create(*m_sBlowoutParticles,TRUE);
-	pParticles->UpdateParent(XFORM(),zero_vel);
-	pParticles->Play();
+	if (m_sBlowoutParticles.size()!=0)
+	{
+		CParticlesObject* pParticles;
+		pParticles	= CParticlesObject::Create(*m_sBlowoutParticles,TRUE);
+		pParticles->UpdateParent(XFORM(),zero_vel);
+		pParticles->Play();
+	}
+	else
+		Msg("~ WARNING idle_particles present, but empty in config for [%s]",this->cNameSect().c_str());
 }
 
 void CCustomZone::PlayHitParticles(CGameObject* pObject)
@@ -1053,7 +1061,7 @@ void  CCustomZone::OnMove()
 
 		if(m_pIdleLight && m_pIdleLight->get_active())
 			m_pIdleLight->set_position(Position());
-     }
+	 }
 }
 
 void	CCustomZone::OnEvent (NET_Packet& P, u16 type)
@@ -1070,15 +1078,15 @@ void	CCustomZone::OnEvent (NET_Packet& P, u16 type)
 		case GE_OWNERSHIP_TAKE : 
 			{
 				u16 id;
-                P.r_u16(id);
+				P.r_u16(id);
 				OnOwnershipTake(id);
 				break;
 			} 
-         case GE_OWNERSHIP_REJECT : 
+		 case GE_OWNERSHIP_REJECT : 
 			 {
 				 u16 id;
-                 P.r_u16			(id);
-                 CArtefact *artefact = smart_cast<CArtefact*>(Level().Objects.net_Find(id)); 
+				 P.r_u16			(id);
+				 CArtefact *artefact = smart_cast<CArtefact*>(Level().Objects.net_Find(id)); 
 				 if(artefact)
 				 {
 					 bool			just_before_destroy = !P.r_eof() && P.r_u8();
@@ -1086,7 +1094,7 @@ void	CCustomZone::OnEvent (NET_Packet& P, u16 type)
 					if (!just_before_destroy)
 						ThrowOutArtefact(artefact);
 				 }
-                 break;
+				 break;
 			}
 	}
 	inherited::OnEvent(P, type);
@@ -1357,25 +1365,33 @@ void CCustomZone::exit_Zone	(SZoneObjectInfo& io)
 
 void CCustomZone::PlayAccumParticles()
 {
-	if(m_sAccumParticles.size()){
-		CParticlesObject* pParticles;
-		pParticles	= CParticlesObject::Create(*m_sAccumParticles,TRUE);
-		pParticles->UpdateParent(XFORM(),zero_vel);
-		pParticles->Play();
-	}
+	if (m_sAccumParticles!=nullptr)
+		if (m_sAccumParticles.size()!=0)
+		{
+			CParticlesObject* pParticles;
+			pParticles	= CParticlesObject::Create(*m_sAccumParticles,TRUE);
+			pParticles->UpdateParent(XFORM(),zero_vel);
+			pParticles->Play();
+		}
+		else
+			Msg("~ WARNING accum_particles present, but empty in config for [%s]",this->cNameSect().c_str());
 
 	if(m_accum_sound._handle())
-		m_accum_sound.play_at_pos	(0, Position());
+		m_accum_sound.play_at_pos	(nullptr, Position());
 }
 
 void CCustomZone::PlayAwakingParticles()
 {
-	if(m_sAwakingParticles.size()){
-		CParticlesObject* pParticles;
-		pParticles	= CParticlesObject::Create(*m_sAwakingParticles,TRUE);
-		pParticles->UpdateParent(XFORM(),zero_vel);
-		pParticles->Play();
-	}
+	if (m_sAwakingParticles!=nullptr)
+		if(m_sAwakingParticles.size()!=0)
+		{
+			CParticlesObject* pParticles;
+			pParticles	= CParticlesObject::Create(*m_sAwakingParticles,TRUE);
+			pParticles->UpdateParent(XFORM(),zero_vel);
+			pParticles->Play();
+		}
+		else 
+			Msg("~ WARNING awake_particles present, but empty in config for [%s]",this->cNameSect().c_str());
 
 	if(m_awaking_sound._handle())
 		m_awaking_sound.play_at_pos	(0, Position());

@@ -25,17 +25,6 @@ PIItem CUIInventoryWnd::CurrentIItem()
 
 void CUIInventoryWnd::SetCurrentItem(CUICellItem* itm)
 {
-	if (psActorFlags.test(AF_INV_SHOW_SELECTED) && UIMask!=nullptr)
-	{
-		if (itm!=nullptr)
-		{
-			if (m_pCurrentCellItem)
-			{
-				m_pCurrentCellItem->SetMask(nullptr);
-			}
-			itm->SetMask(UIMask);
-		}
-	}
 	if(m_pCurrentCellItem == itm) return;
 	m_pCurrentCellItem				= itm;
 	UIItemInfo.InitItem			(CurrentIItem());
@@ -312,7 +301,6 @@ bool CUIInventoryWnd::OnItemDbClick(CUICellItem* itm)
 
 	CUIDragDropListEx*	old_owner		= itm->OwnerList();
 	EListType t_old						= GetType(old_owner);
-	itm->SetMask(nullptr);
 	switch(t_old){
 		case iwSlot:{
 			ToBag	(itm, false);

@@ -11,14 +11,14 @@
 //#define VERIFY_RESTRICTORS //всякие проверки для рестрикторов
 #define IGNORE_CRITICAL_ECONDITIONS
 //#define CREATE_MDUMP //создавать дамп памяти
-//#define SHOW_INCORRECT_r_tgt 
+#define SHOW_INCORRECT_r_tgt 
 
 
 //#define PATCH_INFO_PRESENT
 
 #define ENGINE_DESCRIPTION "OP 2.1 Engine"
 #define ENGINE_MINOR "0"
-#define ENGINE_MAJOR "52m"
+#define ENGINE_MAJOR "53b"
 
 #ifdef DEBUG
 	#define ENGINE_BUILD_TYPE "debug"

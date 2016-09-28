@@ -32,14 +32,18 @@ public:
 	virtual void	save				(NET_Packet &output_packet);
 	virtual void	load				(IReader &input_packet);
 
-	virtual bool	Action				(s32 cmd, u32 flags);
+	bool	Action				(s32 cmd, u32 flags) override;
 	virtual void	UpdateCL			();
 	virtual void	OnDrawUI			();
 	virtual bool	use_crosshair		()	const {return false;}
 	virtual void	GetBriefInfo		(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count);
 	virtual void	net_Relcase			(CObject *object);
+	int				GetCurrentFireMode	() override;	
+
 protected:
 	CBinocularsVision*					m_binoc_vision;
+	void			FireEnd				() override;
+	void			switch2_Fire		() override;
 
 	DECLARE_SCRIPT_REGISTER_FUNCTION
 };

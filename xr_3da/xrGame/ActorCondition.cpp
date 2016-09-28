@@ -270,7 +270,7 @@ bool CActorCondition::IsCantWalkWeight()
 
 		CCustomOutfit* outfit	= m_object->GetOutfit();
 		if(outfit)
-			max_w += outfit->m_additional_weight;
+			max_w += outfit->m_additional_weight*outfit->GetCondition();
 		
 		TIItemContainer::iterator it=object().inventory().m_belt.begin();
 		TIItemContainer::iterator ite=object().inventory().m_belt.end();

@@ -126,6 +126,7 @@ protected:
 
 	virtual	void			LoadShellParticles	(LPCSTR section, LPCSTR prefix);
 	virtual	void			LoadFlameParticles	(LPCSTR section, LPCSTR prefix);
+	std::string				flameParticleSection;
 	
 	////////////////////////////////////////////////
 	//спецефические функции для партиклов
@@ -152,6 +153,7 @@ public:
 	float					m_fPredBulletTime;
 	float					m_fTimeToAim;
 	BOOL					m_bUseAimBullet;
+	bool					bShowParticleError[3];
 protected:
 	//имя пратиклов для огня
 	shared_str				m_sFlameParticlesCurrent;

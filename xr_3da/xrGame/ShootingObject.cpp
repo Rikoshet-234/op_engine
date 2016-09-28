@@ -37,14 +37,14 @@ CShootingObject::CShootingObject(void)
 	m_fTimeToAim					= 0.0f;
 
 	//particles
-	m_sFlameParticlesCurrent		= m_sFlameParticles = NULL;
-	m_sSmokeParticlesCurrent		= m_sSmokeParticles = NULL;
-	m_sShellParticles				= NULL;
+	m_sFlameParticlesCurrent		= m_sFlameParticles = nullptr;
+	m_sSmokeParticlesCurrent		= m_sSmokeParticles = nullptr;
+	m_sShellParticles				= nullptr;
 	
 	bWorking						= false;
 
-	light_render					= 0;
-
+	light_render					= nullptr;
+	std::fill(std::begin(bShowParticleError), std::end(bShowParticleError), false);
 	reinit();
 
 }
@@ -185,8 +185,7 @@ void CShootingObject::Light_Render	(const Fvector& P)
 // Particles
 //////////////////////////////////////////////////////////////////////////
 
-void CShootingObject::StartParticles (CParticlesObject*& pParticles, LPCSTR particles_name, 
-									 const Fvector& pos, const  Fvector& vel, bool auto_remove_flag)
+void CShootingObject::StartParticles (CParticlesObject*& pParticles, LPCSTR particles_name, const Fvector& pos, const  Fvector& vel, bool auto_remove_flag)
 {
 	if(!particles_name) return;
 
@@ -209,8 +208,7 @@ void CShootingObject::StopParticles (CParticlesObject*&	pParticles)
 	CParticlesObject::Destroy(pParticles);
 }
 
-void CShootingObject::UpdateParticles (CParticlesObject*& pParticles, 
-							   const Fvector& pos, const Fvector& vel)
+void CShootingObject::UpdateParticles (CParticlesObject*& pParticles, const Fvector& pos, const Fvector& vel)
 {
 	if(!pParticles)		return;
 
@@ -246,6 +244,7 @@ void CShootingObject::LoadFlameParticles (LPCSTR section, LPCSTR prefix)
 	string256 full_name;
 
 	// flames
+	flameParticleSection=section;
 	strconcat(sizeof(full_name),full_name, prefix, "flame_particles");
 	if(pSettings->line_exist(section, full_name))
 		m_sFlameParticles	= pSettings->r_string (section, full_name);
@@ -265,8 +264,7 @@ void CShootingObject::LoadFlameParticles (LPCSTR section, LPCSTR prefix)
 }
 
 
-void CShootingObject::OnShellDrop	(const Fvector& play_pos,
-									 const Fvector& parent_vel)
+void CShootingObject::OnShellDrop	(const Fvector& play_pos,const Fvector& parent_vel)
 {
 	if(!m_sShellParticles) return;
 	if( Device.vCameraPosition.distance_to_sqr(play_pos)>2*2 ) return;
@@ -283,16 +281,32 @@ void CShootingObject::OnShellDrop	(const Fvector& play_pos,
 
 
 //партиклы дыма
-void CShootingObject::StartSmokeParticles	(const Fvector& play_pos,
-											const Fvector& parent_vel)
+void CShootingObject::StartSmokeParticles	(const Fvector& play_pos,const Fvector& parent_vel)
 {
-	CParticlesObject* pSmokeParticles = NULL;
-	StartParticles(pSmokeParticles, *m_sSmokeParticlesCurrent, play_pos, parent_vel, true);
+	CParticlesObject* pSmokeParticles = nullptr;
+	if (m_sSmokeParticlesCurrent!=nullptr)
+		if (m_sSmokeParticlesCurrent.size()!=0)
+			StartParticles(pSmokeParticles, *m_sSmokeParticlesCurrent, play_pos, parent_vel, true);
+		else 
+			if (!bShowParticleError[0])
+			{
+				Msg("~ WARNING smoke_particles present, but empty in config for [%s]",flameParticleSection.c_str());
+				bShowParticleError[0]=true;
+			}
 }
 
 
 void CShootingObject::StartFlameParticles	()
 {
+	if (m_sFlameParticlesCurrent==nullptr || m_sFlameParticlesCurrent.size()==0)
+	{
+		if (!bShowParticleError[1])
+		{
+			Msg("~ WARNING flame_particles present, but empty in config for [%s]",flameParticleSection.c_str());
+			bShowParticleError[1]=true;
+		}
+		return;
+	}
 	if(0==m_sFlameParticlesCurrent.size()) return;
 
 	//если партиклы циклические
@@ -311,17 +325,17 @@ void CShootingObject::StartFlameParticles	()
 }
 void CShootingObject::StopFlameParticles	()
 {
-	if(0==m_sFlameParticlesCurrent.size()) return;
-	if(m_pFlameParticles == NULL) return;
+	if((m_sFlameParticlesCurrent==nullptr) || (0==m_sFlameParticlesCurrent.size())) return;
+	if(m_pFlameParticles == nullptr) return;
 
 	m_pFlameParticles->SetAutoRemove(true);
 	m_pFlameParticles->Stop();
-	m_pFlameParticles = NULL;
+	m_pFlameParticles = nullptr;
 }
 
 void CShootingObject::UpdateFlameParticles	()
 {
-	if(0==m_sFlameParticlesCurrent.size())		return;
+	if((m_sFlameParticlesCurrent==nullptr) || (0==m_sFlameParticlesCurrent.size())) return;
 	if(!m_pFlameParticles)				return;
 
 	Fmatrix		pos; 
@@ -475,7 +489,14 @@ void CShootingObject::FireEnd	()
 
 void CShootingObject::StartShotParticles	()
 {
-	CParticlesObject* pSmokeParticles = NULL;
-	StartParticles(pSmokeParticles, *m_sShotParticles, 
-					m_vCurrentShootPos, m_vCurrentShootDir, true);
+	CParticlesObject* pSmokeParticles = nullptr;
+	if (m_sShotParticles!=nullptr )
+		if (m_sShotParticles.size()!=0)
+			StartParticles(pSmokeParticles, *m_sShotParticles, m_vCurrentShootPos, m_vCurrentShootDir, true);
+		else
+			if (!bShowParticleError[2])
+			{
+				Msg("~ WARNING shot_particles present, but empty in config for [%s]",flameParticleSection.c_str());
+				bShowParticleError[2]=true;
+			}
 }

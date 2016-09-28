@@ -318,7 +318,7 @@ float  CInventoryOwner::MaxCarryWeight () const
 
 	const CCustomOutfit* outfit	= GetOutfit();
 	if(outfit)
-		ret += outfit->m_additional_weight2;
+		ret += outfit->m_additional_weight2*outfit->GetCondition();
 
 	TIItemContainer::const_iterator I=inventory().m_belt.begin();
 	TIItemContainer::const_iterator E=inventory().m_belt.end();
