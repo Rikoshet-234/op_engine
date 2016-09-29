@@ -13,3 +13,5 @@ Flags32		psDeviceFlags		= {rsFullscreen|rsDetails|mtPhysics|mtSound|mtNetwork|rs
 
 // textures 
 int			psTextureLOD		= 0;
+
+Flags32 g_uCommonFlags;

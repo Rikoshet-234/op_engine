@@ -30,6 +30,11 @@
 #include "game_object_space.h"
 #include "game_cl_base_weapon_usage_statistic.h"
 
+#include "GamePersistent.h"
+#include "game_graph.h"
+
+
+
 #ifdef DEBUG
 #	include "debug_renderer.h"
 #	include "PHDebug.h"
@@ -147,7 +152,6 @@ void CGameObject::OnEvent		(NET_Packet& P, u16 type)
 			HDS.Read_Packet_Cont(P);
 			CObject*	Hitter = Level().Objects.net_Find(HDS.whoID);
 			CObject*	Weapon = Level().Objects.net_Find(HDS.weaponID);
-			//Msg("Hit received: %d[%d,%d] ammo: [%s]", HDS.whoID, HDS.weaponID, HDS.BulletID,HDS.ammoSection.c_str());
 			HDS.who		= Hitter;
 			//-------------------------------------------------------
 			switch (HDS.PACKET_TYPE)
@@ -163,6 +167,33 @@ void CGameObject::OnEvent		(NET_Packet& P, u16 type)
 			}
 			SetHitInfo(Hitter, Weapon, HDS.bone(), HDS.p_in_bone_space, HDS.dir);
 			Hit				(&HDS);
+			//hit callback
+
+			shared_str boneName="";
+			CKinematics* kin=smart_cast<CKinematics*>(Visual());
+			if (kin->LL_BoneCount()>HDS.boneID)			
+				boneName=kin->LL_GetData(HDS.boneID).name.c_str();
+			if (g_uCommonFlags.test(E_COMMON_FLAGS::enShowObjectHit))
+				Msg("Hit received: %s [%s] ammo: [%s] on [%s] bone [%s : %i] power [%f] hit_type [%s]", 
+					Hitter->cName().c_str(),
+					Weapon->cNameSect().c_str(),
+					HDS.ammoSection.c_str(),
+					this->cName().c_str(),
+					boneName.c_str(),
+					HDS.boneID,
+					HDS.power,
+					ALife::g_cafHitType2String(static_cast<ALife::EHitType>(HDS.hit_type))
+				);
+			this->callback(GameObject::ECallbackType::eOnObjectHit)(
+					smart_cast<CGameObject*>(Hitter)->lua_game_object(),
+					smart_cast<CGameObject*>(Weapon)->lua_game_object(),
+					HDS.ammoSection.c_str(),
+					HDS.boneID,
+					boneName.c_str(),
+					HDS.power,
+					HDS.hit_type
+				);
+			//
 			//---------------------------------------------------------------------------
 			if (GameID() != GAME_SINGLE)
 				Game().m_WeaponUsageStatistic->OnBullet_Check_Result(false);
@@ -496,13 +527,6 @@ void CGameObject::setup_parent_ai_locations(bool assign_position)
 	if (assign_position && use_parent_ai_locations())
 	{
 		Position().set		(l_tpGameObject->Position());
-		//Fvector pos(l_tpGameObject->Position());		
-		//Fvector dir(l_tpGameObject->Direction());
-		//dir.setHP(dir.getH(), 0);
-		//pos.add(dir);  // чтобы не подпрыгнул владелец
-		//pos.y = pos.y + 0.7f;		
-		//Position().set(pos);
-		//Direction().set(dir);
 	}
 
 	// setup its ai locations

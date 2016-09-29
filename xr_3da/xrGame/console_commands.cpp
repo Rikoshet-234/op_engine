@@ -40,9 +40,12 @@
 #include "../resourcemanager.h"
 #include "doug_lea_memory_allocator.h"
 #include "cameralook.h"
-
+#include "game_graph_space.h"
 #include "GameSpy/GameSpy_Full.h"
 #include "GameSpy/GameSpy_Patching.h"
+#include "alife_graph_registry.h"
+#include "map_manager.h"
+
 
 #ifdef DEBUG
 #	include "PHDebug.h"
@@ -107,10 +110,6 @@ extern LPSTR	dbg_stalker_death_anim;
 extern BOOL		b_death_anim_velocity;
 #endif
 int g_AI_inactive_time = 0;
-Flags32 g_uCommonFlags;
-enum E_COMMON_FLAGS{
-	flAiUseTorchDynamicLights	= 1
-};
 
 CUIOptConCom g_OptConCom;
 
@@ -170,13 +169,10 @@ public:
 	virtual void Execute(LPCSTR args) {
 		CCC_Token::Execute(args);
 		if (g_pGameLevel && Level().game){
-//#ifndef	DEBUG
 			if (GameID() != GAME_SINGLE){
 				Msg("For this game type difficulty level is disabled.");
 				return;
 			};
-//#endif
-
 			game_cl_Single* game		= smart_cast<game_cl_Single*>(Level().game); VERIFY(game);
 			game->OnDifficultyChanged	();
 		}
@@ -186,38 +182,6 @@ public:
 		strcpy_s(I,"game difficulty"); 
 	}
 };
-
-
-
-#ifdef DEBUG
-class CCC_ALifePath : public IConsole_Command {
-public:
-	CCC_ALifePath(LPCSTR N) : IConsole_Command(N)  { };
-	virtual void Execute(LPCSTR args) {
-		if (!ai().get_level_graph())
-			Msg("! there is no graph!");
-		else {
-			int id1=-1, id2=-1;
-			sscanf(args ,"%d %d",&id1,&id2);
-			if ((-1 != id1) && (-1 != id2))
-				if (_max(id1,id2) > (int)ai().game_graph().header().vertex_count() - 1)
-					Msg("! there are only %d vertexes!",ai().game_graph().header().vertex_count());
-				else
-					if (_min(id1,id2) < 0)
-						Msg("! invalid vertex number (%d)!",_min(id1,id2));
-					else {
-//						Sleep				(1);
-//						CTimer				timer;
-//						timer.Start			();
-//						float				fValue = ai().m_tpAStar->ffFindMinimalPath(id1,id2);
-//						Msg					("* %7.2f[%d] : %11I64u cycles (%.3f microseconds)",fValue,ai().m_tpAStar->m_tpaNodes.size(),timer.GetElapsed_ticks(),timer.GetElapsed_ms()*1000.f);
-					}
-			else
-				Msg("! not enough parameters!");
-		}
-	}
-};
-#endif // DEBUG
 
 void moveInfos(LPCSTR args,bool add)
 {
@@ -292,8 +256,6 @@ public:
 	}
 };
 
-
-
 class CCC_ALifeTimeFactor : public IConsole_Command {
 public:
 	CCC_ALifeTimeFactor(LPCSTR N) : IConsole_Command(N)  { };
@@ -350,7 +312,6 @@ public:
 			Log("!Not a single player game!");
 	}
 };
-
 
 class CCC_ALifeObjectsPerUpdate : public IConsole_Command {
 public:
@@ -679,8 +640,6 @@ public:
 	  }
 };
 
-
-
 class CCC_Net_CL_InputUpdateRate : public CCC_Integer {
 protected:
 	int		*value_blin;
@@ -755,270 +714,6 @@ public:
 	}
 };
 
-
-#ifdef DEBUG
-
-class CCC_DrawGameGraphAll : public IConsole_Command {
-public:
-				 CCC_DrawGameGraphAll	(LPCSTR N) : IConsole_Command(N)
-	{
-		bEmptyArgsHandled = true;
-	}
-
-	virtual void Execute				(LPCSTR args)
-	{
-		if (!ai().get_level_graph())
-			return;
-
-		ai().level_graph().setup_current_level	(-1);
-	}
-};
-
-class CCC_DrawGameGraphCurrent : public IConsole_Command {
-public:
-				 CCC_DrawGameGraphCurrent	(LPCSTR N) : IConsole_Command(N)
-	{
-		bEmptyArgsHandled = true;
-	}
-
-	virtual void Execute					(LPCSTR args)
-	{
-		if (!ai().get_level_graph())
-			return;
-
-		ai().level_graph().setup_current_level	(
-			ai().level_graph().level_id()
-		);
-	}
-};
-
-class CCC_DrawGameGraphLevel : public IConsole_Command {
-public:
-				 CCC_DrawGameGraphLevel	(LPCSTR N) : IConsole_Command(N)
-	{
-	}
-
-	virtual void Execute					(LPCSTR args)
-	{
-		if (!ai().get_level_graph())
-			return;
-
-		string256			S;
-		S[0]				= 0;
-		sscanf				(args,"%s",S);
-
-		if (!*S) {
-			ai().level_graph().setup_current_level	(-1);
-			return;
-		}
-
-		const GameGraph::SLevel	*level = ai().game_graph().header().level(S,true);
-		if (!level) {
-			Msg				("! There is no level %s in the game graph",S);
-			return;
-		}
-
-		ai().level_graph().setup_current_level	(level->id());
-	}
-};
-
-class CCC_ScriptDbg : public IConsole_Command {
-public:
-	CCC_ScriptDbg(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = true; };
-	virtual void Execute(LPCSTR args) {
-		
-		if(strstr(cName,"script_debug_break")==cName ){
-		
-		CScriptDebugger* d = ai().script_engine().debugger();
-		if(d){
-			if(d->Active())
-				d->initiateDebugBreak();
-			else
-				Msg("Script debugger not active.");
-		}else
-			Msg("Script debugger not present.");
-		}
-		else if(strstr(cName,"script_debug_stop")==cName ){
-			ai().script_engine().stopDebugger();
-		}
-		else if(strstr(cName,"script_debug_restart")==cName ){
-			ai().script_engine().restartDebugger();
-		};
-	};
-	
-
-	virtual void	Info	(TInfo& I)		
-	{
-		if(strstr(cName,"script_debug_break")==cName )
-			strcpy_s(I,"initiate script debugger [DebugBreak] command"); 
-
-		else if(strstr(cName,"script_debug_stop")==cName )
-			strcpy_s(I,"stop script debugger activity"); 
-
-		else if(strstr(cName,"script_debug_restart")==cName )
-			strcpy_s(I,"restarts script debugger or start if no script debugger presents"); 
-	}
-};
-
-#include "map_manager.h"
-class CCC_DumpMap : public IConsole_Command {
-public:
-	CCC_DumpMap	(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = true; };
-	virtual void	Execute				(LPCSTR args) {
-		Level().MapManager().Dump();
-	}
-	virtual void	Info	(TInfo& I)		
-	{
-		strcpy_s(I,"dumps all currentmap locations"); 
-	}
-
-};
-
-#include "alife_graph_registry.h"
-class CCC_DumpCreatures : public IConsole_Command {
-public:
-	CCC_DumpCreatures	(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = true; };
-	virtual void	Execute				(LPCSTR args) {
-		
-		typedef CSafeMapIterator<ALife::_OBJECT_ID,CSE_ALifeDynamicObject>::_REGISTRY::const_iterator const_iterator;
-
-		const_iterator I = ai().alife().graph().level().objects().begin();
-		const_iterator E = ai().alife().graph().level().objects().end();
-		for ( ; I != E; ++I) {
-			CSE_ALifeCreatureAbstract *obj = smart_cast<CSE_ALifeCreatureAbstract *>(I->second);
-			if (obj) {
-				Msg("\"%s\",",obj->name_replace());
-			}
-		}		
-
-	}
-	virtual void	Info	(TInfo& I)		
-	{
-		strcpy_s(I,"dumps all creature names"); 
-	}
-
-};
-
-
-
-class CCC_DebugFonts : public IConsole_Command {
-public:
-	CCC_DebugFonts (LPCSTR N) : IConsole_Command(N) {bEmptyArgsHandled = true; }
-	virtual void Execute				(LPCSTR args) {
-		HUD().GetUI()->StartStopMenu( xr_new<CUIDebugFonts>(), true);		
-	}
-};
-
-class CCC_DebugNode : public IConsole_Command {
-public:
-	CCC_DebugNode(LPCSTR N) : IConsole_Command(N)  { };
-
-	virtual void Execute(LPCSTR args) {
-
-		string128 param1, param2;
-		_GetItem(args,0,param1,' ');
-		_GetItem(args,1,param2,' ');
-
-		u32 value1;
-		u32 value2;
-		
-		sscanf(param1,"%u",&value1);
-		sscanf(param2,"%u",&value2);
-		
-		if ((value1 > 0) && (value2 > 0)) {
-			g_bDebugNode		= TRUE;
-			g_dwDebugNodeSource	= value1;
-			g_dwDebugNodeDest	= value2;
-		} else {
-			g_bDebugNode = FALSE;
-		}
-	}
-};
-
-class CCC_ShowMonsterInfo : public IConsole_Command {
-public:
-				CCC_ShowMonsterInfo(LPCSTR N) : IConsole_Command(N)  { };
-
-	virtual void Execute(LPCSTR args) {
-
-		string128 param1, param2;
-		_GetItem(args,0,param1,' ');
-		_GetItem(args,1,param2,' ');
-
-		CObject			*obj = Level().Objects.FindObjectByName(param1);
-		CBaseMonster	*monster = smart_cast<CBaseMonster *>(obj);
-		if (!monster)	return;
-		
-		u32				value2;
-		
-		sscanf			(param2,"%u",&value2);
-		monster->set_show_debug_info (u8(value2));
-	}
-};
-class CCC_DbgPhTrackObj : public IConsole_Command {
-public:
-	CCC_DbgPhTrackObj(LPCSTR N) : IConsole_Command(N)  { };
-	virtual void Execute(LPCSTR args/**/) {
-			ph_dbg_draw_mask1.set(ph_m1_DbgTrackObject,TRUE);
-			PH_DBG_SetTrackObject(args);
-			//CObject* O= Level().Objects.FindObjectByName(args);
-			//if(O)
-			//{
-			//	PH_DBG_SetTrackObject(*(O->cName()));
-			//	ph_dbg_draw_mask1.set(ph_m1_DbgTrackObject,TRUE);
-			//}
-
-		}
-	
-	//virtual void	Info	(TInfo& I)		
-	//{
-	//	strcpy_s(I,"restart game fast"); 
-	//}
-};
-#endif
-
-class CCC_PHIterations : public CCC_Integer {
-public:
-		CCC_PHIterations(LPCSTR N) :
-		CCC_Integer(N,&phIterations,15,50)
-		{};
-	  virtual void	Execute	(LPCSTR args)
-	  {
-		  CCC_Integer::Execute	(args);
-		  dWorldSetQuickStepNumIterations(NULL,phIterations);
-	  }
-};
-
-#ifdef DEBUG
-class CCC_PHGravity : public IConsole_Command {
-public:
-		CCC_PHGravity(LPCSTR N) :
-		IConsole_Command(N)
-		{};
-	  virtual void	Execute	(LPCSTR args)
-	  {
-		  if(!ph_world)	return;
-#ifndef DEBUG
-		  if (g_pGameLevel && Level().game && GameID() != GAME_SINGLE)
-		  {
-			  Msg("Command is not available in Multiplayer");
-			  return;
-		  }
-#endif
-		  ph_world->SetGravity(float(atof(args)));
-	  }
-	  virtual void	Status	(TStatus& S)
-	{	
-		if(ph_world)
-			sprintf_s	(S,"%3.5f",ph_world->Gravity());
-		else
-			sprintf_s	(S,"%3.5f",default_world_gravity);
-		while	(xr_strlen(S) && ('0'==S[xr_strlen(S)-1]))	S[xr_strlen(S)-1] = 0;
-	}
-	
-};
-#endif // DEBUG
-
 class CCC_PHFps : public IConsole_Command {
 public:
 	CCC_PHFps(LPCSTR N) :
@@ -1037,36 +732,18 @@ public:
 
 };
 
-#ifdef DEBUG
-extern void print_help(lua_State *L);
-
-struct CCC_LuaHelp : public IConsole_Command {
-	CCC_LuaHelp(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = true; };
-
-	virtual void Execute(LPCSTR args) {
-		print_help(ai().script_engine().lua());
-	}
+class CCC_PHIterations : public CCC_Integer {
+public:
+		CCC_PHIterations(LPCSTR N) :
+		CCC_Integer(N,&phIterations,15,50)
+		{};
+	  virtual void	Execute	(LPCSTR args)
+	  {
+		  CCC_Integer::Execute	(args);
+		  dWorldSetQuickStepNumIterations(NULL,phIterations);
+	  }
 };
 
-struct CCC_ShowSmartCastStats : public IConsole_Command {
-	CCC_ShowSmartCastStats(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = true; };
-
-	virtual void Execute(LPCSTR args) {
-		show_smart_cast_stats();
-	}
-};
-
-struct CCC_ClearSmartCastStats : public IConsole_Command {
-	CCC_ClearSmartCastStats(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = true; };
-
-	virtual void Execute(LPCSTR args) {
-		clear_smart_cast_stats();
-	}
-};
-#endif
-
-//#ifndef MASTER_GOLD
-#	include "game_graph.h"
 struct CCC_JumpToLevel : public IConsole_Command {
 	CCC_JumpToLevel(LPCSTR N) : IConsole_Command(N)  {bEmptyArgsHandled = true;};
 
@@ -1104,9 +781,6 @@ struct CCC_JumpToLevel : public IConsole_Command {
 		strcpy_s(I," jump to selected level"); 
 	}
 };
-//#endif // MASTER_GOLD
-
-#include "GamePersistent.h"
 
 //#include "ui/UIInventoryWnd.h"
 //class CCC_TexTest : public IConsole_Command {
@@ -1187,6 +861,60 @@ struct CCC_TimeFactorSingle : public CCC_Float {
 		Level().Server->game->SetGameTimeFactor(g_fTimeFactor);
 	}
 };
+
+class CCC_DumpObjects : public IConsole_Command {
+public:
+	CCC_DumpObjects(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = true; };
+	virtual void Execute(LPCSTR)
+	{
+		Level().Objects.dump_all_objects();
+	}
+};
+
+class CCC_GSCheckForUpdates : public IConsole_Command {
+public:
+	CCC_GSCheckForUpdates(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = true; };
+	virtual void Execute(LPCSTR arguments)
+	{
+		if (!MainMenu()) return;
+		/*
+		CGameSpy_Available GSA;
+		shared_str result_string;
+		if (!GSA.CheckAvailableServices(result_string))
+		{
+			Msg(*result_string);
+//			return;
+		};
+		CGameSpy_Patching GameSpyPatching;
+		*/
+		bool InformOfNoPatch = true;
+		if (arguments && *arguments) {
+			int bInfo = 1;
+			sscanf	(arguments,"%d", &bInfo);
+			InformOfNoPatch = (bInfo != 0);
+		}
+		
+//		GameSpyPatching.CheckForPatch(InformOfNoPatch);
+		
+		MainMenu()->GetGS()->m_pGS_Patching->CheckForPatch(InformOfNoPatch);
+	}
+};
+
+class CCC_Net_SV_GuaranteedPacketMode : public CCC_Integer {
+protected:
+	int		*value_blin;
+public:
+	CCC_Net_SV_GuaranteedPacketMode(LPCSTR N, int* V, int _min=0, int _max=2) :
+	  CCC_Integer(N,V,_min,_max),
+		  value_blin(V)
+	  {};
+
+	  virtual void	Execute	(LPCSTR args)
+	  {
+		  CCC_Integer::Execute(args);
+	  }
+};
+
 
 #ifdef DEBUG
 class CCC_RadioGroupMask2;
@@ -1376,62 +1104,304 @@ public:
 	}
 };
 
-#endif // DEBUG
 
-class CCC_DumpObjects : public IConsole_Command {
+class CCC_DrawGameGraphAll : public IConsole_Command {
 public:
-	CCC_DumpObjects(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = true; };
-	virtual void Execute(LPCSTR)
+				 CCC_DrawGameGraphAll	(LPCSTR N) : IConsole_Command(N)
 	{
-		Level().Objects.dump_all_objects();
+		bEmptyArgsHandled = true;
+	}
+
+	virtual void Execute				(LPCSTR args)
+	{
+		if (!ai().get_level_graph())
+			return;
+
+		ai().level_graph().setup_current_level	(-1);
 	}
 };
 
-class CCC_GSCheckForUpdates : public IConsole_Command {
+class CCC_DrawGameGraphCurrent : public IConsole_Command {
 public:
-	CCC_GSCheckForUpdates(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = true; };
-	virtual void Execute(LPCSTR arguments)
+				 CCC_DrawGameGraphCurrent	(LPCSTR N) : IConsole_Command(N)
 	{
-		if (!MainMenu()) return;
-		/*
-		CGameSpy_Available GSA;
-		shared_str result_string;
-		if (!GSA.CheckAvailableServices(result_string))
-		{
-			Msg(*result_string);
-//			return;
-		};
-		CGameSpy_Patching GameSpyPatching;
-		*/
-		bool InformOfNoPatch = true;
-		if (arguments && *arguments) {
-			int bInfo = 1;
-			sscanf	(arguments,"%d", &bInfo);
-			InformOfNoPatch = (bInfo != 0);
+		bEmptyArgsHandled = true;
+	}
+
+	virtual void Execute					(LPCSTR args)
+	{
+		if (!ai().get_level_graph())
+			return;
+
+		ai().level_graph().setup_current_level	(
+			ai().level_graph().level_id()
+		);
+	}
+};
+
+class CCC_DrawGameGraphLevel : public IConsole_Command {
+public:
+				 CCC_DrawGameGraphLevel	(LPCSTR N) : IConsole_Command(N)
+	{
+	}
+
+	virtual void Execute					(LPCSTR args)
+	{
+		if (!ai().get_level_graph())
+			return;
+
+		string256			S;
+		S[0]				= 0;
+		sscanf				(args,"%s",S);
+
+		if (!*S) {
+			ai().level_graph().setup_current_level	(-1);
+			return;
 		}
+
+		const GameGraph::SLevel	*level = ai().game_graph().header().level(S,true);
+		if (!level) {
+			Msg				("! There is no level %s in the game graph",S);
+			return;
+		}
+
+		ai().level_graph().setup_current_level	(level->id());
+	}
+};
+
+class CCC_ScriptDbg : public IConsole_Command {
+public:
+	CCC_ScriptDbg(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = true; };
+	virtual void Execute(LPCSTR args) {
 		
-//		GameSpyPatching.CheckForPatch(InformOfNoPatch);
+		if(strstr(cName,"script_debug_break")==cName ){
 		
-		MainMenu()->GetGS()->m_pGS_Patching->CheckForPatch(InformOfNoPatch);
+		CScriptDebugger* d = ai().script_engine().debugger();
+		if(d){
+			if(d->Active())
+				d->initiateDebugBreak();
+			else
+				Msg("Script debugger not active.");
+		}else
+			Msg("Script debugger not present.");
+		}
+		else if(strstr(cName,"script_debug_stop")==cName ){
+			ai().script_engine().stopDebugger();
+		}
+		else if(strstr(cName,"script_debug_restart")==cName ){
+			ai().script_engine().restartDebugger();
+		};
+	};
+	
+
+	virtual void	Info	(TInfo& I)		
+	{
+		if(strstr(cName,"script_debug_break")==cName )
+			strcpy_s(I,"initiate script debugger [DebugBreak] command"); 
+
+		else if(strstr(cName,"script_debug_stop")==cName )
+			strcpy_s(I,"stop script debugger activity"); 
+
+		else if(strstr(cName,"script_debug_restart")==cName )
+			strcpy_s(I,"restarts script debugger or start if no script debugger presents"); 
 	}
 };
 
 
-
-class CCC_Net_SV_GuaranteedPacketMode : public CCC_Integer {
-protected:
-	int		*value_blin;
+class CCC_DumpMap : public IConsole_Command {
 public:
-	CCC_Net_SV_GuaranteedPacketMode(LPCSTR N, int* V, int _min=0, int _max=2) :
-	  CCC_Integer(N,V,_min,_max),
-		  value_blin(V)
-	  {};
+	CCC_DumpMap	(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = true; };
+	virtual void	Execute				(LPCSTR args) {
+		Level().MapManager().Dump();
+	}
+	virtual void	Info	(TInfo& I)		
+	{
+		strcpy_s(I,"dumps all currentmap locations"); 
+	}
 
+};
+
+class CCC_DumpCreatures : public IConsole_Command {
+public:
+	CCC_DumpCreatures	(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = true; };
+	virtual void	Execute				(LPCSTR args) {
+		
+		typedef CSafeMapIterator<ALife::_OBJECT_ID,CSE_ALifeDynamicObject>::_REGISTRY::const_iterator const_iterator;
+
+		const_iterator I = ai().alife().graph().level().objects().begin();
+		const_iterator E = ai().alife().graph().level().objects().end();
+		for ( ; I != E; ++I) {
+			CSE_ALifeCreatureAbstract *obj = smart_cast<CSE_ALifeCreatureAbstract *>(I->second);
+			if (obj) {
+				Msg("\"%s\",",obj->name_replace());
+			}
+		}		
+
+	}
+	virtual void	Info	(TInfo& I)		
+	{
+		strcpy_s(I,"dumps all creature names"); 
+	}
+
+};
+
+class CCC_DebugFonts : public IConsole_Command {
+public:
+	CCC_DebugFonts (LPCSTR N) : IConsole_Command(N) {bEmptyArgsHandled = true; }
+	virtual void Execute				(LPCSTR args) {
+		HUD().GetUI()->StartStopMenu( xr_new<CUIDebugFonts>(), true);		
+	}
+};
+
+class CCC_DebugNode : public IConsole_Command {
+public:
+	CCC_DebugNode(LPCSTR N) : IConsole_Command(N)  { };
+
+	virtual void Execute(LPCSTR args) {
+
+		string128 param1, param2;
+		_GetItem(args,0,param1,' ');
+		_GetItem(args,1,param2,' ');
+
+		u32 value1;
+		u32 value2;
+		
+		sscanf(param1,"%u",&value1);
+		sscanf(param2,"%u",&value2);
+		
+		if ((value1 > 0) && (value2 > 0)) {
+			g_bDebugNode		= TRUE;
+			g_dwDebugNodeSource	= value1;
+			g_dwDebugNodeDest	= value2;
+		} else {
+			g_bDebugNode = FALSE;
+		}
+	}
+};
+
+class CCC_ShowMonsterInfo : public IConsole_Command {
+public:
+				CCC_ShowMonsterInfo(LPCSTR N) : IConsole_Command(N)  { };
+
+	virtual void Execute(LPCSTR args) {
+
+		string128 param1, param2;
+		_GetItem(args,0,param1,' ');
+		_GetItem(args,1,param2,' ');
+
+		CObject			*obj = Level().Objects.FindObjectByName(param1);
+		CBaseMonster	*monster = smart_cast<CBaseMonster *>(obj);
+		if (!monster)	return;
+		
+		u32				value2;
+		
+		sscanf			(param2,"%u",&value2);
+		monster->set_show_debug_info (u8(value2));
+	}
+};
+class CCC_DbgPhTrackObj : public IConsole_Command {
+public:
+	CCC_DbgPhTrackObj(LPCSTR N) : IConsole_Command(N)  { };
+	virtual void Execute(LPCSTR args/**/) {
+			ph_dbg_draw_mask1.set(ph_m1_DbgTrackObject,TRUE);
+			PH_DBG_SetTrackObject(args);
+			//CObject* O= Level().Objects.FindObjectByName(args);
+			//if(O)
+			//{
+			//	PH_DBG_SetTrackObject(*(O->cName()));
+			//	ph_dbg_draw_mask1.set(ph_m1_DbgTrackObject,TRUE);
+			//}
+
+		}
+	
+	//virtual void	Info	(TInfo& I)		
+	//{
+	//	strcpy_s(I,"restart game fast"); 
+	//}
+};
+
+class CCC_PHGravity : public IConsole_Command {
+public:
+		CCC_PHGravity(LPCSTR N) :
+		IConsole_Command(N)
+		{};
 	  virtual void	Execute	(LPCSTR args)
 	  {
-		  CCC_Integer::Execute(args);
+		  if(!ph_world)	return;
+#ifndef DEBUG
+		  if (g_pGameLevel && Level().game && GameID() != GAME_SINGLE)
+		  {
+			  Msg("Command is not available in Multiplayer");
+			  return;
+		  }
+#endif
+		  ph_world->SetGravity(float(atof(args)));
 	  }
+	  virtual void	Status	(TStatus& S)
+	{	
+		if(ph_world)
+			sprintf_s	(S,"%3.5f",ph_world->Gravity());
+		else
+			sprintf_s	(S,"%3.5f",default_world_gravity);
+		while	(xr_strlen(S) && ('0'==S[xr_strlen(S)-1]))	S[xr_strlen(S)-1] = 0;
+	}
+	
 };
+extern void print_help(lua_State *L);
+
+struct CCC_LuaHelp : public IConsole_Command {
+	CCC_LuaHelp(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = true; };
+
+	virtual void Execute(LPCSTR args) {
+		print_help(ai().script_engine().lua());
+	}
+};
+
+struct CCC_ShowSmartCastStats : public IConsole_Command {
+	CCC_ShowSmartCastStats(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = true; };
+
+	virtual void Execute(LPCSTR args) {
+		show_smart_cast_stats();
+	}
+};
+
+struct CCC_ClearSmartCastStats : public IConsole_Command {
+	CCC_ClearSmartCastStats(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = true; };
+
+	virtual void Execute(LPCSTR args) {
+		clear_smart_cast_stats();
+	}
+};
+
+class CCC_ALifePath : public IConsole_Command {
+public:
+	CCC_ALifePath(LPCSTR N) : IConsole_Command(N)  { };
+	virtual void Execute(LPCSTR args) {
+		if (!ai().get_level_graph())
+			Msg("! there is no graph!");
+		else {
+			int id1=-1, id2=-1;
+			sscanf(args ,"%d %d",&id1,&id2);
+			if ((-1 != id1) && (-1 != id2))
+				if (_max(id1,id2) > (int)ai().game_graph().header().vertex_count() - 1)
+					Msg("! there are only %d vertexes!",ai().game_graph().header().vertex_count());
+				else
+					if (_min(id1,id2) < 0)
+						Msg("! invalid vertex number (%d)!",_min(id1,id2));
+					else {
+//						Sleep				(1);
+//						CTimer				timer;
+//						timer.Start			();
+//						float				fValue = ai().m_tpAStar->ffFindMinimalPath(id1,id2);
+//						Msg					("* %7.2f[%d] : %11I64u cycles (%.3f microseconds)",fValue,ai().m_tpAStar->m_tpaNodes.size(),timer.GetElapsed_ticks(),timer.GetElapsed_ms()*1000.f);
+					}
+			else
+				Msg("! not enough parameters!");
+		}
+	}
+};
+#endif // DEBUG
+
 
 
 void CCC_RegisterCommands()
@@ -1467,7 +1437,7 @@ void CCC_RegisterCommands()
 
 	psActorFlags.set(AF_INV_SHOW_EXT_DESC,true);
 	psActorFlags.set(AF_INV_SHOW_SELECTED,true);
-	CMD3(CCC_Mask,				"inv_extdesc",		&psActorFlags,	AF_INV_SHOW_EXT_DESC);
+	CMD3(CCC_Mask,				"inv_extdesc",			&psActorFlags,	AF_INV_SHOW_EXT_DESC);
 	CMD3(CCC_Mask,				"inv_showselected",		&psActorFlags,	AF_INV_SHOW_SELECTED);
 
 	CMD1(CCC_DemoPlay,			"demo_play"				);
@@ -1482,14 +1452,16 @@ void CCC_RegisterCommands()
 	CMD3(CCC_Mask,				"g_autopickup",			&psActorFlags,	AF_AUTOPICKUP);
 	g_uCommonFlags.zero();
 	g_uCommonFlags.set(flAiUseTorchDynamicLights, TRUE);
+	g_uCommonFlags.set(enShowObjectHit, FALSE);
 
-	CMD3(CCC_Mask,		"ai_use_torch_dynamic_lights",	&g_uCommonFlags, flAiUseTorchDynamicLights);
-	CMD1(CCC_GSCheckForUpdates, "check_for_updates");
-	CMD1(CCC_DumpInfos,				"dump_infos");
-	CMD1(CCC_GiveInfos,				"give_infos");
-	CMD1(CCC_RemoveInfos,			"remove_infos");
-	CMD1(CCC_Script,		"run_script");
-	CMD1(CCC_ScriptCommand,	"run_string");
+	CMD3(CCC_Mask,				"ai_use_torch_dynamic_lights",	&g_uCommonFlags, flAiUseTorchDynamicLights);
+	CMD3(CCC_Mask,				"engine_show_object_hit",		&g_uCommonFlags, enShowObjectHit);
+	CMD1(CCC_GSCheckForUpdates, "check_for_updates"		);
+	CMD1(CCC_DumpInfos,			"dump_infos"			);
+	CMD1(CCC_GiveInfos,			"give_infos"			);
+	CMD1(CCC_RemoveInfos,		"remove_infos"			);
+	CMD1(CCC_Script,			"run_script"			);
+	CMD1(CCC_ScriptCommand,		"run_string"			);
 
 
 #ifndef MASTER_GOLD

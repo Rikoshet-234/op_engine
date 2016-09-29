@@ -48,6 +48,14 @@ ENGINE_API extern	u32			psCurrentVidMode[];
 ENGINE_API extern	u32			psCurrentBPP		;
 ENGINE_API extern	Flags32		psDeviceFlags		;
 
+ENGINE_API extern	Flags32		g_uCommonFlags;
+ENGINE_API enum E_COMMON_FLAGS
+{
+	flAiUseTorchDynamicLights	= 1 <<0,
+	enShowObjectHit				= 1<<1
+};
+
+
 // game path definition
 #define _game_data_				"$game_data$"
 #define _game_textures_			"$game_textures$"

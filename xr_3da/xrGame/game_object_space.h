@@ -54,6 +54,8 @@ namespace GameObject {
 
 		eOnNPCWeaponFire,
 
+		eOnObjectHit,
+
 		eDummy = u32(-1),
 	};
 };

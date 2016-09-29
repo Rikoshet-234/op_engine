@@ -92,7 +92,10 @@ void CScriptGameObject::script_register(lua_State *L)
 
 				value("on_npc_weapon_fire",			int(GameObject::eOnNPCWeaponFire)),
 
-				value("on_actor_weapon_fire",			int(GameObject::eOnActorWeaponFire))
+				value("on_actor_weapon_fire",			int(GameObject::eOnActorWeaponFire)),
+
+				value("on_object_hit",			int(GameObject::eOnObjectHit))
+
 			],
 
 		def("buy_condition",				(void (*)(CScriptIniFile*,LPCSTR))(&::buy_condition)),

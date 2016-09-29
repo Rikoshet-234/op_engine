@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "pch_script.h"
+#include "../defines.h"
 #include "object_handler.h"
 #include "object_handler_space.h"
 #include "object_handler_planner.h"
@@ -26,6 +27,7 @@
 #include "stalker_animation_manager.h"
 #include "object_handler_planner_impl.h"
 #include "effectorshot.h"
+
 
 CObjectHandler::CObjectHandler		()
 {
@@ -278,7 +280,6 @@ void CObjectHandler::detach				(CInventoryItem *inventory_item)
 	inherited::detach			(inventory_item);
 }
 
-extern Flags32 g_uCommonFlags;
 
 bool CObjectHandler::can_use_dynamic_lights	()
 {	

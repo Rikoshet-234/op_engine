@@ -18,7 +18,7 @@
 
 #define ENGINE_DESCRIPTION "OP 2.1 Engine"
 #define ENGINE_MINOR "0"
-#define ENGINE_MAJOR "53b"
+#define ENGINE_MAJOR "53c"
 
 #ifdef DEBUG
 	#define ENGINE_BUILD_TYPE "debug"

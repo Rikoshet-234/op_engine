@@ -135,7 +135,10 @@ void CWeaponMagazined::LoadFireModes(LPCSTR section)
 		m_iPrefferedFireMode = READ_IF_EXISTS(pSettings, r_s16,section,"preffered_fire_mode",-1);
 	}
 	else
+	{
 		m_bHasDifferentFireModes = false;
+		SetQueueSize(1);
+	}
 }
 void CWeaponMagazined::FireStart		()
 {
@@ -477,7 +480,6 @@ LPCSTR bts(bool val)
 void CWeaponMagazined::state_Fire	(float dt)
 {
 	VERIFY(fTimeToFire>0.f);
-
 	Fvector					p1, d; 
 	p1.set(get_LastFP());
 	d.set(get_LastFD());
@@ -1163,8 +1165,7 @@ void	CWeaponMagazined::SetQueueSize			(int size)
 	m_iQueueSize = size; 
 	if (m_iQueueSize == -1)
 		strcpy_s(m_sCurFireMode, " (A)");
-	else
-		if (m_bHasDifferentFireModes)
+	else if (m_bHasDifferentFireModes)
 			sprintf_s(m_sCurFireMode, " (%d)", m_iQueueSize);
 };
 

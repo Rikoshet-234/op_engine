@@ -291,3 +291,5 @@ public:
 					CCC_LoadCFG_custom(LPCSTR cmd);
 	virtual bool	allow			(LPCSTR cmd);
 };
+
+
