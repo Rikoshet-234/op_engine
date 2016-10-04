@@ -585,6 +585,31 @@ void CUIWindow::BringAllToTop()
 	}
 }
 
+void CUIWindow::ScaleSizeOnOriginalRect(Frect textureRect,bool center)
+{
+	float wIconWidth=GetWidth();
+	float wIconHeight=GetHeight();
+	float rectWidth=textureRect.x2;
+	float rectHeight=textureRect.y2;
+	float scaleWidth= wIconWidth/rectWidth;
+	float scaleHeight=wIconHeight/rectHeight;
+	scaleWidth=scaleWidth>1?1:scaleWidth;
+	scaleHeight=scaleHeight>1?1:scaleHeight;
+	float scale_x = Device.fASPECT  / 0.75f;
+	float scale = (scaleWidth<scaleHeight?scaleWidth:scaleHeight);
+	SetWidth(rectWidth * scale * scale_x);
+	SetHeight(rectHeight * scale);
+	if (center)
+	{
+		Fvector2 pos=GetWndPos();
+		float xd=(GetWidth()-wIconWidth)/2;
+		float yd=(GetHeight()-wIconHeight)/2;
+		pos.x+=xd<0?-xd:xd;
+		pos.y+=yd<0?-yd:yd;
+		SetWndPos(pos);
+	}
+}
+
 //дл€ перевода окна и потомков в исходное состо€ние
 void CUIWindow::Reset()
 {

@@ -14,14 +14,6 @@ CWeaponSVU::CWeaponSVU(void) : CWeaponCustomPistol("SVU")
 {
 }
 
-int CWeaponSVU::GetCurrentFireMode()
-{
-	int fireMode=CWeaponCustomPistol::GetCurrentFireMode();
-	if (m_bHasDifferentFireModes)
-		fireMode=m_aFireModes[m_iCurFireMode];	
-	return fireMode;
-}
-
 CWeaponSVU::~CWeaponSVU(void)
 {
 }

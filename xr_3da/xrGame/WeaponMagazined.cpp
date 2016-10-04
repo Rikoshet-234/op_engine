@@ -36,6 +36,7 @@ CWeaponMagazined::CWeaponMagazined(LPCSTR name, ESoundTypes eSoundType) : CWeapo
 	m_iShotNum = 0;
 	m_iQueueSize = WEAPON_ININITE_QUEUE;
 	m_bLockType = false;
+	m_iCurFireMode=0;
 }
 
 CWeaponMagazined::~CWeaponMagazined()
@@ -136,8 +137,11 @@ void CWeaponMagazined::LoadFireModes(LPCSTR section)
 	}
 	else
 	{
-		m_bHasDifferentFireModes = false;
+		//m_aFireModes.clear();
+		//m_aFireModes.push_back(1);
+		//m_iCurFireMode=0;
 		SetQueueSize(1);
+		m_bHasDifferentFireModes = false;
 	}
 }
 void CWeaponMagazined::FireStart		()
@@ -1156,7 +1160,9 @@ void	CWeaponMagazined::OnH_A_Chield		()
 		CActor	*actor = smart_cast<CActor*>(H_Parent());
 		if (!actor) SetQueueSize(-1);
 		else SetQueueSize(GetCurrentFireMode());
-	};	
+	}
+	else
+		SetQueueSize(1);
 	inherited::OnH_A_Chield();
 };
 
@@ -1181,6 +1187,8 @@ void CWeaponMagazined::save(NET_Packet &output_packet)
 	inherited::save	(output_packet);
 	save_data		(m_iQueueSize, output_packet);
 	save_data		(m_iShotNum, output_packet);
+	if (m_iCurFireMode<0 || m_iCurFireMode>10)
+		m_iCurFireMode=0;
 	save_data		(m_iCurFireMode, output_packet);
 }
 
@@ -1190,12 +1198,15 @@ void CWeaponMagazined::load(IReader &input_packet)
 	load_data		(m_iQueueSize, input_packet);SetQueueSize(m_iQueueSize);
 	load_data		(m_iShotNum, input_packet);
 	load_data		(m_iCurFireMode, input_packet);
+	if (m_iCurFireMode<0 || m_iCurFireMode>10)
+		m_iCurFireMode=0;
 }
 
 void CWeaponMagazined::net_Export	(NET_Packet& P)
 {
 	inherited::net_Export (P);
-
+	if (m_iCurFireMode<0 || m_iCurFireMode>10)
+		m_iCurFireMode=0;
 	P.w_u8(u8(m_iCurFireMode&0x00ff));
 }
 
@@ -1207,7 +1218,13 @@ void CWeaponMagazined::net_Import	(NET_Packet& P)
 	inherited::net_Import (P);
 
 	m_iCurFireMode = P.r_u8();
-	SetQueueSize(GetCurrentFireMode());
+
+	if (m_iCurFireMode<0 || m_iCurFireMode>10)
+		m_iCurFireMode=0;
+	if (m_bHasDifferentFireModes)
+		SetQueueSize(GetCurrentFireMode());
+	else
+		SetQueueSize(1);
 }
 #include "string_table.h"
 void CWeaponMagazined::GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count)

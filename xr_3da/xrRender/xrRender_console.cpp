@@ -108,6 +108,7 @@ int			ps_r2_wait_sleep			= 0;
 float		ps_r2_lt_smooth				= 1.f;				// 1.f
 float		ps_r2_slight_fade			= 1.f;				// 1.f
 
+ENGINE_API int	ps_r_msaa_level;
 
 //- Mad Max
 float		ps_r2_gloss_factor			= 1.0f;
@@ -362,7 +363,8 @@ void		xrRender_initconsole	()
 	CMD4(CCC_Integer,	"r2_gi_photons",		&ps_r2_GI_photons,			8,		256		);
 	CMD4(CCC_Float,		"r2_gi_refl",			&ps_r2_GI_refl,				EPS_L,	0.99f	);
 
-	CMD4(CCC_Integer,	"r2_wait_sleep",		&ps_r2_wait_sleep,			0,		1		);
+	CMD4(CCC_Integer,	"r2_wait_sleep",		&ps_r2_wait_sleep,			0,		10		);
+	CMD4(CCC_Integer,	"r__msaa_level",		&ps_r_msaa_level,			0,		16		);
 
 #ifdef DEBUG
 	CMD4(CCC_Integer,	"r2_dhemi_count",		&ps_r2_dhemi_count,			4,		25		);

@@ -9,6 +9,7 @@
 #pragma warning(default:4995)
 #include "HW.h"
 #include "xr_IOconsole.h"
+#include "device.h"
 
 #ifndef _EDITOR
 	void	fill_vid_mode_list			(CHW* _hw);
@@ -21,6 +22,7 @@
 	void	free_vid_mode_list			();
 
 ENGINE_API CHW			HW;
+ENGINE_API  int			ps_r_msaa_level = 0;
 
 #ifdef DEBUG
 IDirect3DStateBlock9*	dwDebugSB = 0;
@@ -284,10 +286,18 @@ void		CHW::CreateDevice		(HWND m_hWnd)
 //. P.BackBufferHeight		= dwHeight;
 	P.BackBufferFormat		= fTarget;
 	P.BackBufferCount		= 1;
-
-	// Multisample
-    P.MultiSampleType		= D3DMULTISAMPLE_NONE;
 	P.MultiSampleQuality	= 0;
+	// Multisample allowed only for R1 
+	if (!bWindowed && !psDeviceFlags.test(rsR2) &&  SUCCEEDED(pD3D->CheckDeviceMultiSampleType(D3DADAPTER_DEFAULT,
+		DevT, fTarget, FALSE,
+		(D3DMULTISAMPLE_TYPE)ps_r_msaa_level, NULL))) // &P.MultiSampleQuality
+		P.MultiSampleType = (D3DMULTISAMPLE_TYPE)ps_r_msaa_level;
+	else
+		P.MultiSampleType		= D3DMULTISAMPLE_NONE;
+	
+	if (P.MultiSampleType)
+		Msg("# Using MSAA type = %d ", (int)P.MultiSampleType);
+
 
 	// Windoze
     P.SwapEffect			= bWindowed?D3DSWAPEFFECT_COPY:D3DSWAPEFFECT_DISCARD;
@@ -397,7 +407,8 @@ u32 CHW::selectGPU ()
 
 u32 CHW::selectRefresh(u32 dwWidth, u32 dwHeight, D3DFORMAT fmt)
 {
-	if (psDeviceFlags.is(rsRefresh60hz))	return D3DPRESENT_RATE_DEFAULT;
+	if (psDeviceFlags.is(rsRefresh60hz))	
+		return D3DPRESENT_RATE_DEFAULT;
 	else
 	{
 		u32 selected	= D3DPRESENT_RATE_DEFAULT;

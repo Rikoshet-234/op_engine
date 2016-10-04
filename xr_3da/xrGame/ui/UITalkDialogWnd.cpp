@@ -328,6 +328,10 @@ void CUIAnswerItemIconed::Init		(LPCSTR text, LPCSTR texture_name, Frect texture
 {
 	inherited::Init					(text,"");
 	m_icon->CreateShader			(texture_name,"hud\\default");
+	if (xr_strcmp(texture_name,EQUIPMENT_ICONS)==0)
+	{
+		m_icon->ScaleSizeOnOriginalRect(texture_rect,true);
+	}
 	m_icon->GetUIStaticItem().SetOriginalRect(texture_rect.x1,texture_rect.y1,texture_rect.x2,texture_rect.y2);
 	m_icon->TextureAvailable		(true);
 	m_icon->TextureOn				();

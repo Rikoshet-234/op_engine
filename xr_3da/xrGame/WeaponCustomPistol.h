@@ -12,7 +12,7 @@ public:
 					CWeaponCustomPistol	(LPCSTR name);
 	virtual			~CWeaponCustomPistol();
 
-	int				GetCurrentFireMode	() override			{ return 1; };
+	int				GetCurrentFireMode	() override		;
 protected:
 	virtual void	FireEnd				();
 	virtual void	switch2_Fire		();

@@ -186,6 +186,36 @@ class cl_hemi_color	: public R_constant_setup {
 	}
 };	static cl_hemi_color		binder_hemi_color;
 
+// KD
+class cl_resolution	: public R_constant_setup {
+	u32			marker;
+	Fvector4	result;
+
+	void setup	(R_constant* C) override
+	{
+		if (marker!=Device.dwFrame)	{
+			float _w = float(Device.dwWidth);
+			float _h = float(Device.dwHeight);
+			result.set (_w, _h, static_cast<float>(1.0)/_w, static_cast<float>(1.0)/_h);
+		}
+		RCache.set_c	(C,result);
+	}
+};	static cl_resolution		binder_resolution;
+
+class cl_screen_params	: public R_constant_setup {
+	u32			marker;
+	Fvector4	result;
+
+	void setup	(R_constant* C) override
+	{
+		if (marker!=Device.dwFrame)	{
+			float _ffov = float(Device.fFOV);
+			float _faspect = float(Device.fASPECT);
+			result.set (_ffov, _faspect, 0.f, 0.f);
+		}
+		RCache.set_c	(C,result);
+	}
+};	static cl_screen_params		binder_screen_params;
 
 // Standart constant-binding
 void	CBlender_Compile::SetMapping	()
@@ -218,6 +248,11 @@ void	CBlender_Compile::SetMapping	()
 //	r_Constant				("L_lmap_color",	&binder_lm_color);
 	r_Constant				("L_hemi_color",	&binder_hemi_color);
 	r_Constant				("L_ambient",		&binder_amb_color);
+
+	//KD
+	r_Constant				("c_screen",		&binder_screen_params);
+	r_Constant				("c_resolution",		&binder_resolution);
+
 
 	// detail
 	if (bDetail	&& detail_scaler)

@@ -166,10 +166,7 @@ void CWeaponBinoculars::net_Relcase	(CObject *object)
 
 int CWeaponBinoculars::GetCurrentFireMode()
 {
-	int fireMode=CWeaponCustomPistol::GetCurrentFireMode();
-	if (m_bHasDifferentFireModes)
-		fireMode=m_aFireModes[m_iCurFireMode];	
-	return fireMode;
+	 return CWeaponCustomPistol::GetCurrentFireMode();
 }
 
 void CWeaponBinoculars::FireEnd()

@@ -541,7 +541,7 @@ void CUIStatic::OnFocusReceive()
 {
 	inherited::OnFocusReceive();
 	if (GetMessageTarget())
-        GetMessageTarget()->SendMessage(this, STATIC_FOCUS_RECEIVED, NULL);
+		GetMessageTarget()->SendMessage(this, STATIC_FOCUS_RECEIVED, NULL);
 }
 
 void CUIStatic::OnFocusLost(){
@@ -612,3 +612,4 @@ bool CUIStatic::IsHighlightText()
 {
 	return m_bCursorOverWindow;
 }
+

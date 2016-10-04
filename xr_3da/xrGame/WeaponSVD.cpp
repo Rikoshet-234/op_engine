@@ -5,14 +5,6 @@ CWeaponSVD::CWeaponSVD(void) : CWeaponCustomPistol("SVD")
 {
 }
 
-int CWeaponSVD::GetCurrentFireMode()
-{
-	int fireMode=CWeaponCustomPistol::GetCurrentFireMode();
-	if (m_bHasDifferentFireModes)
-		fireMode=m_aFireModes[m_iCurFireMode];	
-	return fireMode;
-}
-
 CWeaponSVD::~CWeaponSVD(void)
 {
 }

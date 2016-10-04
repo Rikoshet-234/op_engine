@@ -188,7 +188,7 @@ protected:
 	bool			m_bHeading;
 	float			m_fHeading;
 
-    // Для вывода текстуры с обрезанием по маске используем CUIFrameWindow
+	// Для вывода текстуры с обрезанием по маске используем CUIFrameWindow
 	CUIFrameWindow	*m_pMask;
 	Fvector2		m_TextureOffset;
 

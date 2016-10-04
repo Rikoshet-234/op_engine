@@ -421,6 +421,15 @@ CRender::CRender()
 
 CRender::~CRender()
 {
+	auto it = SWIs.begin();
+	for (; it != SWIs.end(); it++)
+	{
+		i_swi_allocated -= it->count;
+		xr_free (it->sw);
+		it->sw = NULL;
+		it->count = 0;
+	}
+	SWIs.clear_and_free();
 }
 
 #include "..\GameFont.h"

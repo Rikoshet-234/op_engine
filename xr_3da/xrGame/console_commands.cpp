@@ -915,6 +915,22 @@ public:
 	  }
 };
 
+class CCC_SetGodMode : public IConsole_Command
+{
+public		:
+	CCC_SetGodMode(LPCSTR N):  IConsole_Command(N)	{ bEmptyArgsHandled = false; };
+	void	Execute	(LPCSTR args) override
+	{
+		if (EQ(args,"on"))			psActorFlags.set(AF_GODMODE,true);
+		else if (EQ(args,"off"))	psActorFlags.set(AF_GODMODE,false);
+		else if (EQ(args,"1"))		psActorFlags.set(AF_GODMODE,true);
+		else if (EQ(args,"0"))		psActorFlags.set(AF_GODMODE,false);
+		else InvalidSyntax();
+		g_uCommonFlags.set(mwShowInvulnerableIcon,psActorFlags.test(AF_GODMODE));
+	}
+	void	Status	(TStatus& S) override	{	strcpy_s(S,psActorFlags.test(AF_GODMODE)?"on":"off"); }
+	void	Info	(TInfo& I) override	{	strcpy_s(I,"'on/off' or '1/0'"); }
+};
 
 #ifdef DEBUG
 class CCC_RadioGroupMask2;
@@ -1444,7 +1460,7 @@ void CCC_RegisterCommands()
 	CMD1(CCC_DemoRecord,		"demo_record"			);
 	CMD1(CCC_PHFps,				"ph_frequency"																					);
 	CMD1(CCC_PHIterations,		"ph_iterations"																					);
-	CMD3(CCC_Mask,				"g_god",				&psActorFlags,	AF_GODMODE	);
+	CMD1(CCC_SetGodMode,				"g_god"			);
 	CMD3(CCC_Mask,				"g_unlimitedammo",		&psActorFlags,	AF_UNLIMITEDAMMO);
 	CMD1(CCC_JumpToLevel,		"jump_to_level"			);
 	CMD3(CCC_Mask,				"cl_dynamiccrosshair",	&psHUD_Flags,	HUD_CROSSHAIR_DYNAMIC);

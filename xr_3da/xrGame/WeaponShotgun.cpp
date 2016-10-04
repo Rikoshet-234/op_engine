@@ -10,7 +10,7 @@
 
 CWeaponShotgun::CWeaponShotgun(void) : CWeaponCustomPistol("TOZ34")
 {
-    m_eSoundShotBoth		= ESoundTypes(SOUND_TYPE_WEAPON_SHOOTING);
+	m_eSoundShotBoth		= ESoundTypes(SOUND_TYPE_WEAPON_SHOOTING);
 	m_eSoundClose			= ESoundTypes(SOUND_TYPE_WEAPON_SHOOTING);
 	m_eSoundAddCartridge	= ESoundTypes(SOUND_TYPE_WEAPON_SHOOTING);
 }
@@ -53,8 +53,6 @@ void CWeaponShotgun::Load	(LPCSTR section)
 	};
 
 }
-
-
 
 
 void CWeaponShotgun::OnShot () 
@@ -140,7 +138,7 @@ void CWeaponShotgun::OnShotBoth()
 void CWeaponShotgun::switch2_Fire	()
 {
 	inherited::switch2_Fire	();
-	bWorking = false;
+	//bWorking = false;
 }
 
 void CWeaponShotgun::switch2_Fire2	()

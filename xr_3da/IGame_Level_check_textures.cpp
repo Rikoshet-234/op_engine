@@ -16,10 +16,10 @@ void IGame_Level::LL_CheckTextures()
 		// Msg		("***FATAL***: %s",msg);
 		bError		= TRUE;
 	}
-	if (m_lmaps>32*1024*1024 || c_lmaps>8)
+	if (m_lmaps>32*1024*1024 || c_lmaps>16)
 	{
-		LPCSTR msg	= "Too many lmap-textures (limit: 8 textures or 32M).\n        Reduce pixel density (worse) or use more vertex lighting (better).";
-		Msg			("***FATAL***: %s",msg);
+		LPCSTR msg	= "Too many lmap-textures (limit: 16 textures or 32M).\n        Reduce pixel density (worse) or use more vertex lighting (better).";
+		Msg			("***WARNING***: %s",msg);
 		bError		= TRUE;
 	}
 }

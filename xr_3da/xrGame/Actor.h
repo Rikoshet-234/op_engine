@@ -125,6 +125,10 @@ public:
 	virtual void	 NewPdaContact		(CInventoryOwner*);
 	virtual void	 LostPdaContact		(CInventoryOwner*);
 
+	IC EActorCameras		active_cam			()	{return cam_active;}			// KD: need to know which cam active outside actor methods
+
+
+
 protected:
 //	virtual void AddMapLocationsFromInfo (const CInfoPortion* info_portion) const;
 	virtual void AddEncyclopediaArticle	(const CInfoPortion* info_portion) const;

@@ -11,7 +11,6 @@ protected:
 	void switch2_Fire	() override;
 public:
 	CWeaponSVU(void);
-	int				GetCurrentFireMode	() override	;
 	virtual ~CWeaponSVU(void);
 
 	DECLARE_SCRIPT_REGISTER_FUNCTION

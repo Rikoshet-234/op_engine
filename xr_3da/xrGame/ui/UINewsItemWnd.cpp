@@ -4,6 +4,7 @@
 #include "UIStatic.h"
 #include "../game_news.h"
 #include "../date_time.h"
+#include "UIInventoryUtilities.h"
 
 CUINewsItemWnd::CUINewsItemWnd()
 {}
@@ -65,4 +66,8 @@ void CUINewsItemWnd::Setup			(GAME_NEWS_DATA& news_data)
 	h1								= _max(h1,h2);
 	h1								= _max(h1,h3);
 	SetHeight						(h1);
+	if (xr_strcmp(news_data.texture_name,EQUIPMENT_ICONS)==0)
+	{
+		ScaleSizeOnOriginalRect(news_data.tex_rect);
+	}
 }

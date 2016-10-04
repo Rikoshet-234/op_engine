@@ -284,5 +284,5 @@ void CObjectHandler::detach				(CInventoryItem *inventory_item)
 bool CObjectHandler::can_use_dynamic_lights	()
 {	
 	// flAiUseTorchDynamicLights == 1
-	return						(!!g_uCommonFlags.test(1));
+	return						(!!g_uCommonFlags.test(flAiUseTorchDynamicLights));
 }

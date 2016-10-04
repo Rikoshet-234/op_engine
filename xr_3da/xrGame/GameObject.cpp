@@ -175,8 +175,8 @@ void CGameObject::OnEvent		(NET_Packet& P, u16 type)
 				boneName=kin->LL_GetData(HDS.boneID).name.c_str();
 			if (g_uCommonFlags.test(E_COMMON_FLAGS::enShowObjectHit))
 				Msg("Hit received: %s [%s] ammo: [%s] on [%s] bone [%s : %i] power [%f] hit_type [%s]", 
-					Hitter->cName().c_str(),
-					Weapon->cNameSect().c_str(),
+					Hitter==nullptr ? "Hiter is null" : Hitter->cName().c_str(),
+					Weapon==nullptr ? "Weapon is null" : Weapon->cNameSect().c_str(),
 					HDS.ammoSection.c_str(),
 					this->cName().c_str(),
 					boneName.c_str(),
@@ -185,8 +185,8 @@ void CGameObject::OnEvent		(NET_Packet& P, u16 type)
 					ALife::g_cafHitType2String(static_cast<ALife::EHitType>(HDS.hit_type))
 				);
 			this->callback(GameObject::ECallbackType::eOnObjectHit)(
-					smart_cast<CGameObject*>(Hitter)->lua_game_object(),
-					smart_cast<CGameObject*>(Weapon)->lua_game_object(),
+					Hitter!=nullptr ? smart_cast<CGameObject*>(Hitter)->lua_game_object() : nullptr,
+					Weapon!=nullptr ? smart_cast<CGameObject*>(Weapon)->lua_game_object() : nullptr,
 					HDS.ammoSection.c_str(),
 					HDS.boneID,
 					boneName.c_str(),

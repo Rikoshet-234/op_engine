@@ -102,7 +102,7 @@ public:
 	//поднять на вершину списка всех родителей окна и его самого
 	void					BringAllToTop		();
 	
-
+	void					ScaleSizeOnOriginalRect(Frect textureRect,bool center=false);
 
 	virtual bool 			OnMouse				(float x, float y, EUIMessages mouse_action);
 	virtual void 			OnMouseMove			();

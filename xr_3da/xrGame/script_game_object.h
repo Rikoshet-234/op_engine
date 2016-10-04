@@ -565,6 +565,11 @@ public:
 			bool				invulnerable						() const;
 			void				invulnerable						(bool invulnerable);
 
+
+			bool				actor_invulnerable						() const;
+			void				actor_invulnerable						(bool invulnerable);
+
+
 	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
 add_to_type_list(CScriptGameObject)

@@ -8,11 +8,22 @@
 //////////////////////////////////////////////////////////////////////
 CWeaponCustomPistol::CWeaponCustomPistol(LPCSTR name) : CWeaponMagazined(name,SOUND_TYPE_WEAPON_PISTOL)
 {
+	m_iCurFireMode=0;
 }
 
 CWeaponCustomPistol::~CWeaponCustomPistol()
 {
 }
+
+int CWeaponCustomPistol::GetCurrentFireMode()
+{
+	int fireMode=1;
+	if (m_bHasDifferentFireModes)
+		if (m_aFireModes.size()>0)
+			fireMode=m_aFireModes[m_iCurFireMode];	
+	return fireMode;
+}
+
 void CWeaponCustomPistol::switch2_Fire	()
 {
 	m_bFireSingleShot			= true;

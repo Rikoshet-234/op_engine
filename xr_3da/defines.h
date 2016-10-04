@@ -52,7 +52,8 @@ ENGINE_API extern	Flags32		g_uCommonFlags;
 ENGINE_API enum E_COMMON_FLAGS
 {
 	flAiUseTorchDynamicLights	= 1 <<0,
-	enShowObjectHit				= 1<<1
+	enShowObjectHit				= 1<<1,
+	mwShowInvulnerableIcon		= 1<<2
 };
 
 

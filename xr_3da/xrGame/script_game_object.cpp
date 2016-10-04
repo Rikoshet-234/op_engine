@@ -521,8 +521,16 @@ bool CScriptGameObject::invulnerable		() const
 {
 	CCustomMonster	*monster = smart_cast<CCustomMonster*>(&object());
 	if (!monster) {
-		ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeError,"CCustomMonster : cannot access class member invulnerable!");
-		return		(false);
+		CActor* actor=smart_cast<CActor*>(&object());
+		if (actor)
+		{
+			return actor_invulnerable();
+		}
+		else
+		{
+			ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeError,"CCustomMonster : cannot access class member invulnerable!");
+			return		(false);
+		}
 	}
 
 	return			(monster->invulnerable());
@@ -532,9 +540,29 @@ void CScriptGameObject::invulnerable		(bool invulnerable)
 {
 	CCustomMonster	*monster = smart_cast<CCustomMonster*>(&object());
 	if (!monster) {
-		ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeError,"CCustomMonster : cannot access class member invulnerable!");
-		return;
+		CActor* actor=smart_cast<CActor*>(&object());
+		if (actor)
+		{
+			actor_invulnerable(invulnerable);
+			return;
+		}
+		else
+		{
+			ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeError,"CCustomMonster : cannot access class member invulnerable!");
+			return;
+		}
 	}
 
 	monster->invulnerable	(invulnerable);
+}
+
+bool				CScriptGameObject::actor_invulnerable						() const
+{
+	return GodMode()==TRUE;
+}
+
+void				CScriptGameObject::actor_invulnerable						(bool invulnerable)
+{
+	psActorFlags.set(AF_GODMODE,invulnerable);
+	g_uCommonFlags.set(mwShowInvulnerableIcon,!invulnerable);	
 }
