@@ -65,7 +65,11 @@ public:
 	virtual void	PlayAnimIdle();
 	virtual void	PlayAnimShoot();
 	virtual void	PlayAnimModeSwitch();
-	
+
+	void	OnNextFireMode		() override;
+	void	OnPrevFireMode		() override;
+	bool	HasFireModes		() override;
+
 	HUD_SOUND			sndShotG;
 	HUD_SOUND			sndReloadG;
 	HUD_SOUND			sndSwitch;

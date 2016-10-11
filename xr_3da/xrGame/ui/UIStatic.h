@@ -14,6 +14,7 @@ struct lanim_cont{
 	CLAItem*				m_lanim;
 	float					m_lanim_start_time;
 	float					m_lanim_delay_time;
+	s32					m_lanim_cont_time;
 	Flags8					m_lanimFlags;
 
 	void					set_defaults		();
@@ -72,6 +73,8 @@ public:
 	virtual void		SetHighlightColor			(const u32 uColor)	{ m_HighlightColor = uColor; }
 			void		EnableTextHighlighting		(bool value)		{ m_bEnableTextHighlighting = value; }
 			void		SetClrLightAnim				(LPCSTR lanim, bool bCyclic, bool bOnlyAlpha, bool bTextColor, bool bTextureColor);
+			bool		IsAnimStarted				() const;
+			void		SetClrAnimLength			(s32 mSec);
 			void		SetXformLightAnim			(LPCSTR lanim, bool bCyclic);
 			void		ResetClrAnimation			();
 			void		ResetXformAnimation			();

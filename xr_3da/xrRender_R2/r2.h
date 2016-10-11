@@ -119,6 +119,9 @@ public:
 	IDirect3DQuery9*											q_sync_point[2]	;
 	u32															q_sync_count	;
 private:
+	int															i_swi_allocated;
+
+
 	// Loading / Unloading
 	void							LoadBuffers					(CStreamReader	*fs,	BOOL	_alternative);
 	void							LoadVisuals					(IReader	*fs);

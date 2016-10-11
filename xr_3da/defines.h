@@ -57,6 +57,12 @@ ENGINE_API enum E_COMMON_FLAGS
 };
 
 
+ENGINE_API extern	int			c_r		;
+ENGINE_API extern	int			c_g		;
+ENGINE_API extern	int			c_b		;
+ENGINE_API extern	int			c_a		;
+ENGINE_API extern	int			c_c		;
+
 // game path definition
 #define _game_data_				"$game_data$"
 #define _game_textures_			"$game_textures$"

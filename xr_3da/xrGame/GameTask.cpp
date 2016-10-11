@@ -210,9 +210,11 @@ void CGameTask::Load(const TASK_ID& id)
 		bool functor_exists;
 		info_num						= g_gameTaskXml->GetNodesNum(l_root,"function_complete");
 		objective.m_complete_lua_functions.resize(info_num);
+		objective.m_complete_lua_functions_names.resize(info_num);
 		for(j=0; j<info_num; ++j){
-			str							= g_gameTaskXml->Read(l_root, "function_complete", j, NULL);
+			str							= g_gameTaskXml->Read(l_root, "function_complete", j, nullptr);
 			functor_exists				= ai().script_engine().functor(str ,objective.m_complete_lua_functions[j]);
+			objective.m_complete_lua_functions_names.insert(objective.m_complete_lua_functions_names.begin()+j,std::make_pair(str,false));
 			if (!functor_exists)
 				Msg						("! ERROR Cannot find script function in task [%s] objective function_complete [%s]",*id, str);
 			//THROW3						(functor_exists, "Cannot find script function described in task objective  ", str);
@@ -223,8 +225,9 @@ void CGameTask::Load(const TASK_ID& id)
 		info_num						= g_gameTaskXml->GetNodesNum(l_root,"function_fail");
 		objective.m_fail_lua_functions.resize(info_num);
 		for(j=0; j<info_num; ++j){
-			str							= g_gameTaskXml->Read(l_root, "function_fail", j, NULL);
+			str							= g_gameTaskXml->Read(l_root, "function_fail", j, nullptr);
 			functor_exists				= ai().script_engine().functor(str ,objective.m_fail_lua_functions[j]);
+			objective.m_fail_lua_functions_names.insert(objective.m_fail_lua_functions_names.begin()+j,std::make_pair(str,false));
 			if (!functor_exists)
 				Msg						("! ERROR Cannot find script function in task [%s] objective function_fail [%s]",*id, str);
 			//THROW3						(functor_exists, "Cannot find script function described in task objective  ", str);
@@ -317,27 +320,11 @@ void SGameTaskObjective::SetTaskState		(ETaskState new_state)
 		infos=m_infos_on_complete;
 		functors=m_lua_functions_on_complete;
 		break;
-	//case eTaskStateInProgress: return;
-	//case eTaskStateDummy: return;
 	default: return;
 	}
 	SendInfo(infos);
 	CallAllFuncs(functors);
 	ChangeStateCallback();
-
-	//if( (new_state==eTaskStateFail) || (new_state==eTaskStateCompleted) ){
-
-	//	if( task_state==eTaskStateFail ){
-	//			SendInfo				(m_infos_on_fail);
-	//			CallAllFuncs			(m_lua_functions_on_fail);
-	//	}else
-	//	if( task_state==eTaskStateCompleted ){
-	//			SendInfo				(m_infos_on_complete);
-	//			CallAllFuncs			(m_lua_functions_on_complete);
-	//	}
-	//	//callback for scripters
-	//	ChangeStateCallback();
-	//}
 }
 
 ETaskState SGameTaskObjective::UpdateState	()
@@ -354,7 +341,7 @@ ETaskState SGameTaskObjective::UpdateState	()
 		return		eTaskStateFail;
 
 //check fail functor
-	if( CheckFunctions(m_fail_lua_functions) )
+	if( CheckFunctions(m_fail_lua_functions,m_fail_lua_functions_names) )
 		return		eTaskStateFail;
 	
 //check complete infos
@@ -363,7 +350,7 @@ ETaskState SGameTaskObjective::UpdateState	()
 
 
 //check complete functor
-	if( CheckFunctions(m_complete_lua_functions) )
+	if( CheckFunctions(m_complete_lua_functions,m_complete_lua_functions_names) )
 		return		eTaskStateCompleted;
 
 	
@@ -389,12 +376,36 @@ bool SGameTaskObjective::CheckInfo		(xr_vector<shared_str>& v)
 	return res;
 }
 
-bool SGameTaskObjective::CheckFunctions	(xr_vector<luabind::functor<bool> >& v)
+bool SGameTaskObjective::CheckFunctions	(xr_vector<luabind::functor<bool> >& v,xr_vector<std::pair<shared_str,bool>>& v_h)
 {
 	bool res = false;
 	xr_vector<luabind::functor<bool> >::iterator it	= v.begin();
-	for(;it!=v.end();++it){
-		if( (*it).is_valid() ) res = (*it)(*(parent->m_ID), idx);
+	u32 fi=0;
+	for(;it!=v.end();++it,++fi)
+	{
+		if( (*it).is_valid() ) 
+		{
+			try
+			{
+				res = (*it)(*(parent->m_ID), idx);
+			}
+			catch (...)
+			{
+				if (v_h.size()>fi)
+				{
+					if (v_h[fi].first!=nullptr)
+					{
+						shared_str functorName=v_h[fi].first;
+						if (!v_h[fi].second)
+						{
+							Msg("! ERROR functor [%s] for task [%s] valid but not return any correct value! assume default 'false' result!",functorName.c_str(),parent->m_ID.c_str());
+							v_h[fi].second=true;
+						}
+					}
+				}
+				res=false;
+			}
+		}
 		if(!res) break;
 	}
 	return res;

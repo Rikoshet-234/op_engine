@@ -149,7 +149,7 @@ void CUIItemInfo::InitItem(CInventoryItem* pInvItem)
 	}
 	if( UICost && IsGameTypeSingle() )
 	{
-		sprintf_s				(str, "%d RU", pInvItem->Cost());		// will be owerwritten in multiplayer
+		sprintf_s				(str, "%d %s", pInvItem->Cost(),*CStringTable().translate("ui_st_money_regional"));		// will be owerwritten in multiplayer
 		UICost->SetText		(str);
 	}
 
@@ -183,11 +183,6 @@ void CUIItemInfo::InitItem(CInventoryItem* pInvItem)
 	{
 		// Загружаем картинку
 		UIItemImage->SetShader				(InventoryUtilities::GetEquipmentIconsShader());
-
-		/*int iGridWidth						= pInvItem->GetGridWidth();
-		int iGridHeight						= pInvItem->GetGridHeight();
-		int iXPos							= pInvItem->GetXPos();
-		int iYPos							= pInvItem->GetYPos();*/
 
 		Frect rect = pInvItem->GetIconInfo().getOriginalRect();
 		UIItemImage->GetUIStaticItem().SetOriginalRect(rect);

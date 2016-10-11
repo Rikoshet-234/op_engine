@@ -45,7 +45,7 @@
 #include "GameSpy/GameSpy_Patching.h"
 #include "alife_graph_registry.h"
 #include "map_manager.h"
-
+#include "../../build_defines.h"
 
 #ifdef DEBUG
 #	include "PHDebug.h"
@@ -605,7 +605,9 @@ public:
 	CCC_FlushLog(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = true; };
 	virtual void Execute(LPCSTR /**args/**/) {
 		FlushLog();
+		#ifdef MORE_SPAM
 		Msg		("* Log file has been saved successfully!");
+		#endif
 	}
 };
 
@@ -615,7 +617,9 @@ public:
 	virtual void Execute(LPCSTR) {
 		LogFile->clear_not_free	();
 		FlushLog				();
+		#ifdef MORE_SPAM
 		Msg						("* Log file has been cleaned successfully!");
+		#endif
 	}
 };
 
@@ -1425,6 +1429,12 @@ void CCC_RegisterCommands()
 	// options
 	g_OptConCom.Init();
 
+	CMD4(CCC_Integer,			"c_r",	&c_r	,			0,		255				);
+	CMD4(CCC_Integer,			"c_g",	&c_g	,			0,		255				);
+	CMD4(CCC_Integer,			"c_b",	&c_b	,			0,		255				);
+	CMD4(CCC_Integer,			"c_a",	&c_a	,			0,		255				);
+	CMD4(CCC_Integer,			"c_c",	&c_c	,			0,		5				);
+	
 	CMD1(CCC_MemStats,			"stat_memory"			);
 	// game
 	psActorFlags.set(AF_ALWAYSRUN, true);
@@ -1536,7 +1546,8 @@ void CCC_RegisterCommands()
 	CMD3(CCC_Mask,				"ai_nil_object_access",	&psAI_Flags,	aiNilObjectAccess);
 	CMD3(CCC_Mask,				"ai_draw_visibility_rays",	&psAI_Flags,	aiDrawVisibilityRays);
 	CMD3(CCC_Mask,				"ai_animation_stats",		&psAI_Flags,	aiAnimationStats);
-
+	
+	
 #ifdef DEBUG_MEMORY_MANAGER
 	CMD3(CCC_Mask,				"debug_on_frame_gather_stats",				&psAI_Flags,	aiDebugOnFrameAllocs);
 	CMD4(CCC_Float,				"debug_on_frame_gather_stats_frequency",	&debug_on_frame_gather_stats_frequency, 0.f, 1.f);

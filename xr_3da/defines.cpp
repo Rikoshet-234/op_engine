@@ -15,3 +15,8 @@ Flags32		psDeviceFlags		= {rsFullscreen|rsDetails|mtPhysics|mtSound|mtNetwork|rs
 int			psTextureLOD		= 0;
 
 Flags32 g_uCommonFlags;
+int			c_r		=0;
+int			c_g		=0;
+int			c_b		=0;
+int			c_a		=0;
+int			c_c		=0;

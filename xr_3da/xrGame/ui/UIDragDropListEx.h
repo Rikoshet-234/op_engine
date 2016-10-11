@@ -3,6 +3,7 @@
 #include "UIWindow.h"
 #include "UIWndCallback.h"
 
+class CInventoryItem;
 class CUICellContainer;
 class CUIScrollBar;
 class CUIStatic;
@@ -16,12 +17,12 @@ enum EListType{
 };
 
 struct CUICell{
-							CUICell					()						{m_item=NULL; Clear();}
+							CUICell					()						{m_item=nullptr; Clear();}
 
 		CUICellItem*		m_item;
 		bool				m_bMainItem;
 		void				SetItem					(CUICellItem* itm, bool bMain)		{m_item = itm; VERIFY(m_item);m_bMainItem = bMain;}
-		bool				Empty					()						{return m_item == NULL;}
+		bool				Empty					()						{return m_item == nullptr;}
 		bool				MainItem				()						{return m_bMainItem;}
 		void				Clear					();
 		bool				operator ==				(const CUICell& C) const{return (m_item == C.m_item);}
@@ -55,6 +56,9 @@ protected:
 	void	__stdcall		OnItemSelected			(CUIWindow* w, void* pData);
 	void	__stdcall		OnItemRButtonClick		(CUIWindow* w, void* pData);
 	void	__stdcall		OnItemDBClick			(CUIWindow* w, void* pData);
+	void	__stdcall		OnItemFocusReceived		(CUIWindow* w, void* pData);
+	void	__stdcall		OnItemFocusLost			(CUIWindow* w, void* pData);
+
 	
 public:
 	static CUIDragItem*		m_drag_item;
@@ -69,6 +73,14 @@ public:
 	DRAG_DROP_EVENT			m_f_item_db_click;
 	DRAG_DROP_EVENT			m_f_item_selected;
 	DRAG_DROP_EVENT			m_f_item_rbutton_click;
+	DRAG_DROP_EVENT			m_f_item_focus_received;
+	DRAG_DROP_EVENT			m_f_item_focus_lost;
+
+	void			select_suitables_by_selected();
+	void			select_suitables_by_item(CInventoryItem* item);
+	void			select_weapons_by_addon(CInventoryItem* addonItem);
+	void			select_weapons_by_ammo(CInventoryItem* ammoItem);
+
 
 	const	Ivector2&		CellsCapacity		();
 			void			SetCellsCapacity	(const Ivector2 c);
@@ -109,8 +121,9 @@ public:
 	virtual		void		Draw				();
 	virtual		void		Update				();
 	virtual		bool		OnMouse				(float x, float y, EUIMessages mouse_action);
-	virtual		void		SendMessage			(CUIWindow* pWnd, s16 msg, void* pData = NULL);
-
+	virtual		void		SendMessage			(CUIWindow* pWnd, s16 msg, void* pData = nullptr);
+	
+	CUICellContainer*	GetCellContainer() const {return m_container;}
 };
 
 class CUICellContainer :public CUIWindow
@@ -128,14 +141,22 @@ protected:
 	Ivector2					m_cellsCapacity;			//count		(col,	row)
 	Ivector2					m_cellSize;					//pixels	(width, height)
 	UI_CELLS_VEC				m_cells;
-
-	void						GetTexUVLT			(Fvector2& uv, u32 col, u32 row);
+	
+	void						GetTexUVLT			(Fvector2& uv, u32 col, u32 row,u8 select_mode=0);
 	void						ReinitSize			();
 	u32							GetCellsInRange		(const Irect& rect, UI_CELLS_VEC& res);
 
 public:							
 								CUICellContainer	(CUIDragDropListEx* parent);
 	virtual						~CUICellContainer	();
+
+	void						clear_select_suitables();
+
+	Fcolor				m_focused_color;
+	Fcolor				m_selected_color;
+	Fcolor				m_suitable_color;
+	s32					m_anim_mSec;
+
 protected:
 	virtual		void			Draw				();
 

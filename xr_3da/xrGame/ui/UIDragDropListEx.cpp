@@ -3,6 +3,18 @@
 #include "UIScrollBar.h"
 #include "../object_broker.h"
 #include "UICellItem.h"
+#include "../../defines.h"
+#include "../inventory_item.h"
+
+#include "../Weapon.h"
+#include "../WeaponMagazinedWGrenade.h"
+#include "../WeaponAmmo.h"
+#include "../Silencer.h"
+#include "../Scope.h"
+#include "../GrenadeLauncher.h"
+#include "../CustomOutfit.h"
+#include "../eatable_item.h"
+
 
 CUIDragItem* CUIDragDropListEx::m_drag_item = NULL;
 
@@ -20,7 +32,7 @@ CUIDragDropListEx::CUIDragDropListEx()
 	m_container					= xr_new<CUICellContainer>(this);
 	m_vScrollBar				= xr_new<CUIScrollBar>();
 	m_vScrollBar->SetAutoDelete	(true);
-	m_selected_item				= NULL;
+	m_selected_item				= nullptr;
 
 	SetCellSize					(Ivector2().set(50,50));
 	SetCellsCapacity			(Ivector2().set(0,0));
@@ -36,6 +48,11 @@ CUIDragDropListEx::CUIDragDropListEx()
 	AddCallback					("cell_item",	DRAG_DROP_ITEM_SELECTED,		CUIWndCallback::void_function		(this, &CUIDragDropListEx::OnItemSelected)			);
 	AddCallback					("cell_item",	DRAG_DROP_ITEM_RBUTTON_CLICK,	CUIWndCallback::void_function	(this, &CUIDragDropListEx::OnItemRButtonClick)			);
 	AddCallback					("cell_item",	DRAG_DROP_ITEM_DB_CLICK,		CUIWndCallback::void_function		(this, &CUIDragDropListEx::OnItemDBClick)			);
+	AddCallback					("cell_item",	WINDOW_FOCUS_RECEIVED,			CUIWndCallback::void_function		(this, &CUIDragDropListEx::OnItemFocusReceived)			);
+	AddCallback					("cell_item",	WINDOW_FOCUS_LOST,				CUIWndCallback::void_function		(this, &CUIDragDropListEx::OnItemFocusLost)			);
+
+
+
 }
 
 CUIDragDropListEx::~CUIDragDropListEx()
@@ -183,6 +200,26 @@ void CUIDragDropListEx::OnItemDBClick(CUIWindow* w, void* pData)
 	DestroyDragItem						();
 }
 
+void CUIDragDropListEx::OnItemFocusReceived(CUIWindow* w, void* pData)
+{
+	if(m_f_item_focus_received)
+	{
+		CUICellItem* itm				= smart_cast<CUICellItem*>(w);
+		m_f_item_focus_received			(itm);
+	}
+
+}
+
+void CUIDragDropListEx::OnItemFocusLost(CUIWindow* w, void* pData)
+{
+	if(m_f_item_focus_lost)
+	{
+		CUICellItem* itm				= smart_cast<CUICellItem*>(w);
+		m_f_item_focus_lost				(itm);
+	}
+
+}
+
 void CUIDragDropListEx::OnItemSelected(CUIWindow* w, void* pData)
 {
 	m_selected_item						= smart_cast<CUICellItem*>(w);
@@ -210,7 +247,7 @@ void CUIDragDropListEx::ClearAll(bool bDestroy)
 {
 	DestroyDragItem			();
 	m_container->ClearAll	(bDestroy);
-	m_selected_item			= NULL;
+	m_selected_item			= nullptr;
 	m_container->SetWndPos	(0,0);
 	ResetCellsCapacity		();
 }
@@ -273,6 +310,10 @@ void CUIDragDropListEx::ReinitScroll()
 		m_vScrollBar->Show			( h1 > h2 );
 		m_vScrollBar->Enable		( h1 > h2 );
 
+
+		//int r_min, r_max;
+		//m_vScrollBar->GetRange(r_min, r_max);
+		// Msg("# CUIDragDropListEx::m_vScrollBar range changed from %d..%d to 0..%f ", r_min, r_max, h1 - h2);
 		m_vScrollBar->SetRange		(0, _max(0,iFloor(h1-h2)) );
 		m_vScrollBar->SetStepSize	(CellSize().y/3);
 		m_vScrollBar->SetPageSize	(iFloor(GetWndSize().y/float(CellSize().y)));
@@ -302,6 +343,144 @@ bool CUIDragDropListEx::OnMouse(float x, float y, EUIMessages mouse_action)
 		}
 	}
 	return b;
+}
+
+void CUIDragDropListEx::select_suitables_by_selected()
+{
+	if (m_selected_item==nullptr)
+		return;
+	CInventoryItem*	 item = static_cast<CInventoryItem*>(m_selected_item->m_pData);
+	select_suitables_by_item(item);
+}
+
+void CUIDragDropListEx::select_suitables_by_item(CInventoryItem* item)
+{
+	if (!item)
+		return;	
+	xr_vector<shared_str>	weaponSections;
+	CWeapon* pWeapon = smart_cast<CWeapon*>(item);
+	if (pWeapon)
+	{
+		weaponSections.clear_not_free();
+		weaponSections.assign( pWeapon->m_ammoTypes.begin(), pWeapon->m_ammoTypes.end() );
+		CWeaponMagazinedWGrenade* wg = smart_cast<CWeaponMagazinedWGrenade*>(item);
+		if (wg)
+		{
+			if ( wg->IsGrenadeLauncherAttached() && wg->m_ammoTypes2.size() )
+			{
+				weaponSections.insert( weaponSections.end(), wg->m_ammoTypes2.begin(), wg->m_ammoTypes2.end() );
+			}
+		}
+		shared_str scope=pWeapon->GetScopeName();
+		shared_str silencer=pWeapon->GetSilencerName();
+		shared_str gr_l=pWeapon->GetGrenadeLauncherName();
+		if (scope!=nullptr)
+			weaponSections.push_back(scope);
+		if (silencer!=nullptr)
+			weaponSections.push_back(silencer);
+		if (gr_l!=nullptr)
+			weaponSections.push_back(gr_l);
+	}
+	select_weapons_by_addon(item);
+	select_weapons_by_ammo(item);
+	if (weaponSections.size()>0)
+	{
+		std::sort(weaponSections.begin(),weaponSections.end());
+		u32 const cnt = this->ItemsCount();
+		for ( u32 i = 0; i < cnt; ++i )
+		{
+			CUICellItem* cellItem = this->GetItemIdx(i);
+			CInventoryItem* listItem = static_cast<CInventoryItem*>(cellItem->m_pData);
+			if ( !listItem )
+				continue;
+			xr_vector<shared_str>::iterator fi=weaponSections.begin();
+			if (std::find(weaponSections.begin(), weaponSections.end(), listItem->object().cNameSect()) != weaponSections.end())
+			{
+				cellItem->m_suitable=true;
+			}
+		}
+
+	/*	Msg("Need to select [%i] items",itemsSections.size());
+		for (auto section = itemsSections.begin(); section != itemsSections.end(); ++section)
+		{ 
+			Msg("%s",section->c_str());
+		}*/
+	}
+}
+
+void CUIDragDropListEx::select_weapons_by_addon(CInventoryItem* addonItem)
+{
+	CScope*				pScope				= smart_cast<CScope*>			(addonItem);
+	CSilencer*			pSilencer			= smart_cast<CSilencer*>		(addonItem);
+	CGrenadeLauncher*	pGrenadeLauncher	= smart_cast<CGrenadeLauncher*>	(addonItem);
+	if (!pScope && !pSilencer && !pGrenadeLauncher)
+		return;
+	u32 const cnt = this->ItemsCount();
+	for ( u32 i = 0; i < cnt; ++i )
+	{
+		CUICellItem* ci = this->GetItemIdx(i);
+		CInventoryItem* item = static_cast<CInventoryItem*>(ci->m_pData);
+		if (!item)
+			continue;
+		CWeapon* weapon = smart_cast<CWeapon*>(item);
+		if (!weapon)
+			continue;
+		if ( pScope && weapon->CanAttach(pScope) )
+		{
+			ci->m_suitable = true;
+			continue;
+		}
+		if ( pSilencer && weapon->CanAttach(pSilencer) )
+		{
+			ci->m_suitable = true;
+			continue;
+		}
+		if ( pGrenadeLauncher && weapon->CanAttach(pGrenadeLauncher) )
+		{
+			ci->m_suitable = true;
+			continue;
+		}
+	}
+}
+
+void CUIDragDropListEx::select_weapons_by_ammo(CInventoryItem* ammoItem)
+{
+	CWeaponAmmo* ammo = smart_cast<CWeaponAmmo*>(ammoItem);
+	if (!ammo)
+		return;
+	shared_str ammo_name = ammoItem->object().cNameSect();
+
+	u32 const cnt = this->ItemsCount();
+	for ( u32 i = 0; i < cnt; ++i )
+	{
+		CUICellItem* ci = this->GetItemIdx(i);
+		CInventoryItem* item = static_cast<CInventoryItem*>(ci->m_pData);
+		if (!item)
+			continue;
+		CWeapon* weapon = smart_cast<CWeapon*>(item);
+		if (!weapon)
+			continue;
+		xr_vector<shared_str>::iterator itb = weapon->m_ammoTypes.begin();
+		xr_vector<shared_str>::iterator ite = weapon->m_ammoTypes.end();
+		for ( ; itb != ite; ++itb )
+			if (xr_strcmp(ammo_name.c_str(),itb->c_str())==0)
+			{
+				ci->m_suitable = true;
+				break; 
+			}
+		
+		CWeaponMagazinedWGrenade* wg = smart_cast<CWeaponMagazinedWGrenade*>(item);
+		if ( !wg || !wg->IsGrenadeLauncherAttached() || !wg->m_ammoTypes2.size() )
+			continue; 
+		itb = wg->m_ammoTypes2.begin();
+		ite = wg->m_ammoTypes2.end();
+		for ( ; itb != ite; ++itb )
+			if (xr_strcmp(ammo_name,(*itb))==0)
+			{
+				ci->m_suitable = true;
+				break; 
+			}
+	}
 }
 
 const Ivector2& CUIDragDropListEx::CellsCapacity()
@@ -396,7 +575,13 @@ bool CUIDragDropListEx::IsOwner(CUICellItem* itm){
 
 CUICellItem* CUIDragDropListEx::GetItemIdx(u32 idx)
 {
-	R_ASSERT(idx<ItemsCount());
+	if (idx >= ItemsCount())
+	{
+		Msg(" attempt get item %d, but items count = %d ", idx, ItemsCount());
+		return nullptr;
+	}
+
+
 	WINDOW_LIST_it it = m_container->GetChildWndList().begin();
 	std::advance	(it, idx);
 	return smart_cast<CUICellItem*>(*it);
@@ -407,10 +592,37 @@ CUICellContainer::CUICellContainer(CUIDragDropListEx* parent)
 	m_pParentDragDropList		= parent;
 	hShader.create				("hud\\fog_of_war","ui\\ui_grid");
 	hGeom.create				(FVF::F_TL, RCache.Vertex.Buffer(), 0);
+	m_anim_mSec=0;
+	m_suitable_color.set(0xFFFFFFFF);
+	m_selected_color.set(0xFFFFFFFF);
+	m_focused_color.set(0xFFFFFFFF);
 }
 
 CUICellContainer::~CUICellContainer()
 {
+}
+
+void CUICellContainer::clear_select_suitables()
+{
+	UI_CELLS_VEC_IT itb = m_cells.begin();
+	UI_CELLS_VEC_IT ite = m_cells.end();
+	for ( ; itb != ite; ++itb )
+	{
+		CUICell& cell = (*itb);
+		if ( cell.m_item )
+		{
+			if (cell.m_item->m_suitable)
+			{
+				if (cell.m_item->IsAnimStarted())
+				{
+					cell.m_item->SetClrLightAnim(nullptr, false, false, false, true);
+					cell.m_item->RestoreColors();
+				}
+				cell.m_item->m_suitable = false;
+			}
+		}
+	}
+
 }
 
 bool CUICellContainer::AddSimilar(CUICellItem* itm)
@@ -547,15 +759,6 @@ bool CUICellContainer::IsRoomFree(const Ivector2& pos, const Ivector2& size)
 	return true;
 }
 
-void CUICellContainer::GetTexUVLT(Fvector2& uv, u32 col, u32 row)
-{
-	uv.set(0.0f,0.0f);
-
-	//if( (col%2==1 && row%2==1)||(col%2==0 && row%2==0) )
-		//uv.set(0.5f,0.0f);
-}
-
-
 void CUICellContainer::SetCellsCapacity(const Ivector2& c)
 {
 	m_cellsCapacity				= c;
@@ -672,6 +875,21 @@ Ivector2 CUICellContainer::PickCell(const Fvector2& abs_pos)
 	return res;
 }
 
+void CUICellContainer::GetTexUVLT(Fvector2& uv, u32 col, u32 row,u8 select_mode)
+{
+	switch (select_mode)
+	{   //select offset??? for drawing
+		case 3: //suitable
+		case 2: //selected
+		case 1: //focused
+			uv.set(0.50f,0.0f);
+			break;
+		case 0:
+		default:
+			uv.set(0.0f,0.0f);
+			break;
+	}
+}
 
 void CUICellContainer::Draw()
 {
@@ -711,18 +929,56 @@ void CUICellContainer::Draw()
 
 	// fill cell buffer
 	u32 vOffset					= 0;
-	FVF::TL* start_pv			= (FVF::TL*)RCache.Vertex.Lock	((tgt_cells.width()+1)*(tgt_cells.height()+1)*6,hGeom.stride(),vOffset);
+	FVF::TL* start_pv			= static_cast<FVF::TL*>(RCache.Vertex.Lock((tgt_cells.width() + 1) * (tgt_cells.height() + 1) * 6, hGeom.stride(), vOffset));
 	FVF::TL* pv					= start_pv;
 	for (int x=0; x<=tgt_cells.width(); ++x){
 		for (int y=0; y<=tgt_cells.height(); ++y){
+			u8 select_mode = 0;
+
+			Ivector2 cpos;
+			cpos.set( x, y );
+			cpos.add( TopVisibleCell() );
+			CUICell& ui_cell = GetCellAt( cpos );
+			u32 back_color=0xFFFFFFFF;
+			if ( !ui_cell.Empty() )
+			{
+				if ( ui_cell.m_item->m_focused )
+				{
+					back_color=m_focused_color.get();
+					select_mode = back_color==0xFFFFFFFF ? 0 : 1;
+					//ui_cell.m_item->SetClrLightAnim(nullptr, true, false, false, true);
+				} 
+				else if ( ui_cell.m_item->m_selected )
+				{
+					back_color=m_selected_color.get();
+					select_mode = back_color==0xFFFFFFFF ? 0 : 2;
+					//ui_cell.m_item->SetClrLightAnim(nullptr, true, false, false, true);
+				}
+				else if ( ui_cell.m_item->m_suitable )
+				{
+					back_color=m_suitable_color.get();
+					select_mode = back_color==0xFFFFFFFF ? 0 : 3;
+					if (!ui_cell.m_item->IsAnimStarted())
+					{
+						ui_cell.m_item->SaveColors();
+						if (m_anim_mSec>0)
+						{
+							ui_cell.m_item->ResetClrAnimation();	
+							ui_cell.m_item->SetClrAnimLength(m_anim_mSec);
+							ui_cell.m_item->SetClrLightAnim("ui_slow_blinking", false, false, false, true);
+						}
+					}
+				}
+			}
 			Fvector2			tp;
-			GetTexUVLT			(tp,tgt_cells.x1+x,tgt_cells.y1+y);
+			GetTexUVLT			(tp,tgt_cells.x1+x,tgt_cells.y1+y,select_mode);
 			for (u32 k=0; k<6; ++k,++pv){
 				const Fvector2& p	= pts[k];
 				const Fvector2& uv	= uvs[k];
 				pv->set			(iFloor(drawLT.x + p.x*(f_len.x) + f_len.x*x)-0.5f, 
 								 iFloor(drawLT.y + p.y*(f_len.y) + f_len.y*y)-0.5f, 
-								 0xFFFFFFFF,tp.x+uv.x,tp.y+uv.y);
+								 back_color,
+								 tp.x+uv.x,tp.y+uv.y);
 			}
 		}
 	}

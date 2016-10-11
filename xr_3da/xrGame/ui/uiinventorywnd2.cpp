@@ -23,11 +23,34 @@ PIItem CUIInventoryWnd::CurrentIItem()
 	return	(m_pCurrentCellItem)?static_cast<PIItem>(m_pCurrentCellItem->m_pData) : NULL;
 }
 
+
+void CUIInventoryWnd::SetItemSelected (CUICellItem* itm)
+{
+	auto curr=CurrentItem();
+	if (curr!=nullptr  && curr->m_selected)
+		curr->m_selected=false;
+	if (itm!=nullptr && !itm->m_selected)	
+		itm->m_selected=true;
+}
+
 void CUIInventoryWnd::SetCurrentItem(CUICellItem* itm)
 {
 	if(m_pCurrentCellItem == itm) return;
+	SetItemSelected(itm);
 	m_pCurrentCellItem				= itm;
 	UIItemInfo.InitItem			(CurrentIItem());
+	
+	m_pUIBagList->GetCellContainer()->clear_select_suitables();
+	m_pUIBeltList->GetCellContainer()->clear_select_suitables();
+	m_pUIPistolList->GetCellContainer()->clear_select_suitables();
+	m_pUIAutomaticList->GetCellContainer()->clear_select_suitables();
+	m_pUIOutfitList->GetCellContainer()->clear_select_suitables();
+
+	m_pUIBagList->select_suitables_by_item(CurrentIItem());
+	m_pUIBeltList->select_suitables_by_item(CurrentIItem());
+	m_pUIPistolList->select_suitables_by_item(CurrentIItem());
+	m_pUIAutomaticList->select_suitables_by_item(CurrentIItem());
+	m_pUIOutfitList->select_suitables_by_item(CurrentIItem());
 }
 
 void CUIInventoryWnd::SendMessage(CUIWindow *pWnd, s16 msg, void *pData)
@@ -59,8 +82,8 @@ void CUIInventoryWnd::InitInventory()
 
 	UIPropertiesBox.Hide		();
 	ClearAllLists				();
-	m_pMouseCapturer			= NULL;
-	SetCurrentItem				(NULL);
+	m_pMouseCapturer			= nullptr;
+	SetCurrentItem				(nullptr);
 
 	//Slots
 	PIItem _itm							= m_pInv->m_slots[PISTOL_SLOT].m_pIItem;
@@ -319,6 +342,28 @@ bool CUIInventoryWnd::OnItemDbClick(CUICellItem* itm)
 	};
 
 	return true;
+}
+
+bool CUIInventoryWnd::OnItemFocusReceive(CUICellItem* itm)
+{
+	if (itm)
+	{
+		itm->m_focused=true;
+		//PIItem	iitem						= static_cast<PIItem>(itm->m_pData);
+		//Msg("[%s] receive focus",iitem->object().cNameSect().c_str());
+	}
+	return						false;
+}
+
+bool CUIInventoryWnd::OnItemFocusLost(CUICellItem* itm)
+{
+	if (itm)
+	{
+		itm->m_focused=false;
+		//PIItem	iitem						= static_cast<PIItem>(itm->m_pData);
+		//Msg("[%s] lost focus",iitem->object().cNameSect().c_str());
+	}
+	return						false;
 }
 
 

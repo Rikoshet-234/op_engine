@@ -22,7 +22,7 @@
 CWeaponMagazinedWGrenade::CWeaponMagazinedWGrenade(LPCSTR name,ESoundTypes eSoundType) : CWeaponMagazined(name, eSoundType)
 {
 	m_ammoType2 = 0;
-    m_bGrenadeMode = false;
+	m_bGrenadeMode = false;
 }
 
 CWeaponMagazinedWGrenade::~CWeaponMagazinedWGrenade(void)
@@ -171,7 +171,7 @@ void CWeaponMagazinedWGrenade::switch2_Reload()
 		m_bPending = true;
 	}
 	else 
-	     inherited::switch2_Reload();
+		 inherited::switch2_Reload();
 }
 
 void CWeaponMagazinedWGrenade::OnShot		()
@@ -244,6 +244,8 @@ void  CWeaponMagazinedWGrenade::PerformSwitchGL()
 				LoadZoomOffset(*hud_sect, "");
 		}
 	}
+	if (m_bGrenadeMode)
+		SetQueueSize(1);
 }
 
 bool CWeaponMagazinedWGrenade::Action(s32 cmd, u32 flags) 
@@ -255,7 +257,7 @@ bool CWeaponMagazinedWGrenade::Action(s32 cmd, u32 flags)
 	case kWPN_ZOOM: 
 	case kWPN_FUNC: 
 			{
-                if(flags&CMD_START) 
+				if(flags&CMD_START) 
 					SwitchState(eSwitch);
 				return true;
 			}
@@ -500,7 +502,7 @@ bool CWeaponMagazinedWGrenade::CanAttach(PIItem pIItem)
 	   CSE_ALifeItemWeapon::eAddonAttachable == m_eGrenadeLauncherStatus &&
 	   0 == (m_flagsAddOnState&CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher) &&
 	   !xr_strcmp(*m_sGrenadeLauncherName, pIItem->object().cNameSect()))
-       return true;
+	   return true;
 	else
 		return inherited::CanAttach(pIItem);
 }
@@ -528,7 +530,7 @@ bool CWeaponMagazinedWGrenade::Attach(PIItem pIItem, bool b_send_event)
 
 		CRocketLauncher::m_fLaunchSpeed = pGrenadeLauncher->GetGrenadeVel();
 
- 		//уничтожить подствольник из инвентаря
+		//уничтожить подствольник из инвентаря
 		if(b_send_event)
 		{
 //.			pIItem->Drop();
@@ -540,7 +542,7 @@ bool CWeaponMagazinedWGrenade::Attach(PIItem pIItem, bool b_send_event)
 		return					true;
 	}
 	else
-        return inherited::Attach(pIItem, b_send_event);
+		return inherited::Attach(pIItem, b_send_event);
 }
 
 bool CWeaponMagazinedWGrenade::Detach(const char* item_section_name, bool b_spawn_item)
@@ -690,6 +692,23 @@ void  CWeaponMagazinedWGrenade::PlayAnimModeSwitch()
 		m_pHUD->animPlay(random_anim(mhud_switch), FALSE, this, eSwitch); //fake
 }
 
+void CWeaponMagazinedWGrenade::OnNextFireMode()
+{
+	if (m_bGrenadeMode) return;
+	inherited::OnNextFireMode();
+}
+
+void CWeaponMagazinedWGrenade::OnPrevFireMode()
+{
+	if (m_bGrenadeMode) return;
+	inherited::OnPrevFireMode();
+}
+
+bool CWeaponMagazinedWGrenade::HasFireModes()
+{
+	if (m_bGrenadeMode) return false;
+	return inherited::HasFireModes();
+}
 
 void CWeaponMagazinedWGrenade::UpdateSounds	()
 {

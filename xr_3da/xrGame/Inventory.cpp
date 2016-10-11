@@ -112,7 +112,9 @@ void CInventory::Take(CGameObject *pObj, bool bNotActivate, bool strict_placemen
 {
 	CInventoryItem *pIItem				= smart_cast<CInventoryItem*>(pObj);
 	VERIFY								(pIItem);
+	if (pIItem->m_pCurrentInventory == this) return;
 	
+
 	if(pIItem->m_pCurrentInventory)
 	{
 		Msg("! ERROR CInventory::Take but object has m_pCurrentInventory");
@@ -190,6 +192,7 @@ bool CInventory::DropItem(CGameObject *pObj)
 	CInventoryItem *pIItem				= smart_cast<CInventoryItem*>(pObj);
 	VERIFY								(pIItem);
 	if( !pIItem )						return false;
+	if (!pIItem->m_pCurrentInventory)	return false;
 
 	if(pIItem->m_pCurrentInventory!=this)
 	{
@@ -203,18 +206,27 @@ bool CInventory::DropItem(CGameObject *pObj)
 	R_ASSERT							(pIItem->m_pCurrentInventory==this);
 	VERIFY								(pIItem->m_eItemPlace!=eItemPlaceUndefined);
 
-	pIItem->object().processing_activate(); 
+	CGameObject &obj = pIItem->object();
+	obj.processing_activate(); 
 	
 	switch(pIItem->m_eItemPlace)
 	{
+	case eItemPlaceUndefined:{
+		Msg("! #ERROR: item %s place in undefined in inventory ", obj.Name_script());
+		}break;
 	case eItemPlaceBelt:{
-			R_ASSERT(InBelt(pIItem));
+			if (InBelt(pIItem)) {
 			m_belt.erase(std::find(m_belt.begin(), m_belt.end(), pIItem));
-			pIItem->object().processing_deactivate();
+			obj.processing_deactivate();
+		} 
+		 else
+		     Msg("! #ERROR: item %s place==belt, but m_belt not contains item", obj.Name_script());
 		}break;
 	case eItemPlaceRuck:{
-			R_ASSERT(InRuck(pIItem));
+	if (InRuck(pIItem))
 			m_ruck.erase(std::find(m_ruck.begin(), m_ruck.end(), pIItem));
+		else
+			Msg("! #ERROR: item %s place==ruck, but m_ruck not contains item", obj.Name_script());
 		}break;
 	case eItemPlaceSlot:{
 			R_ASSERT			(InSlot(pIItem));
@@ -345,6 +357,7 @@ bool CInventory::Ruck(PIItem pIItem)
 		if(m_belt.end() != it) m_belt.erase(it);
 	}
 	
+
 	m_ruck.insert									(m_ruck.end(), pIItem); 
 	
 	CalcTotalWeight									();
@@ -352,6 +365,9 @@ bool CInventory::Ruck(PIItem pIItem)
 
 	m_pOwner->OnItemRuck							(pIItem, pIItem->m_eItemPlace);
 	pIItem->m_eItemPlace							= eItemPlaceRuck;
+
+
+
 	pIItem->OnMoveToRuck							();
 
 	if(in_slot)
@@ -603,12 +619,12 @@ bool CInventory::Action(s32 cmd, u32 flags)
 	case kWPN_4:
 	case kWPN_5:
 	case kWPN_6:
-       {
+	   {
 		   if (cmd == kWPN_6 && !IsGameTypeSingle()) return false;
 
 			if(flags&CMD_START)
 			{
-                if((int)m_iActiveSlot == cmd - kWPN_1 &&
+				if((int)m_iActiveSlot == cmd - kWPN_1 &&
 					m_slots[m_iActiveSlot].m_pIItem )
 				{
 					if(IsGameTypeSingle())
@@ -629,7 +645,7 @@ bool CInventory::Action(s32 cmd, u32 flags)
 		{
 			if(flags&CMD_START)
 			{
-                if((int)m_iActiveSlot == ARTEFACT_SLOT &&
+				if((int)m_iActiveSlot == ARTEFACT_SLOT &&
 					m_slots[m_iActiveSlot].m_pIItem && IsGameTypeSingle())
 				{
 					b_send_event = Activate(NO_ACTIVE_SLOT);
@@ -651,9 +667,23 @@ void CInventory::Update()
 {
 	bool bActiveSlotVisible;
 	
+	/*PIItem itm=nullptr;
+	int total = static_cast<int>(m_all.size());
+	int it    = total - 1;
+	while (it >= 0)
+	{
+		itm = m_all[it];
+		if (!itm || NULL == itm->m_object)
+		{
+			Msg("! ERROR: detected bad object %s in inventory m_all[%d/%d]", (itm ? itm->Name() : "(NULL)"), it, total);
+			m_all.erase(m_all.begin() + it);			
+		}
+		else it--;
+	} */
+
 	if(m_iActiveSlot == NO_ACTIVE_SLOT || 
 		!m_slots[m_iActiveSlot].m_pIItem ||
-        m_slots[m_iActiveSlot].m_pIItem->IsHidden())
+		m_slots[m_iActiveSlot].m_pIItem->IsHidden())
 	{ 
 		bActiveSlotVisible = false;
 	}
@@ -670,6 +700,8 @@ void CInventory::Update()
 
 		m_iActiveSlot = m_iNextActiveSlot;
 	}
+
+
 	UpdateDropTasks	();
 }
 
@@ -681,16 +713,24 @@ void CInventory::UpdateDropTasks()
 			UpdateDropItem		(m_slots[i].m_pIItem);
 	}
 
-	for(i = 0; i < 2; ++i)	
+	for(int i = 0; i < 2; ++i)	
 	{
 		TIItemContainer &list			= i?m_ruck:m_belt;
-		TIItemContainer::iterator it	= list.begin();
-		TIItemContainer::iterator it_e	= list.end();
+		auto it		= list.begin();
+		auto it_e	= list.end();
 	
-		for( ;it!=it_e; ++it)
+		while (it != it_e)
 		{
-			UpdateDropItem		(*it);
+			auto _it = it++;
+			if (*_it)
+				UpdateDropItem(*_it);
+			else
+			{
+				Msg("! ERROR: unassigned item in inventory.%s", (i == 0 ? "belt" : "slot"));
+				list.erase(_it);
+			}
 		}
+
 	}
 
 	if (m_drop_last_frame)
@@ -702,7 +742,7 @@ void CInventory::UpdateDropTasks()
 
 void CInventory::UpdateDropItem(PIItem pIItem)
 {
-	if( pIItem->GetDropManual() )
+	if(pIItem->m_object && pIItem->GetDropManual() )
 	{
 		pIItem->SetDropManual(FALSE);
 		if ( OnServer() ) 
@@ -840,7 +880,7 @@ u32 CInventory::dwfGetSameItemCount(LPCSTR caSection, bool SearchAll)
 	{
 		PIItem	l_pIItem = *l_it;
 		if (l_pIItem && !xr_strcmp(l_pIItem->object().cNameSect(), caSection))
-            ++l_dwCount;
+			++l_dwCount;
 	}
 	
 	return		(l_dwCount);
@@ -939,11 +979,9 @@ bool CInventory::InRuck(PIItem pIItem) const
 bool CInventory::CanPutInSlot(PIItem pIItem) const
 {
 	if(!m_bSlotsUseful) return false;
-
-	if( !GetOwner()->CanPutInSlot(pIItem, pIItem->GetSlot() ) ) return false;
-
-	if(pIItem->GetSlot() < m_slots.size() && 
-		m_slots[pIItem->GetSlot()].m_pIItem == NULL )
+	auto slot = pIItem->GetSlot();
+	if( !GetOwner()->CanPutInSlot(pIItem, slot ) ) return false;
+	if(slot < m_slots.size() && m_slots[slot].m_pIItem == NULL)
 		return true;
 	
 	return false;
@@ -979,7 +1017,7 @@ CInventoryItem	*CInventory::tpfGetObjectByIndex(int iIndex)
 		int			i = 0;
 		for(TIItemContainer::iterator l_it = l_list.begin(); l_list.end() != l_it; ++l_it, ++i) 
 			if (i == iIndex)
-                return	(*l_it);
+				return	(*l_it);
 	}
 	else {
 		ai().script_engine().script_log	(ScriptStorage::eLuaMessageTypeError,"invalid inventory index!");
@@ -1010,7 +1048,9 @@ bool CInventory::CanTakeItem(CInventoryItem *inventory_item) const
 
 	if(!inventory_item->CanTake()) return false;
 
-	for(TIItemContainer::const_iterator it = m_all.begin(); it != m_all.end(); it++)
+	TIItemContainer::const_iterator it;
+
+	for(it = m_all.begin(); it != m_all.end(); it++)
 		if((*it)->object().ID() == inventory_item->object().ID()) break;
 	VERIFY3(it == m_all.end(), "item already exists in inventory",*inventory_item->object().cName());
 

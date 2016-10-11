@@ -44,6 +44,8 @@ class CInventoryItem :
 	, public pureRender
 #endif
 {
+	friend class CInventoryScript;
+	friend class CInventory;
 private:
 	typedef CAttachableItem inherited;
 	UIIconInfo m_iconInfo;

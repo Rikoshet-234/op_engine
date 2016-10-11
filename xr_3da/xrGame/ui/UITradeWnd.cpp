@@ -448,17 +448,19 @@ void CUITradeWnd::UpdatePrices()
 	m_iOthersTradePrice = CalcItemsPrice	(&m_uidata->UIOthersTradeList,	m_pOthersTrade, false);
 
 
+	shared_str moneyRegional=CStringTable().translate("ui_st_money_regional");
 	string256				buf;
-	sprintf_s					(buf, "%d RU", m_iOurTradePrice);
+	sprintf_s					(buf, "%d %s", m_iOurTradePrice,moneyRegional.c_str());
+
 	m_uidata->UIOurPriceCaption.GetPhraseByIndex(2)->str = buf;
-	sprintf_s					(buf, "%d RU", m_iOthersTradePrice);
+	sprintf_s					(buf, "%d %s", m_iOthersTradePrice,moneyRegional.c_str());
 	m_uidata->UIOthersPriceCaption.GetPhraseByIndex(2)->str = buf;
 
-	sprintf_s					(buf, "%d RU", m_pInvOwner->get_money());
+	sprintf_s					(buf, "%d %s", m_pInvOwner->get_money(),moneyRegional.c_str());
 	m_uidata->UIOurMoneyStatic.SetText(buf);
 
 	if(!m_pOthersInvOwner->InfinitiveMoney()){
-		sprintf_s					(buf, "%d RU", m_pOthersInvOwner->get_money());
+		sprintf_s					(buf, "%d %s", m_pOthersInvOwner->get_money(),moneyRegional.c_str());
 		m_uidata->UIOtherMoneyStatic.SetText(buf);
 	}else
 	{
@@ -608,7 +610,7 @@ void CUITradeWnd::SetCurrentItem(CUICellItem* itm)
 
 		string256			str;
 
-		sprintf_s				(str, "%d RU", m_pOthersTrade->GetItemPrice(CurrentIItem(), bBuying) );
+		sprintf_s				(str, "%d %s", m_pOthersTrade->GetItemPrice(CurrentIItem(), bBuying),*CStringTable().translate("ui_st_money_regional") );
 		m_uidata->UIItemInfo.UICost->SetText (str);
 	}
 }

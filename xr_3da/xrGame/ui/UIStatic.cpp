@@ -21,6 +21,7 @@ void lanim_cont::set_defaults()
 	m_lanim					= NULL;	
 	m_lanim_start_time		= -1.0f;
 	m_lanim_delay_time		= 0.0f;
+	m_lanim_cont_time		= 0;
 	m_lanimFlags.zero		();
 }
 
@@ -34,7 +35,7 @@ CUIStatic:: CUIStatic()
 	m_TextureOffset.set		(0.0f,0.0f);
 	m_TextOffset.set		(0.0f,0.0f);
 
-	m_pMask					= NULL;
+	m_pMask					= nullptr;
 	m_ElipsisPos			= eepNone;
 	m_iElipsisIndent		= 0;
 
@@ -46,7 +47,7 @@ CUIStatic:: CUIStatic()
 	m_lanim_clr.set_defaults	();
 	m_lanim_xform.set_defaults	();
 
-	m_pLines				= NULL;
+	m_pLines				= nullptr;
 	m_bEnableTextHighlighting = false;
 }
 
@@ -60,11 +61,16 @@ void CUIStatic::SetXformLightAnim(LPCSTR lanim, bool bCyclic)
 	if(lanim && lanim[0]!=0)
 		m_lanim_xform.m_lanim	= LALib.FindItem(lanim);
 	else
-		m_lanim_xform.m_lanim	= NULL;
+		m_lanim_xform.m_lanim	= nullptr;
 	
 	m_lanim_xform.m_lanimFlags.zero		();
 
 	m_lanim_xform.m_lanimFlags.set		(LA_CYCLIC,			bCyclic);
+}
+
+void CUIStatic::SetClrAnimLength			(s32 mSec)
+{
+	m_lanim_clr.m_lanim_cont_time=mSec;
 }
 
 void CUIStatic::SetClrLightAnim(LPCSTR lanim, bool bCyclic, bool bOnlyAlpha, bool bTextColor, bool bTextureColor)
@@ -72,7 +78,7 @@ void CUIStatic::SetClrLightAnim(LPCSTR lanim, bool bCyclic, bool bOnlyAlpha, boo
 	if(lanim && lanim[0]!=0)
 		m_lanim_clr.m_lanim	= LALib.FindItem(lanim);
 	else
-		m_lanim_clr.m_lanim	= NULL;
+		m_lanim_clr.m_lanim	= nullptr;
 	
 	m_lanim_clr.m_lanimFlags.zero		();
 
@@ -80,6 +86,11 @@ void CUIStatic::SetClrLightAnim(LPCSTR lanim, bool bCyclic, bool bOnlyAlpha, boo
 	m_lanim_clr.m_lanimFlags.set		(LA_ONLYALPHA,		bOnlyAlpha);
 	m_lanim_clr.m_lanimFlags.set		(LA_TEXTCOLOR,		bTextColor);
 	m_lanim_clr.m_lanimFlags.set		(LA_TEXTURECOLOR,	bTextureColor);
+}
+
+bool CUIStatic::IsAnimStarted() const
+{
+	return m_lanim_clr.m_lanim	!= nullptr;
 }
 
 void CUIStatic::Init(LPCSTR tex_name, float x, float y, float width, float height)
@@ -208,11 +219,13 @@ void CUIStatic::Update()
 	{
 		if(m_lanim_clr.m_lanim_start_time<0.0f)		ResetClrAnimation	();
 		float t = Device.dwTimeContinual/1000.0f;
-
 		if (t < m_lanim_clr.m_lanim_start_time)	// consider animation delay
 			return;
-
-		if(m_lanim_clr.m_lanimFlags.test(LA_CYCLIC) || t-m_lanim_clr.m_lanim_start_time < m_lanim_clr.m_lanim->Length_sec()){
+		if(
+				m_lanim_clr.m_lanimFlags.test(LA_CYCLIC) ||
+				t <	m_lanim_clr.m_lanim_start_time+ m_lanim_clr.m_lanim_cont_time/1000 ||
+				t-m_lanim_clr.m_lanim_start_time < m_lanim_clr.m_lanim->Length_sec())
+		{
 
 			int frame;
 			u32 clr					= m_lanim_clr.m_lanim->CalculateRGB(t-m_lanim_clr.m_lanim_start_time,frame);
@@ -281,7 +294,10 @@ bool CUIStatic::IsClrAnimStoped(){
 		return false;
 	
 	float t = Device.dwTimeContinual/1000.0f;
-	if(t-m_lanim_clr.m_lanim_start_time < m_lanim_clr.m_lanim->Length_sec())
+	if(
+			t-m_lanim_clr.m_lanim_start_time < m_lanim_clr.m_lanim->Length_sec() /*||
+			m_lanim_clr.m_lanim->Length_sec() < m_lanim_clr.m_lanim_cont_time/1000*/
+	)
 		return false;
 	else 
 		return true;

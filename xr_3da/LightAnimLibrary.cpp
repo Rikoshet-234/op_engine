@@ -110,18 +110,18 @@ u32 CLAItem::InterpolateRGB(int frame)
     }else{							// не ключ
     	B=Keys.upper_bound(frame);  // ищем следующий ключ
         if (B==Keys.end()){			// если его нет вернем цвет последнего ключа
-	    	B--;
+	        --B;
         	return B->second;
         }
     	A=B;        				// иначе в A занесем предыдущий ключ
-        A--;
+	    --A;
     }
 
     R_ASSERT(Keys.size()>1);
     // интерполируем цвет
     Fcolor c, c0, c1;
-    float a0=(float)A->first;
-    float a1=(float)B->first;
+    float a0=static_cast<float>(A->first);
+    float a1=static_cast<float>(B->first);
     c0.set(A->second);
     c1.set(B->second);
     float t = float(frame-a0)/float(a1-a0);

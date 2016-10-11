@@ -49,7 +49,6 @@ public:
 	virtual void			Hide						();
 
 	void					AddItemToBag				(PIItem pItem);
-
 protected:
 	enum eInventorySndAction{	eInvSndOpen	=0,
 								eInvSndClose,
@@ -100,6 +99,8 @@ protected:
 	bool		xr_stdcall		OnItemDbClick				(CUICellItem* itm);
 	bool		xr_stdcall		OnItemSelected				(CUICellItem* itm);
 	bool		xr_stdcall		OnItemRButtonClick			(CUICellItem* itm);
+	bool		xr_stdcall		OnItemFocusLost			(CUICellItem* itm);
+	bool		xr_stdcall		OnItemFocusReceive			(CUICellItem* itm);
 
 
 	CUIStatic					UIProgressBack;
@@ -149,6 +150,7 @@ protected:
 	void						SetCurrentItem				(CUICellItem* itm);
 	CUICellItem*				CurrentItem					();
 	PIItem						CurrentIItem				();
+	void						SetItemSelected				(CUICellItem* itm);
 
 	TIItemContainer				ruck_list;
 	u32							m_iCurrentActiveSlot;

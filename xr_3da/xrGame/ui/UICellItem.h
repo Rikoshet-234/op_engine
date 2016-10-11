@@ -2,6 +2,8 @@
 
 #include "UIStatic.h"
 #include "UIDialogWnd.h"
+#include "../inventory_item.h"
+#include "UIColorAnimatorWrapper.h"
 
 class CUIDragItem;
 class CUIDragDropListEx;
@@ -46,7 +48,7 @@ public:
 	IC const	Ivector2&	GetGridSize				()						{return m_grid_size;}; //size in grid
 	IC			void		SetAccelerator			(int dik)				{m_accelerator=dik;};
 	IC			int			GetAccelerator			()		const			{return m_accelerator;};
-
+	
 	virtual		CUIDragItem* CreateDragItem			();
 
 	CUIDragDropListEx*		OwnerList				()						{return m_pParentList;}
@@ -56,7 +58,15 @@ public:
 				void*		m_pData;
 				int			m_index;
 				//bool		m_b_already_drawn;
-				bool		m_b_destroy_childs;
+	bool					m_b_destroy_childs;
+	bool					m_focused;
+	bool					m_selected;
+	bool					m_suitable;
+
+	Fcolor					m_preAnimTexColor;
+	Fcolor					m_preAnimTextColor;
+	void					SaveColors();
+	void					RestoreColors();
 };
 
 class CUIDragItem: public CUIWindow, public pureRender, public pureFrame

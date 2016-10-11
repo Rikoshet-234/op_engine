@@ -110,7 +110,7 @@ CUIWindow::CUIWindow()
 	m_pKeyboardCapturer		=  NULL;
 	SetWndRect				(0,0,0,0);
 	m_bAutoDelete			= false;
-    Show					(true);
+	Show					(true);
 	Enable					(true);
 	m_bCursorOverWindow		= false;
 	m_bClickable			= false;
@@ -290,7 +290,7 @@ bool CUIWindow::OnMouse(float x, float y, EUIMessages mouse_action)
 
 		if( (_last_db_click_frame!=Device.dwFrame) && (dwCurTime-m_dwLastClickTime < DOUBLE_CLICK_TIME) )
 		{
-            mouse_action			= WINDOW_LBUTTON_DB_CLICK;
+			mouse_action			= WINDOW_LBUTTON_DB_CLICK;
 			_last_db_click_frame	= Device.dwFrame;
 		}
 
@@ -300,7 +300,7 @@ bool CUIWindow::OnMouse(float x, float y, EUIMessages mouse_action)
 	if(GetParent()== NULL)
 	{
 		if(!wndRect.in(cursor_pos))
-            return false;
+			return false;
 		//получить координаты относительно окна
 		cursor_pos.x -= wndRect.left;
 		cursor_pos.y -= wndRect.top;
@@ -334,7 +334,7 @@ bool CUIWindow::OnMouse(float x, float y, EUIMessages mouse_action)
 		case WINDOW_LBUTTON_DB_CLICK:
 			if (OnDbClick())						return true;	break;
 		default:
-            break;
+			break;
 	}
 
 	//Проверка на попадание мыши в окно,
@@ -405,12 +405,18 @@ void CUIWindow::OnFocusReceive()
 {
 	m_dwFocusReceiveTime	= Device.dwTimeGlobal;
 	m_bCursorOverWindow		= true;	
+	if (auto target=GetMessageTarget())
+		target->SendMessage(this, WINDOW_FOCUS_RECEIVED, nullptr);
+
 }
 
 void CUIWindow::OnFocusLost()
 {
 	m_dwFocusReceiveTime	= 0;
 	m_bCursorOverWindow		= false;	
+	if (auto target=GetMessageTarget())
+		target->SendMessage(this, WINDOW_FOCUS_LOST, nullptr);
+
 }
 
 
@@ -550,7 +556,7 @@ CUIWindow* CUIWindow::GetChildMouseHandler(){
 		}
 	}
 
-    return this;
+	return this;
 }
 
 //перемесчтить окно на вершину.

@@ -39,17 +39,16 @@ using namespace InventoryUtilities;
 
 
 
-CUIInventoryWnd*	g_pInvWnd = NULL;
+CUIInventoryWnd*	g_pInvWnd = nullptr;
 
 CUIInventoryWnd::CUIInventoryWnd()
 {
 	m_iCurrentActiveSlot				= NO_ACTIVE_SLOT;
 	
-	UIRank								= NULL;
-	//UIMask=nullptr;
+	UIRank								= nullptr;
 
 	Init								();
-	SetCurrentItem						(NULL);
+	m_pCurrentCellItem=nullptr;
 
 	g_pInvWnd							= this;	
 	m_b_need_reinit						= false;
@@ -66,17 +65,6 @@ void CUIInventoryWnd::Init()
 	
 
 	xml_init.InitWindow					(uiXml, "main", 0, this);
-
-	/*if (uiXml.NavigateToNode("mask_frame_window",0))
-	{
-		UIMask=xr_new<CUIFrameWindow>();
-		xml_init.InitFrameWindow			(uiXml, "mask_frame_window", 0, UIMask);
-		size_t color=						xml_init.GetColor(uiXml,"mask_frame_window:frame_color",0,0x00);
-		UIMask->SetColor(color);
-		UIMask->SetAutoDelete(true);
-		AttachChild(UIMask);
-		UIMask->Show(false);
-	}*/
 
 	AttachChild							(&UIBeltSlots);
 	xml_init.InitStatic					(uiXml, "belt_slots", 0, &UIBeltSlots);
@@ -199,7 +187,7 @@ void CUIInventoryWnd::Init()
 	::Sound->create						(sounds[eInvItemUse],		uiXml.Read("snd_item_use",		0,	NULL),st_Effect,sg_SourceType);
 
 	uiXml.SetLocalRoot					(stored_root);
-
+	
 }
 
 EListType CUIInventoryWnd::GetType(CUIDragDropListEx* l)
@@ -225,7 +213,6 @@ void CUIInventoryWnd::PlaySnd(eInventorySndAction a)
 
 CUIInventoryWnd::~CUIInventoryWnd()
 {
-	//xr_delete(UIMask);
 //.	ClearDragDrop(m_vDragDropItems);
 	ClearAllLists						();
 }
@@ -290,7 +277,8 @@ void CUIInventoryWnd::Update()
 		}
 		// update money
 		string64						sMoney;
-		sprintf_s							(sMoney,"%d RU", _money);
+		sprintf_s						(sMoney,"%d %s", _money, *CStringTable().translate("ui_st_money_regional"));
+
 		UIMoneyWnd.SetText				(sMoney);
 
 		// update outfit parameters
@@ -478,6 +466,8 @@ void CUIInventoryWnd::BindDragDropListEnents(CUIDragDropListEx* lst)
 	lst->m_f_item_db_click			= CUIDragDropListEx::DRAG_DROP_EVENT(this,&CUIInventoryWnd::OnItemDbClick);
 	lst->m_f_item_selected			= CUIDragDropListEx::DRAG_DROP_EVENT(this,&CUIInventoryWnd::OnItemSelected);
 	lst->m_f_item_rbutton_click		= CUIDragDropListEx::DRAG_DROP_EVENT(this,&CUIInventoryWnd::OnItemRButtonClick);
+	lst->m_f_item_focus_lost		= CUIDragDropListEx::DRAG_DROP_EVENT(this,&CUIInventoryWnd::OnItemFocusLost);
+	lst->m_f_item_focus_received		= CUIDragDropListEx::DRAG_DROP_EVENT(this,&CUIInventoryWnd::OnItemFocusReceive);
 }
 
 

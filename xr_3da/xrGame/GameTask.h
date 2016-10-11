@@ -39,7 +39,7 @@ private:
 	void					SendInfo		(xr_vector<shared_str>&);
 	void					CallAllFuncs	(xr_vector<luabind::functor<bool> >& v);
 	bool					CheckInfo		(xr_vector<shared_str>&);
-	bool					CheckFunctions	(xr_vector<luabind::functor<bool> >& v);
+	bool					CheckFunctions	(xr_vector<luabind::functor<bool> >& v,xr_vector<std::pair<shared_str,bool>>& v_h);
 	void					SetTaskState	(ETaskState new_state);
 public:
 	SScriptObjectiveHelper	m_pScriptHelper;
@@ -67,8 +67,10 @@ public:
 	xr_vector<shared_str>				m_infos_on_complete;
 	xr_vector<shared_str>				m_infos_on_fail;
 
-	xr_vector<luabind::functor<bool> >	m_complete_lua_functions;
-	xr_vector<luabind::functor<bool> >	m_fail_lua_functions;
+	xr_vector<luabind::functor<bool> >		m_complete_lua_functions;
+	xr_vector<std::pair<shared_str,bool>>	m_complete_lua_functions_names;
+	xr_vector<luabind::functor<bool> >		m_fail_lua_functions;
+	xr_vector<std::pair<shared_str,bool>>	m_fail_lua_functions_names;
 
 	xr_vector<luabind::functor<bool> >	m_lua_functions_on_complete;
 	xr_vector<luabind::functor<bool> >	m_lua_functions_on_fail;
