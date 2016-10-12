@@ -2,7 +2,7 @@
 #include "xrSheduler.h"
 #include "xr_object.h"
 #include "../build_defines.h"
-#include "../xrShared/lua_tools.h"
+#include "../xrLua/lua_tools.h"
 #include "xrGame/ai_space.h"
 #include "xrGame/script_storage_space.h"
 #include "xrGame/script_engine.h"

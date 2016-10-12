@@ -20,7 +20,7 @@
 #include "alife_registry_container.h"
 #include "xrServer.h"
 #include "level.h"
-#include "../xrShared/lua_tools.h"
+#include "../xrLua/lua_tools.h"
 #include "script_game_object.h"
 
 using namespace luabind;

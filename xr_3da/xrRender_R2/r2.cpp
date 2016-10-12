@@ -424,7 +424,8 @@ CRender::~CRender()
 	auto it = SWIs.begin();
 	for (; it != SWIs.end(); it++)
 	{
-		i_swi_allocated -= it->count;
+#pragma message("i_swi_allocated is not defined")
+		//i_swi_allocated -= it->count;
 		xr_free (it->sw);
 		it->sw = NULL;
 		it->count = 0;
