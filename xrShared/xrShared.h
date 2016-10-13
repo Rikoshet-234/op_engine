@@ -1,12 +1,6 @@
 #ifndef xrSharedH
 #define xrSharedH
 
-extern "C" {
-	#include <lua.h>
-	#include <luajit.h>
-	#include <lcoco.h>
-};
-
 #include <algorithm>
 #include <limits>
 #include <vector>

@@ -178,6 +178,7 @@
       <Filter>luabind</Filter>
     </ClCompile>
     <ClCompile Include="StdAfx.cpp" />
+    <ClCompile Include="lua_tools.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\lapi.h">
@@ -274,6 +275,7 @@
       <Filter>etc</Filter>
     </ClInclude>
     <ClInclude Include="StdAfx.h" />
+    <ClInclude Include="lua_tools.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="dynasm\dasm_x86.lua">

@@ -26,7 +26,7 @@
 #include <luabind/detail/stack_utils.hpp>
 #include <luabind/luabind.hpp>
 #include <utility>
-#include "../xrShared/lua_tools.h"
+#include "../lua_tools.h"
 
 using namespace luabind::detail;
 

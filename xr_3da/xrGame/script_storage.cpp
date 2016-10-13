@@ -11,7 +11,7 @@
 #include "script_thread.h"
 #include <stdarg.h>
 #include "doug_lea_memory_allocator.h"
-#include "../xrShared/lua_tools.h"
+#include "../xrLua/lua_tools.h"
 
 LPCSTR	file_header_old = "\
 local function script_name() \

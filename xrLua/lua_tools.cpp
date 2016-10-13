@@ -1,10 +1,13 @@
 #include "stdafx.h"
+
+#define LUA_LIB
+
 #include "lua_tools.h"
 
-XRSHARED_EXPORT lua_State* g_game_lua=nullptr;	
-XRSHARED_EXPORT lua_State* g_active_lua=nullptr;	
+lua_State* g_game_lua=nullptr;	
+lua_State* g_active_lua=nullptr;	
 
-XRSHARED_EXPORT LPCSTR get_lua_traceback(lua_State *L, int depth)
+LPCSTR get_lua_traceback(lua_State *L, int depth)
 {
 	if (L)  g_active_lua = L;
 	if (!L) L = g_active_lua;

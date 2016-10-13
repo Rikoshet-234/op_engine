@@ -11,7 +11,7 @@
 #include "ai_space.h"
 #include "object_factory.h"
 #include "script_process.h"
-#include "../../xrShared/lua_tools.h"
+#include "../../xrLua/lua_tools.h"
 #include "../../xrCore/OPFuncs/ExpandedCmdParams.h"
 
 #ifdef USE_DEBUGGER

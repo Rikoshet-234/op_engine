@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "../xrShared/lua_tools.h"
+#include "../xrLua/lua_tools.h"
 #include "NET_error.h"
 
 XR_NETERROR_EXPORT void LogPacketError(LPCSTR format, ...)

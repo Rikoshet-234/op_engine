@@ -9,7 +9,7 @@
 #include	"ai_script_space.h"
 #include	"ai_script_lua_extension.h"
 #include	"luabind/return_reference_to_policy.hpp"
-#include "../xrShared/lua_tools.h"
+#include	"../xrLua/lua_tools.h"
 
 using namespace				luabind;
 

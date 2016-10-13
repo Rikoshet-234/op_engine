@@ -8,11 +8,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="lua_tools.h" />
     <ClInclude Include="xrShared.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
-    <ClCompile Include="lua_tools.cpp" />
   </ItemGroup>
 </Project>
