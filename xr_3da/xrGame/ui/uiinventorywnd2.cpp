@@ -7,7 +7,7 @@
 #include "../hudmanager.h"
 #include "../inventory.h"
 #include "UIInventoryUtilities.h"
-
+#include "../WeaponMagazined.h"
 #include "UICellItem.h"
 #include "UICellItemFactory.h"
 #include "UIDragDropListEx.h"
@@ -184,7 +184,7 @@ bool CUIInventoryWnd::ToSlot(CUICellItem* itm, bool force_place)
 		VERIFY								(result);
 
 		CUICellItem* i						= old_owner->RemoveItem(itm, (old_owner==new_owner) );
-		
+
 		new_owner->SetItem					(i);
 	
 		SendEvent_Item2Slot					(iitem);
@@ -293,7 +293,10 @@ bool CUIInventoryWnd::OnItemDrop(CUICellItem* itm)
 	CUIDragDropListEx*	old_owner		= itm->OwnerList();
 	CUIDragDropListEx*	new_owner		= CUIDragDropListEx::m_drag_item->BackList();
 	if(old_owner==new_owner || !old_owner || !new_owner)
-					return false;
+	{
+
+		return false;
+	}
 
 	EListType t_new		= GetType(new_owner);
 	EListType t_old		= GetType(old_owner);
@@ -333,6 +336,23 @@ bool CUIInventoryWnd::OnItemDbClick(CUICellItem* itm)
 			if(!ToSlot(itm, false)){
 				if( !ToBelt(itm, false) )
 					ToSlot	(itm, true);
+			}
+			CWeaponAmmo* ammo=static_cast<CWeaponAmmo*>(itm->m_pData);
+			if (!ammo)
+				break;
+			auto pistol=m_pInv->m_slots[PISTOL_SLOT].m_pIItem;
+			auto rifle=m_pInv->m_slots[RIFLE_SLOT].m_pIItem;
+			if (pistol != NULL && pistol->CanLoadAmmo(ammo))
+			{
+				CWeaponMagazined* weapon=smart_cast<CWeaponMagazined*>(pistol);
+				weapon->LoadAmmo(ammo);
+				break;
+			}
+			if (rifle != NULL && rifle->CanLoadAmmo(ammo))
+			{
+				CWeaponMagazined* weapon=smart_cast<CWeaponMagazined*>(rifle);
+				weapon->LoadAmmo(ammo);
+				break;
 			}
 		}break;
 

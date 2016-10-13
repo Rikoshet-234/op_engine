@@ -814,6 +814,54 @@ bool CWeaponMagazined::CanDetach(const char* item_section_name)
 		return inherited::CanDetach(item_section_name);
 }
 
+bool CWeaponMagazined::CanLoadAmmo(CWeaponAmmo* pAmmo)
+{
+	bool allowed=false;
+	if (!pAmmo) return allowed;
+	xr_vector<shared_str>::iterator itb = m_ammoTypes.begin();
+	xr_vector<shared_str>::iterator ite = m_ammoTypes.end();
+	for ( ; itb != ite; ++itb )
+		if (xr_strcmp(pAmmo->cNameSect().c_str(),itb->c_str())==0)
+		{
+			allowed=true;
+			break; 
+		}
+	return allowed;
+}
+
+void CWeaponMagazined::LoadAmmo(CWeaponAmmo* pAmmo)
+{
+	if (!pAmmo)
+	{
+		Msg("! WARNING not possible to load null ammo in magazine for [%s]",Name());
+		return;
+	}
+	if(m_eGrenadeLauncherStatus == CSE_ALifeItemWeapon::eAddonAttachable &&	0 != (m_flagsAddOnState&CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher))
+		return; //на будущее... после починки бага гранотометов. хех...
+	m_set_next_ammoType_on_reload=u32(-1);
+	for (u32 i=0;i<m_ammoTypes.size();i++)
+		if (xr_strcmp(*m_ammoTypes[i],pAmmo->cNameSect().c_str())==0)
+		{
+			m_set_next_ammoType_on_reload=i;
+			break;
+		}
+	if (m_set_next_ammoType_on_reload!=u32(-1))
+	{
+		//CInventoryItem* item		= smart_cast<CInventoryItem*>(this);
+		//CInventoryOwner* owner	= smart_cast<CInventoryOwner*>(H_Parent());
+		//if (owner->inventory().ActiveItem()==item)
+		//{
+		//	играть звук и анимацию
+		//}
+		//else
+		//{
+		//	спрятать текущее, достать новое и играть звук и анимацию.
+		//}
+		//SwitchState(eReload); //полный цикл перезарядки (разрядка+звук+анимация), активный итем не меняется. :)
+		ReloadMagazine();
+	}
+}
+
 bool CWeaponMagazined::Attach(PIItem pIItem, bool b_send_event)
 {
 	bool result = false;

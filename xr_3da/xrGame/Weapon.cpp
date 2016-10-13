@@ -934,6 +934,10 @@ void CWeapon::SpawnAmmo(u32 boxCurr, LPCSTR ammoSect, u32 ParentID)
 	F_entity_Destroy				(D);
 }
 
+void CWeapon::LoadAmmo(CWeaponAmmo* pAmmo)
+{
+}
+
 int CWeapon::GetAmmoCurrent(bool use_item_to_spawn) const
 {
 	int l_count = iAmmoElapsed;

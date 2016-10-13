@@ -84,14 +84,15 @@ void CUIInventoryWnd::ActivatePropertiesBox()
 	CSilencer*			pSilencer			= smart_cast<CSilencer*>		(CurrentIItem());
 	CGrenadeLauncher*	pGrenadeLauncher	= smart_cast<CGrenadeLauncher*>	(CurrentIItem());
 	CBottleItem*		pBottleItem			= smart_cast<CBottleItem*>		(CurrentIItem());
+	CWeaponAmmo*		pAmmoItem			= smart_cast<CWeaponAmmo*>		(CurrentIItem());
 	
 	bool	b_show			= false;
+	bool	b_picked=false;
 
-
-	if(!pOutfit && CurrentIItem()->GetSlot()!=NO_ACTIVE_SLOT && !m_pInv->m_slots[CurrentIItem()->GetSlot()].m_bPersistent && m_pInv->CanPutInSlot(CurrentIItem()))
+	if(!pOutfit && CurrentIItem()->GetSlot()!=NO_ACTIVE_SLOT && !m_pInv->m_slots[CurrentIItem()->GetSlot()].m_bPersistent && m_pInv->CanPutInSlot(CurrentIItem()) )
 	{
 		UIPropertiesBox.AddItem(getComplexString("st_move_to_slot",CurrentIItem()).c_str(),  nullptr, INVENTORY_TO_SLOT_ACTION);
-		b_show			= true;
+		b_show			= b_picked = true;
 	}
 	if(CurrentIItem()->Belt() && m_pInv->CanPutInBelt(CurrentIItem()))
 	{
@@ -117,6 +118,10 @@ void CUIInventoryWnd::ActivatePropertiesBox()
 	//отсоединение аддонов от вещи
 	if(pWeapon)
 	{
+		//оружие можно засунуть в слот, даже если там не пусто
+		if (!b_picked && CurrentItem()->OwnerList()!=m_pUIAutomaticList && CurrentItem()->OwnerList()!=m_pUIPistolList) //не надо издеваться над CanPutInSlot , ему и так по жизни трудно
+			UIPropertiesBox.AddItem(getComplexString("st_move_to_slot",CurrentIItem()).c_str(),  nullptr, INVENTORY_TO_SLOT_ACTION);
+
 		if(pWeapon->GrenadeLauncherAttachable() && pWeapon->IsGrenadeLauncherAttached())
 		{
 			UIPropertiesBox.AddItem(getComplexString("st_detach_gl",nullptr,getAddonInvName(pWeapon->GetGrenadeLauncherName().c_str())).c_str(),  nullptr, INVENTORY_DETACH_GRENADE_LAUNCHER_ADDON);
@@ -203,7 +208,24 @@ void CUIInventoryWnd::ActivatePropertiesBox()
 		 }
 
 	}
-	LPCSTR _action = NULL;
+
+	if (pAmmoItem)
+	{
+		auto pistol=m_pInv->m_slots[PISTOL_SLOT].m_pIItem;
+		auto rifle=m_pInv->m_slots[RIFLE_SLOT].m_pIItem;
+		if (pistol != NULL && pistol->CanLoadAmmo(pAmmoItem))
+		{
+			CWeaponMagazined* weapon=smart_cast<CWeaponMagazined*>(pistol);
+			UIPropertiesBox.AddItem(getComplexString("st_load_ammo",weapon).c_str(),  weapon, INVENTORY_LOAD_MAGAZINE);
+		}
+		if (rifle != NULL && rifle->CanLoadAmmo(pAmmoItem))
+		{
+			CWeaponMagazined* weapon=smart_cast<CWeaponMagazined*>(rifle);
+			UIPropertiesBox.AddItem(getComplexString("st_load_ammo",weapon).c_str(),  weapon, INVENTORY_LOAD_MAGAZINE);
+		}
+	}
+
+	LPCSTR _action = nullptr;
 
 	if(pMedkit || pAntirad)
 	{
@@ -215,7 +237,8 @@ void CUIInventoryWnd::ActivatePropertiesBox()
 			_action					= "st_drink";
 		else
 			_action					= "st_eat";
-	}
+	} 
+	
 
 	if(_action){
 		UIPropertiesBox.AddItem(_action,  nullptr, INVENTORY_EAT_ACTION);
@@ -290,10 +313,18 @@ void CUIInventoryWnd::ProcessPropertiesBoxClicked	()
 		case INVENTORY_RELOAD_MAGAZINE:
 			(smart_cast<CWeapon*>(CurrentIItem()))->Action(kWPN_RELOAD, CMD_START);
 			break;
+		case INVENTORY_LOAD_MAGAZINE:
+			{
+				CWeaponMagazined*	weapon	=static_cast<CWeaponMagazined*>(UIPropertiesBox.GetClickedItem()->GetData());
+				CWeaponAmmo*		ammo	=static_cast<CWeaponAmmo*>(CurrentItem()->m_pData);
+				if (weapon && ammo)
+						weapon->LoadAmmo(ammo);
+			}
+			break;
 		case INVENTORY_UNLOAD_MAGAZINE:
 			{
 				CUICellItem * itm = CurrentItem();
-				(smart_cast<CWeaponMagazined*>((CWeapon*)itm->m_pData))->UnloadMagazine();
+				(smart_cast<CWeaponMagazined*>(static_cast<CWeapon*>(itm->m_pData)))->UnloadMagazine();
 				for(size_t i=0; i<itm->ChildsCount(); ++i)
 				{
 					CUICellItem * child_itm			= itm->Child(i);

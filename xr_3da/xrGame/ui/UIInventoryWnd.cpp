@@ -398,7 +398,6 @@ void CUIInventoryWnd::DetachAddon(const char* addon_name)
 	}
 }
 
-
 void	CUIInventoryWnd::SendEvent_ActivateSlot	(PIItem	pItem)
 {
 	NET_Packet						P;

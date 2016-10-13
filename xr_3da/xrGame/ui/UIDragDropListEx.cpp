@@ -149,7 +149,7 @@ void CUIDragDropListEx::OnItemStartDragging(CUIWindow* w, void* pData)
 }
 
 void CUIDragDropListEx::OnItemDrop(CUIWindow* w, void* pData)
-{
+{ 
 	OnItemSelected						(w, pData);
 	CUICellItem*		itm				= smart_cast<CUICellItem*>(w);
 	VERIFY								(itm->OwnerList() == itm->OwnerList());
@@ -272,7 +272,8 @@ void CUIDragDropListEx::Draw()
 {
 	inherited::Draw				();
 
-	if(0 && bDebug){
+	if(0 && bDebug)
+		{
 		CGameFont* F		= UI()->Font()->pFontDI;
 		F->SetAligment		(CGameFont::alCenter);
 		F->SetHeightI		(0.02f);
@@ -460,15 +461,14 @@ void CUIDragDropListEx::select_weapons_by_ammo(CInventoryItem* ammoItem)
 		CWeapon* weapon = smart_cast<CWeapon*>(item);
 		if (!weapon)
 			continue;
+		if (weapon->CanLoadAmmo(ammo))
+		{
+			ci->m_suitable = true;
+			break; 
+		}
+
 		xr_vector<shared_str>::iterator itb = weapon->m_ammoTypes.begin();
 		xr_vector<shared_str>::iterator ite = weapon->m_ammoTypes.end();
-		for ( ; itb != ite; ++itb )
-			if (xr_strcmp(ammo_name.c_str(),itb->c_str())==0)
-			{
-				ci->m_suitable = true;
-				break; 
-			}
-		
 		CWeaponMagazinedWGrenade* wg = smart_cast<CWeaponMagazinedWGrenade*>(item);
 		if ( !wg || !wg->IsGrenadeLauncherAttached() || !wg->m_ammoTypes2.size() )
 			continue; 
@@ -704,7 +704,7 @@ CUICellItem* CUICellContainer::RemoveItem(CUICellItem* itm, bool force_root)
 			C.Clear			();
 		}
 
-	itm->SetOwnerList		(NULL);
+	itm->SetOwnerList		(NULL); 
 	DetachChild				(itm);
 	return					itm;
 }

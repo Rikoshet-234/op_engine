@@ -978,12 +978,15 @@ bool CInventory::InRuck(PIItem pIItem) const
 
 bool CInventory::CanPutInSlot(PIItem pIItem) const
 {
-	if(!m_bSlotsUseful) return false;
-	auto slot = pIItem->GetSlot();
-	if( !GetOwner()->CanPutInSlot(pIItem, slot ) ) return false;
+	if(!m_bSlotsUseful) 
+		return false;
+	u32 slot = pIItem->GetSlot();
+	if (slot==NO_ACTIVE_SLOT) 
+		return false;
+	if( !GetOwner()->CanPutInSlot(pIItem, slot )) 
+		return false;
 	if(slot < m_slots.size() && m_slots[slot].m_pIItem == NULL)
 		return true;
-	
 	return false;
 }
 //проверяет можем ли поместить вещь на пояс,
