@@ -332,3 +332,6 @@ paket-files/
 # JetBrains Rider
 .idea/
 *.sln.iml
+
+
+prepare_builds.cmd 

@@ -138,7 +138,7 @@ void CWeaponShotgun::OnShotBoth()
 void CWeaponShotgun::switch2_Fire	()
 {
 	inherited::switch2_Fire	();
-	//bWorking = false;
+	bWorking = true;
 }
 
 void CWeaponShotgun::switch2_Fire2	()

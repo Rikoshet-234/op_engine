@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
+#include "../../xrLua/lua_tools.h"
 
 #if !defined(AI_COMPILER) && !defined(PRIQUEL)
 IC CGameGraph::CGameGraph											()
@@ -165,9 +166,23 @@ IC	const GameGraph::LEVEL_MAP &GameGraph::CHeader::levels			() const
 	return						(m_levels);
 }
 
+IC const GameGraph::SLevel* GameGraph::CHeader::level_ex(const _LEVEL_ID& id) const
+{
+	LEVEL_MAP::const_iterator	I = levels().find(id);
+	if (I == levels().end())
+	{
+		return nullptr;
+	}
+	return &(I->second);
+}
+
 IC	const GameGraph::SLevel &GameGraph::CHeader::level				(const _LEVEL_ID &id) const
 {
 	LEVEL_MAP::const_iterator	I = levels().find(id);
+	if (I == levels().end())
+	{
+		Msg(get_lua_traceback(g_game_lua,5));
+	}
 	R_ASSERT2					(I != levels().end(),make_string("there is no specified level in the game graph : %d",id));
 	return						((*I).second);
 }

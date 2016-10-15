@@ -304,9 +304,23 @@ LPCSTR get_level_name							(const CALifeSimulator *self, int level_id)
 		log_script_error("level_name(%d) == invalid level id", level_id);
 		return "invalid_level_index";
 	}
-
-	LPCSTR								result = *ai().game_graph().header().level((GameGraph::_LEVEL_ID)level_id).name();
-	return								(result);
+	auto slevel_struct=ai().game_graph().header().level_ex(static_cast<GameGraph::_LEVEL_ID>(level_id));
+	if (slevel_struct==nullptr)
+	{
+		Msg("! ERROR level id not found in the game graph : [%d]",level_id);
+		Msg(get_lua_traceback(g_game_lua,5));
+		return nullptr;
+	}
+	auto name=slevel_struct->name();
+	if (!name)
+	{
+		Msg("! ERROR level found, but this not have correct name, id [%d]",level_id);
+		Msg(get_lua_traceback(g_game_lua,5));
+		return nullptr;
+	}
+	return name.c_str();
+	//LPCSTR								result = *ai().game_graph().header().level((GameGraph::_LEVEL_ID)level_id).name();
+	//return								(result);
 }
 
 CSE_ALifeCreatureActor *get_actor				(const CALifeSimulator *self)
