@@ -118,7 +118,7 @@ void xrCore::_initialize	(LPCSTR _ApplicationName, LogCallback cb, BOOL init_fs,
 		FS._initialize		(flags,0,fs_fname);
 
 		Msg					("'%s' build %d, %s","xrCore",build_id, build_date);
-		Msg					("%s\n",OPFuncs::GetOPEngineVersion().c_str());
+		Msg					("%s\n",OPFuncs::GetOPEngineVersion());
 		EFS._initialize		();
 #ifdef DEBUG
 	#ifndef	_EDITOR
