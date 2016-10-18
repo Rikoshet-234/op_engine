@@ -45,10 +45,7 @@ namespace OPFuncs
 
 	LPCSTR lua_GetOPEngineVersion()
 	{
-		std::string version=GetOPEngineVersion();
-		char* result=new char[version.length()+1];
-		strcpy(result,version.c_str());
-		return result;
+		return GetOPEngineVersion();
 	}
 
 	bool lua_IsOPEngine()

@@ -6,20 +6,20 @@
 namespace OPFuncs
 {
 
-	XRCORE_API std::string GetOPEngineVersion()
+	XRCORE_API LPCSTR GetOPEngineVersion()
 	{
+		static string1024 engineVersion="";
+		if (engineVersion[0] == 0)
+		{
 #ifdef PATCH_INFO_PRESENT
-		string512 patchVersion="";
-		sprintf_s(patchVersion," %s ver %s.%s",PATCH_DESCRIPTION , PATCH_MINOR , PATCH_MAJOR);
-#endif
-		string1024 engineVersion="";
-		sprintf_s(engineVersion,"%s ver %s.%s%s %s",ENGINE_DESCRIPTION,ENGINE_MINOR,ENGINE_MAJOR,
-#ifdef PATCH_INFO_PRESENT
-			patchVersion
+			sprintf_s(engineVersion,"%s ver %s.%s %s ver %s.%s %s"
+				,ENGINE_DESCRIPTION, ENGINE_MINOR, ENGINE_MAJOR
+				,PATCH_DESCRIPTION, PATCH_MINOR, PATCH_MAJOR
+				,ENGINE_BUILD_TYPE);
 #else
-			""
+			sprintf_s(engineVersion,"%s ver %s.%s %s",ENGINE_DESCRIPTION,ENGINE_MINOR,ENGINE_MAJOR,ENGINE_BUILD_TYPE);
 #endif
-			,ENGINE_BUILD_TYPE);
-		return std::string(engineVersion);
+		}
+		return engineVersion;
 	}
 }

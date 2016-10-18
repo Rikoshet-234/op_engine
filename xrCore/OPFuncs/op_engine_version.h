@@ -5,7 +5,7 @@
 
 namespace OPFuncs
 {
-	XRCORE_API std::string GetOPEngineVersion();
+	XRCORE_API LPCSTR GetOPEngineVersion();
 }
 
 #endif
