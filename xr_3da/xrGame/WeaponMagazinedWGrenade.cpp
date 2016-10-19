@@ -607,6 +607,89 @@ float	CWeaponMagazinedWGrenade::CurrentZoomFactor	()
 	return inherited::CurrentZoomFactor();
 }
 
+LPCSTR bstr(bool tostr)
+{
+	return tostr ? "true" : "false";
+}
+
+void CWeaponMagazinedWGrenade::LoadAmmo(CWeaponAmmo* pAmmo)
+{
+	xr_vector<shared_str>::iterator ammo1_it=std::find(m_ammoTypes.begin(),m_ammoTypes.end(),pAmmo->cNameSect());
+	xr_vector<shared_str>::iterator ammo2_it=std::find(m_ammoTypes2.begin(),m_ammoTypes2.end(),pAmmo->cNameSect());
+	bool ammo1=ammo1_it!=m_ammoTypes.end();
+	bool ammo2=ammo2_it!=m_ammoTypes2.end();
+
+	if (!m_bGrenadeMode) // подствольник не выключен
+	{
+		if (ammo1 && !ammo2) // б/п найдены в списке патронов
+		{
+			inherited::LoadAmmo(pAmmo);
+			return;
+		} 
+		if (!ammo1 && ammo2) // б/п найдены в списке гранат
+		{
+			if (IsGrenadeLauncherAttached()) 
+			{
+				u32 index2=std::distance(m_ammoTypes2.begin(), ammo2_it);
+				if (index2==m_ammoType2 && !m_magazine2.empty())
+				{
+					PlayEmptySnd();
+					return;
+				}
+				m_ammoType2=index2;
+				PerformSwitchGL();
+				PlaySound(sndReloadG,get_LastFP2());
+				UnloadMagazine();
+				ReloadMagazine();
+				return;
+			}
+		}
+		PlayEmptySnd();
+		return;
+	}
+	else // подствольник выключен
+	{
+		if (!ammo1 && ammo2) // б/п найдены в списке патронов
+		{
+			u32 index2=std::distance(m_ammoTypes2.begin(), ammo2_it);
+			if (index2==m_ammoType2 && static_cast<u32>(iMagazineSize2)==m_magazine2.size())
+			{
+				PlayEmptySnd();
+				return;
+			}
+			m_ammoType2=index2;
+			PerformSwitchGL();
+			inherited::LoadAmmo(pAmmo);
+			return;
+		}
+		if (ammo1 && !ammo2) // б/п найдены в списке гранат
+		{
+			u32 index1=std::distance(m_ammoTypes.begin(), ammo1_it);
+			if (index1==m_ammoType && !m_magazine.empty())
+			{
+				PlayEmptySnd();
+				return;
+			}
+			PlaySound(sndReloadG,get_LastFP2());
+			UnloadMagazine();
+			m_ammoType=index1;
+			ReloadMagazine();
+			return;
+		}
+	}
+	PlayEmptySnd();
+}
+
+
+bool CWeaponMagazinedWGrenade::CanLoadAmmo(CWeaponAmmo* pAmmo)
+{
+	bool grAllowed=false;
+	if (!pAmmo) return grAllowed;
+	bool ammo1=std::find(m_ammoTypes.begin(),m_ammoTypes.end(),pAmmo->cNameSect())!=m_ammoTypes.end();
+	bool ammo2=std::find(m_ammoTypes2.begin(),m_ammoTypes2.end(),pAmmo->cNameSect())!=m_ammoTypes2.end();
+	return ammo1 || ammo2;
+}
+
 //виртуальные функции для проигрывания анимации HUD
 void CWeaponMagazinedWGrenade::PlayAnimShow()
 {

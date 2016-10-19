@@ -318,11 +318,6 @@ void CUIMainIngameWnd::SetMPChatLog(CUIWindow* pChat, CUIWindow* pLog){
 	m_pMPLogWnd  = pLog;
 }
 
-double round(double number)
-{
-	return number < 0.0 ? ceil(number - 0.5) : floor(number + 0.5);
-}
-
 void CUIMainIngameWnd::SetAmmoIcon (const shared_str& sect_name)
 {
 	if ( !sect_name.size() )

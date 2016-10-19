@@ -56,6 +56,7 @@ namespace GameObject {
 
 		eOnObjectHit,
 
+		eOnInventoryShowPropBox,
 		eDummy = u32(-1),
 	};
 };

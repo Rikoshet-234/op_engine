@@ -35,7 +35,7 @@ public:
 	virtual		bool		OnKeyboard				(int dik, EUIMessages keyboard_action);
 	virtual		bool		OnMouse					(float x, float y, EUIMessages mouse_action);
 	virtual		void		Draw					();
-	virtual		void		Update					()						{inherited::Update(); /*m_b_already_drawn=false;*/};
+	virtual		void		Update					()						{inherited::Update(); m_b_already_drawn=false;};
 				
 	virtual		void		OnAfterChild			()						{};
 
@@ -57,7 +57,7 @@ public:
 				size_t			m_drawn_frame;
 				void*		m_pData;
 				int			m_index;
-				//bool		m_b_already_drawn;
+				bool		m_b_already_drawn;
 	bool					m_b_destroy_childs;
 	bool					m_focused;
 	bool					m_selected;

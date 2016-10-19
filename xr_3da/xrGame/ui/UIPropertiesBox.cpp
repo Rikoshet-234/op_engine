@@ -62,6 +62,14 @@ bool CUIPropertiesBox::AddItem(const char*  str, void* pData, u32 tag_value)
 
 	return true;
 }
+
+//void CUIPropertiesBox::AddSubItem(LPCSTR str, luabind::functor<void> &lua_function)
+//{
+//	CUIListBoxItem* itm		= m_UIListWnd.AddItem(str);
+//	itm->SetTAG				(INVENTORY_PROP_CALL_FUNC);
+//	itm->SetData			(&lua_function);
+//}
+
 void CUIPropertiesBox::RemoveItemByTAG(u32 tag)
 {
 	m_UIListWnd.RemoveWindow(m_UIListWnd.GetItemByTAG(tag));

@@ -61,7 +61,9 @@ protected:
 
 	
 public:
+	shared_str				listId;
 	static CUIDragItem*		m_drag_item;
+	int						m_i_scroll_pos;
 							CUIDragDropListEx	();
 	virtual					~CUIDragDropListEx	();
 				void		Init				(float x, float y, float w, float h);
@@ -149,7 +151,7 @@ protected:
 public:							
 								CUICellContainer	(CUIDragDropListEx* parent);
 	virtual						~CUICellContainer	();
-
+	CUICellItem*				GetFocuseditem		();
 	void						clear_select_suitables();
 
 	Fcolor				m_focused_color;
@@ -174,7 +176,6 @@ protected:
 				
 				bool			AddSimilar			(CUICellItem* itm);
 				CUICellItem*	FindSimilar			(CUICellItem* itm);
-
 				void			PlaceItemAtPos		(CUICellItem* itm, Ivector2& cell_pos);
 				CUICellItem*	RemoveItem			(CUICellItem* itm, bool force_root);
 				bool			ValidCell			(const Ivector2& pos) const;

@@ -95,6 +95,7 @@ void CScriptGameObject::script_register(lua_State *L)
 				value("on_actor_weapon_fire",			int(GameObject::eOnActorWeaponFire)),
 
 				value("on_object_hit",			int(GameObject::eOnObjectHit))
+				//value("on_inv_prop_show",		int(GameObject::eOnInventoryShowPropBox))
 
 			],
 

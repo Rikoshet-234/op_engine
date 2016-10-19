@@ -34,8 +34,9 @@ public:
 	virtual void	InitAddons();
 	virtual bool	UseScopeTexture();
 	virtual	float	CurrentZoomFactor	();
+	void			LoadAmmo			(CWeaponAmmo *pAmmo) override;
+	bool			CanLoadAmmo			(CWeaponAmmo *pAmmo) override;
 
-	
 	virtual void	OnStateSwitch	(u32 S);
 	
 	virtual void	switch2_Idle	();

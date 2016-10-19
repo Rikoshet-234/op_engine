@@ -50,9 +50,7 @@ CUIDragDropListEx::CUIDragDropListEx()
 	AddCallback					("cell_item",	DRAG_DROP_ITEM_DB_CLICK,		CUIWndCallback::void_function		(this, &CUIDragDropListEx::OnItemDBClick)			);
 	AddCallback					("cell_item",	WINDOW_FOCUS_RECEIVED,			CUIWndCallback::void_function		(this, &CUIDragDropListEx::OnItemFocusReceived)			);
 	AddCallback					("cell_item",	WINDOW_FOCUS_LOST,				CUIWndCallback::void_function		(this, &CUIDragDropListEx::OnItemFocusLost)			);
-
-
-
+	m_i_scroll_pos=-1;
 }
 
 CUIDragDropListEx::~CUIDragDropListEx()
@@ -306,23 +304,17 @@ void CUIDragDropListEx::ReinitScroll()
 {
 		float h1 = m_container->GetWndSize().y;
 		float h2 = GetWndSize().y;
+		int pos=m_i_scroll_pos==-1 ? ScrollPos() : m_i_scroll_pos;
 		VERIFY						(_valid(h1));
 		VERIFY						(_valid(h2));
 		m_vScrollBar->Show			( h1 > h2 );
 		m_vScrollBar->Enable		( h1 > h2 );
-
-
-		//int r_min, r_max;
-		//m_vScrollBar->GetRange(r_min, r_max);
-		// Msg("# CUIDragDropListEx::m_vScrollBar range changed from %d..%d to 0..%f ", r_min, r_max, h1 - h2);
 		m_vScrollBar->SetRange		(0, _max(0,iFloor(h1-h2)) );
-		m_vScrollBar->SetStepSize	(CellSize().y/3);
+		m_vScrollBar->SetStepSize	(CellSize().y);
 		m_vScrollBar->SetPageSize	(iFloor(GetWndSize().y/float(CellSize().y)));
 
-
-		m_vScrollBar->SetScrollPos(m_vScrollBar->GetScrollPos());
-
 		m_container->SetWndPos		(0,0);
+		SetScrollPos	(pos); 
 }
 
 bool CUIDragDropListEx::OnMouse(float x, float y, EUIMessages mouse_action)
@@ -334,13 +326,16 @@ bool CUIDragDropListEx::OnMouse(float x, float y, EUIMessages mouse_action)
 		switch(mouse_action){
 		case WINDOW_MOUSE_WHEEL_DOWN:
 				m_vScrollBar->TryScrollInc();
+				m_i_scroll_pos=m_vScrollBar->GetScrollPos();
 				return true;
 				break;
 
 		case WINDOW_MOUSE_WHEEL_UP:
 				m_vScrollBar->TryScrollDec();
+				m_i_scroll_pos=m_vScrollBar->GetScrollPos();
 				return true;
 				break;
+		default: break;
 		}
 	}
 	return b;
@@ -365,12 +360,9 @@ void CUIDragDropListEx::select_suitables_by_item(CInventoryItem* item)
 		weaponSections.clear_not_free();
 		weaponSections.assign( pWeapon->m_ammoTypes.begin(), pWeapon->m_ammoTypes.end() );
 		CWeaponMagazinedWGrenade* wg = smart_cast<CWeaponMagazinedWGrenade*>(item);
-		if (wg)
+		if (wg &&  wg->m_ammoTypes2.size())
 		{
-			if ( wg->IsGrenadeLauncherAttached() && wg->m_ammoTypes2.size() )
-			{
-				weaponSections.insert( weaponSections.end(), wg->m_ammoTypes2.begin(), wg->m_ammoTypes2.end() );
-			}
+			weaponSections.insert( weaponSections.end(), wg->m_ammoTypes2.begin(), wg->m_ammoTypes2.end() );
 		}
 		shared_str scope=pWeapon->GetScopeName();
 		shared_str silencer=pWeapon->GetSilencerName();
@@ -458,28 +450,16 @@ void CUIDragDropListEx::select_weapons_by_ammo(CInventoryItem* ammoItem)
 		CInventoryItem* item = static_cast<CInventoryItem*>(ci->m_pData);
 		if (!item)
 			continue;
-		CWeapon* weapon = smart_cast<CWeapon*>(item);
-		if (!weapon)
-			continue;
-		if (weapon->CanLoadAmmo(ammo))
+		CWeaponMagazined* weapon = smart_cast<CWeaponMagazined*>(item);
+		CWeaponMagazinedWGrenade* wg = smart_cast<CWeaponMagazinedWGrenade*>(item);
+		if (wg && wg->CanLoadAmmo(ammo))
 		{
 			ci->m_suitable = true;
-			break; 
 		}
-
-		xr_vector<shared_str>::iterator itb = weapon->m_ammoTypes.begin();
-		xr_vector<shared_str>::iterator ite = weapon->m_ammoTypes.end();
-		CWeaponMagazinedWGrenade* wg = smart_cast<CWeaponMagazinedWGrenade*>(item);
-		if ( !wg || !wg->IsGrenadeLauncherAttached() || !wg->m_ammoTypes2.size() )
-			continue; 
-		itb = wg->m_ammoTypes2.begin();
-		ite = wg->m_ammoTypes2.end();
-		for ( ; itb != ite; ++itb )
-			if (xr_strcmp(ammo_name,(*itb))==0)
-			{
-				ci->m_suitable = true;
-				break; 
-			}
+		else if (weapon && weapon->CanLoadAmmo(ammo))
+		{
+			ci->m_suitable = true;
+		}
 	}
 }
 
@@ -655,6 +635,17 @@ CUICellItem* CUICellContainer::FindSimilar(CUICellItem* itm)
 			return i;
 	}
 	return NULL;
+}
+
+CUICellItem* CUICellContainer::GetFocuseditem()
+{
+	for(WINDOW_LIST_it it = m_ChildWndList.begin(); m_ChildWndList.end()!=it; ++it)
+	{
+		CUICellItem* i = smart_cast<CUICellItem*>(*it);
+		if (i->m_focused)
+			return i;
+	}
+	return nullptr;
 }
 
 void CUICellContainer::PlaceItemAtPos(CUICellItem* itm, Ivector2& cell_pos)
@@ -940,7 +931,7 @@ void CUICellContainer::Draw()
 			cpos.add( TopVisibleCell() );
 			CUICell& ui_cell = GetCellAt( cpos );
 			u32 back_color=0xFFFFFFFF;
-			if ( !ui_cell.Empty() )
+			if (!ui_cell.Empty() )
 			{
 				if ( ui_cell.m_item->m_focused )
 				{
@@ -1000,7 +991,7 @@ void CUICellContainer::Draw()
 		for(;it!=m_cells_to_draw.end();++it)
 		{
 			CUICell& cell = (*it);
-			if( !cell.Empty() && /*!cell.m_item->m_b_already_drawn &&*/ (cell.m_item->m_drawn_frame != Device.dwFrame))
+			if( !cell.Empty() && !cell.m_item->m_b_already_drawn /* (cell.m_item->m_drawn_frame != Device.dwFrame)*/)
 			{
 				cell.m_item->Draw				();
 			}

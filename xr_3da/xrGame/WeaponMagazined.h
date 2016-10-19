@@ -66,9 +66,7 @@ protected:
 	virtual void	switch2_Showing	();
 	
 	virtual void	OnShot			();	
-	
 	virtual void	OnEmptyClick	();
-
 	virtual void	OnAnimationEnd	(u32 state);
 	virtual void	OnStateSwitch	(u32 S);
 
@@ -124,7 +122,8 @@ public:
 
 	virtual void	GetBriefInfo				(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count);
 
-
+	void			PlayEmptySnd()	{PlaySound	(sndEmptyClick,get_LastFP());};
+	void			PlayHideSnd()	{PlaySound	(sndHide,get_LastFP());};
 	//////////////////////////////////////////////
 	// для стрельбы очередями или одиночными
 	//////////////////////////////////////////////
@@ -135,7 +134,7 @@ public:
 	IC		int		GetQueueSize			() const	{return m_iQueueSize;};
 	virtual bool	StopedAfterQueueFired	()			{return m_bStopedAfterQueueFired; }
 	virtual void	StopedAfterQueueFired	(bool value){m_bStopedAfterQueueFired = value; }
-
+	
 protected:
 	//максимальный размер очереди, которой можно стрельнуть
 	int				m_iQueueSize;

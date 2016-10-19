@@ -93,7 +93,6 @@ public:
 	virtual bool				CanAttach			(PIItem pIItem) {return false;}
 	virtual bool				CanDetach			(LPCSTR item_section_name) {return false;}
 	virtual bool				CanLoadAmmo			(CWeaponAmmo *pAmmo) {return false;}
-	virtual bool				CanLoadGrenade		(CWeaponAmmo *pAmmo) {return false;}
 
 	virtual EHandDependence		HandDependence		()	const	{return hd1Hand;};
 	virtual bool				IsSingleHanded		()	const	{return true;};	

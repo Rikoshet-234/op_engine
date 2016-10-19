@@ -16,8 +16,9 @@
 #include "UIListBoxItem.h"
 #include "../CustomOutfit.h"
 #include "../string_table.h"
-
-
+#include "../game_object_space.h"
+#include "../script_callback_ex.h"
+#include "../script_game_object.h"
 
 void CUIInventoryWnd::EatItem(PIItem itm)
 {
@@ -258,6 +259,10 @@ void CUIInventoryWnd::ActivatePropertiesBox()
 			UIPropertiesBox.AddItem("st_drop_all", reinterpret_cast<void*>(33), INVENTORY_DROP_ACTION);
 	}
 
+	/*CGameObject* GO = smart_cast<CGameObject*>(CurrentIItem()); 
+	if (GO)
+		Actor()->callback(GameObject::eOnInventoryShowPropBox)(&UIPropertiesBox,GO->lua_game_object());*/
+
 	if(b_show)
 	{
 		UIPropertiesBox.AutoUpdateSize	();
@@ -324,13 +329,30 @@ void CUIInventoryWnd::ProcessPropertiesBoxClicked	()
 		case INVENTORY_UNLOAD_MAGAZINE:
 			{
 				CUICellItem * itm = CurrentItem();
-				(smart_cast<CWeaponMagazined*>(static_cast<CWeapon*>(itm->m_pData)))->UnloadMagazine();
+				CWeapon* weapon=static_cast<CWeapon*>(itm->m_pData);
+				if (!weapon)
+					break;
+				CWeaponMagazined* wm=smart_cast<CWeaponMagazined*>(weapon);
+				if (!wm)
+					break;
+				wm->PlayEmptySnd();
+				wm->UnloadMagazine();
 				for(size_t i=0; i<itm->ChildsCount(); ++i)
 				{
 					CUICellItem * child_itm			= itm->Child(i);
 					(smart_cast<CWeaponMagazined*>((CWeapon*)child_itm->m_pData))->UnloadMagazine();
 				}
+
 			}break;
+		case INVENTORY_PROP_CALL_FUNC:
+			{
+				/*luabind::functor<void> &func=*static_cast<luabind::functor<void> *>(UIPropertiesBox.GetClickedItem()->GetData());
+				if (func && func.is_valid())
+					func();*/
+				
+				
+			}
+			break;
 		}
 	}
 }

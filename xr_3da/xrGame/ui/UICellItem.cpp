@@ -11,7 +11,7 @@ CUICellItem::CUICellItem()
 	m_pParentList		= nullptr;
 	m_pData				= nullptr;
 	m_custom_draw		= nullptr;
-	//m_b_already_drawn	= false;
+	m_b_already_drawn	= false;
 	m_drawn_frame=0;
 	SetAccelerator		(0);
 	m_b_destroy_childs	= true;
@@ -32,7 +32,7 @@ CUICellItem::~CUICellItem()
 void CUICellItem::Draw()
 {
 	m_drawn_frame=Device.dwFrame;
-	//m_b_already_drawn		= true;
+	m_b_already_drawn		= true;
 	inherited::Draw();
 	if(m_custom_draw) 
 		m_custom_draw->OnDraw(this);

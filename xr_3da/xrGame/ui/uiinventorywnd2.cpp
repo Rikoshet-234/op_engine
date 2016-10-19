@@ -12,6 +12,10 @@
 #include "UICellItemFactory.h"
 #include "UIDragDropListEx.h"
 #include "UI3tButton.h"
+#include "../grenadelauncher.h"
+#include "../silencer.h"
+#include "../scope.h"
+#include "../grenadelauncher.h"
 
 CUICellItem* CUIInventoryWnd::CurrentItem()
 {
@@ -111,8 +115,6 @@ void CUIInventoryWnd::InitInventory()
 		CUICellItem* itm			= create_cell_item(*it);
 		m_pUIBeltList->SetItem		(itm);
 	}
-
-
 	
 	ruck_list		= m_pInv->m_ruck;
 	std::sort		(ruck_list.begin(),ruck_list.end(),InventoryUtilities::GreaterRoomInRuck);
@@ -292,20 +294,63 @@ bool CUIInventoryWnd::OnItemDrop(CUICellItem* itm)
 {
 	CUIDragDropListEx*	old_owner		= itm->OwnerList();
 	CUIDragDropListEx*	new_owner		= CUIDragDropListEx::m_drag_item->BackList();
-	if(old_owner==new_owner || !old_owner || !new_owner)
-	{
-
+	if (!old_owner || !new_owner)
 		return false;
-	}
 
 	EListType t_new		= GetType(new_owner);
 	EListType t_old		= GetType(old_owner);
-	if(t_new == t_old)	return true;
+	if (t_new == t_old == iwBag)
+	{
+		CUICellItem* focusedCellItem=new_owner->GetCellContainer()->GetFocuseditem();
+		if (!focusedCellItem)
+			return false;
+
+		PIItem draggedItem=static_cast<PIItem>(itm->m_pData);
+		PIItem focusedItem=static_cast<PIItem>(focusedCellItem->m_pData);
+		if (!draggedItem || !focusedItem)
+			return false;
+		//аддон или патроны бросили на оружие
+		CWeapon*			weapon				= smart_cast<CWeapon*>			(focusedItem);
+		if (weapon)
+		{
+			CScope*				pScope				= smart_cast<CScope*>			(draggedItem);
+			CSilencer*			pSilencer			= smart_cast<CSilencer*>		(draggedItem);
+			CGrenadeLauncher*	pGrenadeLauncher	= smart_cast<CGrenadeLauncher*>	(draggedItem);
+			CWeaponAmmo*		pAmmo				= smart_cast<CWeaponAmmo*>		(draggedItem);
+			m_pUIBagList->m_i_scroll_pos=m_pUIBagList->ScrollPos();
+			if (pScope || pSilencer || pGrenadeLauncher)
+			{
+				SetCurrentItem(itm);
+				AttachAddon(weapon);
+			} 
+			else if (pAmmo!=nullptr && weapon->CanLoadAmmo(pAmmo))
+				weapon->LoadAmmo(pAmmo);
+		}
+		return true;
+	}
+	else if (t_new == t_old )
+		return true;
 
 	switch(t_new){
 		case iwSlot:{
 			if(GetSlotList(CurrentIItem()->GetSlot())==new_owner)
 				ToSlot	(itm, true);
+			CUICellItem* focusedCellItem=new_owner->GetCellContainer()->GetFocuseditem();
+			if (!focusedCellItem)
+				break;
+			PIItem draggedItem=static_cast<PIItem>(itm->m_pData);
+			PIItem focusedItem=static_cast<PIItem>(focusedCellItem->m_pData);
+			if (!draggedItem || !focusedItem)
+				break;
+			CWeapon*			weapon				= smart_cast<CWeapon*>			(focusedItem);
+			if (weapon)
+			{
+				CWeaponAmmo*		pAmmo				= smart_cast<CWeaponAmmo*>		(draggedItem);
+				if (!pAmmo)
+					break;
+				if (pAmmo!=nullptr && weapon->CanLoadAmmo(pAmmo))
+					weapon->LoadAmmo(pAmmo);
+			}
 		}break;
 		case iwBag:{
 			ToBag	(itm, true);
@@ -313,6 +358,7 @@ bool CUIInventoryWnd::OnItemDrop(CUICellItem* itm)
 		case iwBelt:{
 			ToBelt	(itm, true);
 		}break;
+	default: break;
 	};
 
 	DropItem				(CurrentIItem(), new_owner);
@@ -367,22 +413,14 @@ bool CUIInventoryWnd::OnItemDbClick(CUICellItem* itm)
 bool CUIInventoryWnd::OnItemFocusReceive(CUICellItem* itm)
 {
 	if (itm)
-	{
 		itm->m_focused=true;
-		//PIItem	iitem						= static_cast<PIItem>(itm->m_pData);
-		//Msg("[%s] receive focus",iitem->object().cNameSect().c_str());
-	}
 	return						false;
 }
 
 bool CUIInventoryWnd::OnItemFocusLost(CUICellItem* itm)
 {
 	if (itm)
-	{
 		itm->m_focused=false;
-		//PIItem	iitem						= static_cast<PIItem>(itm->m_pData);
-		//Msg("[%s] lost focus",iitem->object().cNameSect().c_str());
-	}
 	return						false;
 }
 

@@ -816,17 +816,8 @@ bool CWeaponMagazined::CanDetach(const char* item_section_name)
 
 bool CWeaponMagazined::CanLoadAmmo(CWeaponAmmo* pAmmo)
 {
-	bool allowed=false;
-	if (!pAmmo) return allowed;
-	xr_vector<shared_str>::iterator itb = m_ammoTypes.begin();
-	xr_vector<shared_str>::iterator ite = m_ammoTypes.end();
-	for ( ; itb != ite; ++itb )
-		if (xr_strcmp(pAmmo->cNameSect().c_str(),itb->c_str())==0)
-		{
-			allowed=true;
-			break; 
-		}
-	return allowed;
+	if (!pAmmo) return false;
+	return std::find(m_ammoTypes.begin(),m_ammoTypes.end(),pAmmo->cNameSect()) != m_ammoTypes.end();
 }
 
 void CWeaponMagazined::LoadAmmo(CWeaponAmmo* pAmmo)
@@ -836,29 +827,23 @@ void CWeaponMagazined::LoadAmmo(CWeaponAmmo* pAmmo)
 		Msg("! WARNING not possible to load null ammo in magazine for [%s]",Name());
 		return;
 	}
-	if(m_eGrenadeLauncherStatus == CSE_ALifeItemWeapon::eAddonAttachable &&	0 != (m_flagsAddOnState&CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher))
-		return; //на будущее... после починки бага гранотометов. хех...
+	xr_string currentAmmoType;
+	if (GetAmmoElapsed()==0 || m_magazine.empty())
+		currentAmmoType=*m_ammoTypes[m_ammoType];
+	else
+		currentAmmoType = *m_ammoTypes[m_magazine.back().m_LocalAmmoType];
+	if ((xr_strcmp(currentAmmoType.c_str(),pAmmo->cNameSect().c_str())==0) && iAmmoElapsed==iMagazineSize)
+		return;
+	xr_vector<shared_str>::iterator am_it=std::find(m_ammoTypes.begin(),m_ammoTypes.end(),pAmmo->cNameSect());
 	m_set_next_ammoType_on_reload=u32(-1);
-	for (u32 i=0;i<m_ammoTypes.size();i++)
-		if (xr_strcmp(*m_ammoTypes[i],pAmmo->cNameSect().c_str())==0)
-		{
-			m_set_next_ammoType_on_reload=i;
-			break;
-		}
-	if (m_set_next_ammoType_on_reload!=u32(-1))
+	if (am_it!=m_ammoTypes.end())
 	{
-		//CInventoryItem* item		= smart_cast<CInventoryItem*>(this);
-		//CInventoryOwner* owner	= smart_cast<CInventoryOwner*>(H_Parent());
-		//if (owner->inventory().ActiveItem()==item)
-		//{
-		//	играть звук и анимацию
-		//}
-		//else
-		//{
-		//	спрятать текущее, достать новое и играть звук и анимацию.
-		//}
-		//SwitchState(eReload); //полный цикл перезарядки (разрядка+звук+анимация), активный итем не меняется. :)
-		ReloadMagazine();
+		m_set_next_ammoType_on_reload=std::distance(m_ammoTypes.begin(),am_it);
+		if (m_set_next_ammoType_on_reload!=u32(-1))
+		{
+			PlayReloadSound();
+			ReloadMagazine();
+		}
 	}
 }
 
