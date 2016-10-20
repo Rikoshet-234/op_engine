@@ -139,27 +139,32 @@ void CUIInventoryWnd::Init()
 	m_pUIBagList						= xr_new<CUIDragDropListEx>(); UIBagWnd.AttachChild(m_pUIBagList); m_pUIBagList->SetAutoDelete(true);
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_bag", 0, m_pUIBagList);
 	BindDragDropListEnents				(m_pUIBagList);
-			m_pUIBagList->listId="m_pUIBagList";
+	m_pUIBagList->listId="m_pUIBagList";
 
 	m_pUIBeltList						= xr_new<CUIDragDropListEx>(); AttachChild(m_pUIBeltList); m_pUIBeltList->SetAutoDelete(true);
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_belt", 0, m_pUIBeltList);
 	BindDragDropListEnents				(m_pUIBeltList);
-			m_pUIBeltList->listId="m_pUIBeltList";
+	m_pUIBeltList->listId="m_pUIBeltList";
 
 	m_pUIOutfitList						= xr_new<CUIOutfitDragDropList>(); AttachChild(m_pUIOutfitList); m_pUIOutfitList->SetAutoDelete(true);
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_outfit", 0, m_pUIOutfitList);
 	BindDragDropListEnents				(m_pUIOutfitList);
-			m_pUIOutfitList->listId="m_pUIOutfitList";
+	m_pUIOutfitList->listId="m_pUIOutfitList";
+
+	m_pUIKnifeList						= xr_new<CUIDragDropListEx>(); AttachChild(m_pUIKnifeList); m_pUIKnifeList->SetAutoDelete(true);
+	xml_init.InitDragDropListEx			(uiXml, "dragdrop_knife", 0, m_pUIKnifeList);
+	BindDragDropListEnents				(m_pUIKnifeList);
+	m_pUIKnifeList->listId="m_pUIKnifeList";
 
 	m_pUIPistolList						= xr_new<CUIDragDropListEx>(); AttachChild(m_pUIPistolList); m_pUIPistolList->SetAutoDelete(true);
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_pistol", 0, m_pUIPistolList);
 	BindDragDropListEnents				(m_pUIPistolList);
-			m_pUIPistolList->listId="m_pUIPistolList";
+	m_pUIPistolList->listId="m_pUIPistolList";
 
 	m_pUIAutomaticList						= xr_new<CUIDragDropListEx>(); AttachChild(m_pUIAutomaticList); m_pUIAutomaticList->SetAutoDelete(true);
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_automatic", 0, m_pUIAutomaticList);
 	BindDragDropListEnents				(m_pUIAutomaticList);
-			m_pUIAutomaticList->listId="m_pUIAutomaticList";
+	m_pUIAutomaticList->listId="m_pUIAutomaticList";
 
 	//pop-up menu
 	AttachChild							(&UIPropertiesBox);
@@ -201,6 +206,7 @@ EListType CUIInventoryWnd::GetType(CUIDragDropListEx* l)
 	if(l==m_pUIBeltList)		return iwBelt;
 
 	if(l==m_pUIAutomaticList)	return iwSlot;
+	if(l==m_pUIKnifeList)		return iwSlot;
 	if(l==m_pUIPistolList)		return iwSlot;
 	if(l==m_pUIOutfitList)		return iwSlot;
 
