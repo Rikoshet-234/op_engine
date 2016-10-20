@@ -57,6 +57,10 @@ namespace GameObject {
 		eOnObjectHit,
 
 		eOnInventoryShowPropBox,
+
+		eOnCellItemDrop,
+		eOnCellItemAfterSelect,
+
 		eDummy = u32(-1),
 	};
 };

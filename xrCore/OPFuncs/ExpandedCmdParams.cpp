@@ -45,12 +45,12 @@ namespace OPFuncs
 	
 	bool ExpandedCmdParams::isParamSet(int param) const
 	{
-		return paramFlags.test(param)==TRUE;
+		return paramFlags.test(param)!=0;
 	}
 
 	bool ExpandedCmdParams::isAnyParamsSet(int param) const
 	{
-		return paramFlags.is_any(param)==TRUE;
+		return paramFlags.is_any(param)!=0;
 	}
 
 }

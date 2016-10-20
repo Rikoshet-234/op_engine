@@ -379,7 +379,7 @@ void CUILevelMap::Init	(shared_str name, CInifile& gameLtx, LPCSTR sh_name)
 	}
 	
 	if (OPFuncs::Dumper->isParamSet(OPFuncs::ExpandedCmdParams::KnownParams::dMapLoad))
-		Msg("CUILevelMap::Init, Succesfully loaded map %s.",*name);
+		Msg("CUILevelMap::Init, Succesfully loaded map %s.",name.c_str());
 /*	
 	if(gameLtx.line_exist(MapName(),"anomalies_texture")){
 		LPCSTR texture						= gameLtx.r_string	(MapName(),"anomalies_texture");

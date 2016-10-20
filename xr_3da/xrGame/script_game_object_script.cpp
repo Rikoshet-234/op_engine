@@ -89,12 +89,11 @@ void CScriptGameObject::script_register(lua_State *L)
 				value("task_state",					int(GameObject::eTaskStateChange)),
 				value("take_item_from_box",			int(GameObject::eInvBoxItemTake)),
 				value("map_location_added",			int(GameObject::eMapLocationAdded)),
-
 				value("on_npc_weapon_fire",			int(GameObject::eOnNPCWeaponFire)),
-
-				value("on_actor_weapon_fire",			int(GameObject::eOnActorWeaponFire)),
-
-				value("on_object_hit",			int(GameObject::eOnObjectHit))
+				value("on_actor_weapon_fire",		int(GameObject::eOnActorWeaponFire)),
+				value("on_object_hit",				int(GameObject::eOnObjectHit)),
+				value("on_cell_after_select",		int(GameObject::eOnCellItemAfterSelect)),
+				value("on_cell_item_drop",			int(GameObject::eOnCellItemDrop))
 				//value("on_inv_prop_show",		int(GameObject::eOnInventoryShowPropBox))
 
 			],

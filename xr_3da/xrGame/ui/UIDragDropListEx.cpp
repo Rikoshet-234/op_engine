@@ -14,6 +14,10 @@
 #include "../GrenadeLauncher.h"
 #include "../CustomOutfit.h"
 #include "../eatable_item.h"
+#include "../actor.h"
+#include "../game_object_space.h"
+#include "../script_callback_ex.h"
+#include "../script_game_object.h"
 
 
 CUIDragItem* CUIDragDropListEx::m_drag_item = NULL;
@@ -345,7 +349,7 @@ void CUIDragDropListEx::select_suitables_by_selected()
 {
 	if (m_selected_item==nullptr)
 		return;
-	CInventoryItem*	 item = static_cast<CInventoryItem*>(m_selected_item->m_pData);
+	CInventoryItem*	item = static_cast<CInventoryItem*>(m_selected_item->m_pData);
 	select_suitables_by_item(item);
 }
 
@@ -399,6 +403,9 @@ void CUIDragDropListEx::select_suitables_by_item(CInventoryItem* item)
 			Msg("%s",section->c_str());
 		}*/
 	}
+
+	if (Actor())
+		Actor()->callback(GameObject::ECallbackType::eOnCellItemAfterSelect)();
 }
 
 void CUIDragDropListEx::select_weapons_by_addon(CInventoryItem* addonItem)
