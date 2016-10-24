@@ -6,27 +6,93 @@
 #include "UICustomEdit.h"
 #include "../../LightAnimLibrary.h"
 
+static enum EInputCharset
+{
+	EIC_English = 0,
+	EIC_Russian,
+	EIC_Ukrainian,
 
-static u32 DILetters[] = { DIK_A, DIK_B, DIK_C, DIK_D, DIK_E, 
-DIK_F, DIK_G, DIK_H, DIK_I, DIK_J, 
-DIK_K, DIK_L, DIK_M, DIK_N, DIK_O, 
-DIK_P, DIK_Q, DIK_R, DIK_S, DIK_T, 
-DIK_U, DIK_V, DIK_W, DIK_X, DIK_Y, DIK_Z,
-DIK_0, DIK_1, DIK_2, DIK_3, DIK_4, DIK_5, DIK_6, DIK_7,
-DIK_8, DIK_9};
+	EIC_Count,
+} gs_currentCharSet = EIC_English;
+
+static struct SKeyMapping
+{
+	int key;
+	char ch[EIC_Count*2];
+} gs_keyMapping[] = 
+{ 
+	{ DIK_A,			{ 'a', 'A', 'ф', 'Ф', 'ф', 'Ф' }}, 
+	{ DIK_B,			{ 'b', 'B', 'и', 'И', 'и', 'И' }}, 
+	{ DIK_C,			{ 'c', 'C', 'с', 'С', 'с', 'С' }}, 
+	{ DIK_D,			{ 'd', 'D', 'в', 'В', 'в', 'В' }}, 
+	{ DIK_E,			{ 'e', 'E', 'у', 'У', 'у', 'У' }}, 
+	{ DIK_F,			{ 'f', 'F', 'а', 'А', 'а', 'А' }}, 
+	{ DIK_G,			{ 'g', 'G', 'п', 'П', 'п', 'П' }}, 
+	{ DIK_H,			{ 'h', 'H', 'р', 'Р', 'р', 'Р' }}, 
+	{ DIK_I,			{ 'i', 'I', 'ш', 'Ш', 'ш', 'Ш' }}, 
+	{ DIK_J,			{ 'j', 'J', 'о', 'О', 'о', 'О' }}, 
+	{ DIK_K,			{ 'k', 'K', 'л', 'Л', 'л', 'Л' }}, 
+	{ DIK_L,			{ 'l', 'L', 'д', 'Д', 'д', 'Д' }}, 
+	{ DIK_M,			{ 'm', 'M', 'ь', 'Ь', 'ь', 'Ь' }}, 
+	{ DIK_N,			{ 'n', 'N', 'т', 'Т', 'т', 'Т' }}, 
+	{ DIK_O,			{ 'o', 'O', 'щ', 'Щ', 'щ', 'Щ' }}, 
+	{ DIK_P,			{ 'p', 'P', 'з', 'З', 'з', 'З' }}, 
+	{ DIK_Q,			{ 'q', 'Q', 'й', 'Й', 'й', 'Й' }}, 
+	{ DIK_R,			{ 'r', 'R', 'к', 'К', 'к', 'К' }}, 
+	{ DIK_S,			{ 's', 'S', 'ы', 'Ы', 'і', 'І' }}, 
+	{ DIK_T,			{ 't', 'T', 'е', 'Е', 'е', 'Е' }}, 
+	{ DIK_U,			{ 'u', 'U', 'г', 'Г', 'г', 'Г' }}, 
+	{ DIK_V,			{ 'v', 'V', 'м', 'М', 'м', 'М' }}, 
+	{ DIK_W,			{ 'w', 'W', 'ц', 'Ц', 'ц', 'Ц' }}, 
+	{ DIK_X,			{ 'x', 'X', 'ч', 'Ч', 'ч', 'Ч' }}, 
+	{ DIK_Y,			{ 'y', 'Y', 'н', 'Н', 'н', 'Н' }}, 
+	{ DIK_Z,			{ 'z', 'Z', 'я', 'Я', 'я', 'Я' }},
+	{ DIK_0,			{ '0', ')', '0', ')', '0', ')' }}, 
+	{ DIK_1,			{ '1', '!', '1', '!', '1', '!' }}, 
+	{ DIK_2,			{ '2', '@', '2', '@', '2', '@' }}, 
+	{ DIK_3,			{ '3', '#', '3', '#', '3', '#' }}, 
+	{ DIK_4,			{ '4', '$', '4', '$', '4', '$' }}, 
+	{ DIK_5,			{ '5', '%', '5', '%', '5', '%' }}, 
+	{ DIK_6,			{ '6', '^', '6', '^', '6', '^' }}, 
+	{ DIK_7,			{ '7', '&', '7', '&', '7', '&' }},
+	{ DIK_8,			{ '8', '*', '8', '*', '8', '*' }}, 
+	{ DIK_9,			{ '9', '(', '9', '(', '9', '(' }},
+	{ DIK_LBRACKET,		{ '[', '{', 'х', 'Х', 'х', 'Х' }},
+	{ DIK_RBRACKET,		{ ']', '}', 'ъ', 'Ъ', 'ї', 'Ї' }},
+	{ DIK_APOSTROPHE,	{ '\'','"', 'э', 'Э', 'є', 'Є' }},
+	{ DIK_COMMA,		{ ',', '<', 'б', 'Б', 'б', 'Б' }},
+	{ DIK_PERIOD,		{ '.', '>', 'ю', 'Ю', 'ю', 'Ю' }},
+	{ DIK_SLASH,		{ '/', '?', '.', ',', '.', ',' }},
+	{ DIK_BACKSLASH,	{ '\\','|', '\\','/', '\\','/' }},
+	{ DIK_SEMICOLON,	{ ';', ':', 'ж', 'Ж', 'ж', 'Ж' }},
+};
 
 static xr_map<u32, char> gs_DIK2CHR;
+
+static inline u32 makeKey(int key, size_t chset, bool shift)
+{
+	return ((u32)(chset * 2 + (shift ? 1 : 0)) << 16) | (u32)key;
+}
 
 CUICustomEdit::CUICustomEdit()
 {
 	m_max_symb_count		= u32(-1);
-	char l_c;
-	for(l_c = 'a'; l_c <= 'z'; ++l_c) 
-		gs_DIK2CHR[DILetters[l_c-'a']] = l_c;
-	for(l_c = '0'; l_c <= '9'; ++l_c)
-		gs_DIK2CHR[DILetters['z'-'a'+l_c+1-'0']] = l_c;
 
+	//! Initialize table only once
+	if (gs_DIK2CHR.empty())
+	{
+		for (size_t i = 0; i < ARRAYSIZE(gs_keyMapping); ++i)
+		{
+			const SKeyMapping& km = gs_keyMapping[i];
+			for(size_t j = 0; j < EIC_Count; ++j)
+			{
+				gs_DIK2CHR[makeKey(km.key, j, false)] = km.ch[j * 2];
+				gs_DIK2CHR[makeKey(km.key, j, true)]  = km.ch[j * 2 + 1];
+			}
+		}
+	}
 	m_bShift = false;
+	m_bControl = false;
 	m_bInputFocus = false;
 
 	m_iKeyPressAndHold = 0;
@@ -164,6 +230,10 @@ bool CUICustomEdit::KeyPressed(int dik)
 	case DIKEYBOARD_RIGHT:
 		m_lines.IncCursorPos();		
 		break;
+	case DIK_LCONTROL:
+	case DIK_RCONTROL:
+		m_bControl = true;
+		break;
 	case DIK_LSHIFT:
 	case DIK_RSHIFT:
 		m_bShift = true;
@@ -198,29 +268,33 @@ bool CUICustomEdit::KeyPressed(int dik)
 		bChanged = true;
 		break;
 	case DIK_SPACE:
-		out_me = ' ';					break;
-	case DIK_LBRACKET:
-		out_me = m_bShift ? '{' : '[';	break;
-	case DIK_RBRACKET:
-		out_me = m_bShift ? '}' : ']';	break;
-	case DIK_SEMICOLON:
-		out_me = m_bShift ? ':' : ';';	break;
-	case DIK_APOSTROPHE:
-		out_me = m_bShift ? '"' : '\'';	break;
-	case DIK_BACKSLASH:
-		out_me = m_bShift ? '|' : '\\';	break;
-	case DIK_SLASH:
-		out_me = m_bShift ? '?' : '/';	break;
-	case DIK_COMMA:
-		out_me = m_bShift ? '<' : ',';	break;
-	case DIK_PERIOD:
-		out_me = m_bShift ? '>' : '.';	break;
+		out_me = ' ';
+		break;
 	case DIK_MINUS:
 		out_me = m_bShift ? '_' : '-';	break;
 	case DIK_EQUALS:
 		out_me = m_bShift ? '+' : '=';	break;
+	//! jarni: must be last, just before default, to catch case when control is not set
+	case DIK_E:
+		if (m_bControl)
+		{
+			gs_currentCharSet = EIC_English;
+			break;
+		}
+	case DIK_R:
+		if (m_bControl)
+		{
+			gs_currentCharSet = EIC_Russian;
+			break;
+		}
+	case DIK_U:
+		if (m_bControl)
+		{
+			gs_currentCharSet = EIC_Ukrainian;
+			break;
+		}
 	default:
-		it = gs_DIK2CHR.find(dik);
+		it = gs_DIK2CHR.find(makeKey(dik, gs_currentCharSet, m_bShift));
 
 		//нажата клавиша с буквой 
 		if (gs_DIK2CHR.end() != it){
@@ -256,6 +330,10 @@ bool CUICustomEdit::KeyReleased(int dik)
 {
 	switch(dik)
 	{
+	case DIK_LCONTROL:
+	case DIK_RCONTROL:
+		m_bControl = false;
+		return true;
 	case DIK_LSHIFT:
 	case DIK_RSHIFT:
 		m_bShift = false;
@@ -294,25 +372,6 @@ void CUICustomEdit::AddLetter(char c)
 
 		return;
 	}
-	if(m_bShift)
-	{
-		switch(c) {
-		case '1': c='!';	break;
-		case '2': c='@';	break;
-		case '3': c='#';	break;
-		case '4': c='$';	break;
-		case '5': c='%';	break;
-		case '6': c='^';	break;
-		case '7': c='&';	break;
-		case '8': c='*';	break;
-		case '9': c='(';	break;
-		case '0': c=')';	break;
-		default:
-			c = c-'a';
-			c = c+'A';
-		}
-	}
-
 	AddChar(c);
 }
 
