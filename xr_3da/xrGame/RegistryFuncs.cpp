@@ -12,11 +12,10 @@
 #endif
 
 
-bool	ReadRegistryValue(LPCSTR rKeyName, DWORD rKeyType, void* value )
+bool	ReadRegistryValue(HKEY hBase, LPCSTR rPath, LPCSTR rKeyName, DWORD rKeyType, void* value )
 {	
-	HKEY hKey = 0;	
-	long res = RegOpenKeyEx(REGISTRY_BASE, 
-		REGISTRY_PATH, 0, KEY_READ, &hKey);
+	HKEY hKey = 0;
+	long res = RegOpenKeyEx(hBase, rPath, 0, KEY_READ, &hKey);
 
 	if (res != ERROR_SUCCESS)
 	{
@@ -107,7 +106,12 @@ bool	WriteRegistryValue	(LPCSTR rKeyName, DWORD rKeyType, const void* value)
 
 void	ReadRegistry_StrValue	(LPCSTR rKeyName, char* value )
 {
-	ReadRegistryValue(rKeyName, REG_SZ, value);
+	ReadRegistryValue(REGISTRY_BASE, REGISTRY_PATH, rKeyName, REG_SZ, value);
+}
+
+void	ReadRegistry_StrValue	(bool localMachine, LPCSTR rPath, LPCSTR rKeyName, char* value )
+{
+	ReadRegistryValue(localMachine ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER, rPath, rKeyName, REG_SZ, value);
 }
 
 void	WriteRegistry_StrValue	(LPCSTR rKeyName, const char* value )
@@ -117,8 +121,14 @@ void	WriteRegistry_StrValue	(LPCSTR rKeyName, const char* value )
 
 void	ReadRegistry_DWValue	(LPCSTR rKeyName, DWORD& value )
 {
-	ReadRegistryValue(rKeyName, REG_DWORD, &value);
+	ReadRegistryValue(REGISTRY_BASE, REGISTRY_PATH, rKeyName, REG_DWORD, &value);
 }
+
+void	ReadRegistry_DWValue	(bool localMachine, LPCSTR rPath, LPCSTR rKeyName, DWORD& value )
+{
+	ReadRegistryValue(localMachine ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER, rPath, rKeyName, REG_DWORD, &value);
+}
+
 void	WriteRegistry_DWValue	(LPCSTR rKeyName, const DWORD& value )
 {
 	WriteRegistryValue(rKeyName, REG_DWORD, &value);

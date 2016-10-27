@@ -2,6 +2,7 @@
 
 #include "UILines.h"
 #include "UIWindow.h"
+#include "UIStatic.h"
 
 class CUICustomEdit : public CUIWindow, public CUILinesOwner {
 	u32				m_max_symb_count;
@@ -38,16 +39,20 @@ public:
 			void	SetLightAnim			(LPCSTR lanim);
 
 protected:
-
 	bool KeyPressed(int dik);
 	bool KeyReleased(int dik);
 
 	void AddLetter(char c);
 	virtual void AddChar(char c);
-
+	
+	void CheckSwitchInputLanguage();
+	void ChangeInputLanguage();
+protected:
 	bool m_bInputFocus;
 	bool m_bShift;
 	bool m_bControl;
+	bool m_bAlt;
+	bool m_bCapital;
 
 	bool m_bNumbersOnly;
 	bool m_bFloatNumbers;
@@ -61,5 +66,8 @@ protected:
 
 //	u32	m_cursorColor;
 
-	CLAItem*				m_lanim;
+	CLAItem*	m_lanim;
+
+	CUIStatic m_languageIcon;
+	size_t m_currentSelectedLanguage;
 };
