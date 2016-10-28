@@ -20,7 +20,6 @@ struct	NET_Buffer
 class	NET_Packet
 {
 public:
-
 	void            construct( const void* data, unsigned size )
 					{
 						memcpy( B.data, data, size );
@@ -30,17 +29,23 @@ public:
 	NET_Buffer		B;
 	u32				r_pos;
 	u32				timeReceive;
+	u32				m_iniString383BackupPos;
+	BYTE			m_iniString383Backup;
 public:
 	// writing - main
 	IC void write_start(){
 		B.count=0;
+		m_iniString383BackupPos = 0;
+		m_iniString383Backup = 0;
 	}
 	IC void	w_begin	( u16 type		)				// begin of packet 'type'
 	{
 		B.count=0;
+		m_iniString383BackupPos = 0;
+		m_iniString383Backup = 0;
 		w_u16(type);
 	}
-	IC void	w		( const void* p, u32 count )
+	IC void	w		( const void* p, u32 count, bool iniString = false )
 	{
 		VERIFY		(p && count);
 		//VERIFY2		(B.count + count < NET_PacketSizeLimit,shared_str().sprintf("Oversized netpacket before write! [%i > %i]",B.count+count,NET_PacketSizeLimit).c_str());
@@ -50,6 +55,12 @@ public:
 			FATAL("ENGINE CRASH: See details in log");
 		};
 		CopyMemory(&B.data[B.count],p,count);
+		//! iniString is broken on position 383, it is at least 383 + 1 byte for EOL
+		if (iniString && count > 384)
+		{
+			m_iniString383BackupPos = B.count + 383;
+			m_iniString383Backup = B.data[m_iniString383BackupPos];
+		}
 		B.count		+= count;
 		//VERIFY2		(B.count<NET_PacketSizeLimit,shared_str().sprintf("Oversized netpacket after write! [%i > %i]",B.count,NET_PacketSizeLimit).c_str());
 		if (B.count >= NET_PacketSizeLimit)
@@ -57,11 +68,21 @@ public:
 			LogPacketError("Oversized netpacket after write! [%i > %i]",B.count,NET_PacketSizeLimit);			
 			FATAL("ENGINE CRASH: See details in log");
 		};
+		if (m_iniString383BackupPos != 0 && B.data[m_iniString383BackupPos] != m_iniString383Backup)
+		{
+			LogPacketError("Custom data broken! [%d != %d] Custom data: %s",B.data[m_iniString383BackupPos],m_iniString383Backup, &B.data[m_iniString383BackupPos-383]);			
+			FATAL("ENGINE CRASH: See details in log");
+		}
 	}
 	IC void w_seek	(u32 pos, const void* p, u32 count)	// random write (only inside allocated region)
 	{
 		VERIFY		(p && count && (pos+count<=B.count));
 		CopyMemory(&B.data[pos],p,count);
+		if (m_iniString383BackupPos != 0 && B.data[m_iniString383BackupPos] != m_iniString383Backup)
+		{
+			LogPacketError("Custom data broken! [%d != %d] Custom data: %s",B.data[m_iniString383BackupPos],m_iniString383Backup, &B.data[m_iniString383BackupPos-383]);			
+			FATAL("ENGINE CRASH: See details in log");
+		}
 	}
 	IC u32	w_tell	()	{ return B.count; }
 
@@ -115,9 +136,9 @@ public:
 	{
 		w	(S,(u32)xr_strlen(S)+1);
 	}
-	IC void w_stringZ			( shared_str& p )
+	IC void w_stringZ			( shared_str& p, bool iniString = false )
 	{
-		if (*p)	w(*p,(u32)xr_strlen(p)+1);
+		if (*p)	w(*p,(u32)xr_strlen(p)+1,iniString);
 		else	w_u8(0);
 	}
 	IC void w_matrix			(Fmatrix& M)

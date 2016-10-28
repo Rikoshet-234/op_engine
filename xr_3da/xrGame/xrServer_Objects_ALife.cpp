@@ -311,7 +311,7 @@ void CSE_ALifeObject::STATE_Write			(NET_Packet &tNetPacket)
 	tNetPacket.w_u32			(m_bDirectControl);
 	tNetPacket.w_u32			(m_tNodeID);
 	tNetPacket.w_u32			(m_flags.get());
-	tNetPacket.w_stringZ		(m_ini_string);
+	tNetPacket.w_stringZ		(m_ini_string,true);
 	tNetPacket.w				(&m_story_id,sizeof(m_story_id));
 	tNetPacket.w				(&m_spawn_story_id,sizeof(m_spawn_story_id));
 }
@@ -367,7 +367,7 @@ void CSE_ALifeObject::STATE_Read			(NET_Packet &tNetPacket, u16 size)
 		if (m_ini_file)
 			xr_delete			(m_ini_file);
 		tNetPacket.r_stringZ	(m_ini_string);
-
+#if 0
 		//! Broken packet?
 		if (m_ini_string.size() == 383 && m_ini_string[0] == '\n')
 		{
@@ -454,6 +454,7 @@ void CSE_ALifeObject::STATE_Read			(NET_Packet &tNetPacket, u16 size)
 				tNetPacket.r_pos = currentRPos;
 			}
 		}
+#endif
 	}
 
 	if (m_wVersion > 61)
