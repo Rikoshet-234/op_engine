@@ -367,6 +367,93 @@ void CSE_ALifeObject::STATE_Read			(NET_Packet &tNetPacket, u16 size)
 		if (m_ini_file)
 			xr_delete			(m_ini_file);
 		tNetPacket.r_stringZ	(m_ini_string);
+
+		//! Broken packet?
+		if (m_ini_string.size() == 383 && m_ini_string[0] == '\n')
+		{
+			u32 currentRPos = tNetPacket.r_pos;
+			shared_str restOfIniString;
+			tNetPacket.r_stringZ(restOfIniString);
+			if (restOfIniString.size() > 0 && (restOfIniString.size() + currentRPos < tNetPacket.B.count))
+			{
+				//! Try to find out which part of string from all.spawn it is
+				string_path file_name;
+				bool file_exists = !!FS.exist(file_name, "$game_spawn$", "all", ".spawn");
+				if (file_exists)
+				{
+					IReader *m_file = 0;
+					m_file = FS.r_open(file_name);
+					if (m_file)
+					{
+						const char* pattern_begin = restOfIniString._get()->value;
+						const char* pattern_end = pattern_begin + restOfIniString.size();
+						const char* pattern_pos = pattern_begin;
+						u32 numOfNonEOLChars = 0;
+						while(pattern_pos < pattern_end)
+						{
+							if((*pattern_pos == '\n' || *pattern_pos == '\r') && numOfNonEOLChars > 0)
+								break;
+							++numOfNonEOLChars;
+							++pattern_pos;
+						}
+						pattern_end = pattern_pos;
+
+						//! Simplified search of substring
+						const char* text_pos = static_cast<char*>(m_file->pointer());
+						const char* text_end = text_pos + m_file->length();
+						pattern_pos = pattern_begin;
+						while(text_pos < text_end && pattern_pos != pattern_end)
+						{
+							pattern_pos = pattern_begin;
+							while(*text_pos == *pattern_pos && pattern_pos < pattern_end && text_pos < text_end)
+							{
+								++text_pos;
+								++pattern_pos;
+							}
+
+							++text_pos;
+						}
+
+						if (pattern_pos == pattern_end)
+						{
+							//! Finally the character we were looking for
+							//! +1 because text_pos is incremented once more before exit from outer loo
+							//! +1 because our target character is one step before start of pattern
+							text_pos -= ((pattern_end - pattern_begin) + 2);
+
+							tNetPacket.B.data[currentRPos-1] = *text_pos;
+							tNetPacket.r_pos = currentRPos - 384;//! 383str + 1z
+							
+							//! Reread custom data
+							tNetPacket.r_stringZ(m_ini_string);
+							Log("Broken save fixed");
+						}
+						else
+						{
+							//! Not found
+							tNetPacket.r_pos = currentRPos;
+						}
+
+						FS.r_close(m_file);
+					}
+					else
+					{
+						//! It exists but we can't open it???
+						tNetPacket.r_pos = currentRPos;
+					}
+				}
+				else
+				{
+					//! Where is all.spawn?
+					tNetPacket.r_pos = currentRPos;
+				}
+			}
+			//! Maybe it wasn't broken in the end
+			else
+			{
+				tNetPacket.r_pos = currentRPos;
+			}
+		}
 	}
 
 	if (m_wVersion > 61)
