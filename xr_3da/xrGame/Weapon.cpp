@@ -53,7 +53,7 @@ CWeapon::CWeapon(LPCSTR name)
 	iAmmoElapsed			= -1;
 	iMagazineSize			= -1;
 	m_ammoType				= 0;
-	m_ammoName				= NULL;
+	m_ammoName				= nullptr;
 
 	eHandDependence			= hdNone;
 
@@ -61,11 +61,11 @@ CWeapon::CWeapon(LPCSTR name)
 	m_fZoomRotationFactor	= 0.f;
 
 
-	m_pAmmo					= NULL;
+	m_pAmmo					= nullptr;
 
 
-	m_pFlameParticles2		= NULL;
-	m_sFlameParticles2		= NULL;
+	m_pFlameParticles2		= nullptr;
+	m_sFlameParticles2		= nullptr;
 
 
 	m_fCurrentCartirdgeDisp = 1.f;
@@ -76,7 +76,7 @@ CWeapon::CWeapon(LPCSTR name)
 	m_can_be_strapped		= false;
 	m_ef_main_weapon_type	= u32(-1);
 	m_ef_weapon_type		= u32(-1);
-	m_UIScope				= NULL;
+	m_UIScope				= nullptr;
 	m_set_next_ammoType_on_reload = u32(-1);
 }
 
@@ -292,7 +292,8 @@ void CWeapon::Load		(LPCSTR section)
 		m_ammoName = pSettings->r_string(*m_ammoTypes[0],"inv_name_short");
 	}
 	else
-		m_ammoName = 0;
+		m_ammoName = nullptr;
+	
 
 	iAmmoElapsed		= pSettings->r_s32		(section,"ammo_elapsed"		);
 	iMagazineSize		= pSettings->r_s32		(section,"ammo_mag_size"	);
@@ -487,7 +488,7 @@ BOOL CWeapon::net_Spawn		(CSE_Abstract* DC)
 	if (iAmmoElapsed>iMagazineSize)
 	{
 		
-		Msg("~ WARNING CWeapon::net_Spawn invalid ammoElapsed for [%s], try to recovery.",E->name_replace());
+		Msg("~ WARNING CWeapon::net_Spawn invalid ammoElapsed for [%s] [%i] [%i], try to recovery.",E->name_replace(),iAmmoElapsed,iMagazineSize);
 		iAmmoElapsed=iMagazineSize;
 		if (m_fCondition>1.0f && iMagazineSize>0)
 			m_fCondition=0.3f;

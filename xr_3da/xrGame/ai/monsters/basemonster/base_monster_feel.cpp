@@ -102,7 +102,8 @@ void CBaseMonster::HitEntity(const CEntity *pEntity, float fDamage, float impuls
 		HS.boneID			= (smart_cast<CKinematics*>(pEntityNC->Visual())->LL_GetBoneRoot());//		l_P.w_s16	(smart_cast<CKinematics*>(pEntityNC->Visual())->LL_GetBoneRoot());
 		HS.p_in_bone_space	= (position_in_bone_space);											//		l_P.w_vec3	(position_in_bone_space);
 		HS.impulse			= (impulse);														//		l_P.w_float	(impulse);
-		HS.hit_type			= (ALife::eHitTypeWound);											//		l_P.w_u16	( u16(ALife::eHitTypeWound) );
+		//HS.hit_type			= (ALife::eHitTypeWound);											//		l_P.w_u16	( u16(ALife::eHitTypeWound) );
+		HS.hit_type			= m_eHitType;											//		l_P.w_u16	( u16(ALife::eHitTypeWound) );
 		HS.Write_Packet(l_P);
 		u_EventSend	(l_P);
 		

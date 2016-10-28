@@ -288,6 +288,8 @@ public:
 private:
 	CAnomalyDetector		*m_anomaly_detector;
 
+	ALife::EHitType		m_eHitType;
+
 public:
 	CAnomalyDetector		&anomaly_detector	() {return (*m_anomaly_detector);}
 	// -----------------------------------------------------------------------------

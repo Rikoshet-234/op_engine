@@ -31,6 +31,23 @@ struct CUICell{
 typedef xr_vector<CUICell>			UI_CELLS_VEC;
 typedef UI_CELLS_VEC::iterator		UI_CELLS_VEC_IT;
 
+typedef enum
+{
+	ltSlotKnife = 0,
+	ltSlotPistol = 1,
+	ltSlotRifle = 2,
+	ltGrenade = 3,
+	ltApparatus = 4,
+	ltBolt = 5,
+	ltSlotOutfit = 6,
+	ltPDA = 7,
+	ltDetector = 8,
+	ltTorch = 9,
+	ltBag	= 10,
+	ltBelt	= 11,
+	ltUnknown = -1
+} IWListTypes;
+
 class CUIDragDropListEx :public CUIWindow, public CUIWndCallback
 {
 private:
@@ -59,9 +76,11 @@ protected:
 	void	__stdcall		OnItemFocusReceived		(CUIWindow* w, void* pData);
 	void	__stdcall		OnItemFocusLost			(CUIWindow* w, void* pData);
 
-	
+	IWListTypes				listId;
 public:
-	shared_str				listId;
+	
+	IWListTypes				GetUIListId() const			{return listId; };
+	void					SetUIListId(IWListTypes id)	{listId=id; };
 	static CUIDragItem*		m_drag_item;
 	int						m_i_scroll_pos;
 							CUIDragDropListEx	();
@@ -78,10 +97,11 @@ public:
 	DRAG_DROP_EVENT			m_f_item_focus_received;
 	DRAG_DROP_EVENT			m_f_item_focus_lost;
 
-	void			select_suitables_by_selected();
-	void			select_suitables_by_item(CInventoryItem* item);
-	void			select_weapons_by_addon(CInventoryItem* addonItem);
-	void			select_weapons_by_ammo(CInventoryItem* ammoItem);
+	bool			select_suitables_by_selected();
+	bool			select_suitables_by_item(CInventoryItem* item);
+	bool			select_weapons_by_addon(CInventoryItem* addonItem);
+	bool			select_weapons_by_ammo(CInventoryItem* ammoItem);
+	bool			select_items_by_section(shared_str section);
 
 
 	const	Ivector2&		CellsCapacity		();
@@ -151,7 +171,7 @@ protected:
 public:							
 								CUICellContainer	(CUIDragDropListEx* parent);
 	virtual						~CUICellContainer	();
-	CUICellItem*				GetFocuseditem		();
+	CUICellItem*				GetFocusedCellItem		();
 	void						clear_select_suitables();
 
 	Fcolor				m_focused_color;

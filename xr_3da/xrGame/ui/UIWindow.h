@@ -201,9 +201,12 @@ public:
 
 	IC bool					CursorOverWindow	() const					{ return m_bCursorOverWindow; }
 
+	EAWindowType			GetUIWindowType() const							{return m_uiWindowType;}
+	void					SetUIWindowType(EAWindowType wt)				{m_uiWindowType=wt;}
 protected:
 	IC void					SafeRemoveChild(CUIWindow* child)				{WINDOW_LIST_it it = std::find(m_ChildWndList.begin(),m_ChildWndList.end(),child); if(it!=m_ChildWndList.end())m_ChildWndList.erase(it);};
 
+	EAWindowType			m_uiWindowType;
 	shared_str				m_windowName;
 	//список дочерних окон
 	WINDOW_LIST				m_ChildWndList;

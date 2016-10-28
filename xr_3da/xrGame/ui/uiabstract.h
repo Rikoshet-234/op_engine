@@ -25,6 +25,15 @@ typedef enum {
 	valBotton
 } EVTextAlignment;
 
+typedef	enum
+{
+	wtInventory=0,
+	wtTrade=1,
+	wtCarbody=2,
+	wtUnknown=-1
+} EAWindowType;
+
+
 class IUITextControl : public IUIFontControl{
 public:
 	virtual ~IUITextControl()											 {};

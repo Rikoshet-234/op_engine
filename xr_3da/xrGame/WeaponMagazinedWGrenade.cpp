@@ -246,6 +246,8 @@ void  CWeaponMagazinedWGrenade::PerformSwitchGL()
 	}
 	if (m_bGrenadeMode)
 		SetQueueSize(1);
+	else
+		SetQueueSize(GetCurrentFireMode());
 }
 
 bool CWeaponMagazinedWGrenade::Action(s32 cmd, u32 flags) 

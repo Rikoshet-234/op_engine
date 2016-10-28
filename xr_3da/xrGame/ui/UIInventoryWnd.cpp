@@ -33,6 +33,7 @@ using namespace InventoryUtilities;
 #include "UIDragDropListEx.h"
 #include "UIOutfitSlot.h"
 #include "UI3tButton.h"
+#include "UIWindow.h"
 
 #define				INVENTORY_ITEM_XML		"inventory_item.xml"
 #define				INVENTORY_XML			"inventory_new.xml"
@@ -53,6 +54,7 @@ CUIInventoryWnd::CUIInventoryWnd()
 	g_pInvWnd							= this;	
 	m_b_need_reinit						= false;
 	Hide								();	
+	SetUIWindowType(EAWindowType::wtInventory);
 }
 
 void CUIInventoryWnd::Init()
@@ -138,33 +140,39 @@ void CUIInventoryWnd::Init()
 
 	m_pUIBagList						= xr_new<CUIDragDropListEx>(); UIBagWnd.AttachChild(m_pUIBagList); m_pUIBagList->SetAutoDelete(true);
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_bag", 0, m_pUIBagList);
-	BindDragDropListEnents				(m_pUIBagList);
-	m_pUIBagList->listId="m_pUIBagList";
+	BindDragDropListEvents				(m_pUIBagList);
+	m_pUIBagList->SetUIListId(IWListTypes::ltBag);
+	inventoryLists.push_back(m_pUIBagList);
 
 	m_pUIBeltList						= xr_new<CUIDragDropListEx>(); AttachChild(m_pUIBeltList); m_pUIBeltList->SetAutoDelete(true);
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_belt", 0, m_pUIBeltList);
-	BindDragDropListEnents				(m_pUIBeltList);
-	m_pUIBeltList->listId="m_pUIBeltList";
+	BindDragDropListEvents				(m_pUIBeltList);
+	m_pUIBeltList->SetUIListId(IWListTypes::ltBelt);
+	inventoryLists.push_back(m_pUIBeltList);
 
 	m_pUIOutfitList						= xr_new<CUIOutfitDragDropList>(); AttachChild(m_pUIOutfitList); m_pUIOutfitList->SetAutoDelete(true);
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_outfit", 0, m_pUIOutfitList);
-	BindDragDropListEnents				(m_pUIOutfitList);
-	m_pUIOutfitList->listId="m_pUIOutfitList";
+	BindDragDropListEvents				(m_pUIOutfitList);
+	m_pUIOutfitList->SetUIListId(IWListTypes::ltSlotOutfit);
+	inventoryLists.push_back(m_pUIOutfitList);
 
 	m_pUIKnifeList						= xr_new<CUIDragDropListEx>(); AttachChild(m_pUIKnifeList); m_pUIKnifeList->SetAutoDelete(true);
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_knife", 0, m_pUIKnifeList);
-	BindDragDropListEnents				(m_pUIKnifeList);
-	m_pUIKnifeList->listId="m_pUIKnifeList";
+	BindDragDropListEvents				(m_pUIKnifeList);
+	m_pUIKnifeList->SetUIListId(IWListTypes::ltSlotKnife);
+	inventoryLists.push_back(m_pUIKnifeList);
 
 	m_pUIPistolList						= xr_new<CUIDragDropListEx>(); AttachChild(m_pUIPistolList); m_pUIPistolList->SetAutoDelete(true);
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_pistol", 0, m_pUIPistolList);
-	BindDragDropListEnents				(m_pUIPistolList);
-	m_pUIPistolList->listId="m_pUIPistolList";
+	BindDragDropListEvents				(m_pUIPistolList);
+	m_pUIPistolList->SetUIListId(IWListTypes::ltSlotPistol);
+	inventoryLists.push_back(m_pUIPistolList);
 
 	m_pUIAutomaticList						= xr_new<CUIDragDropListEx>(); AttachChild(m_pUIAutomaticList); m_pUIAutomaticList->SetAutoDelete(true);
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_automatic", 0, m_pUIAutomaticList);
-	BindDragDropListEnents				(m_pUIAutomaticList);
-	m_pUIAutomaticList->listId="m_pUIAutomaticList";
+	BindDragDropListEvents				(m_pUIAutomaticList);
+	m_pUIAutomaticList->SetUIListId(IWListTypes::ltSlotRifle);
+	inventoryLists.push_back(m_pUIAutomaticList);
 
 	//pop-up menu
 	AttachChild							(&UIPropertiesBox);
@@ -197,18 +205,38 @@ void CUIInventoryWnd::Init()
 	::Sound->create						(sounds[eInvItemUse],		uiXml.Read("snd_item_use",		0,	NULL),st_Effect,sg_SourceType);
 
 	uiXml.SetLocalRoot					(stored_root);
-	
 }
 
 EListType CUIInventoryWnd::GetType(CUIDragDropListEx* l)
 {
-	if(l==m_pUIBagList)			return iwBag;
-	if(l==m_pUIBeltList)		return iwBelt;
+	IWListTypes listType=l->GetUIListId();
+	switch (listType)
+	{
+		case ltBag: return iwBag;
+		case ltBelt: return iwBelt;
 
-	if(l==m_pUIAutomaticList)	return iwSlot;
-	if(l==m_pUIKnifeList)		return iwSlot;
-	if(l==m_pUIPistolList)		return iwSlot;
-	if(l==m_pUIOutfitList)		return iwSlot;
+		case ltSlotKnife: 
+		case ltSlotPistol: 
+		case ltSlotRifle: 
+		case ltGrenade: 
+		case ltApparatus:
+		case ltBolt: 
+		case ltSlotOutfit:
+		case ltPDA: 
+		case ltDetector:
+		case ltTorch: return iwSlot;
+		case ltUnknown: 
+		default: NODEFAULT;
+	}
+
+
+	//if(l==m_pUIBagList)			return iwBag;
+	//if(l==m_pUIBeltList)		return iwBelt;
+
+	//if(l==m_pUIAutomaticList)	return iwSlot;
+	//if(l==m_pUIKnifeList)		return iwSlot;
+	//if(l==m_pUIPistolList)		return iwSlot;
+	//if(l==m_pUIOutfitList)		return iwSlot;
 
 	NODEFAULT;
 #ifdef DEBUG
@@ -469,7 +497,7 @@ void	CUIInventoryWnd::SendEvent_Item_Eat			(PIItem	pItem)
 };
 
 
-void CUIInventoryWnd::BindDragDropListEnents(CUIDragDropListEx* lst)
+void CUIInventoryWnd::BindDragDropListEvents(CUIDragDropListEx* lst)
 {
 	lst->m_f_item_drop				= CUIDragDropListEx::DRAG_DROP_EVENT(this,&CUIInventoryWnd::OnItemDrop);
 	lst->m_f_item_start_drag		= CUIDragDropListEx::DRAG_DROP_EVENT(this,&CUIInventoryWnd::OnItemStartDrag);

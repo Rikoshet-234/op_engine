@@ -40,6 +40,7 @@ public:
 	virtual		void		OnAfterChild			()						{};
 
 				u32			ChildsCount				();
+				bool		HasChilds() const		{return m_childs.size()>0;}
 				void		 PushChild				(CUICellItem*);
 				CUICellItem* PopChild				();
 				CUICellItem* Child					(u32 idx)				{return m_childs[idx];};
@@ -56,6 +57,7 @@ public:
 				void		SetCustomDraw			(ICustomDrawCell* c);
 				size_t			m_drawn_frame;
 				void*		m_pData;
+	CInventoryItem*			GetInventoryItem() const {return	static_cast<PIItem>(m_pData);}
 				int			m_index;
 				bool		m_b_already_drawn;
 	bool					m_b_destroy_childs;

@@ -270,7 +270,6 @@ void CUIInventoryWnd::ActivatePropertiesBox()
 	{
 		UIPropertiesBox.AutoUpdateSize	();
 		UIPropertiesBox.BringAllToTop	();
-
 		Fvector2						cursor_pos;
 		Frect							vis_rect;
 		GetAbsoluteRect					(vis_rect);
@@ -278,6 +277,7 @@ void CUIInventoryWnd::ActivatePropertiesBox()
 		cursor_pos.sub					(vis_rect.lt);
 		UIPropertiesBox.Show			(vis_rect, cursor_pos);
 		PlaySnd							(eInvProperties);
+		SetCapture(static_cast<CUIWindow*>(&UIPropertiesBox),true);
 	}
 }
 
@@ -352,8 +352,6 @@ void CUIInventoryWnd::ProcessPropertiesBoxClicked	()
 				/*luabind::functor<void> &func=*static_cast<luabind::functor<void> *>(UIPropertiesBox.GetClickedItem()->GetData());
 				if (func && func.is_valid())
 					func();*/
-				
-				
 			}
 			break;
 		}

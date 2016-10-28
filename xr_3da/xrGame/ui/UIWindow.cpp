@@ -102,6 +102,7 @@ void CUIWindow::ResetPPMode()
 CUIWindow::CUIWindow()
 {
 //.	m_dbg_flag.zero			();
+	m_uiWindowType			= EAWindowType::wtUnknown;
 	m_pFont					= NULL;
 	m_pParentWnd			= NULL;
 	m_pMouseCapturer		= NULL;

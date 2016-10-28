@@ -15,7 +15,11 @@
 #include "../grenadelauncher.h"
 #include "../silencer.h"
 #include "../scope.h"
+#include "../script_callback_ex.h"
 #include "../grenadelauncher.h"
+#include "../game_object_space.h"
+#include "../script_callback_ex.h"
+
 
 CUICellItem* CUIInventoryWnd::CurrentItem()
 {
@@ -37,26 +41,107 @@ void CUIInventoryWnd::SetItemSelected (CUICellItem* itm)
 		itm->m_selected=true;
 }
 
+void CUIInventoryWnd::ClearAllSuitables()
+{
+	std::for_each(inventoryLists.begin(),inventoryLists.end(),[](CUIDragDropListEx* list)
+	{
+		list->GetCellContainer()->clear_select_suitables();
+	});
+}
+
+void CUIInventoryWnd::ClearSuitablesInList(IWListTypes listType)
+{
+	auto listIt=std::find_if(inventoryLists.begin(),inventoryLists.end(),[listType](CUIDragDropListEx* list)
+	{
+		return list->GetUIListId()==listType;
+	});
+	if (listIt!=inventoryLists.end())
+	{
+		(*listIt)->GetCellContainer()->clear_select_suitables();
+	}
+}
+
+void CUIInventoryWnd::SetSuitableBySection(LPCSTR section)
+{
+	std::for_each(inventoryLists.begin(),inventoryLists.end(),[section](CUIDragDropListEx* list)
+	{
+		list->select_items_by_section(section);
+	});
+}
+
+xr_vector<LPCSTR> CUIInventoryWnd::getStringsFromLua(luabind::object const& table) const
+{
+	xr_vector<LPCSTR> luaStrings;
+	if (table!=nullptr && table.is_valid() && table.type()==LUA_TTABLE)
+		for(luabind::object::iterator iter=table.begin(); iter != table.end(); ++iter)
+		{
+			switch(iter->type())
+			{
+			case LUA_TSTRING:
+		   			luaStrings.push_back(luabind::object_cast<LPCSTR>(*iter));
+					break;
+			default: break;
+			}
+		}
+	return luaStrings;
+}
+
+void CUIInventoryWnd::SetSuitableBySection(luabind::object const& sections)
+{
+	xr_vector<LPCSTR> list=getStringsFromLua(sections);
+	if (list.size()>0)
+		std::for_each(list.begin(),list.end(),[&](LPCSTR section)
+		{
+			SetSuitableBySection(section);
+		});
+}
+
+void CUIInventoryWnd::SetSuitableBySectionInList(IWListTypes listType, luabind::object const& sections)
+{
+	auto listIt=std::find_if(inventoryLists.begin(),inventoryLists.end(),[listType](CUIDragDropListEx* list)
+	{
+		return list->GetUIListId()==listType;
+	});
+	if (listIt!=inventoryLists.end())
+	{
+		xr_vector<LPCSTR> listStrings=getStringsFromLua(sections);
+		if (listStrings.size()>0)
+			std::for_each(listStrings.begin(),listStrings.end(),[&](LPCSTR section)
+			{
+				(*listIt)->select_items_by_section(section);
+			});
+	};
+}
+
+void CUIInventoryWnd::SetSuitableBySectionInList(IWListTypes listType, LPCSTR section)
+{
+	auto listIt=std::find_if(inventoryLists.begin(),inventoryLists.end(),[listType](CUIDragDropListEx* list)
+	{
+		return list->GetUIListId()==listType;
+	});
+	if (listIt!=inventoryLists.end())
+	{
+		(*listIt)->select_items_by_section(section);
+	};
+}
+
 void CUIInventoryWnd::SetCurrentItem(CUICellItem* itm)
 {
 	if(m_pCurrentCellItem == itm) return;
 	SetItemSelected(itm);
 	m_pCurrentCellItem				= itm;
 	UIItemInfo.InitItem			(CurrentIItem());
-	
-	m_pUIBagList->GetCellContainer()->clear_select_suitables();
-	m_pUIBeltList->GetCellContainer()->clear_select_suitables();
-	m_pUIKnifeList->GetCellContainer()->clear_select_suitables();
-	m_pUIPistolList->GetCellContainer()->clear_select_suitables();
-	m_pUIAutomaticList->GetCellContainer()->clear_select_suitables();
-	m_pUIOutfitList->GetCellContainer()->clear_select_suitables();
+	bool processed=false;
+	ClearAllSuitables();
 
-	m_pUIBagList->select_suitables_by_item(CurrentIItem());
-	m_pUIBeltList->select_suitables_by_item(CurrentIItem());
-	m_pUIKnifeList->select_suitables_by_item(CurrentIItem());
-	m_pUIPistolList->select_suitables_by_item(CurrentIItem());
-	m_pUIAutomaticList->select_suitables_by_item(CurrentIItem());
-	m_pUIOutfitList->select_suitables_by_item(CurrentIItem());
+	auto currentIItem=CurrentIItem();
+	std::for_each(inventoryLists.begin(),inventoryLists.end(),[&processed,currentIItem](CUIDragDropListEx* list)
+	{
+		bool ls=list->select_suitables_by_item(currentIItem);
+		processed=processed || ls;
+	});
+	if (Actor())
+		Actor()->callback(GameObject::ECallbackType::eOnCellItemAfterSelect)(this,CurrentItem(),processed);
 }
 
 void CUIInventoryWnd::SendMessage(CUIWindow *pWnd, s16 msg, void *pData)
@@ -156,7 +241,7 @@ void CUIInventoryWnd::DropCurrentItem(bool b_all)
 	if(!b_all && CurrentIItem() && !CurrentIItem()->IsQuestItem())
 	{
 		SendEvent_Item_Drop		(CurrentIItem());
-		SetCurrentItem			(NULL);
+		SetCurrentItem			(nullptr);
 		InventoryUtilities::UpdateWeight			(UIBagWnd, true);
 		return;
 	}
@@ -167,12 +252,12 @@ void CUIInventoryWnd::DropCurrentItem(bool b_all)
 
 		for(u32 i=0; i<cnt; ++i){
 			CUICellItem*	itm				= CurrentItem()->PopChild();
-			PIItem			iitm			= (PIItem)itm->m_pData;
+			PIItem			iitm			= static_cast<PIItem>(itm->m_pData);
 			SendEvent_Item_Drop				(iitm);
 		}
 
 		SendEvent_Item_Drop					(CurrentIItem());
-		SetCurrentItem						(NULL);
+		SetCurrentItem						(nullptr);
 		InventoryUtilities::UpdateWeight	(UIBagWnd, true);
 		return;
 	}
@@ -183,7 +268,7 @@ void CUIInventoryWnd::DropCurrentItem(bool b_all)
 bool CUIInventoryWnd::ToSlot(CUICellItem* itm, bool force_place)
 {
 	CUIDragDropListEx*	old_owner			= itm->OwnerList();
-	PIItem	iitem							= (PIItem)itm->m_pData;
+	PIItem	iitem							= static_cast<PIItem>(itm->m_pData);
 	u32 _slot								= iitem->GetSlot();
 
 	if(GetInventory()->CanPutInSlot(iitem)){
@@ -212,7 +297,7 @@ bool CUIInventoryWnd::ToSlot(CUICellItem* itm, bool force_place)
 		VERIFY								(slot_list->ItemsCount()==1);
 
 		CUICellItem* slot_cell				= slot_list->GetItemIdx(0);
-		VERIFY								(slot_cell && ((PIItem)slot_cell->m_pData)==_iitem);
+		VERIFY								(slot_cell && (static_cast<PIItem>(slot_cell->m_pData))==_iitem);
 
 		bool result							= ToBag(slot_cell, false);
 		VERIFY								(result);
@@ -305,19 +390,15 @@ bool CUIInventoryWnd::OnItemDrop(CUICellItem* itm)
 	CUIDragDropListEx*	new_owner		= CUIDragDropListEx::m_drag_item->BackList();
 	if (!old_owner || !new_owner)
 		return false;
+	CUICellItem* focusedCellItem=new_owner->GetCellContainer()->GetFocusedCellItem();
+	CInventoryItem *draggedItem=static_cast<CInventoryItem *>(itm->m_pData);
+	CInventoryItem *focusedItem=focusedCellItem!=nullptr ? static_cast<CInventoryItem *>(focusedCellItem->m_pData) : nullptr;
 
 	EListType t_new		= GetType(new_owner);
 	EListType t_old		= GetType(old_owner);
+	bool processed=false;
 	if (t_new == iwBag && t_old == iwBag)
 	{
-		CUICellItem* focusedCellItem=new_owner->GetCellContainer()->GetFocuseditem();
-		if (!focusedCellItem)
-			return false;
-
-		PIItem draggedItem=static_cast<PIItem>(itm->m_pData);
-		PIItem focusedItem=static_cast<PIItem>(focusedCellItem->m_pData);
-		if (!draggedItem || !focusedItem)
-			return false;
 		//аддон или патроны бросили на оружие
 		CWeapon*			weapon				= smart_cast<CWeapon*>			(focusedItem);
 		if (weapon)
@@ -331,10 +412,16 @@ bool CUIInventoryWnd::OnItemDrop(CUICellItem* itm)
 			{
 				SetCurrentItem(itm);
 				AttachAddon(weapon);
+				processed=true;
 			} 
 			else if (pAmmo!=nullptr && weapon->CanLoadAmmo(pAmmo))
+			{
 				weapon->LoadAmmo(pAmmo);
+				processed=true;
+			}
 		}
+		if (Actor())
+			Actor()->callback(GameObject::ECallbackType::eOnCellItemDrop)(this,old_owner,new_owner,itm,focusedCellItem,processed);
 		return true;
 	}
 	else if (t_new == t_old)
@@ -342,42 +429,44 @@ bool CUIInventoryWnd::OnItemDrop(CUICellItem* itm)
 
 	switch(t_new){
 		case iwSlot:{
-			if(GetSlotList(CurrentIItem()->GetSlot())==new_owner)
-				ToSlot	(itm, true);
-			CUICellItem* focusedCellItem=new_owner->GetCellContainer()->GetFocuseditem();
-			if (!focusedCellItem)
-				break;
-			PIItem draggedItem=static_cast<PIItem>(itm->m_pData);
-			PIItem focusedItem=static_cast<PIItem>(focusedCellItem->m_pData);
-			if (!draggedItem || !focusedItem)
-				break;
-			CWeapon*			weapon				= smart_cast<CWeapon*>			(focusedItem);
-			if (weapon)
+			CUIDragDropListEx *slotForitem=GetSlotList(CurrentIItem()->GetSlot());
+			if(slotForitem==new_owner)
+					processed=ToSlot	(itm, true);
+			else
 			{
-				CWeaponAmmo*		pAmmo				= smart_cast<CWeaponAmmo*>		(draggedItem);
-				if (!pAmmo)
-					break;
-				if (pAmmo!=nullptr && weapon->CanLoadAmmo(pAmmo))
-					weapon->LoadAmmo(pAmmo);
+				CWeapon*			weapon				= smart_cast<CWeapon*>			(focusedItem); 
+				if (weapon)
+				{
+					CWeaponAmmo*		pAmmo				= smart_cast<CWeaponAmmo*>		(draggedItem);
+					if (pAmmo!=nullptr && weapon->CanLoadAmmo(pAmmo))
+					{
+						weapon->LoadAmmo(pAmmo);
+						processed=true;
+					}
+				}
 			}
 		}break;
 		case iwBag:{
-			ToBag	(itm, true);
+			processed=ToBag	(itm, true);
 		}break;
 		case iwBelt:{
-			ToBelt	(itm, true);
+			processed=ToBelt	(itm, true);
 		}break;
 	default: break;
 	};
 
 	DropItem				(CurrentIItem(), new_owner);
-
+	if (Actor())
+			Actor()->callback(GameObject::ECallbackType::eOnCellItemDrop)(this,old_owner,new_owner,itm,focusedCellItem,processed);
 	return true;
 }
 
 bool CUIInventoryWnd::OnItemDbClick(CUICellItem* itm)
 {
-	if(TryUseItem((PIItem)itm->m_pData))		
+	CInventoryItem *invItem=static_cast<PIItem>(itm->m_pData);
+	if (!invItem)
+		return false;
+	if(TryUseItem(invItem))
 		return true;
 
 	CUIDragDropListEx*	old_owner		= itm->OwnerList();
@@ -386,34 +475,58 @@ bool CUIInventoryWnd::OnItemDbClick(CUICellItem* itm)
 		case iwSlot:{
 			ToBag	(itm, false);
 		}break;
-
 		case iwBag:{
-			if(!ToSlot(itm, false)){
+			if(!ToSlot(itm, false))
+			{
 				if( !ToBelt(itm, false) )
 					ToSlot	(itm, true);
 			}
-			CWeaponAmmo* ammo=static_cast<CWeaponAmmo*>(itm->m_pData);
-			if (!ammo)
+			else
 				break;
-			auto pistol=m_pInv->m_slots[PISTOL_SLOT].m_pIItem;
-			auto rifle=m_pInv->m_slots[RIFLE_SLOT].m_pIItem;
-			if (pistol != NULL && pistol->CanLoadAmmo(ammo))
-			{
-				CWeaponMagazined* weapon=smart_cast<CWeaponMagazined*>(pistol);
-				weapon->LoadAmmo(ammo);
-				break;
+			CWeaponAmmo* ammo=smart_cast<CWeaponAmmo*>(invItem);
+			CInventoryItem *pistol=m_pInv->m_slots[PISTOL_SLOT].m_pIItem;
+			CInventoryItem *rifle=m_pInv->m_slots[RIFLE_SLOT].m_pIItem;
+			if (ammo)
+			{				
+				if (pistol != nullptr && pistol->CanLoadAmmo(ammo))
+				{
+					CWeaponMagazined* weapon=smart_cast<CWeaponMagazined*>(pistol);
+					weapon->LoadAmmo(ammo);
+					break;
+				}
+				if (rifle != nullptr && rifle->CanLoadAmmo(ammo))
+				{
+					CWeaponMagazined* weapon=smart_cast<CWeaponMagazined*>(rifle);
+					weapon->LoadAmmo(ammo);
+					break;
+				}
 			}
-			if (rifle != NULL && rifle->CanLoadAmmo(ammo))
+
+			CScope*				pScope				= smart_cast<CScope*>			(invItem);
+			CSilencer*			pSilencer			= smart_cast<CSilencer*>		(invItem);
+			CGrenadeLauncher*	pGrenadeLauncher	= smart_cast<CGrenadeLauncher*> (invItem);
+			if (pScope || pSilencer || pGrenadeLauncher)
 			{
-				CWeaponMagazined* weapon=smart_cast<CWeaponMagazined*>(rifle);
-				weapon->LoadAmmo(ammo);
-				break;
+				pistol=smart_cast<CWeaponMagazined*>(pistol);
+				rifle=smart_cast<CWeaponMagazined*>(rifle);
+				if (pistol!=nullptr && (pistol->CanAttach(pScope) || pistol->CanAttach(pSilencer) || pistol->CanAttach(pGrenadeLauncher)))
+				{
+					SetCurrentItem(itm);
+					AttachAddon(pistol);
+					break;
+				}
+				if (rifle!=nullptr && (rifle->CanAttach(pScope) || rifle->CanAttach(pSilencer) || rifle->CanAttach(pGrenadeLauncher)))
+				{
+					SetCurrentItem(itm);
+					AttachAddon(rifle);
+					break;
+				}
 			}
 		}break;
-
 		case iwBelt:{
 			ToBag	(itm, false);
 		}break;
+		default: break;
 	};
 
 	return true;
@@ -443,7 +556,7 @@ bool CUIInventoryWnd::OnItemRButtonClick(CUICellItem* itm)
 
 CUIDragDropListEx* CUIInventoryWnd::GetSlotList(u32 slot_idx)
 {
-	if(slot_idx == NO_ACTIVE_SLOT || GetInventory()->m_slots[slot_idx].m_bPersistent)	return NULL;
+	if(slot_idx == NO_ACTIVE_SLOT || GetInventory()->m_slots[slot_idx].m_bPersistent)	return nullptr;
 	switch (slot_idx)
 	{
 		case KNIFE_SLOT:
@@ -463,17 +576,12 @@ CUIDragDropListEx* CUIInventoryWnd::GetSlotList(u32 slot_idx)
 			break;
 
 	};
-	return NULL;
+	return nullptr;
 }
 
 
 
 void CUIInventoryWnd::ClearAllLists()
 {
-	m_pUIBagList->ClearAll					(true);
-	m_pUIBeltList->ClearAll					(true);
-	m_pUIOutfitList->ClearAll				(true);
-	m_pUIKnifeList->ClearAll				(true);
-	m_pUIPistolList->ClearAll				(true);
-	m_pUIAutomaticList->ClearAll			(true);
+	std::for_each(inventoryLists.begin(),inventoryLists.end(),[](CUIDragDropListEx* list){list->ClearAll(true);});
 }

@@ -63,6 +63,11 @@ void CBaseMonster::Load(LPCSTR section)
 
 	m_melee_rotation_factor			= READ_IF_EXISTS(pSettings,r_float,section,"Melee_Rotation_Factor", 1.5f);
 	berserk_always					= READ_IF_EXISTS(!!pSettings,r_bool,section,"berserk_always", false);
+
+	m_eHitType=ALife::EHitType::eHitTypeWound;
+	if (pSettings->line_exist(section,"hit_type"))
+		m_eHitType						= ALife::g_tfString2HitType(pSettings->r_string(section, "hit_type"));
+
 }
 
 // if sound is absent just do not load that one

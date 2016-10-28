@@ -90,8 +90,11 @@ protected:
 	CUIDragDropListEx*			m_pUIPistolList;
 	CUIDragDropListEx*			m_pUIAutomaticList;
 	CUIOutfitDragDropList*		m_pUIOutfitList;
+
+	xr_vector<CUIDragDropListEx*>	inventoryLists;
+
 	void						ClearAllLists				();
-	void						BindDragDropListEnents		(CUIDragDropListEx* lst);
+	void						BindDragDropListEvents		(CUIDragDropListEx* lst);
 	
 	EListType					GetType						(CUIDragDropListEx* l);
 	CUIDragDropListEx*			GetSlotList					(u32 slot_idx);
@@ -101,7 +104,7 @@ protected:
 	bool		xr_stdcall		OnItemDbClick				(CUICellItem* itm);
 	bool		xr_stdcall		OnItemSelected				(CUICellItem* itm);
 	bool		xr_stdcall		OnItemRButtonClick			(CUICellItem* itm);
-	bool		xr_stdcall		OnItemFocusLost			(CUICellItem* itm);
+	bool		xr_stdcall		OnItemFocusLost				(CUICellItem* itm);
 	bool		xr_stdcall		OnItemFocusReceive			(CUICellItem* itm);
 
 
@@ -145,7 +148,6 @@ protected:
 	bool						ToBag						(CUICellItem* itm, bool b_use_cursor_pos);
 	bool						ToBelt						(CUICellItem* itm, bool b_use_cursor_pos);
 
-
 	void						AttachAddon					(PIItem item_to_upgrade);
 	void						DetachAddon					(const char* addon_name);
 	void						SetCurrentItem				(CUICellItem* itm);
@@ -156,4 +158,14 @@ protected:
 	TIItemContainer				ruck_list;
 	u32							m_iCurrentActiveSlot;
 
+public:
+	void						ClearAllSuitables();
+	void						ClearSuitablesInList(IWListTypes listType);
+	void						SetSuitableBySection(LPCSTR section);
+	void						SetSuitableBySection(luabind::object const &sections);
+	void						SetSuitableBySectionInList(IWListTypes listType,LPCSTR section);
+	void						SetSuitableBySectionInList(IWListTypes listType,luabind::object const& sections);
+private:
+	xr_vector<LPCSTR>			getStringsFromLua(luabind::object const& table) const;
 };
+

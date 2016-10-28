@@ -11,6 +11,8 @@
 #include "game_object_space.h"
 #include "script_ini_file.h"
 #include "sight_manager_space.h"
+#include "ui/UICellItem.h"
+#include "GameObject.h"
 
 using namespace luabind;
 
@@ -51,6 +53,11 @@ void CScriptGameObject::script_register(lua_State *L)
 				script_register_game_object_trader(instance)
 			)
 		),
+
+		class_<CInventoryItem>("CInventoryItem")
+		.def("Name",				&CInventoryItem::Name)
+		.def("GetGameObject",		&CInventoryItem::GetGameObject),
+
 
 		class_<enum_exporter<GameObject::ECallbackType> >("callback")
 			.enum_("callback_types")

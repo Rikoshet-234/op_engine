@@ -31,7 +31,7 @@ void CUICell::Clear()
 
 CUIDragDropListEx::CUIDragDropListEx()
 {
-
+	listId=ltUnknown;
 	m_flags.zero				();
 	m_container					= xr_new<CUICellContainer>(this);
 	m_vScrollBar				= xr_new<CUIScrollBar>();
@@ -345,18 +345,19 @@ bool CUIDragDropListEx::OnMouse(float x, float y, EUIMessages mouse_action)
 	return b;
 }
 
-void CUIDragDropListEx::select_suitables_by_selected()
+bool CUIDragDropListEx::select_suitables_by_selected()
 {
 	if (m_selected_item==nullptr)
-		return;
+		return false;
 	CInventoryItem*	item = static_cast<CInventoryItem*>(m_selected_item->m_pData);
-	select_suitables_by_item(item);
+	return select_suitables_by_item(item);
 }
 
-void CUIDragDropListEx::select_suitables_by_item(CInventoryItem* item)
+bool CUIDragDropListEx::select_suitables_by_item(CInventoryItem* item)
 {
 	if (!item)
-		return;	
+		return false;	
+	bool selected=false;
 	xr_vector<shared_str>	weaponSections;
 	CWeapon* pWeapon = smart_cast<CWeapon*>(item);
 	if (pWeapon)
@@ -378,8 +379,7 @@ void CUIDragDropListEx::select_suitables_by_item(CInventoryItem* item)
 		if (gr_l!=nullptr)
 			weaponSections.push_back(gr_l);
 	}
-	select_weapons_by_addon(item);
-	select_weapons_by_ammo(item);
+	selected=select_weapons_by_addon(item) || select_weapons_by_ammo(item);
 	if (weaponSections.size()>0)
 	{
 		std::sort(weaponSections.begin(),weaponSections.end());
@@ -394,6 +394,7 @@ void CUIDragDropListEx::select_suitables_by_item(CInventoryItem* item)
 			if (std::find(weaponSections.begin(), weaponSections.end(), listItem->object().cNameSect()) != weaponSections.end())
 			{
 				cellItem->m_suitable=true;
+				selected=true;
 			}
 		}
 
@@ -403,18 +404,17 @@ void CUIDragDropListEx::select_suitables_by_item(CInventoryItem* item)
 			Msg("%s",section->c_str());
 		}*/
 	}
-
-	if (Actor())
-		Actor()->callback(GameObject::ECallbackType::eOnCellItemAfterSelect)();
+	return selected;
 }
 
-void CUIDragDropListEx::select_weapons_by_addon(CInventoryItem* addonItem)
+bool CUIDragDropListEx::select_weapons_by_addon(CInventoryItem* addonItem)
 {
 	CScope*				pScope				= smart_cast<CScope*>			(addonItem);
 	CSilencer*			pSilencer			= smart_cast<CSilencer*>		(addonItem);
 	CGrenadeLauncher*	pGrenadeLauncher	= smart_cast<CGrenadeLauncher*>	(addonItem);
 	if (!pScope && !pSilencer && !pGrenadeLauncher)
-		return;
+		return false;
+	bool selected=false;
 	u32 const cnt = this->ItemsCount();
 	for ( u32 i = 0; i < cnt; ++i )
 	{
@@ -428,28 +428,32 @@ void CUIDragDropListEx::select_weapons_by_addon(CInventoryItem* addonItem)
 		if ( pScope && weapon->CanAttach(pScope) )
 		{
 			ci->m_suitable = true;
+			selected=true;
 			continue;
 		}
 		if ( pSilencer && weapon->CanAttach(pSilencer) )
 		{
 			ci->m_suitable = true;
+			selected=true;
 			continue;
 		}
 		if ( pGrenadeLauncher && weapon->CanAttach(pGrenadeLauncher) )
 		{
 			ci->m_suitable = true;
+			selected=true;
 			continue;
 		}
 	}
+	return selected;
 }
 
-void CUIDragDropListEx::select_weapons_by_ammo(CInventoryItem* ammoItem)
+bool CUIDragDropListEx::select_weapons_by_ammo(CInventoryItem* ammoItem)
 {
 	CWeaponAmmo* ammo = smart_cast<CWeaponAmmo*>(ammoItem);
 	if (!ammo)
-		return;
+		return false;
 	shared_str ammo_name = ammoItem->object().cNameSect();
-
+	bool selected=false;
 	u32 const cnt = this->ItemsCount();
 	for ( u32 i = 0; i < cnt; ++i )
 	{
@@ -462,12 +466,36 @@ void CUIDragDropListEx::select_weapons_by_ammo(CInventoryItem* ammoItem)
 		if (wg && wg->CanLoadAmmo(ammo))
 		{
 			ci->m_suitable = true;
+			selected=true;
 		}
 		else if (weapon && weapon->CanLoadAmmo(ammo))
 		{
 			ci->m_suitable = true;
+			selected=true;
 		}
 	}
+	return selected;
+}
+
+bool CUIDragDropListEx::select_items_by_section(shared_str section)
+{
+	if (!section)
+		return false;
+	bool selected=false;
+	u32 const cnt = this->ItemsCount();
+	for ( u32 i = 0; i < cnt; ++i )
+	{
+		CUICellItem* ci = this->GetItemIdx(i);
+		CInventoryItem* item = static_cast<CInventoryItem*>(ci->m_pData);
+		if (!item)
+			continue;
+		if (xr_strcmp(item->object().cNameSect(),section)==0)
+		{
+			ci->m_suitable = true;
+			selected=true;
+		}
+	}
+	return selected;
 }
 
 const Ivector2& CUIDragDropListEx::CellsCapacity()
@@ -508,7 +536,6 @@ void CUIDragDropListEx::SetItem(CUICellItem* itm) //auto
 	}
 
 	Ivector2 dest_cell_pos =	m_container->FindFreeCell(itm->GetGridSize());
-
 	SetItem						(itm,dest_cell_pos);
 }
 
@@ -644,7 +671,7 @@ CUICellItem* CUICellContainer::FindSimilar(CUICellItem* itm)
 	return NULL;
 }
 
-CUICellItem* CUICellContainer::GetFocuseditem()
+CUICellItem* CUICellContainer::GetFocusedCellItem()
 {
 	for(WINDOW_LIST_it it = m_ChildWndList.begin(); m_ChildWndList.end()!=it; ++it)
 	{
@@ -725,7 +752,6 @@ Ivector2 CUICellContainer::FindFreeCell	(const Ivector2& size)
 			for(tmp.x=0; tmp.x<=m_cellsCapacity.x-size.x; ++tmp.x )
 				if(IsRoomFree(tmp,size))
 					return  tmp;
-
 		R_ASSERT2		(0,"there are no free room to place item");
 	}
 	return			tmp;

@@ -12,7 +12,8 @@
 #include "hit_immunity.h"
 #include "attachable_item.h"
 #include "ui/UIIconInfo.h"
-
+#include "script_game_object.h"
+#include "CharacterPhysicsSupport.h"
 
 enum EHandDependence{
 	hdNone	= 0,
@@ -247,6 +248,8 @@ private:
 	CPhysicsShellHolder*		m_object;
 
 public:
+	CScriptGameObject* GetGameObject() const {return m_object!=nullptr ? m_object->lua_game_object() : nullptr ;}
+
 	virtual CInventoryItem		*cast_inventory_item		()	{return this;}
 	virtual CAttachableItem		*cast_attachable_item		()	{return this;}
 	virtual CPhysicsShellHolder	*cast_physics_shell_holder	()	{return 0;}

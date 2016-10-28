@@ -9,6 +9,8 @@
 #include "UIMMShniaga.h"
 #include "UITextureMaster.h"
 #include "UIScrollView.h"
+#include "UIInventoryWnd.h"
+#include "UICellItem.h"
 
 CFontManager& mngr(){
 	return *(UI()->Font());
@@ -102,6 +104,9 @@ void CUIWindow::script_register(lua_State *L)
 		.def("SetAutoDelete",			&CUIWindow::SetAutoDelete)
 		.def("IsAutoDelete",			&CUIWindow::IsAutoDelete)
 
+		.def("SetUIWindowType",			&CUIWindow::SetUIWindowType)
+		.def("GetUIWindowType",			&CUIWindow::GetUIWindowType)
+
 		.def("SetWndRect",				(void (CUIWindow::*)(Frect))					&CUIWindow::SetWndRect_script)
 		.def("SetWndRect",				(void (CUIWindow::*)(float,float,float,float))   &CUIWindow::SetWndRect_script)
 		.def("Init",					(void (CUIWindow::*)(float,float,float,float))   &CUIWindow::Init)
@@ -162,8 +167,32 @@ void CUIWindow::script_register(lua_State *L)
 		.def("SetText",						&CUILabel::SetText)
 		.def("GetText",						&CUILabel::GetText),
 
+		class_<CUICellItem>("CUICellItem")
+		.def("ChildsCount",		&CUICellItem::ChildsCount)
+		.def("Child",			&CUICellItem::Child)
+		.def("HasChilds",		&CUICellItem::HasChilds)
+		.def("OwnerList",		&CUICellItem::OwnerList)
+		.def("GetInventoryItem",		&CUICellItem::GetInventoryItem),
+		
+
 		class_<CUIMMShniaga, CUIWindow>("CUIMMShniaga")
 		.def("SetVisibleMagnifier",			&CUIMMShniaga::SetVisibleMagnifier),
+	
+		class_<CUIInventoryWnd, CUIWindow>("CUIInventoryWnd")
+		.def("GetUIWindowType",				&CUIInventoryWnd::GetUIWindowType)
+		.def("ClearAllSuitables",			&CUIInventoryWnd::ClearAllSuitables)
+		.def("ClearSuitablesInList",		&CUIInventoryWnd::ClearSuitablesInList)
+		.def("SetSuitableBySection",		static_cast<void (CUIInventoryWnd::*)(LPCSTR)>					(&CUIInventoryWnd::SetSuitableBySection))
+		.def("SetSuitableBySection",		static_cast<void (CUIInventoryWnd::*)(luabind::object const& )>	(&CUIInventoryWnd::SetSuitableBySection))
+		.def("SetSuitableBySectionInList",	static_cast<void (CUIInventoryWnd::*)(IWListTypes,LPCSTR)>					(&CUIInventoryWnd::SetSuitableBySectionInList))
+		.def("SetSuitableBySectionInList",	static_cast<void (CUIInventoryWnd::*)(IWListTypes,luabind::object const& )>	(&CUIInventoryWnd::SetSuitableBySectionInList)),
+
+		class_<CUIDragDropListEx, CUIWindow,CUIWndCallback>("CUIDragDropListEx")
+		.def("GetUIListId",				&CUIDragDropListEx::GetUIListId),
+
+
+
+		
 
 		class_<CUIScrollView, CUIWindow>("CUIScrollView")
 		.def(							constructor<>())
@@ -181,6 +210,32 @@ void CUIWindow::script_register(lua_State *L)
 //		.def("",						&CUIFrameLineWnd::)
 //		.def("",						&CUIFrameLineWnd::)
 //		.def("",						&CUIFrameLineWnd::)
+		class_<enum_exporter<IWListTypes>>("ui_iw_list_types")
+		.enum_("ui_iw_list_types")
+			[
+				value("LT_KNIFE",				int(ltSlotKnife)),
+				value("LT_PISTOL",				int(ltSlotPistol)),
+				value("LT_RIFLE",				int(ltSlotRifle)),
+				value("LT_GRENADE",				int(ltGrenade)),
+				value("LT_APPARATUS",			int(ltApparatus)),
+				value("LT_BOLT",				int(ltBolt)),
+				value("LT_OUTFIT",				int(ltSlotOutfit)),
+				value("LT_PDA",					int(ltPDA)),
+				value("LT_DETECTOR",			int(ltDetector)),
+				value("LT_TORCH",				int(ltTorch)),
+				value("LT_BAG",					int(ltBag)),
+				value("LT_BELT",				int(ltBelt)),
+				value("LT_UNKNOWN",				int(ltUnknown))
+			],
+
+		class_<enum_exporter<EAWindowType>>("ui_windows_types")
+		.enum_("ui_windows_types")
+			[
+				value("WT_INVENTORY",	int(wtInventory)),
+				value("WT_TRADE",		int(wtTrade)),
+				value("WT_CARBODY",		int(wtCarbody)),
+				value("WT_UNKNOWN",		int(wtUnknown))
+			],
 
 		class_<enum_exporter<EUIMessages> >("ui_events")
 			.enum_("events")
