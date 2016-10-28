@@ -4,29 +4,120 @@
 #include <dinput.h>
 #include "../HUDManager.h"
 #include "UICustomEdit.h"
+#include "../RegistryFuncs.h"
 #include "../../LightAnimLibrary.h"
+#include "UIInventoryUtilities.h"
 
+static enum ELayoutSwitchShortcut
+{
+	ELSS_AltShift = 0,
+	ELSS_CtrlShift
+} gs_currentLayoutSwitchShortCut = ELSS_AltShift;
 
-static u32 DILetters[] = { DIK_A, DIK_B, DIK_C, DIK_D, DIK_E, 
-DIK_F, DIK_G, DIK_H, DIK_I, DIK_J, 
-DIK_K, DIK_L, DIK_M, DIK_N, DIK_O, 
-DIK_P, DIK_Q, DIK_R, DIK_S, DIK_T, 
-DIK_U, DIK_V, DIK_W, DIK_X, DIK_Y, DIK_Z,
-DIK_0, DIK_1, DIK_2, DIK_3, DIK_4, DIK_5, DIK_6, DIK_7,
-DIK_8, DIK_9};
+#define ENRUUA_ONLY
+//#define USE_GLOBAL_LANGUAGE
 
-static xr_map<u32, char> gs_DIK2CHR;
+static u8 gs_KBState[256];
+static xr_vector<HKL> gs_hklList;
+static xr_vector<xr_string> gs_langNames;
+
+#ifdef USE_GLOBAL_LANGUAGE
+static size_t gs_currentSelectedLanguage = 0;
+#define CURRENT_SELECTED_LANGUAGE gs_currentSelectedLanguage
+#else
+#define CURRENT_SELECTED_LANGUAGE m_currentSelectedLanguage
+#endif
 
 CUICustomEdit::CUICustomEdit()
 {
 	m_max_symb_count		= u32(-1);
-	char l_c;
-	for(l_c = 'a'; l_c <= 'z'; ++l_c) 
-		gs_DIK2CHR[DILetters[l_c-'a']] = l_c;
-	for(l_c = '0'; l_c <= '9'; ++l_c)
-		gs_DIK2CHR[DILetters['z'-'a'+l_c+1-'0']] = l_c;
 
+	//! Initialize table only once
+	if (gs_hklList.empty())
+	{
+		//! Zero KB state list, particular keys will be set in appropriate key events
+		ZeroMemory(gs_KBState, sizeof(gs_KBState));
+
+		//! Find out which short cut switches languages
+		DWORD layoutSwitchShortcut = 0;
+		ReadRegistry_DWValue(false, "Keyboard Layout\\Toggle", "Hotkey", layoutSwitchShortcut);
+		if (layoutSwitchShortcut == 2)
+		{
+			gs_currentLayoutSwitchShortCut = ELSS_CtrlShift;
+		}
+		else
+		{
+			gs_currentLayoutSwitchShortCut = ELSS_AltShift;
+		}
+
+		//! Get keyboard layouts from system
+		xr_vector<HKL> hklList;
+		hklList.resize(GetKeyboardLayoutList(0, NULL));
+		GetKeyboardLayoutList(static_cast<int>(hklList.size()), &hklList[0]);
+		
+		//! Create list of input languages
+		CURRENT_SELECTED_LANGUAGE = 0;
+		gs_langNames.resize(hklList.size());
+		gs_hklList.reserve(hklList.size());
+		for(size_t i = 0, j = 0; i < hklList.size(); ++i)
+		{
+			ActivateKeyboardLayout(hklList[i], KLF_SETFORPROCESS);
+			char layoutName[64] = { 0 };
+			if (GetKeyboardLayoutName(layoutName))
+			{
+				xr_string key = "SYSTEM\\CurrentControlSet\\Control\\Keyboard Layouts\\";
+				key.append(layoutName);
+				char layoutText[64];
+				ReadRegistry_StrValue(true, key.c_str(), "Layout Text", layoutText);
+				char c1 = static_cast<char>(toupper(layoutText[0]));
+				char c2 = static_cast<char>(toupper(layoutText[1]));
+
+				if (c1 == 'U' && c2 == 'S')
+				{
+					c1 = 'E';
+					c2 = 'N';
+					CURRENT_SELECTED_LANGUAGE = gs_hklList.size();
+				}
+
+#ifdef ENRUUA_ONLY
+				if (c1 == 'E' && c2 == 'N' ||
+					c1 == 'R' && c2 == 'U' ||
+					c1 == 'U' && c2 == 'K')
+#endif
+				{
+					gs_hklList.push_back(hklList[i]);
+					gs_langNames[j].resize(3);
+					gs_langNames[j][0] = c1;
+					gs_langNames[j][1] = c2;
+					gs_langNames[j][2] = 0;
+					++j;
+				}
+			}
+			else
+			{
+				//! Skip layout if we can't get it's name
+			}
+		}
+		
+		//! Shrink names list to actual size
+		gs_langNames.resize(gs_hklList.size());
+	}
+
+#ifndef USE_GLOBAL_LANGUAGE
+	m_currentSelectedLanguage = 0;
+	for(size_t i = 0; i < gs_langNames.size(); ++i)
+	{
+		if (gs_langNames[i][0] == 'E' && gs_langNames[i][1] == 'N')
+		{
+			m_currentSelectedLanguage = i;
+			break;
+		}
+	}
+#endif
 	m_bShift = false;
+	m_bControl = false;
+	m_bAlt = false;
+	m_bCapital = false;
 	m_bInputFocus = false;
 
 	m_iKeyPressAndHold = 0;
@@ -44,6 +135,8 @@ CUICustomEdit::CUICustomEdit()
 
 	m_textColor[0]=color_argb(255,235,219,185);
 	m_textColor[1]=color_argb(255,100,100,100);
+
+	AttachChild(&m_languageIcon);
 }
 
 CUICustomEdit::~CUICustomEdit()
@@ -58,9 +151,19 @@ void CUICustomEdit::SetTextColorD(u32 color){
 	m_textColor[1] = color;
 }
 
-void CUICustomEdit::Init(float x, float y, float width, float height){
+void CUICustomEdit::Init(float x, float y, float width, float height)
+{
 	CUIWindow::Init(x,y,width,height);
 	m_lines.SetWndSize(m_wndSize);
+
+	m_languageIcon.SetAutoDelete(false);
+	m_languageIcon.SetColor(m_textColor[0]);
+	m_languageIcon.TextureAvailable(false);
+	m_languageIcon.SetText(gs_langNames[CURRENT_SELECTED_LANGUAGE].c_str());
+	m_languageIcon.SetWndPos(width - 7.f,2.0f);
+	Fvector2 wndSize;
+	wndSize.set(7.f, height-4.f);
+	m_languageIcon.SetWndSize(wndSize);
 }
 
 void CUICustomEdit::SetLightAnim(LPCSTR lanim)
@@ -102,6 +205,15 @@ void CUICustomEdit::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 
 bool CUICustomEdit::OnMouse(float x, float y, EUIMessages mouse_action)
 {
+	if(mouse_action == WINDOW_LBUTTON_DB_CLICK || mouse_action == WINDOW_LBUTTON_DOWN || mouse_action == WINDOW_RBUTTON_DOWN)
+	{
+		Frect liRect = m_languageIcon.GetWndRect();
+		if (liRect.in(x,y))
+		{
+			ChangeInputLanguage();
+		}
+	}
+
 	if (m_bFocusByDbClick)
 	{
 		if(mouse_action == WINDOW_LBUTTON_DB_CLICK && !m_bInputFocus)
@@ -109,7 +221,7 @@ bool CUICustomEdit::OnMouse(float x, float y, EUIMessages mouse_action)
 			GetParent()->SetKeyboardCapture(this, true);
 			m_bInputFocus = true;
 			m_iKeyPressAndHold = 0;
-
+			m_languageIcon.SetText(!m_bNumbersOnly ? gs_langNames[CURRENT_SELECTED_LANGUAGE].c_str() : "");
 			m_lines.MoveCursorToEnd();
 		}
 	}
@@ -119,7 +231,7 @@ bool CUICustomEdit::OnMouse(float x, float y, EUIMessages mouse_action)
 		GetParent()->SetKeyboardCapture(this, true);
 		m_bInputFocus = true;
 		m_iKeyPressAndHold = 0;
-
+		m_languageIcon.SetText(!m_bNumbersOnly ? gs_langNames[CURRENT_SELECTED_LANGUAGE].c_str() : "");
 		m_lines.MoveCursorToEnd();
 	}
 	return false;
@@ -151,7 +263,6 @@ bool CUICustomEdit::OnKeyboard(int dik, EUIMessages keyboard_action)
 
 bool CUICustomEdit::KeyPressed(int dik)
 {
-	xr_map<u32, char>::iterator it;
 	char out_me = 0;
 	bool bChanged = false;
 	switch(dik)
@@ -164,9 +275,23 @@ bool CUICustomEdit::KeyPressed(int dik)
 	case DIKEYBOARD_RIGHT:
 		m_lines.IncCursorPos();		
 		break;
+	case DIK_LCONTROL:
+	case DIK_RCONTROL:
+		m_bControl = true;
+		CheckSwitchInputLanguage();
+		break;
+	case DIK_LMENU:
+	case DIK_RMENU:
+		m_bAlt = true;
+		CheckSwitchInputLanguage();
+		break;
 	case DIK_LSHIFT:
 	case DIK_RSHIFT:
 		m_bShift = true;
+		CheckSwitchInputLanguage();
+		break;
+	case DIK_CAPITAL:
+		m_bCapital = !m_bCapital;
 		break;
 	case DIK_ESCAPE:
 		if (xr_strlen(GetText()) != 0)
@@ -197,37 +322,21 @@ bool CUICustomEdit::KeyPressed(int dik)
 		m_lines.DelChar();
 		bChanged = true;
 		break;
-	case DIK_SPACE:
-		out_me = ' ';					break;
-	case DIK_LBRACKET:
-		out_me = m_bShift ? '{' : '[';	break;
-	case DIK_RBRACKET:
-		out_me = m_bShift ? '}' : ']';	break;
-	case DIK_SEMICOLON:
-		out_me = m_bShift ? ':' : ';';	break;
-	case DIK_APOSTROPHE:
-		out_me = m_bShift ? '"' : '\'';	break;
-	case DIK_BACKSLASH:
-		out_me = m_bShift ? '|' : '\\';	break;
-	case DIK_SLASH:
-		out_me = m_bShift ? '?' : '/';	break;
-	case DIK_COMMA:
-		out_me = m_bShift ? '<' : ',';	break;
-	case DIK_PERIOD:
-		out_me = m_bShift ? '>' : '.';	break;
-	case DIK_MINUS:
-		out_me = m_bShift ? '_' : '-';	break;
-	case DIK_EQUALS:
-		out_me = m_bShift ? '+' : '=';	break;
 	default:
-		it = gs_DIK2CHR.find(dik);
+		{
+			gs_KBState[VK_SHIFT] = m_bShift ? 0x80 : 0x00;
+			gs_KBState[VK_CAPITAL] = m_bCapital ? 0x01 : 0x00;
+			gs_KBState[VK_CONTROL] = m_bControl ? 0x80 : 0x00;
+			gs_KBState[VK_MENU] = m_bAlt ? 0x80 : 0x00;
 
-		//нажата клавиша с буквой 
-		if (gs_DIK2CHR.end() != it){
-			AddLetter((*it).second);
-			bChanged = true;
+			UINT vk = MapVirtualKeyEx(dik, MAPVK_VSC_TO_VK_EX, gs_hklList[CURRENT_SELECTED_LANGUAGE]);
+			WORD result = 0;
+			if (ToAsciiEx(vk, dik, gs_KBState, &result, 0, gs_hklList[CURRENT_SELECTED_LANGUAGE]) == 1)
+			{
+				AddLetter(LOBYTE(result));
+				bChanged = true;
+			}
 		}
-
 		break;
 	}
 
@@ -256,6 +365,14 @@ bool CUICustomEdit::KeyReleased(int dik)
 {
 	switch(dik)
 	{
+	case DIK_LCONTROL:
+	case DIK_RCONTROL:
+		m_bControl = false;
+		return true;
+	case DIK_LMENU:
+	case DIK_RMENU:
+		m_bAlt = false;
+		return true;
 	case DIK_LSHIFT:
 	case DIK_RSHIFT:
 		m_bShift = false;
@@ -264,8 +381,6 @@ bool CUICustomEdit::KeyReleased(int dik)
 
 	return true;
 }
-
-
 
 void CUICustomEdit::AddChar(char c)
 {
@@ -294,25 +409,6 @@ void CUICustomEdit::AddLetter(char c)
 
 		return;
 	}
-	if(m_bShift)
-	{
-		switch(c) {
-		case '1': c='!';	break;
-		case '2': c='@';	break;
-		case '3': c='#';	break;
-		case '4': c='$';	break;
-		case '5': c='%';	break;
-		case '6': c='^';	break;
-		case '7': c='&';	break;
-		case '8': c='*';	break;
-		case '9': c='(';	break;
-		case '0': c=')';	break;
-		default:
-			c = c-'a';
-			c = c+'A';
-		}
-	}
-
 	AddChar(c);
 }
 
@@ -327,7 +423,7 @@ void CUICustomEdit::Update()
 	{	
 		static u32 last_time; 
 
-		u32 cur_time = Device.TimerAsync();
+		u32 cur_time = Device.TimerAsync_MMT();
 
 		if(m_iKeyPressAndHold)
 		{
@@ -388,6 +484,7 @@ void  CUICustomEdit::Draw()
 
 		m_lines.m_pFont->Out				(outXY.x, outXY.y, "_");
 	}
+	m_languageIcon.Draw();
 }
 
 void CUICustomEdit::SetText(LPCSTR str)
@@ -411,4 +508,18 @@ void CUICustomEdit::SetNumbersOnly(bool status){
 
 void CUICustomEdit::SetFloatNumbers(bool status){
 	m_bFloatNumbers = status;
+}
+
+void CUICustomEdit::CheckSwitchInputLanguage()
+{
+	if (m_bShift && (gs_currentLayoutSwitchShortCut == ELSS_AltShift ? m_bAlt : m_bControl))
+	{
+		ChangeInputLanguage();
+	}
+}
+
+void CUICustomEdit::ChangeInputLanguage()
+{
+	CURRENT_SELECTED_LANGUAGE = (CURRENT_SELECTED_LANGUAGE + 1) % gs_hklList.size();
+	m_languageIcon.SetText(!m_bNumbersOnly ? gs_langNames[CURRENT_SELECTED_LANGUAGE].c_str() : "");
 }
