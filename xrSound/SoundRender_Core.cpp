@@ -237,11 +237,11 @@ void CSoundRender_Core::set_geometry_env(IReader* I)
 	
 	Memory.mem_copy		(_data, geom_ch->pointer(), geom_ch->length() );
 
-	IReader* geom		= xr_new<IReader>(_data, geom_ch->length(), 0);
+	IReader geom(_data, geom_ch->length(), 0);
 	
 	hdrCFORM			H;
-	geom->r				(&H,sizeof(hdrCFORM));
-	Fvector*	verts	= (Fvector*)geom->pointer();
+	geom.r				(&H,sizeof(hdrCFORM));
+	Fvector*	verts	= (Fvector*)geom.pointer();
 	CDB::TRI*	tris	= (CDB::TRI*)(verts+H.vertcount);
 	for (u32 it=0; it<H.facecount; it++)
 	{
@@ -260,7 +260,7 @@ void CSoundRender_Core::set_geometry_env(IReader* I)
 	geom_ENV->build		(verts, H.vertcount, tris, H.facecount);
 #endif
 	geom_ch->close			();
-	geom->close				();
+	//geom->close				();
 	xr_free					(_data);
 }
 

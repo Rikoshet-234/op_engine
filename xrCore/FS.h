@@ -258,6 +258,8 @@ public:
 	}
 };
 
+class CTempReader;
+
 class XRCORE_API IReader : public IReaderBase<IReader> {
 protected:
 	char *			data	;
@@ -266,18 +268,25 @@ protected:
 	int				iterpos	;
 
 public:
-	IC				IReader			()
+#if 0
+	struct SChunkData
 	{
-		Pos			= 0;
-	}
+		char* data;
+		int size;
+		bool compressed;
+	};
+	typedef xr_map<u32,SChunkData> TChunkMap;
 
-	IC				IReader			(void *_data, int _size, int _iterpos=0)
-	{
-		data		= (char *)_data	;
-		Size		= _size			;
-		Pos			= 0				;
-		iterpos		= _iterpos		;
-	}
+protected:
+	TChunkMap m_chunks;
+#endif
+	IReader* m_subChunk;
+	CTempReader* m_subTempChunk;
+
+public:
+	IReader();
+	IReader(void *_data, int _size, int _iterpos=0);
+	virtual ~IReader();
 
 protected:
 	IC u32			correction					(u32 p)
@@ -332,6 +341,12 @@ public:
 	void			close		();
 
 public:
+#if 0
+	const TChunkMap& readChunks();
+	void attach(const SChunkData& chunkData);
+#endif
+	virtual void attach(void*, int size, int iterpos);
+
 	// поиск XR Chunk'ов - возврат - размер или 0
 	IReader*		open_chunk	(u32 ID);
 

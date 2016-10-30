@@ -266,23 +266,109 @@ void	IWriter::w_printf(const char* format, ...)
 
 //---------------------------------------------------
 // base stream
+#if 0
+const IReader::TChunkMap& IReader::readChunks()
+{
+	Pos = 0;
+	while ( Pos + 8 <= Size)
+	{
+		const u32 dwType = r_u32();
+		const u32 dwSize = r_u32();
+		
+		SChunkData& cd = m_chunks[dwType];
+		cd.data = data + Pos;
+		cd.size = dwSize;
+		cd.compressed = !!(dwType&CFS_CompressMark);
+		Pos += dwSize;
+	}
+	return m_chunks;
+}
+
+void IReader::attach(const IReader::SChunkData& chunkData)
+{
+	data = const_cast<char*>(chunkData.data);
+	Size = chunkData.size;
+	Pos = 0;
+	iterpos = 0;
+	R_ASSERT2(!chunkData.compressed,"Compressed chunk are not yet supported.");
+}
+#endif
+
+void IReader::attach(void* _data, int _size, int _iterpos)
+{
+	data = static_cast<char*>(_data);
+	Size = _size;
+	Pos = 0;
+	iterpos = _iterpos;
+}
+
 IReader*	IReader::open_chunk(u32 ID)
 {
 	BOOL	bCompressed;
 	u32	dwSize = find_chunk(ID,&bCompressed);
-	if (dwSize!=0) {
-		if (bCompressed) {
+	if (dwSize!=0)
+	{
+		if (bCompressed)
+		{
 			BYTE*		dest;
 			unsigned	dest_sz;
 			_decompressLZ(&dest,&dest_sz,pointer(),dwSize);
-			return xr_new<CTempReader>	(dest,		dest_sz,		tell()+dwSize);
-		} else {
-			return xr_new<IReader>		(pointer(),	dwSize,			tell()+dwSize);
+			//! return xr_new<CTempReader>	(dest,		dest_sz,		tell()+dwSize);
+			if (!m_subTempChunk) m_subTempChunk = xr_new<CTempReader>();
+			m_subTempChunk->attach(dest, dest_sz, tell()+dwSize);
+			return m_subTempChunk;
 		}
-	} else return 0;
+		else
+		{
+			//return xr_new<IReader>		(pointer(),	dwSize,			tell()+dwSize);
+			if (!m_subChunk) m_subChunk = xr_new<IReader>();
+			m_subChunk->attach(pointer(), dwSize, tell()+dwSize);
+			return m_subChunk;
+		}
+	} 
+	else
+		return 0;
 };
+
+IReader::IReader()
+{
+	data = 0;
+	Size = 0;
+	Pos = 0;
+	iterpos = 0;
+	m_subChunk = NULL;
+	m_subTempChunk = NULL;
+}
+
+IReader::IReader(void *_data, int _size, int _iterpos/*=0*/)
+{
+	data		= (char *)_data	;
+	Size		= _size			;
+	Pos			= 0				;
+	iterpos		= _iterpos		;
+	m_subChunk = NULL;
+	m_subTempChunk = NULL;
+}
+
+IReader::~IReader()
+{
+	if (m_subChunk)
+	{
+		xr_delete(m_subChunk);
+		m_subChunk = NULL;
+	}
+
+	if (m_subTempChunk)
+	{
+		xr_delete(m_subTempChunk);
+		m_subTempChunk = NULL;
+	}
+}
+
 void	IReader::close()
-{	xr_delete((IReader*)this); }
+{
+	//xr_delete((IReader*)this);
+}
 
 IReader*	IReader::open_chunk_iterator	(u32& ID, IReader* _prev)
 {
@@ -305,10 +391,18 @@ IReader*	IReader::open_chunk_iterator	(u32& ID, IReader* _prev)
 		u8*				dest	;
 		unsigned		dest_sz	;
 		_decompressLZ	(&dest,&dest_sz,pointer(),_size);
-		return xr_new<CTempReader>	(dest,		dest_sz,	tell()+_size);
-	} else {
+		//return xr_new<CTempReader>	(dest,		dest_sz,	tell()+_size);
+		if (!m_subTempChunk) m_subTempChunk = xr_new<CTempReader>();
+		m_subTempChunk->attach(dest, dest_sz, tell()+_size);
+		return m_subTempChunk;
+	}
+	else
+	{
 		// normal
-		return xr_new<IReader>		(pointer(),	_size,		tell()+_size);
+		//return xr_new<IReader>		(pointer(),	_size,		tell()+_size);
+		if (!m_subChunk) m_subChunk = xr_new<IReader>();
+		m_subChunk->attach(pointer(), _size, tell()+_size);
+		return m_subChunk;
 	}
 }
 
@@ -385,6 +479,12 @@ void	IReader::skip_stringZ	()
 
 //---------------------------------------------------
 // temp stream
+void CTempReader::attach(void* _data, int _size, int _iterpos)
+{
+	if (data) xr_free(data);
+	inherited::attach(_data, _size, _iterpos);
+}
+
 CTempReader::~CTempReader()
 {	xr_free(data);	};
 //---------------------------------------------------

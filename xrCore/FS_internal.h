@@ -73,8 +73,11 @@ public:
 // It automatically frees memory after destruction
 class CTempReader : public IReader
 {
+	typedef IReader inherited;
 public:
-				CTempReader(void *_data, int _size, int _iterpos) : IReader(_data,_size,_iterpos)	{}
+	CTempReader() {}
+	CTempReader(void *_data, int _size, int _iterpos) : IReader(_data,_size,_iterpos)	{}
+	virtual void attach(void*, int size, int iterpos);
 	virtual		~CTempReader();
 };
 class CPackReader : public IReader
