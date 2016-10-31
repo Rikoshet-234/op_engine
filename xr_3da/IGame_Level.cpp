@@ -76,10 +76,12 @@ BOOL IGame_Level::Load			(u32 dwNum)
 
 	// CForms
 	g_pGamePersistent->LoadTitle	("st_loading_cform");
+	
+	CTimer t;
+	t.Start();
 	ObjectSpace.Load			();
 	pApp->LoadSwitch			();
-
-
+	Msg("* object space load: %d ms", t.GetElapsed_ms());
 	// HUD + Environment
 //.	pHUD						= (CCustomHUD*)NEW_INSTANCE	(CLSID_HUDMANAGER);
 	if(g_hud)
@@ -97,7 +99,6 @@ BOOL IGame_Level::Load			(u32 dwNum)
 	R_ASSERT					(Load_GameSpecific_Before());
 	Objects.Load				();
 	R_ASSERT					(Load_GameSpecific_After ());
-
 	// Done
 	FS.r_close					( LL_Stream );
 	bReady						= true;
@@ -107,7 +108,6 @@ BOOL IGame_Level::Load			(u32 dwNum)
 #endif
 
 	Device.seqFrame.Add			(this);
-
 	return TRUE;
 }
 

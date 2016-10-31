@@ -118,18 +118,15 @@ struct dummy {
 void CALifeSpawnRegistry::load				(IReader &file_stream, xrGUID *save_guid)
 {
 	CTimer t;
+	t.Start();
 	IReader						*chunk;
 	chunk						= file_stream.open_chunk(0);
-	t.Start();
 	m_header.load				(*chunk);
-	Msg("*   CALifeSpawnRegistry::load[m_header]: %u ms",t.GetElapsed_ms());
 	chunk->close				();
 	R_ASSERT2					(!save_guid || (*save_guid == header().guid()),"Saved game doesn't correspond to the spawn : DELETE SAVED GAME!");
 
 	chunk						= file_stream.open_chunk(1);	
-	t.Start();
 	m_spawns.load				(*chunk);
-	Msg("*   CALifeSpawnRegistry::load[m_spawns]: %u ms",t.GetElapsed_ms());
 	chunk->close				();
 
 #if 0
@@ -151,16 +148,12 @@ void CALifeSpawnRegistry::load				(IReader &file_stream, xrGUID *save_guid)
 #endif
 
 	chunk						= file_stream.open_chunk(2);
-	t.Start();
 	load_data					(m_artefact_spawn_positions,*chunk);
-	Msg("*   CALifeSpawnRegistry::load[load_data]: %u ms",t.GetElapsed_ms());
 	chunk->close				();
 
 	chunk						= file_stream.open_chunk(3);
 	R_ASSERT2					(chunk,"Spawn version mismatch - REBUILD SPAWN!");
-	t.Start();
 	ai().patrol_path_storage	(*chunk);
-	Msg("*   CALifeSpawnRegistry::load[patrol_path_storage]: %u ms",t.GetElapsed_ms());
 	chunk->close				();
 
 #ifdef PRIQUEL
@@ -174,14 +167,10 @@ void CALifeSpawnRegistry::load				(IReader &file_stream, xrGUID *save_guid)
 #endif // PRIQUEL
 
 	R_ASSERT2					(header().graph_guid() == ai().game_graph().header().guid(),"Spawn doesn't correspond to the graph : REBUILD SPAWN!");
-	t.Start();
 	build_story_spawns			();
-	Msg("*   CALifeSpawnRegistry::load[build_story_spawns]: %u ms",t.GetElapsed_ms());
-	t.Start();
 	build_root_spawns			();
-	Msg("*   CALifeSpawnRegistry::load[build_root_spawns]: %u ms",t.GetElapsed_ms());
 
-	Msg							("* %d spawn points are successfully loaded",m_spawns.vertex_count());
+	Msg							("* %d spawn points are successfully loaded (%2.3fs)",m_spawns.vertex_count(), t.GetElapsed_sec());
 }
 
 void CALifeSpawnRegistry::save_updates		(IWriter &stream)

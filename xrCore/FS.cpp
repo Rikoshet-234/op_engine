@@ -266,34 +266,6 @@ void	IWriter::w_printf(const char* format, ...)
 
 //---------------------------------------------------
 // base stream
-#if 0
-const IReader::TChunkMap& IReader::readChunks()
-{
-	Pos = 0;
-	while ( Pos + 8 <= Size)
-	{
-		const u32 dwType = r_u32();
-		const u32 dwSize = r_u32();
-		
-		SChunkData& cd = m_chunks[dwType];
-		cd.data = data + Pos;
-		cd.size = dwSize;
-		cd.compressed = !!(dwType&CFS_CompressMark);
-		Pos += dwSize;
-	}
-	return m_chunks;
-}
-
-void IReader::attach(const IReader::SChunkData& chunkData)
-{
-	data = const_cast<char*>(chunkData.data);
-	Size = chunkData.size;
-	Pos = 0;
-	iterpos = 0;
-	R_ASSERT2(!chunkData.compressed,"Compressed chunk are not yet supported.");
-}
-#endif
-
 void IReader::attach(void* _data, int _size, int _iterpos)
 {
 	data = static_cast<char*>(_data);
@@ -367,6 +339,7 @@ IReader::~IReader()
 
 void	IReader::close()
 {
+	m_chunkMap.clear();
 	//xr_delete((IReader*)this);
 }
 

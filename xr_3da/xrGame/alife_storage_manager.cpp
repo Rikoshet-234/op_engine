@@ -86,54 +86,42 @@ void CALifeStorageManager::save	(LPCSTR save_name, bool update_name)
 
 void CALifeStorageManager::load	(void *buffer, const u32 &buffer_size, LPCSTR file_name)
 {
-	CTimer t;
 	IReader						source(buffer,buffer_size);
-	t.Start();
 	header().load				(source);
-	Msg("*  header: %u ms",t.GetElapsed_ms());
-	t.Start();
 	time_manager().load			(source);
-	Msg("*  time_manager: %u ms",t.GetElapsed_ms());
-	t.Start();
 	spawns().load				(source,file_name);
-	Msg("*  spawns: %u ms",t.GetElapsed_ms());
 
 #ifdef PRIQUEL
 	graph().on_load				();
 #endif // PRIQUEL
 
-	t.Start();
 	objects().load				(source);
-	Msg("*  objects: %u ms",t.GetElapsed_ms());
 
 	VERIFY						(can_register_objects());
 	can_register_objects		(false);
 	CALifeObjectRegistry::OBJECT_REGISTRY::iterator	B = objects().objects().begin();
 	CALifeObjectRegistry::OBJECT_REGISTRY::iterator	E = objects().objects().end();
 	CALifeObjectRegistry::OBJECT_REGISTRY::iterator	I;
-	t.Start();
 	for (I = B; I != E; ++I) {
 		ALife::_OBJECT_ID		id = (*I).second->ID;
 		(*I).second->ID			= server().PerformIDgen(id);
 		VERIFY					(id == (*I).second->ID);
 		register_object			((*I).second,false);
 	} 
-	Msg("*  register_object for %u objects: %u ms", objects().objects().size(), t.GetElapsed_ms());
-	t.Start();
 	registry().load				(source);
-	Msg("*  registry: %u ms",t.GetElapsed_ms());
 
 	can_register_objects		(true);
-
+	
+	CTimer t;
 	t.Start();
 	for (I = B; I != E; ++I)
 		(*I).second->on_register();
-	Msg("*  on_register for %u objects: %u ms", objects().objects().size(), t.GetElapsed_ms());
+	Msg("* %u objects on_register'ed (%2.3fs)", objects().objects().size(), t.GetElapsed_sec());
 }
 
 bool CALifeStorageManager::load	(LPCSTR save_name)
 {
-	CTimer						timer, t;
+	CTimer						timer;
 	timer.Start					();
 	string256					save;
 	strcpy						(save,m_save_name);
@@ -160,22 +148,14 @@ bool CALifeStorageManager::load	(LPCSTR save_name)
 	strconcat					(sizeof(temp),temp,CStringTable().translate("st_loading_saved_game").c_str()," \"",save_name,SAVE_EXTENSION,"\"");
 	g_pGamePersistent->LoadTitle(temp);
 
-	t.Start();
 	unload						();
 	reload						(m_section);
-	Msg("* unload/reload: %u ms",t.GetElapsed_ms());
 
-	t.Start();
 	u32							source_count = stream->r_u32();
 	void						*source_data = xr_malloc(source_count);
-	Msg("* malloc %u bytes: %u ms",source_count, t.GetElapsed_ms());
-	t.Start();
 	rtc_decompress				(source_data,source_count,stream->pointer(),stream->length() - 3*sizeof(u32));
-	Msg("* decompress: %u ms",t.GetElapsed_ms());
 	FS.r_close					(stream);
-	t.Start();
 	load						(source_data, source_count, file_name);
-	Msg("* load: %u ms",t.GetElapsed_ms());
 	xr_free						(source_data);
 
 	groups().on_after_game_load	();
