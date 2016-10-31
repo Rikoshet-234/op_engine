@@ -83,6 +83,8 @@ void xrServer::OnCL_Connected		(IClient* _CL)
 	//
 	NET_Packet P;
 	P.B.count = 0;
+	P.m_iniString383Backup = 0;
+	P.m_iniString383BackupPos = 0;
 	P.w_clientID(CL->ID);
 	P.r_pos = 0;
 	ClientID clientID;clientID.set	(0);
