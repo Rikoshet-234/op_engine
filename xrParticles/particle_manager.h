@@ -13,7 +13,7 @@ namespace PAPI{
 		DEFINE_VECTOR				(ParticleActions*,ParticleActionsVec,ParticleActionsVecIt);
 		ParticleEffectVec			effect_vec;
 		ParticleActionsVec			alist_vec;
-		std::string defName;
+		shared_str					defName;
     public:
 		    						CParticleManager	();
         virtual						~CParticleManager	();
@@ -44,9 +44,9 @@ namespace PAPI{
     	virtual u32					GetParticlesCount	(int effect_id);
 
         // action
-        virtual ParticleAction*		CreateAction		(PActionEnum action_id);
-        virtual u32					LoadActions			(int alist_id, IReader& R);
-		virtual u32					LoadActions			(int alist_id, IReader& R,std::string defName);
+	    ParticleAction*		CreateAction		(PActionEnum action_id) override;
+	    u32					LoadActions			(int alist_id, IReader& R) override;
+	    u32					LoadActions			(int alist_id, IReader& R,shared_str defName) override;
 	    bool CheckActionsList() override;
 		bool CheckActionList(int list_id);
 	    virtual void				SaveActions			(int alist_id, IWriter& W);

@@ -30,7 +30,7 @@ ParticleEffect*	CParticleManager::GetEffectPtr(int effect_id)
 
 ParticleActions* CParticleManager::GetActionListPtr(int a_list_num)
 {
-	R_ASSERT(a_list_num>=0&&a_list_num<(int)alist_vec.size());
+	R_ASSERT(a_list_num>=0&&a_list_num<static_cast<int>(alist_vec.size()));
 	if (!CheckActionList(a_list_num))
 	{
 		if (alist_vec[a_list_num]!=nullptr)
@@ -203,7 +203,7 @@ u32	CParticleManager::GetParticlesCount	(int effect_id)
 // action
 ParticleAction* CParticleManager::CreateAction(PActionEnum type)
 {
-	ParticleAction* pa			= 0;
+	ParticleAction* pa			= nullptr;
 	switch(type){
 	case PAAvoidID:				pa = xr_new<PAAvoid>();				break;
 	case PABounceID:    		pa = xr_new<PABounce>();			break;
@@ -241,7 +241,7 @@ ParticleAction* CParticleManager::CreateAction(PActionEnum type)
 	pa->type					= type;
 	return pa;
 }
-u32 CParticleManager::LoadActions(int alist_id, IReader& R,std::string defName)
+u32 CParticleManager::LoadActions(int alist_id, IReader& R,shared_str defName)
 {
 	this->defName=defName;
 	return LoadActions(alist_id,R);
@@ -296,9 +296,20 @@ u32 CParticleManager::LoadActions(int alist_id, IReader& R)
 		for (u32 k=0; k<cnt; k++)
 		{
 			u32 act_type=R.r_u32();
-			PActionEnum act_enum=(PActionEnum)act_type;
+			PActionEnum act_enum=static_cast<PActionEnum>(act_type);
 			ParticleAction* act	= CreateAction	(act_enum);
-			act->Load			(R);
+			if (act->CanLoadData(R))
+				act->Load			(R);
+			else
+			{
+				Msg("! ERROR not enouth data for [%s] in particles.xr. Set to PAMove action.",defName!=nullptr? defName.c_str():"unknown");
+				act	= CreateAction	(PAMoveID);
+				R.seek(R.length());
+				if (R.eof())
+					break;
+				//R.seek()
+				//act->Load			(R);
+			}
 			pa->append			(act);
 		}
 	}

@@ -5,6 +5,7 @@
 #include "level.h"
 #include "actor.h"
 #include "xr_level_controller.h"
+#include "../../xrLua/lua_tools.h"
 
 dlgItem::dlgItem(CUIWindow* pWnd)
 {
@@ -211,6 +212,11 @@ void CDialogHolder::SetMainInputReceiver	(CUIDialogWnd* ir, bool _find_remove)
 void CDialogHolder::StartStopMenu(CUIDialogWnd* pDialog, bool bDoHideIndicators)
 {
 //.	ai().script_engine().script_log	(eLuaMessageTypeError,"foo");
+	if (!pDialog)
+	{
+		get_lua_traceback(g_game_lua,5);
+		return;
+	}
 	if( pDialog->IsShown() )
 		StopMenu(pDialog);
 	else
