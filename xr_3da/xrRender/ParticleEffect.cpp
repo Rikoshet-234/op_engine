@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
+#include "ParticleEffectDef.h"
 #include "ParticleEffect.h"
 
 using namespace PAPI;
@@ -149,9 +150,8 @@ BOOL CParticleEffect::Compile(CPEDef* def)
 		RefreshShader			();
 
 		// append actions
-		std::string defName=m_Def->Name();
 		IReader F				(m_Def->m_Actions.pointer(),m_Def->m_Actions.size());
-		ParticleManager()->LoadActions		(m_HandleActionList,F/*,defName*/);
+		ParticleManager()->LoadActions		(m_HandleActionList,F,m_Def->Name());
 		ParticleManager()->CheckActionsList();
 		ParticleManager()->SetMaxParticles	(m_HandleEffect,m_Def->m_MaxParticles);
 		ParticleManager()->SetCallback		(m_HandleEffect,OnEffectParticleBirth,OnEffectParticleDead,this,0);

@@ -20,6 +20,8 @@ namespace PAPI{
 
 		virtual void 	Load		(IReader& F)=0;
 		virtual void 	Save		(IWriter& F)=0;
+
+		virtual bool	CanLoadData(IReader& F)=0;
 	};
     DEFINE_VECTOR(ParticleAction*,PAVec,PAVecIt);
 	class ParticleActions{

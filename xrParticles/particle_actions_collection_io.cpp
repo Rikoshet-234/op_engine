@@ -7,7 +7,11 @@ using namespace PAPI;
 void ParticleAction::Load	(IReader& F)
 {
 	m_Flags.assign	(F.r_u32());
-    type			= (PActionEnum)F.r_u32();
+    type			= static_cast<PActionEnum>(F.r_u32());
+}
+bool ParticleAction::CanLoadData(IReader& F)
+{
+	return F.elapsed()>=sizeof(u32)*2; //m_Flags+type
 }
 void ParticleAction::Save	(IWriter& F)
 {
@@ -23,6 +27,11 @@ void PAAvoid::Load			(IReader& F)
     magnitude		= F.r_float();
     epsilon			= F.r_float();
     positionL		= position;
+}
+bool PAAvoid::CanLoadData(IReader& F)
+{
+	return ParticleAction::CanLoadData(F) && 
+		((F.elapsed()-sizeof(u32)*2)>=(sizeof(pDomain)+sizeof(float)*3));
 }
 void PAAvoid::Save			(IWriter& F)
 {
@@ -42,6 +51,11 @@ void PABounce::Load			(IReader& F)
     cutoffSqr		= F.r_float();
     positionL		= position;
 }
+bool PABounce::CanLoadData(IReader& F)
+{
+	bool head=ParticleAction::CanLoadData(F);
+	return head && ((F.elapsed()-sizeof(u32)*2)>=(sizeof(pDomain)+sizeof(float)*3));
+}
 void PABounce::Save			(IWriter& F)
 {
 	ParticleAction::Save  	(F);
@@ -56,11 +70,17 @@ void PACopyVertexB::Load   	(IReader& F)
 	ParticleAction::Load   	(F);
     copy_pos		= F.r_u32();
 }
+bool PACopyVertexB::CanLoadData(IReader& F)
+{
+	bool head=ParticleAction::CanLoadData(F);
+	return head && ((F.elapsed()-sizeof(u32)*2)>=sizeof(u32));
+}
 void PACopyVertexB::Save   	(IWriter& F)
 {
 	ParticleAction::Save   	(F);
     F.w_u32			(copy_pos);
 }
+
 
 void PADamping::Load		(IReader& F)
 {
@@ -68,6 +88,11 @@ void PADamping::Load		(IReader& F)
     F.r_fvector3	(damping);
     vlowSqr			= F.r_float	();
     vhighSqr		= F.r_float	();
+}
+bool PADamping::CanLoadData(IReader& F)
+{
+	bool head=ParticleAction::CanLoadData(F);
+	return head && ((F.elapsed()-sizeof(u32)*2)>=(sizeof(Fvector3)+sizeof(float)*2));
 }
 void PADamping::Save		(IWriter& F)
 {
@@ -88,6 +113,11 @@ void PAExplosion::Load		(IReader& F)
 	epsilon			= F.r_float();
 	centerL			= center;
 }
+bool PAExplosion::CanLoadData(IReader& F)
+{
+	bool head=ParticleAction::CanLoadData(F);
+	return head && ((F.elapsed()-sizeof(u32)*2)>=(sizeof(Fvector3)+sizeof(float)*5));
+}
 void PAExplosion::Save		(IWriter& F)
 {
 	ParticleAction::Save   	(F);
@@ -106,6 +136,11 @@ void PAFollow::Load			(IReader& F)
 	epsilon			= F.r_float();
 	max_radius		= F.r_float();
 }
+bool PAFollow::CanLoadData(IReader& F)
+{
+	bool head=ParticleAction::CanLoadData(F);
+	return head && ((F.elapsed()-sizeof(u32)*2)>=sizeof(float)*3);
+}
 void PAFollow::Save			(IWriter& F)
 {
 	ParticleAction::Save  	(F);
@@ -121,6 +156,11 @@ void PAGravitate::Load		(IReader& F)
 	epsilon			= F.r_float();
 	max_radius		= F.r_float();
 }
+bool PAGravitate::CanLoadData(IReader& F)
+{
+	bool head=ParticleAction::CanLoadData(F);
+	return head && ((F.elapsed()-sizeof(u32)*2)>=sizeof(float)*3);
+}
 void PAGravitate::Save		(IWriter& F)
 {
 	ParticleAction::Save   	(F);
@@ -134,6 +174,11 @@ void PAGravity::Load		(IReader& F)
 	ParticleAction::Load	(F);
 	F.r_fvector3	(direction);
     directionL		= direction;
+}
+bool PAGravity::CanLoadData(IReader& F)
+{
+	bool head=ParticleAction::CanLoadData(F);
+	return head && ((F.elapsed()-sizeof(u32)*2)>=sizeof(Fvector3));
 }
 void PAGravity::Save		(IWriter& F)
 {
@@ -152,6 +197,11 @@ void PAJet::Load			(IReader& F)
 	centerL			= center;
 	accL			= acc;
 }
+bool PAJet::CanLoadData(IReader& F)
+{
+	bool head=ParticleAction::CanLoadData(F);
+	return head && ((F.elapsed()-sizeof(u32)*2)>=(sizeof(Fvector3)+sizeof(pDomain)+sizeof(float)*3));
+}
 void PAJet::Save			(IWriter& F)
 {
 	ParticleAction::Save   	(F);
@@ -168,6 +218,11 @@ void PAKillOld::Load		(IReader& F)
     age_limit		= F.r_float	();
     kill_less_than	= F.r_u32	();
 }
+bool PAKillOld::CanLoadData(IReader& F)
+{
+	bool head=ParticleAction::CanLoadData(F);
+	return head && ((F.elapsed()-sizeof(u32)*2)>=(sizeof(float)+sizeof(u32)));
+}
 void PAKillOld::Save		(IWriter& F)
 {
 	ParticleAction::Save	(F);
@@ -182,6 +237,11 @@ void PAMatchVelocity::Load 	(IReader& F)
 	epsilon			= F.r_float();
 	max_radius		= F.r_float();
 }
+bool PAMatchVelocity::CanLoadData(IReader& F)
+{
+	bool head=ParticleAction::CanLoadData(F);
+	return head && ((F.elapsed()-sizeof(u32)*2)>=sizeof(float)*3);
+}
 void PAMatchVelocity::Save 	(IWriter& F)
 {
 	ParticleAction::Save   	(F);
@@ -193,6 +253,10 @@ void PAMatchVelocity::Save 	(IWriter& F)
 void PAMove::Load			(IReader& F)
 {
 	ParticleAction::Load   	(F);
+}
+bool PAMove::CanLoadData(IReader& F)
+{
+	return ParticleAction::CanLoadData(F);
 }
 void PAMove::Save			(IWriter& F)
 {
@@ -209,6 +273,11 @@ void PAOrbitLine::Load		(IReader& F)
 	max_radius		= F.r_float();
 	pL				= p;
 	axisL			= axis;
+}
+bool PAOrbitLine::CanLoadData(IReader& F)
+{
+	bool head=ParticleAction::CanLoadData(F);
+	return head && ((F.elapsed()-sizeof(u32)*2)>=(sizeof(Fvector3)*2+sizeof(float)*3));
 }
 void PAOrbitLine::Save		(IWriter& F)
 {
@@ -229,6 +298,11 @@ void PAOrbitPoint::Load		(IReader& F)
 	max_radius		= F.r_float();
 	centerL			= center;
 }
+bool PAOrbitPoint::CanLoadData(IReader& F)
+{
+	bool head=ParticleAction::CanLoadData(F);
+	return head && ((F.elapsed()-sizeof(u32)*2)>=(sizeof(float)*3)+sizeof(Fvector3));
+}
 void PAOrbitPoint::Save		(IWriter& F)
 {
 	ParticleAction::Save  	(F);
@@ -244,6 +318,11 @@ void PARandomAccel::Load	(IReader& F)
     F.r				(&gen_acc,sizeof(pDomain));
     gen_accL		= gen_acc;
 }
+bool PARandomAccel::CanLoadData(IReader& F)
+{
+	bool head=ParticleAction::CanLoadData(F);
+	return head && ((F.elapsed()-sizeof(u32)*2)>=sizeof(pDomain));
+}
 void PARandomAccel::Save	(IWriter& F)
 {
 	ParticleAction::Save   	(F);
@@ -255,6 +334,11 @@ void PARandomDisplace::Load	(IReader& F)
 	ParticleAction::Load  	(F);
     F.r				(&gen_disp,sizeof(pDomain));
     gen_dispL		= gen_disp;
+}
+bool PARandomDisplace::CanLoadData(IReader& F)
+{
+	bool head=ParticleAction::CanLoadData(F);
+	return head && ((F.elapsed()-sizeof(u32)*2)>=sizeof(pDomain));
 }
 void PARandomDisplace::Save	(IWriter& F)
 {
@@ -268,6 +352,11 @@ void PARandomVelocity::Load	(IReader& F)
     F.r				(&gen_vel,sizeof(pDomain));
     gen_velL		= gen_vel;
 }
+bool PARandomVelocity::CanLoadData(IReader& F)
+{
+	bool head=ParticleAction::CanLoadData(F);
+	return head && ((F.elapsed()-sizeof(u32)*2)>=sizeof(pDomain));
+}
 void PARandomVelocity::Save	(IWriter& F)
 {
 	ParticleAction::Save 	(F);
@@ -278,6 +367,11 @@ void PARestore::Load		(IReader& F)
 {
 	ParticleAction::Load  	(F);
     time_left		= F.r_float();
+}
+bool PARestore::CanLoadData(IReader& F)
+{
+	bool head=ParticleAction::CanLoadData(F);
+	return head && ((F.elapsed()-sizeof(u32)*2)>=sizeof(float));
 }
 void PARestore::Save		(IWriter& F)
 {
@@ -293,6 +387,11 @@ void PAScatter::Load		(IReader& F)
 	epsilon			= F.r_float();
 	max_radius		= F.r_float();
 	centerL			= center;
+}
+bool PAScatter::CanLoadData(IReader& F)
+{
+	bool head=ParticleAction::CanLoadData(F);
+	return head && ((F.elapsed()-sizeof(u32)*2)>=(sizeof(Fvector3)+sizeof(float)*3));
 }
 void PAScatter::Save		(IWriter& F)
 {
@@ -310,6 +409,11 @@ void PASink::Load			(IReader& F)
     F.r				(&position,sizeof(pDomain));
     positionL		= position;
 }
+bool PASink::CanLoadData(IReader& F)
+{
+	bool head=ParticleAction::CanLoadData(F);
+	return head && ((F.elapsed()-sizeof(u32)*2)>=(sizeof(pDomain)+sizeof(u32)));
+}
 void PASink::Save			(IWriter& F)
 {
 	ParticleAction::Save	(F);
@@ -324,6 +428,11 @@ void PASinkVelocity::Load  	(IReader& F)
     F.r				(&velocity,sizeof(pDomain));
     velocityL		= velocity;
 }
+bool PASinkVelocity::CanLoadData(IReader& F)
+{
+	bool head=ParticleAction::CanLoadData(F);
+	return head && ((F.elapsed()-sizeof(u32)*2)>=(sizeof(pDomain)+sizeof(u32)));
+}
 void PASinkVelocity::Save  	(IWriter& F)
 {
 	ParticleAction::Save   	(F);
@@ -336,6 +445,11 @@ void PASpeedLimit::Load		(IReader& F)
 	ParticleAction::Load   	(F);
 	min_speed		= F.r_float();
 	max_speed		= F.r_float();
+}
+bool PASpeedLimit::CanLoadData(IReader& F)
+{
+	bool head=ParticleAction::CanLoadData(F);
+	return head && ((F.elapsed()-sizeof(u32)*2)>=(sizeof(float)*2));
 }
 void PASpeedLimit::Save		(IWriter& F)
 {
@@ -361,6 +475,11 @@ void PASource::Load			(IReader& F)
     positionL		= position;
     velocityL		= velocity;
 }
+bool PASource::CanLoadData(IReader& F)
+{
+	bool head=ParticleAction::CanLoadData(F);
+	return head && ((F.elapsed()-sizeof(u32)*2)>=(sizeof(pDomain)*5+sizeof(float)*5 + sizeof(Fvector3)));
+}
 void PASource::Save			(IWriter& F)
 {
 	ParticleAction::Save  	(F);
@@ -384,6 +503,11 @@ void PATargetColor::Load	(IReader& F)
     alpha			= F.r_float();
 	scale			= F.r_float();
 }
+bool PATargetColor::CanLoadData(IReader& F)
+{
+	bool head=ParticleAction::CanLoadData(F);
+	return head && ((F.elapsed()-sizeof(u32)*2)>=(sizeof(Fvector3)+sizeof(float)*2));
+}
 void PATargetColor::Save	(IWriter& F)
 {
 	ParticleAction::Save   	(F);
@@ -398,6 +522,11 @@ void PATargetSize::Load		(IReader& F)
 	F.r_fvector3	(size);
 	F.r_fvector3	(scale);
 }
+bool PATargetSize::CanLoadData(IReader& F)
+{
+	bool head=ParticleAction::CanLoadData(F);
+	return head && ((F.elapsed()-sizeof(u32)*2)>=(sizeof(Fvector3)*2));
+}
 void PATargetSize::Save		(IWriter& F)
 {
 	ParticleAction::Save	(F);
@@ -410,6 +539,11 @@ void PATargetRotate::Load	(IReader& F)
 	ParticleAction::Load   	(F);
 	F.r_fvector3	(rot);
 	scale			= F.r_float();
+}
+bool PATargetRotate::CanLoadData(IReader& F)
+{
+	bool head=ParticleAction::CanLoadData(F);
+	return head && ((F.elapsed()-sizeof(u32)*2)>=(sizeof(Fvector3)+sizeof(float)));
 }
 void PATargetRotate::Save	(IWriter& F)
 {
@@ -424,6 +558,11 @@ void PATargetVelocity::Load	(IReader& F)
 	F.r_fvector3	(velocity);
 	scale			= F.r_float();
 	velocityL		= velocity;
+}
+bool PATargetVelocity::CanLoadData(IReader& F)
+{
+	bool head=ParticleAction::CanLoadData(F);
+	return head && ((F.elapsed()-sizeof(u32)*2)>=(sizeof(Fvector3)+sizeof(float)));
 }
 void PATargetVelocity::Save	(IWriter& F)
 {
@@ -443,6 +582,11 @@ void PAVortex::Load			(IReader& F)
 	centerL			= center;
 	axisL			= axis;
 }
+bool PAVortex::CanLoadData(IReader& F)
+{
+	bool head=ParticleAction::CanLoadData(F);
+	return head && ((F.elapsed()-sizeof(u32)*2)>=(sizeof(Fvector3)*2+sizeof(float)*3));
+}
 void PAVortex::Save			(IWriter& F)
 {
 	ParticleAction::Save 	(F);
@@ -461,6 +605,11 @@ void PATurbulence::Load		(IReader& F)
 	magnitude		= F.r_float();
 	epsilon			= F.r_float();
     F.r_fvector3	(offset);
+}
+bool PATurbulence::CanLoadData(IReader& F)
+{
+	bool head=ParticleAction::CanLoadData(F);
+	return head && ((F.elapsed()-sizeof(u32)*2)>=(sizeof(float)*3+sizeof(s32)+sizeof(Fvector3)));
 }
 void PATurbulence::Save		(IWriter& F)
 {

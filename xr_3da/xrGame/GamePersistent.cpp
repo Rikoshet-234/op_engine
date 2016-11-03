@@ -18,6 +18,8 @@
 
 #include "../CameraManager.h"
 #include "actor.h"
+#include <chrono>
+#include <functional>
 
 
 #ifndef MASTER_GOLD
@@ -120,18 +122,30 @@ extern void init_game_globals	();
 
 void CGamePersistent::OnAppStart()
 {
-	// load game materials
-	Msg("Start loading CGamePersistent at ");
+	auto chrono1 = std::chrono::high_resolution_clock::now();
 	GMLib.Load					();
-	Msg("GMLib loaded at ");
+	auto chrono2 = std::chrono::high_resolution_clock::now();
+	Msg("GMLib loaded at %lli msec",std::chrono::duration_cast<std::chrono::milliseconds>(chrono2-chrono1).count());
+	
+	chrono1 = std::chrono::high_resolution_clock::now();
 	init_game_globals			();
-	Msg("init_game_globals loaded at ");
+	chrono2 = std::chrono::high_resolution_clock::now();
+	Msg("Game_Globals loaded at %lli msec",std::chrono::duration_cast<std::chrono::milliseconds>(chrono2-chrono1).count());
+
+	chrono1 = std::chrono::high_resolution_clock::now();
 	__super::OnAppStart			();
-	Msg("__super::OnAppStart loaded at s");
+	chrono2 = std::chrono::high_resolution_clock::now();
+	Msg("App_Start loaded at %lli msec",std::chrono::duration_cast<std::chrono::milliseconds>(chrono2-chrono1).count());
+
+	chrono1 = std::chrono::high_resolution_clock::now();
 	m_pUI_core					= xr_new<ui_core>();
-	Msg("ui_core loaded at ");
+	chrono2 = std::chrono::high_resolution_clock::now();
+	Msg("ui_core loaded at %lli msec",std::chrono::duration_cast<std::chrono::milliseconds>(chrono2-chrono1).count());
+
+	chrono1 = std::chrono::high_resolution_clock::now();
 	m_pMainMenu					= xr_new<CMainMenu>();
-	Msg("CMainMenu loaded at ");
+	chrono2 = std::chrono::high_resolution_clock::now();
+	Msg("Main_Menu loaded at %lli msec",std::chrono::duration_cast<std::chrono::milliseconds>(chrono2-chrono1).count());
 }
 
 

@@ -867,8 +867,8 @@ void CActor::g_Physics(Fvector& _accel, float jump, float dt)
 
 				if (Device.dwFrame - last_hit_frame > 30)
 					u_EventSend	(l_P);
-				else
-					Msg("##DBG: collision hit ignored, last_hit_frame = %d, current frame = %d ", last_hit_frame, Device.dwFrame);
+				//else
+					//Msg("##DBG: collision hit ignored, last_hit_frame = %d, current frame = %d ", last_hit_frame, Device.dwFrame);
 				last_hit_frame = Device.dwFrame;
 			}
 		}
