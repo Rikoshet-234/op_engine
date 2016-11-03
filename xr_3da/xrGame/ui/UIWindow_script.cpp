@@ -11,7 +11,12 @@
 #include "UIScrollView.h"
 #include "UIInventoryWnd.h"
 #include "UICellItem.h"
+#include "UIMainIngameWnd.h"
+#include "../Level.h"
+#include "../UIGameCustom.h"
+#include "../UIGameSP.h"
 
+#pragma region Font manager
 CFontManager& mngr(){
 	return *(UI()->Font());
 }
@@ -47,7 +52,7 @@ CGameFont* GetFontGraffiti50Russian()
 {return mngr().pFontGraffiti50Russian;}
 CGameFont* GetFontLetterica25()
 {return mngr().pFontLetterica25;}
-
+#pragma endregion
 
 int GetARGB(u16 a, u16 r, u16 g, u16 b)
 {return color_argb(a,r,g,b);}
@@ -66,6 +71,12 @@ LPCSTR	get_texture_name(LPCSTR icon_name)
 TEX_INFO	get_texture_info(LPCSTR name, LPCSTR def_name)
 {
 	return CUITextureMaster::FindItem(name, def_name);
+}
+
+CUIInventoryWnd* get_inv_wnd()
+{
+	CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
+	return pGameSP->InventoryMenu;
 }
 
 using namespace luabind;
@@ -177,8 +188,12 @@ void CUIWindow::script_register(lua_State *L)
 
 		class_<CUIMMShniaga, CUIWindow>("CUIMMShniaga")
 		.def("SetVisibleMagnifier",			&CUIMMShniaga::SetVisibleMagnifier),
+
+		class_<CUIMainIngameWnd, CUIWindow>("CUIMainIngameWnd"),
+		//.def("re_init",&CUIMainIngameWnd::re_init),
 	
 		class_<CUIInventoryWnd, CUIWindow>("CUIInventoryWnd")
+		.def("re_init",				&CUIInventoryWnd::re_init)
 		.def("GetUIWindowType",				&CUIInventoryWnd::GetUIWindowType)
 		.def("ClearAllSuitables",			&CUIInventoryWnd::ClearAllSuitables)
 		.def("ClearSuitablesInList",		&CUIInventoryWnd::ClearSuitablesInList)
@@ -190,10 +205,8 @@ void CUIWindow::script_register(lua_State *L)
 		class_<CUIDragDropListEx, CUIWindow,CUIWndCallback>("CUIDragDropListEx")
 		.def("GetUIListId",				&CUIDragDropListEx::GetUIListId),
 
-
-
+		def("get_inv_wnd",&get_inv_wnd),		
 		
-
 		class_<CUIScrollView, CUIWindow>("CUIScrollView")
 		.def(							constructor<>())
 		.def("AddWindow",				&CUIScrollView::AddWindow)
@@ -206,10 +219,6 @@ void CUIWindow::script_register(lua_State *L)
 		.def("GetCurrentScrollPos",		&CUIScrollView::GetCurrentScrollPos)
 		.def("SetScrollPos",			&CUIScrollView::SetScrollPos),
 
-
-//		.def("",						&CUIFrameLineWnd::)
-//		.def("",						&CUIFrameLineWnd::)
-//		.def("",						&CUIFrameLineWnd::)
 		class_<enum_exporter<IWListTypes>>("ui_iw_list_types")
 		.enum_("ui_iw_list_types")
 			[
@@ -221,7 +230,7 @@ void CUIWindow::script_register(lua_State *L)
 				value("LT_BOLT",				int(ltBolt)),
 				value("LT_OUTFIT",				int(ltSlotOutfit)),
 				value("LT_PDA",					int(ltPDA)),
-				value("LT_DETECTOR",			int(ltDetector)),
+				value("LT_DETECTOR",			int(ltSlotDetector)),
 				value("LT_TORCH",				int(ltTorch)),
 				value("LT_BAG",					int(ltBag)),
 				value("LT_BELT",				int(ltBelt)),

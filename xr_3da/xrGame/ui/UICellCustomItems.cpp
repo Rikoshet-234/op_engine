@@ -13,6 +13,7 @@ CUIInventoryCellItem::CUIInventoryCellItem(CInventoryItem* itm)
 	inherited::SetShader							(InventoryUtilities::GetEquipmentIconsShader());
 
 	m_grid_size.set									(itm->GetGridWidth(),itm->GetGridHeight());
+	m_grid_size_start.set(m_grid_size);
 	inherited::SetOriginalRect						(itm->GetIconInfo().getOriginalRect());
 	inherited::SetStretchTexture					(true);
 }

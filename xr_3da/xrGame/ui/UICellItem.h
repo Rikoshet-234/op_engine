@@ -25,6 +25,7 @@ protected:
 
 	CUIDragDropListEx*		m_pParentList;
 	Ivector2				m_grid_size;
+	Ivector2				m_grid_size_start;
 	ICustomDrawCell*		m_custom_draw;
 	int						m_accelerator;
 	virtual void			UpdateItemText			();
@@ -47,6 +48,8 @@ public:
 				bool		HasChild					(CUICellItem* item);
 	virtual		bool		EqualTo					(CUICellItem* itm);
 	IC const	Ivector2&	GetGridSize				()						{return m_grid_size;}; //size in grid
+	IC			void		SetGridSize				(Ivector2 vec)			{m_grid_size.set(vec);}
+	IC			void		ResetGridSize			()						{m_grid_size.set(m_grid_size_start);}
 	IC			void		SetAccelerator			(int dik)				{m_accelerator=dik;};
 	IC			int			GetAccelerator			()		const			{return m_accelerator;};
 	

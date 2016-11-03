@@ -473,6 +473,8 @@ bool CUIXmlInit::InitDragDropListEx(CUIXml& xml_doc, const char* path, int index
 		pWnd->GetCellContainer()->m_anim_mSec=xml_doc.ReadAttribInt(buf, index, "anim_time", 0);
 	}
 
+	pWnd->m_b_adjustCells=xml_doc.ReadAttribInt(path, index, "adjust_cells",0)?true:false;
+
 	return true;
 }
 

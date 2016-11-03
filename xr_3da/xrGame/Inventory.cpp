@@ -73,7 +73,7 @@ CInventory::CInventory()
 
 	m_slots[PDA_SLOT].m_bVisible				= false;
 	m_slots[OUTFIT_SLOT].m_bVisible				= false;
-	m_slots[DETECTOR_SLOT].m_bVisible			= false;
+	//m_slots[DETECTOR_SLOT].m_bVisible			= false;
 	m_slots[TORCH_SLOT].m_bVisible				= false;
 
 	m_bSlotsUseful								= true;
@@ -305,7 +305,17 @@ bool CInventory::Slot(PIItem pIItem, bool bNotActivate)
 
 bool CInventory::Belt(PIItem pIItem) 
 {
-	if(!CanPutInBelt(pIItem))	return false;
+	if(!CanPutInBelt(pIItem))
+	{
+		if (pIItem->m_eItemPlace==EItemPlace::eItemPlaceBelt && !pIItem->Belt())
+		{
+			CGameObject &obj = pIItem->object();
+			bool test=pIItem->Belt();
+			Msg("~ WARNING: item [%s] in belt, but configured for unplaced in belt.Put in ruck.",obj.Name_script());
+			Ruck(pIItem);
+		}
+		return false;
+	}
 	
 	//גושü בûכא ג סכמעו
 	bool in_slot = InSlot(pIItem);

@@ -569,6 +569,18 @@ public:
 			bool				actor_invulnerable						() const;
 			void				actor_invulnerable						(bool invulnerable);
 
+			float				GetActorMaxWeight					() const;
+			float				GetTotalWeight						() const;
+			float				Weight								() const;
+
+			bool				ItemInBelt(CScriptGameObject* itemObj) const;
+			bool				ItemInBelt(LPCSTR itemSection) const;
+			bool				ItemInSlot(CScriptGameObject* itemObj,u32 slotId) const;
+			bool				ItemInSlot(CScriptGameObject* itemObj) const;
+			bool				ItemInSlot(LPCSTR itemSection) const;
+			bool				ItemInSlot(LPCSTR itemSection,u32 slotId) const;
+			void				IterateBeltOnlyFunctor(luabind::functor<void> functor);
+			void				IterateRuckOnlyFunctor(luabind::functor<void> functor);
 
 	DECLARE_SCRIPT_REGISTER_FUNCTION
 };

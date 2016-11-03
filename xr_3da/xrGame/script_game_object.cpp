@@ -33,6 +33,7 @@
 #include "detail_path_manager.h"
 #include "level_graph.h"
 #include "actor.h"
+#include "ActorCondition.h"
 #include "actor_memory.h"
 #include "visual_memory_manager.h"
 
@@ -565,4 +566,147 @@ void				CScriptGameObject::actor_invulnerable						(bool invulnerable)
 {
 	psActorFlags.set(AF_GODMODE,invulnerable);
 	g_uCommonFlags.set(mwShowInvulnerableIcon,!invulnerable);	
+}
+
+float CScriptGameObject::GetActorMaxWeight() const
+{
+	CActor* pActor = smart_cast<CActor*>(&object());
+	if(!pActor) {
+		ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeError,"CActor : cannot access class member GetActorMaxWeight!");
+		return			(false);
+	}
+	return				(pActor->inventory().GetMaxWeight());
+}
+
+float CScriptGameObject::GetTotalWeight() const
+{
+	CInventoryOwner	*inventory_owner = smart_cast<CInventoryOwner*>(&object());
+	if (!inventory_owner) {
+		ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeError,"CInventoryOwner : cannot access class member GetTotalWeight!");
+		return			(false);
+	}
+	return				(inventory_owner->inventory().TotalWeight());
+}
+
+float CScriptGameObject::Weight() const
+{
+	CInventoryItem		*inventory_item = smart_cast<CInventoryItem*>(&object());
+	if (!inventory_item) {
+		ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeError,"CSciptEntity : cannot access class member Weight!");
+		return			(false);
+	}
+	return				(inventory_item->Weight());
+}
+
+bool CScriptGameObject::ItemInBelt(LPCSTR itemSection) const
+{
+	if (itemSection==nullptr )
+	{
+		return		false;
+	}
+	CInventoryOwner	*inventory_owner = smart_cast<CInventoryOwner*>(&object());
+	if (!inventory_owner) {
+		return		false;
+	}
+
+	const TIItemContainer &list =  inventory_owner->inventory().m_belt;
+	for(TIItemContainer::const_iterator it = list.begin(); list.end() != it; ++it) 
+	{
+		PIItem pIItem = *it;
+		if (std::string(pIItem->object().cNameSect().c_str()).find(std::string(itemSection))!=std::string::npos)
+			return true;
+	}
+	return false;
+}
+bool CScriptGameObject::ItemInBelt(CScriptGameObject* itemObj) const
+{
+	if (itemObj==nullptr)
+	{
+		ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeError,"CInventoryItem : input is null for ItemInBelt!");
+		return		false;
+	}
+	CInventoryItem	*inventory_item = smart_cast<CInventoryItem*>(&(itemObj->object()));
+	if (!inventory_item) {
+		ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeError,"CInventoryItem : cannot access class member ItemInBelt!");
+		return		false;
+	}
+	CInventoryOwner	*inventory_owner = smart_cast<CInventoryOwner*>(&object());
+	if (!inventory_owner) {
+		ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeError,"CInventoryOwner : cannot access class member ItemInBelt!");
+		return		false;
+	}
+	return inventory_owner->inventory().InBelt(inventory_item);
+}
+
+bool CScriptGameObject::ItemInSlot(LPCSTR itemSection, u32 slotId) const
+{
+	CInventoryOwner	*inventory_owner = smart_cast<CInventoryOwner*>(&object());
+	if (!inventory_owner) {
+		return		false;
+	}
+	PIItem itemFromSlot=inventory_owner->inventory().ItemFromSlot(slotId);
+	return itemFromSlot!=nullptr && 
+		std::string(itemFromSlot->object().cNameSect().c_str()).find(std::string(itemSection))!=std::string::npos;
+}
+
+bool CScriptGameObject::ItemInSlot(CScriptGameObject* itemObj,u32 slotId) const
+{
+	if (itemObj==nullptr)
+	{
+		return		false;
+	}
+	CInventoryItem	*inventory_item = smart_cast<CInventoryItem*>(&(itemObj->object()));
+	if (!inventory_item) {
+		ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeError,"CInventoryItem : cannot access class member ItemInBelt!");
+		return		false;
+	}
+	CInventoryOwner	*inventory_owner = smart_cast<CInventoryOwner*>(&object());
+	if (!inventory_owner) {
+		ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeError,"CInventoryOwner : cannot access class member ItemInBelt!");
+		return		false;
+	}
+	PIItem itemFromSlot=inventory_owner->inventory().ItemFromSlot(slotId);
+	return (itemFromSlot!=nullptr) && (itemFromSlot->object().ID()==inventory_item->object().ID());
+}
+
+bool CScriptGameObject::ItemInSlot(CScriptGameObject* itemObj) const
+{
+	if (itemObj==nullptr)
+	{
+		ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeError,"CInventoryItem : input is null for ItemInSlot!");
+		return		false;
+	}
+	CInventoryItem	*inventory_item = smart_cast<CInventoryItem*>(&(itemObj->object()));
+	if (!inventory_item) {
+		ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeError,"CInventoryItem : cannot access class member ItemInSlot!");
+		return		false;
+	}
+	CInventoryOwner	*inventory_owner = smart_cast<CInventoryOwner*>(&object());
+	if (!inventory_owner) {
+		ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeError,"CInventoryOwner : cannot access class member ItemInSlot!");
+		return		false;
+	}
+	return inventory_owner->inventory().InSlot(inventory_item);
+}
+
+bool CScriptGameObject::ItemInSlot(LPCSTR itemSection) const
+{
+	if (itemSection==nullptr)
+	{
+		ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeError,"CInventoryItem : input is null for ItemInSlot!");
+		return		false;
+	}
+	
+	CInventoryOwner	*inventory_owner = smart_cast<CInventoryOwner*>(&object());
+	if (!inventory_owner) {
+		ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeError,"CInventoryOwner : cannot access class member ItemInSlot!");
+		return		false;
+	}
+	xr_vector<CInventorySlot>::iterator I = inventory_owner->inventory().m_slots.begin();
+	xr_vector<CInventorySlot>::iterator E = inventory_owner->inventory().m_slots.end();
+	for ( ; I != E; ++I)
+		if (CInventoryItem* item=(*I).m_pIItem)
+			if (std::string(item->object().cNameSect().c_str()).find(itemSection)!=std::string::npos)
+				return true;
+	return false;
 }

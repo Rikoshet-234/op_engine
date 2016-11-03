@@ -177,7 +177,13 @@ void CUIInventoryWnd::InitInventory()
 	SetCurrentItem				(nullptr);
 
 	//Slots
-	PIItem _itm							= m_pInv->m_slots[KNIFE_SLOT].m_pIItem;
+	PIItem _itm							= m_pInv->m_slots[DETECTOR_SLOT].m_pIItem;
+	if(_itm)
+	{
+		CUICellItem* itm				= create_cell_item(_itm);
+		m_pUIDetectorList->SetItem		(itm);
+	}
+	_itm							= m_pInv->m_slots[KNIFE_SLOT].m_pIItem;
 	if(_itm)
 	{
 		CUICellItem* itm				= create_cell_item(_itm);
@@ -559,6 +565,9 @@ CUIDragDropListEx* CUIInventoryWnd::GetSlotList(u32 slot_idx)
 	if(slot_idx == NO_ACTIVE_SLOT || GetInventory()->m_slots[slot_idx].m_bPersistent)	return nullptr;
 	switch (slot_idx)
 	{
+		case DETECTOR_SLOT:
+			return m_pUIDetectorList;
+			break;
 		case KNIFE_SLOT:
 			return m_pUIKnifeList;
 			break;

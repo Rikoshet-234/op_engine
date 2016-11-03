@@ -45,6 +45,11 @@ protected:
 	CUIStatic			UIStaticHealth;
 	CUIStatic			UIStaticArmor;
 	CUIStatic			UIStaticQuickHelp;
+	CUIStatic			UIStaticRadiation;
+	CUIStatic			UIStaticRadiationDanger;
+	CUIStatic			UIStaticHudTime;
+	shared_str			formatTimeString;
+	CUIProgressBar		UIRadiationBar;
 	CUIProgressBar		UIHealthBar;
 	CUIProgressBar		UIArmorBar;
 	CUICarPanel			UICarPanel;
@@ -153,6 +158,7 @@ public:
 	CUIMotionIcon&		MotionIcon							(){return UIMotionIcon;}
 	void				OnConnected							();
 	void				reset_ui							();
+	void				re_init();
 protected:
 	CInventoryItem*		m_pPickUpItem;
 	CUIStatic			UIPickUpItemIcon;
