@@ -689,7 +689,7 @@ bool CWeaponMagazinedWGrenade::CanLoadAmmo(CWeaponAmmo* pAmmo)
 	if (!pAmmo) return grAllowed;
 	bool ammo1=std::find(m_ammoTypes.begin(),m_ammoTypes.end(),pAmmo->cNameSect())!=m_ammoTypes.end();
 	bool ammo2=std::find(m_ammoTypes2.begin(),m_ammoTypes2.end(),pAmmo->cNameSect())!=m_ammoTypes2.end();
-	return ammo1 || ammo2;
+	return ammo1 || (ammo2 && GrenadeLauncherAttachable());
 }
 
 //виртуальные функции для проигрывания анимации HUD

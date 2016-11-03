@@ -3,6 +3,8 @@
 #include "level.h"
 #include "hudmanager.h"
 #include "ui/uistatic.h"
+#include "ui/UIMainIngameWnd.h"
+#include "ui/UIInventoryWnd.h"
 
 using namespace luabind;
 
@@ -30,5 +32,6 @@ void CUIGameCustom::script_register(lua_State *L)
 			.def("RemoveCustomStatic",		&CUIGameCustom::RemoveCustomStatic)
 			.def("GetCustomStatic",			&CUIGameCustom::GetCustomStatic),
 			def("get_hud",					&get_hud)
+
 		];
 }

@@ -13,6 +13,3 @@
 //#define CREATE_MDUMP //создавать дамп памяти
 #define SHOW_INCORRECT_r_tgt 
 
-
-
-

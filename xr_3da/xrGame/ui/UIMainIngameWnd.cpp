@@ -51,6 +51,7 @@
 #include "../game_news.h"
 #include "UICellCustomItems.h"
 #include "../../defines.h"
+#include <stdlib.h>
 
 #ifdef DEBUG
 #	include "../debug_renderer.h"
@@ -83,15 +84,15 @@ const u32	g_clWhite					= 0xffffffff;
 
 CUIMainIngameWnd::CUIMainIngameWnd()
 {
-	m_pActor					= NULL;
-	m_pWeapon					= NULL;
-	m_pGrenade					= NULL;
-	m_pItem						= NULL;
+	m_pActor					= nullptr;
+	m_pWeapon					= nullptr;
+	m_pGrenade					= nullptr;
+	m_pItem						= nullptr;
 	UIZoneMap					= xr_new<CUIZoneMap>();
-	m_pPickUpItem				= NULL;
+	m_pPickUpItem				= nullptr;
 	m_artefactPanel				= xr_new<CUIArtefactPanel>();
-	m_pMPChatWnd				= NULL;
-	m_pMPLogWnd					= NULL;	
+	m_pMPChatWnd				= nullptr;
+	m_pMPLogWnd					= nullptr;	
 }
 
 #include "UIProgressShape.h"
@@ -116,6 +117,20 @@ void CUIMainIngameWnd::Init()
 
 	Enable(false);
 
+	AttachChild					(&UIStaticRadiation);
+	xml_init.InitStatic			(uiXml, "static_radiation", 0, &UIStaticRadiation);
+	UIStaticRadiation.AttachChild	(&UIRadiationBar);
+	xml_init.InitProgressBar	(uiXml, "progress_bar_radiation", 0, &UIRadiationBar);
+	AttachChild					(&UIStaticRadiationDanger);
+	xml_init.InitStatic			(uiXml, "static_radiation_danger", 0, &UIStaticRadiationDanger);
+	UIStaticRadiationDanger.SetTextST("st_radiation_danger");
+	UIStaticRadiationDanger.SetVisible(false);
+
+	AttachChild(&UIStaticHudTime);
+	xml_init.InitStatic			(uiXml, "static_hud_time", 0, &UIStaticHudTime);
+	formatTimeString=uiXml.ReadAttrib("static_hud_time",0,"format","");
+	UIStaticHudTime.SetText(formatTimeString.c_str());
+	//static_hud_time
 
 	AttachChild					(&UIStaticHealth);
 	xml_init.InitStatic			(uiXml, "static_health", 0, &UIStaticHealth);
@@ -356,13 +371,12 @@ void CUIMainIngameWnd::Update()
 		m_pMPLogWnd->Update();
 
 
-
 	m_pActor = smart_cast<CActor*>(Level().CurrentViewEntity());
 	if (!m_pActor) 
 	{
-		m_pItem					= NULL;
-		m_pWeapon				= NULL;
-		m_pGrenade				= NULL;
+		m_pItem					= nullptr;
+		m_pWeapon				= nullptr;
+		m_pGrenade				= nullptr;
 		CUIWindow::Update		();
 		return;
 	}
@@ -421,7 +435,6 @@ void CUIMainIngameWnd::Update()
 
 
 		EWarningIcons i					= ewiWeaponJammed;
-
 		while (i < ewiInvincible)
 		{
 			float value = 0;
@@ -463,17 +476,32 @@ void CUIMainIngameWnd::Update()
 
 			if (rit != m_Thresholds[i].rend()){
 				float v = *rit;
-				SetWarningIconColor(i, color_argb(0xFF, clampr<u32>(static_cast<u32>(255 * ((v - min) / (max - min) * 2)), 0, 255), 
+				u32 color=color_argb(0xFF, clampr<u32>(static_cast<u32>(255 * ((v - min) / (max - min) * 2)), 0, 255), 
 					clampr<u32>(static_cast<u32>(255 * (2.0f - (v - min) / (max - min) * 2)), 0, 255),
-					0));
+					0);
+				SetWarningIconColor(i, color);
+				if (i==ewiRadiation && value>=0.7)
+					UIStaticRadiationDanger.SetVisible(true);
 			}else
+			{
 				TurnOffWarningIcon(i);
+				if (i==ewiRadiation && UIStaticRadiationDanger.GetVisible())
+					UIStaticRadiationDanger.SetVisible(false);
+			}
 
-			i = (EWarningIcons)(i + 1);
+			i = static_cast<EWarningIcons>(i + 1);
 		}
 	}
 
-	// health&armor
+	float radiation=m_pActor->conditions().GetRadiation();
+	UIRadiationBar.SetProgressPos(radiation*100.0f);
+	
+	u32 year = 0, month = 0, day = 0, hours = 0, mins = 0, secs = 0, milisecs = 0;
+	split_time(Level().GetGameTime(), year, month, day, hours, mins, secs, milisecs);
+	string64 buffer;
+	sprintf_s(buffer,"%2i:%2i",hours,mins);
+	UIStaticHudTime.SetText(buffer);
+
 	UIHealthBar.SetProgressPos		(m_pActor->GetfHealth()*100.0f);
 	UIMotionIcon.SetPower			(m_pActor->conditions().GetPower()*100.0f);
 
@@ -1182,7 +1210,7 @@ void CUIMainIngameWnd::UpdateActiveItemInfo()
 		UIWeaponIcon.Show			(false);
 		UIWeaponSignAmmo.Show		(false);
 		UIWeaponBack.SetText		("");
-		m_pWeapon					= NULL;
+		m_pWeapon					= nullptr;
 	}
 }
 
@@ -1193,12 +1221,54 @@ void CUIMainIngameWnd::OnConnected()
 
 void CUIMainIngameWnd::reset_ui()
 {
-	m_pActor						= NULL;
-	m_pWeapon						= NULL;
-	m_pGrenade						= NULL;
-	m_pItem							= NULL;
-	m_pPickUpItem					= NULL;
+	m_pActor						= nullptr;
+	m_pWeapon						= nullptr;
+	m_pGrenade						= nullptr;
+	m_pItem							= nullptr;
+	m_pPickUpItem					= nullptr;
 	UIMotionIcon.ResetVisibility	();
+}
+
+void CUIMainIngameWnd::re_init()
+{
+	DetachChild(&UIStaticRadiation);
+	UIStaticRadiation.DetachChild(&UIRadiationBar);
+
+	CUIXml						uiXml;
+	uiXml.Init					(CONFIG_PATH, UI_PATH, MAININGAME_XML);
+	CUIXmlInit					xml_init;
+	CUIWindow::Init				(0,0, UI_BASE_WIDTH, UI_BASE_HEIGHT);
+
+	AttachChild					(&UIStaticRadiation);
+	xml_init.InitStatic			(uiXml, "static_radiation", 0, &UIStaticRadiation);
+	UIStaticRadiation.AttachChild	(&UIRadiationBar);
+	xml_init.InitProgressBar	(uiXml, "progress_bar_radiation", 0, &UIRadiationBar);
+
+	/*UIStaticHealth.DetachChild(&UIHealthBar);
+	UIStaticArmor.DetachChild(&UIArmorBar);
+	UIWeaponBack.DetachChild(&UIWeaponSignAmmo);
+	UIWeaponBack.DetachChild(&UIWeaponIcon);
+	
+	DetachChild(m_UIIcons);
+	DetachChild(&UICarPanel);
+	DetachChild(&UIMotionIcon);
+	DetachChild(m_artefactPanel);
+	DetachChild(&UIStaticDiskIO);
+
+	
+	DetachChild(&UIStaticHealth);
+	DetachChild(&UIStaticArmor);
+	DetachChild(&UIWeaponBack);
+	DetachChild(&UIWeaponSignAmmo);
+	DetachChild(&UIWeaponIcon);
+	DetachChild(&UIPickUpItemIcon);
+	DetachChild(&UIPdaOnline);
+	if (IsChild(&UIStaticQuickHelp))
+		DetachChild(&UIStaticQuickHelp);
+	
+	xr_delete					(UIZoneMap);
+	UIZoneMap					= xr_new<CUIZoneMap>();*/
+
 }
 
 #ifdef DEBUG

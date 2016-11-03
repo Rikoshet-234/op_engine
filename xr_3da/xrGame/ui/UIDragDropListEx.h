@@ -41,7 +41,7 @@ typedef enum
 	ltBolt = 5,
 	ltSlotOutfit = 6,
 	ltPDA = 7,
-	ltDetector = 8,
+	ltSlotDetector = 8,
 	ltTorch = 9,
 	ltBag	= 10,
 	ltBelt	= 11,
@@ -81,6 +81,7 @@ public:
 	
 	IWListTypes				GetUIListId() const			{return listId; };
 	void					SetUIListId(IWListTypes id)	{listId=id; };
+	bool					m_b_adjustCells;
 	static CUIDragItem*		m_drag_item;
 	int						m_i_scroll_pos;
 							CUIDragDropListEx	();

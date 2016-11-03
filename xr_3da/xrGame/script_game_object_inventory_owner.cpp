@@ -205,6 +205,32 @@ void CScriptGameObject::ForEachInventoryItems(const luabind::functor<void> &func
 	}
 }
 
+void CScriptGameObject::IterateRuckOnlyFunctor(luabind::functor<void> functor) 
+{
+	CInventoryOwner			*inventory_owner = smart_cast<CInventoryOwner*>(&this->object());
+	if (!inventory_owner) {
+		ai().script_engine().script_log		(ScriptStorage::eLuaMessageTypeError,"CScriptGameObject::IterateInventory non-CInventoryOwner object !!!");
+		return;
+	}
+	TIItemContainer::iterator	I = inventory_owner->inventory().m_ruck.begin();
+	TIItemContainer::iterator	E = inventory_owner->inventory().m_ruck.end();
+	for ( ; I != E; ++I)
+		functor				(object,(*I)->object().lua_game_object());
+}
+
+void CScriptGameObject::IterateBeltOnlyFunctor(luabind::functor<void> functor) 
+{
+	CInventoryOwner			*inventory_owner = smart_cast<CInventoryOwner*>(&this->object());
+	if (!inventory_owner) {
+		ai().script_engine().script_log		(ScriptStorage::eLuaMessageTypeError,"CScriptGameObject::IterateInventory non-CInventoryOwner object !!!");
+		return;
+	}
+	TIItemContainer::iterator	I = inventory_owner->inventory().m_belt.begin();
+	TIItemContainer::iterator	E = inventory_owner->inventory().m_belt.end();
+	for ( ; I != E; ++I)
+		functor				(object,(*I)->object().lua_game_object());
+}
+
 void CScriptGameObject::IterateInventorySimple	(luabind::functor<void> functor)
 {
 	CInventoryOwner			*inventory_owner = smart_cast<CInventoryOwner*>(&this->object());

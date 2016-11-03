@@ -26,12 +26,13 @@ class CUIInventoryWnd: public CUIDialogWnd
 private:
 	typedef CUIDialogWnd	inherited;
 	bool					m_b_need_reinit;
+
 public:
 							CUIInventoryWnd				();
 	virtual					~CUIInventoryWnd			();
 
 	virtual void			Init						();
-
+	void					re_init						();
 	void					InitInventory				();
 	void					InitInventory_delayed		();
 	virtual bool			StopAnyMove					()					{return false;}
@@ -89,7 +90,9 @@ protected:
 	CUIDragDropListEx*			m_pUIKnifeList;
 	CUIDragDropListEx*			m_pUIPistolList;
 	CUIDragDropListEx*			m_pUIAutomaticList;
+	CUIDragDropListEx*			m_pUIDetectorList;
 	CUIOutfitDragDropList*		m_pUIOutfitList;
+
 
 	xr_vector<CUIDragDropListEx*>	inventoryLists;
 

@@ -239,15 +239,42 @@ class_<CScriptGameObject> &script_register_game_object1(class_<CScriptGameObject
 
 		.def("vertex_in_direction",			&CScriptGameObject::vertex_in_direction)
 
-		.def("item_in_slot",				&CScriptGameObject::item_in_slot)
-		.def("active_slot",				&CScriptGameObject::active_slot)
+		
+		.def("active_slot",					&CScriptGameObject::active_slot)
 		.def("activate_slot",				&CScriptGameObject::activate_slot)
+		.def("max_weight",					&CScriptGameObject::GetActorMaxWeight)
+		.def("total_weight",				&CScriptGameObject::GetTotalWeight)
+		.def("item_weight",					&CScriptGameObject::Weight)
+		.def("item_in_belt",				static_cast<bool (CScriptGameObject::*)(CScriptGameObject*) const>(&CScriptGameObject::ItemInBelt))
+		.def("item_in_belt",				static_cast<bool (CScriptGameObject::*)(LPCSTR) const>(&CScriptGameObject::ItemInBelt))
+		.def("item_in_slot",				&CScriptGameObject::item_in_slot)
+		.def("item_in_slot",				static_cast<bool (CScriptGameObject::*)(CScriptGameObject*) const>(&CScriptGameObject::ItemInSlot))
+		.def("item_in_slot",				static_cast<bool (CScriptGameObject::*)(CScriptGameObject*, u32) const>(&CScriptGameObject::ItemInSlot))
+		.def("iterate_belt",				&CScriptGameObject::IterateBeltOnlyFunctor)
+		.def("iterate_ruck",				&CScriptGameObject::IterateRuckOnlyFunctor)
+
+		
+		.enum_("inventory_slots")
+		[
+			value("NO_ACTIVE_SLOT",			int(NO_ACTIVE_SLOT)),
+			value("KNIFE",					int(KNIFE_SLOT)),
+			value("PISTOL",					int(PISTOL_SLOT)),
+			value("RIFLE",					int(RIFLE_SLOT)),
+			value("GRENADE",				int(GRENADE_SLOT)),
+			value("APPARATUS",				int(APPARATUS_SLOT)),
+			value("BOLT",					int(BOLT_SLOT)),
+			value("OUTFIT",					int(OUTFIT_SLOT)),
+			value("PDA",					int(PDA_SLOT)),
+			value("DETECTOR",				int(DETECTOR_SLOT)),
+			value("TORCH",					int(TORCH_SLOT)),
+			value("ARTEFACT",				int(ARTEFACT_SLOT))
+		]
 
 #ifdef DEBUG
-		.def("debug_planner",				&CScriptGameObject::debug_planner)
+			     .def("debug_planner", &CScriptGameObject::debug_planner)
 #endif // DEBUG
-		.def("invulnerable",				(bool (CScriptGameObject::*)() const)&CScriptGameObject::invulnerable)
-		.def("invulnerable",				(void (CScriptGameObject::*)(bool))&CScriptGameObject::invulnerable)
+			     .def("invulnerable", static_cast<bool (CScriptGameObject::*)() const>(&CScriptGameObject::invulnerable))
+			     .def("invulnerable", static_cast<void (CScriptGameObject::*)(bool)>(&CScriptGameObject::invulnerable))
 
 	;return	(instance);
 }

@@ -365,7 +365,7 @@ bool CUIDragDropListEx::select_suitables_by_item(CInventoryItem* item)
 		weaponSections.clear_not_free();
 		weaponSections.assign( pWeapon->m_ammoTypes.begin(), pWeapon->m_ammoTypes.end() );
 		CWeaponMagazinedWGrenade* wg = smart_cast<CWeaponMagazinedWGrenade*>(item);
-		if (wg &&  wg->m_ammoTypes2.size())
+		if (wg &&  wg->m_ammoTypes2.size() && wg->GrenadeLauncherAttachable())
 		{
 			weaponSections.insert( weaponSections.end(), wg->m_ammoTypes2.begin(), wg->m_ammoTypes2.end() );
 		}
@@ -556,6 +556,13 @@ void CUIDragDropListEx::SetItem(CUICellItem* itm, Ivector2 cell_pos) // start at
 	if(m_container->AddSimilar(itm))	return;
 	R_ASSERT						(m_container->IsRoomFree(cell_pos, itm->GetGridSize()));
 
+	if (m_b_adjustCells)
+	{
+		if ((itm->GetGridSize().x<m_container->CellsCapacity().x) && (itm->GetGridSize().y<m_container->CellsCapacity().y))
+		{
+			itm->SetGridSize(m_container->CellsCapacity());
+		}
+	}
 	m_container->PlaceItemAtPos	(itm, cell_pos);
 
 	itm->SetWindowName			("cell_item");
@@ -575,6 +582,7 @@ CUICellItem* CUIDragDropListEx::RemoveItem(CUICellItem* itm, bool force_root)
 {
 	CUICellItem* i				= m_container->RemoveItem		(itm, force_root);
 	i->SetOwnerList				((CUIDragDropListEx*)NULL);
+	i->ResetGridSize();
 	return						i;
 }
 
