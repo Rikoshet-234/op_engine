@@ -3,7 +3,7 @@
 #define CMD_START	(1<<0)
 #define CMD_STOP	(1<<1)
 
-#define NO_ACTIVE_SLOT		0xffffffff
+#define NO_ACTIVE_SLOT		0xffffffff //i hate this method for define slots...
 #define KNIFE_SLOT			0
 #define PISTOL_SLOT			1
 #define RIFLE_SLOT			2
@@ -16,6 +16,22 @@
 #define TORCH_SLOT			9
 #define ARTEFACT_SLOT		10
 #define SLOTS_TOTAL			11
+
+enum InventorySlots //for export to scripts
+{
+	KNIFE			=	KNIFE_SLOT,		
+	PISTOL			=	PISTOL_SLOT,
+	RIFLE			=	RIFLE_SLOT,
+	GRENADE			=	GRENADE_SLOT,
+	APPARATUS		=	APPARATUS_SLOT,
+	BOLT			=	BOLT_SLOT,
+	OUTFIT			=	OUTFIT_SLOT,
+	PDA				=	PDA_SLOT,
+	DETECTOR		=	DETECTOR_SLOT,
+	TORCH			=	TORCH_SLOT,
+	ARTEFACT		=	ARTEFACT_SLOT,
+	NO_ACT_SLOT	=	NO_ACTIVE_SLOT
+};
 
 #define RUCK_HEIGHT			280
 #define RUCK_WIDTH			7

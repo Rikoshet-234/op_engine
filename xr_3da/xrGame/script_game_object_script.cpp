@@ -58,6 +58,21 @@ void CScriptGameObject::script_register(lua_State *L)
 		.def("Name",				&CInventoryItem::Name)
 		.def("GetGameObject",		&CInventoryItem::GetGameObject),
 
+		class_<enum_exporter<InventorySlots> >("inventory_slots")
+		.enum_("inventory_slots")
+			[
+				value("KNIFE",			int(InventorySlots::KNIFE)),
+				value("PISTOL",			int(InventorySlots::PISTOL)),
+				value("PISTOL",			int(InventorySlots::PISTOL)),
+				value("GRENADE",		int(InventorySlots::GRENADE)),
+				value("APPARATUS",		int(InventorySlots::APPARATUS)),
+				value("BOLT",			int(InventorySlots::BOLT)),
+				value("OUTFIT",			int(InventorySlots::OUTFIT)),
+				value("PDA",			int(InventorySlots::PDA)),
+				value("DETECTOR",		int(InventorySlots::DETECTOR)),
+				value("TORCH",			int(InventorySlots::TORCH)),
+				value("ARTEFACT",		int(InventorySlots::ARTEFACT))
+			],
 
 		class_<enum_exporter<GameObject::ECallbackType> >("callback")
 			.enum_("callback_types")
