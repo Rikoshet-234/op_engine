@@ -215,7 +215,7 @@ void CScriptGameObject::IterateRuckOnlyFunctor(luabind::functor<void> functor)
 	TIItemContainer::iterator	I = inventory_owner->inventory().m_ruck.begin();
 	TIItemContainer::iterator	E = inventory_owner->inventory().m_ruck.end();
 	for ( ; I != E; ++I)
-		functor				(object,(*I)->object().lua_game_object());
+		functor				((*I)->object().lua_game_object());
 }
 
 void CScriptGameObject::IterateBeltOnlyFunctor(luabind::functor<void> functor) 
@@ -228,7 +228,7 @@ void CScriptGameObject::IterateBeltOnlyFunctor(luabind::functor<void> functor)
 	TIItemContainer::iterator	I = inventory_owner->inventory().m_belt.begin();
 	TIItemContainer::iterator	E = inventory_owner->inventory().m_belt.end();
 	for ( ; I != E; ++I)
-		functor				(object,(*I)->object().lua_game_object());
+		functor				((*I)->object().lua_game_object());
 }
 
 void CScriptGameObject::IterateInventorySimple	(luabind::functor<void> functor)
