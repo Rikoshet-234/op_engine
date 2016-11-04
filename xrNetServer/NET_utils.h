@@ -55,8 +55,8 @@ public:
 			FATAL("ENGINE CRASH: See details in log");
 		};
 		CopyMemory(&B.data[B.count],p,count);
-		//! all broken iniStrings started with \n
-		if (iniString && *(char*)p == '\n')
+		//! not all broken iniStrings start with \n, so check all of them
+		if (iniString && (count - 1) > 0)
 		{
 			m_iniStringOffset = B.count;
 			m_iniStringSize = count - 1;//! -1 because in case of stringZ count includes terminating 0
