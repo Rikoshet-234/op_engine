@@ -138,9 +138,32 @@ CSE_Abstract *CSE_ALifeTraderAbstract::init	()
 {
 	string4096					S;
 	//sprintf_s						(S,"%s\r\n[game_info]\r\nname_id = default\r\n",!*base()->m_ini_string ? "" : *base()->m_ini_string);
+	if (base()->m_ini_string.size() > 300)
+	{
+		for (u32 i = 0; i < base()->m_ini_string.size(); ++i)
+		{
+			if (base()->m_ini_string[i] == 0)
+			{
+				LogPacketError("Custom data broken [init::before]! [%d != %d](%u, %X) Custom data: %s"
+					, base()->m_ini_string.size(), i, base()->m_ini_string._get()->dwReference, base()->m_ini_string._get()->dwCRC, base()->m_ini_string.c_str());
+				FATAL("ENGINE CRASH: See details in log");
+			}
+		}
+	}
 	sprintf_s						(S,"%s\r\n[game_info]\r\n",!*base()->m_ini_string ? "" : *base()->m_ini_string);
 	base()->m_ini_string		= S;
-
+	if (base()->m_ini_string.size() > 300)
+	{
+		for (u32 i = 0; i < base()->m_ini_string.size(); ++i)
+		{
+			if (base()->m_ini_string[i] == 0)
+			{
+				LogPacketError("Custom data broken [init::after]! [%d != %d](%u, %X) Custom data: %s"
+					, base()->m_ini_string.size(), i, base()->m_ini_string._get()->dwReference, base()->m_ini_string._get()->dwCRC, base()->m_ini_string.c_str());
+				FATAL("ENGINE CRASH: See details in log");
+			}
+		}
+	}
 	return						(base());
 }
 

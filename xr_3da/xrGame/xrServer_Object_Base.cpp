@@ -119,11 +119,37 @@ CSE_Abstract::CSE_Abstract					(LPCSTR caSection)
 			IReader				*reader = FS.r_open(file_name);
 			VERIFY				(reader);
 			{
+				if (m_ini_string.size() > 300)
+				{
+					for (u32 i = 0; i < m_ini_string.size(); ++i)
+					{
+						if (m_ini_string[i] == 0)
+						{
+							LogPacketError("Custom data broken [CSE_Abstract::before]! [%d != %d](%u, %X) Custom data: %s"
+								, m_ini_string.size(), i, m_ini_string._get()->dwReference, m_ini_string._get()->dwCRC, m_ini_string.c_str());
+							FATAL("ENGINE CRASH: See details in log");
+						}
+					}
+				}
+
 				int				size = reader->length()*sizeof(char);
 				LPSTR			temp = (LPSTR)_alloca(size + 1);
 				CopyMemory		(temp,reader->pointer(),size);
 				temp[size]		= 0;
 				m_ini_string	= temp;
+
+				if (m_ini_string.size() > 300)
+				{
+					for (u32 i = 0; i < m_ini_string.size(); ++i)
+					{
+						if (m_ini_string[i] == 0)
+						{
+							LogPacketError("Custom data broken [CSE_Abstract::after]! [%d != %d](%u, %X) Custom data: %s"
+								, m_ini_string.size(), i, m_ini_string._get()->dwReference, m_ini_string._get()->dwCRC, m_ini_string.c_str());
+							FATAL("ENGINE CRASH: See details in log");
+						}
+					}
+				}
 			}
 			FS.r_close			(reader);
 		}
@@ -158,6 +184,19 @@ CSE_Motion* CSE_Abstract::motion			()
 CInifile &CSE_Abstract::spawn_ini			()
 {
 	if (!m_ini_file) 
+	{
+		if (m_ini_string.size() > 300)
+		{
+			for (u32 i = 0; i < m_ini_string.size(); ++i)
+			{
+				if (m_ini_string[i] == 0)
+				{
+					LogPacketError("Custom data broken [spawn_ini::before]! [%d != %d](%u, %X) Custom data: %s"
+						, m_ini_string.size(), i, m_ini_string._get()->dwReference, m_ini_string._get()->dwCRC, m_ini_string.c_str());
+					FATAL("ENGINE CRASH: See details in log");
+				}
+			}
+		}
 #pragma warning(push)
 #pragma warning(disable:4238)
 		m_ini_file			= xr_new<CInifile>(
@@ -167,6 +206,20 @@ CInifile &CSE_Abstract::spawn_ini			()
 			),
 			FS.get_path("$game_config$")->m_Path
 		);
+
+		if (m_ini_string.size() > 300)
+		{
+			for (u32 i = 0; i < m_ini_string.size(); ++i)
+			{
+				if (m_ini_string[i] == 0)
+				{
+					LogPacketError("Custom data broken [spawn_ini::after]! [%d != %d](%u, %X) Custom data: %s"
+						, m_ini_string.size(), i, m_ini_string._get()->dwReference, m_ini_string._get()->dwCRC, m_ini_string.c_str());
+					FATAL("ENGINE CRASH: See details in log");
+				}
+			}
+		}
+	}
 #pragma warning(pop)
 	return						(*m_ini_file);
 }

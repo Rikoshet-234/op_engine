@@ -311,6 +311,18 @@ void CSE_ALifeObject::STATE_Write			(NET_Packet &tNetPacket)
 	tNetPacket.w_u32			(m_bDirectControl);
 	tNetPacket.w_u32			(m_tNodeID);
 	tNetPacket.w_u32			(m_flags.get());
+	if (m_ini_string.size() > 300)
+	{
+		for (u32 i = 0; i < m_ini_string.size(); ++i)
+		{
+			if (m_ini_string[i] == 0)
+			{
+				LogPacketError("Custom data broken [STATE_Write::before]! [%d != %d](%u, %X) Custom data: %s"
+					, m_ini_string.size(), i, m_ini_string._get()->dwReference, m_ini_string._get()->dwCRC, m_ini_string.c_str());
+				FATAL("ENGINE CRASH: See details in log");
+			}
+		}
+	}
 	tNetPacket.w_stringZ		(m_ini_string,true);
 	tNetPacket.w				(&m_story_id,sizeof(m_story_id));
 	tNetPacket.w				(&m_spawn_story_id,sizeof(m_spawn_story_id));
@@ -366,95 +378,31 @@ void CSE_ALifeObject::STATE_Read			(NET_Packet &tNetPacket, u16 size)
 	if (m_wVersion > 57) {
 		if (m_ini_file)
 			xr_delete			(m_ini_file);
-		tNetPacket.r_stringZ	(m_ini_string);
-#if 0
-		//! Broken packet?
-		if (m_ini_string.size() == 383 && m_ini_string[0] == '\n')
+		if (m_ini_string.size() > 300)
 		{
-			u32 currentRPos = tNetPacket.r_pos;
-			shared_str restOfIniString;
-			tNetPacket.r_stringZ(restOfIniString);
-			if (restOfIniString.size() > 0 && (restOfIniString.size() + currentRPos < tNetPacket.B.count))
+			for (u32 i = 0; i < m_ini_string.size(); ++i)
 			{
-				//! Try to find out which part of string from all.spawn it is
-				string_path file_name;
-				bool file_exists = !!FS.exist(file_name, "$game_spawn$", "all", ".spawn");
-				if (file_exists)
+				if (m_ini_string[i] == 0)
 				{
-					IReader *m_file = 0;
-					m_file = FS.r_open(file_name);
-					if (m_file)
-					{
-						const char* pattern_begin = restOfIniString._get()->value;
-						const char* pattern_end = pattern_begin + restOfIniString.size();
-						const char* pattern_pos = pattern_begin;
-						u32 numOfNonEOLChars = 0;
-						while(pattern_pos < pattern_end)
-						{
-							if((*pattern_pos == '\n' || *pattern_pos == '\r') && numOfNonEOLChars > 0)
-								break;
-							++numOfNonEOLChars;
-							++pattern_pos;
-						}
-						pattern_end = pattern_pos;
-
-						//! Simplified search of substring
-						const char* text_pos = static_cast<char*>(m_file->pointer());
-						const char* text_end = text_pos + m_file->length();
-						pattern_pos = pattern_begin;
-						while(text_pos < text_end && pattern_pos != pattern_end)
-						{
-							pattern_pos = pattern_begin;
-							while(*text_pos == *pattern_pos && pattern_pos < pattern_end && text_pos < text_end)
-							{
-								++text_pos;
-								++pattern_pos;
-							}
-
-							++text_pos;
-						}
-
-						if (pattern_pos == pattern_end)
-						{
-							//! Finally the character we were looking for
-							//! +1 because text_pos is incremented once more before exit from outer loo
-							//! +1 because our target character is one step before start of pattern
-							text_pos -= ((pattern_end - pattern_begin) + 2);
-
-							tNetPacket.B.data[currentRPos-1] = *text_pos;
-							tNetPacket.r_pos = currentRPos - 384;//! 383str + 1z
-							
-							//! Reread custom data
-							tNetPacket.r_stringZ(m_ini_string);
-							Log("Broken save fixed");
-						}
-						else
-						{
-							//! Not found
-							tNetPacket.r_pos = currentRPos;
-						}
-
-						FS.r_close(m_file);
-					}
-					else
-					{
-						//! It exists but we can't open it???
-						tNetPacket.r_pos = currentRPos;
-					}
+					LogPacketError("Custom data broken [STATE_Read::before]! [%d != %d](%u, %X) Custom data: %s"
+						, m_ini_string.size(), i, m_ini_string._get()->dwReference, m_ini_string._get()->dwCRC, m_ini_string.c_str());
+					FATAL("ENGINE CRASH: See details in log");
 				}
-				else
-				{
-					//! Where is all.spawn?
-					tNetPacket.r_pos = currentRPos;
-				}
-			}
-			//! Maybe it wasn't broken in the end
-			else
-			{
-				tNetPacket.r_pos = currentRPos;
 			}
 		}
-#endif
+		tNetPacket.r_stringZ	(m_ini_string);
+		if (m_ini_string.size() > 300)
+		{
+			for (u32 i = 0; i < m_ini_string.size(); ++i)
+			{
+				if (m_ini_string[i] == 0)
+				{
+					LogPacketError("Custom data broken [STATE_Read::after]! [%d != %d](%u, %X) Custom data: %s"
+						, m_ini_string.size(), i, m_ini_string._get()->dwReference, m_ini_string._get()->dwCRC, m_ini_string.c_str());
+					FATAL("ENGINE CRASH: See details in log");
+				}
+			}
+		}
 	}
 
 	if (m_wVersion > 61)
@@ -475,7 +423,31 @@ void CSE_ALifeObject::UPDATE_Read			(NET_Packet &tNetPacket)
 void CSE_ALifeObject::FillProps				(LPCSTR pref, PropItemVec& items)
 {
 	inherited::FillProps		(pref, 	items);
+	if (m_ini_string.size() > 300)
+	{
+		for (u32 i = 0; i < m_ini_string.size(); ++i)
+		{
+			if (m_ini_string[i] == 0)
+			{
+				LogPacketError("Custom data broken [FillProps::before]! [%d != %d](%u, %X) Custom data: %s"
+					, m_ini_string.size(), i, m_ini_string._get()->dwReference, m_ini_string._get()->dwCRC, m_ini_string.c_str());
+				FATAL("ENGINE CRASH: See details in log");
+			}
+		}
+	}
 	PHelper().CreateRText		(items,	PrepareKey(pref,*s_name,"Custom data"),&m_ini_string);
+	if (m_ini_string.size() > 300)
+	{
+		for (u32 i = 0; i < m_ini_string.size(); ++i)
+		{
+			if (m_ini_string[i] == 0)
+			{
+				LogPacketError("Custom data broken [FillProps::after]! [%d != %d](%u, %X) Custom data: %s"
+					, m_ini_string.size(), i, m_ini_string._get()->dwReference, m_ini_string._get()->dwCRC, m_ini_string.c_str());
+				FATAL("ENGINE CRASH: See details in log");
+			}
+		}
+	}
 	if (m_flags.is(flUseSwitches)) {
 		PHelper().CreateFlag32	(items,	PrepareKey(pref,*s_name,"ALife\\Can switch online"),	&m_flags,			flSwitchOnline);
 		PHelper().CreateFlag32	(items,	PrepareKey(pref,*s_name,"ALife\\Can switch offline"),	&m_flags,			flSwitchOffline);

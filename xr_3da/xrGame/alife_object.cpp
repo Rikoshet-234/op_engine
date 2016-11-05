@@ -10,10 +10,35 @@
 #include "xrServer_Objects_ALife.h"
 #include "alife_simulator.h"
 #include "xrServer_Objects_ALife_Items.h"
+#include "../../xrNetServer/NET_error.h"
 
 void CSE_ALifeObject::spawn_supplies		()
 {
+	if (m_ini_string.size() > 300)
+	{
+		for (u32 i = 0; i < m_ini_string.size(); ++i)
+		{
+			if (m_ini_string[i] == 0)
+			{
+				LogPacketError("Custom data broken [spawn_supplies::before]! [%d != %d](%u, %X) Custom data: %s"
+					, m_ini_string.size(), i, m_ini_string._get()->dwReference, m_ini_string._get()->dwCRC, m_ini_string.c_str());
+				FATAL("ENGINE CRASH: See details in log");
+			}
+		}
+	}
 	spawn_supplies(*m_ini_string);
+	if (m_ini_string.size() > 300)
+	{
+		for (u32 i = 0; i < m_ini_string.size(); ++i)
+		{
+			if (m_ini_string[i] == 0)
+			{
+				LogPacketError("Custom data broken [spawn_supplies::after]! [%d != %d](%u, %X) Custom data: %s"
+					, m_ini_string.size(), i, m_ini_string._get()->dwReference, m_ini_string._get()->dwCRC, m_ini_string.c_str());
+				FATAL("ENGINE CRASH: See details in log");
+			}
+		}
+	}
 }
 
 void CSE_ALifeObject::spawn_supplies		(LPCSTR ini_string)
