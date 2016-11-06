@@ -257,7 +257,20 @@ BOOL CGameObject::net_Spawn		(CSE_Abstract*	DC)
 	VERIFY							(_valid(renderable.xform));
 	VERIFY							(!fis_zero(DET(renderable.xform)));
 	CSE_ALifeObject					*O = smart_cast<CSE_ALifeObject*>(E);
-	if (O && xr_strlen(O->m_ini_string)) {
+	if (O && xr_strlen(O->m_ini_string)) 
+	{
+		if (O->m_ini_string.size() > 300)
+		{
+			for (u32 i = 0; i < O->m_ini_string.size(); ++i)
+			{
+				if (O->m_ini_string[i] == 0)
+				{
+					LogPacketError("Custom data broken [net_Spawn::before]! [%d != %d](%u, %X) Custom data: %s"
+						, O->m_ini_string.size(), i, O->m_ini_string._get()->dwReference, O->m_ini_string._get()->dwCRC, O->m_ini_string.c_str());
+					FATAL("ENGINE CRASH: See details in log");
+				}
+			}
+		}
 #pragma warning(push)
 #pragma warning(disable:4238)
 		m_ini_file					= xr_new<CInifile>(
@@ -268,6 +281,18 @@ BOOL CGameObject::net_Spawn		(CSE_Abstract*	DC)
 			FS.get_path("$game_config$")->m_Path
 		);
 #pragma warning(pop)
+		if (O->m_ini_string.size() > 300)
+		{
+			for (u32 i = 0; i < O->m_ini_string.size(); ++i)
+			{
+				if (O->m_ini_string[i] == 0)
+				{
+					LogPacketError("Custom data broken [net_Spawn::before]! [%d != %d](%u, %X) Custom data: %s"
+						, O->m_ini_string.size(), i, O->m_ini_string._get()->dwReference, O->m_ini_string._get()->dwCRC, O->m_ini_string.c_str());
+					FATAL("ENGINE CRASH: See details in log");
+				}
+			}
+		}
 	}
 
 	m_story_id						= ALife::_STORY_ID(-1);
