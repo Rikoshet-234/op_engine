@@ -45,6 +45,18 @@ void CSE_ALifeTraderAbstract::spawn_supplies	()
 
 		if (xr_strlen(dynamic_object->m_ini_string))
 		{
+			if (dynamic_object->m_ini_string.size() > 300)
+			{
+				for (u32 i = 0; i < dynamic_object->m_ini_string.size(); ++i)
+				{
+					if (dynamic_object->m_ini_string[i] == 0)
+					{
+						LogPacketError("Custom data broken [ATA::spawn_supplies::before]! [%d != %d](%u, %X) Custom data: %s"
+							, dynamic_object->m_ini_string.size(), i, dynamic_object->m_ini_string._get()->dwReference, dynamic_object->m_ini_string._get()->dwCRC, dynamic_object->m_ini_string.c_str());
+						FATAL("ENGINE CRASH: See details in log");
+					}
+				}
+			}
 #pragma warning(push)
 #pragma warning(disable:4238)
 			CInifile					ini(
@@ -58,6 +70,19 @@ void CSE_ALifeTraderAbstract::spawn_supplies	()
 
 			if (ini.section_exist("dont_spawn_character_supplies")) 
 				specific_character_supply = false;
+
+			if (dynamic_object->m_ini_string.size() > 300)
+			{
+				for (u32 i = 0; i < dynamic_object->m_ini_string.size(); ++i)
+				{
+					if (dynamic_object->m_ini_string[i] == 0)
+					{
+						LogPacketError("Custom data broken [ATA::spawn_supplies::after]! [%d != %d](%u, %X) Custom data: %s"
+							, dynamic_object->m_ini_string.size(), i, dynamic_object->m_ini_string._get()->dwReference, dynamic_object->m_ini_string._get()->dwCRC, dynamic_object->m_ini_string.c_str());
+						FATAL("ENGINE CRASH: See details in log");
+					}
+				}
+			}
 		}
 
 		if(specific_character_supply)
