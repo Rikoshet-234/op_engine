@@ -3,7 +3,7 @@
 
 #pragma once
 
-//#define PATCH_INFO_PRESENT
+#define PATCH_INFO_PRESENT
 
 #define ENGINE_DESCRIPTION "OP 2.1 Engine"
 #define ENGINE_MINOR "0"
