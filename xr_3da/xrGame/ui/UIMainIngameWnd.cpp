@@ -219,20 +219,24 @@ void CUIMainIngameWnd::Init()
 	xml_init.InitStatic			(uiXml, "invincible_static", 0, &UIInvincibleIcon);
 	UIInvincibleIcon.Show		(false);
 
+	xml_init.InitStatic			(uiXml, "weight_current_static", 0, &UIWeightIcon);
+	UIWeightIcon.Show		(false);
+
 
 	if(GameID()==GAME_ARTEFACTHUNT){
 		xml_init.InitStatic		(uiXml, "artefact_static", 0, &UIArtefactIcon);
 		UIArtefactIcon.Show		(false);
 	}
 	
-	shared_str warningStrings[6] = 
+	shared_str warningStrings[7] = 
 	{	
 		"jammed",
 		"radiation",
 		"wounds",
 		"starvation",
 		"fatigue",
-		"invincible"
+		"weight",
+		"invincible"		
 	};
 
 	// «агружаем пороговые значени€ дл€ индикаторов
@@ -456,6 +460,13 @@ void CUIMainIngameWnd::Update()
 				break;		
 			case ewiPsyHealth:
 				value = 1 - m_pActor->conditions().GetPsyHealth();
+				break;
+			case ewiWeight:
+				{
+					float cur_weight = Actor()->inventory().TotalWeight();
+					float max_weight = Actor()->MaxCarryWeight();
+					value=cur_weight*100/max_weight;
+				}
 				break;
 			default:
 				R_ASSERT(!"Unknown type of warning icon");
@@ -1013,7 +1024,9 @@ void CUIMainIngameWnd::SetWarningIconColor(EWarningIcons icon, const u32 cl)
 	case ewiArtefact:
 		SetWarningIconColor		(&UIArtefactIcon, cl);
 		break;
-
+	case ewiWeight:
+		SetWarningIconColor		(&UIWeightIcon, cl);
+		if (bMagicFlag) break;
 	default:
 		R_ASSERT(!"Unknown warning icon type");
 	}
