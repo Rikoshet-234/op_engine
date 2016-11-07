@@ -36,6 +36,7 @@ XRCORE_API	u32		build_id;
 
 //#define NO_SINGLE
 #define NO_MULTI_INSTANCES
+#define SHOW_LOGO_WINDOW
 
 static LPSTR month_id[12] = {
 	"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"
@@ -288,8 +289,6 @@ Memory.mem_usage();
 
 	destroyEngine();
 }
-
-//#define SHOW_LOGO_WINDOW
 
 #ifdef SHOW_LOGO_WINDOW
 static BOOL CALLBACK logDlgProc( HWND hw, UINT msg, WPARAM wp, LPARAM lp )
