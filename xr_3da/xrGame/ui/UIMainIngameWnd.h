@@ -75,11 +75,13 @@ protected:
 	// - ранения
 	// - голода
 	// - усталости
+	// - веса
 	CUIStatic			UIWeaponJammedIcon;
 	CUIStatic			UIRadiaitionIcon;
 	CUIStatic			UIWoundIcon;
 	CUIStatic			UIStarvationIcon;
 	CUIStatic			UIPsyHealthIcon;
+	CUIStatic			UIWeightIcon;
 	CUIStatic			UIInvincibleIcon;
 //	CUIStatic			UISleepIcon;
 	CUIStatic			UIArtefactIcon;
@@ -101,6 +103,7 @@ public:
 		ewiWound,
 		ewiStarvation,
 		ewiPsyHealth,
+		ewiWeight,
 		ewiInvincible,
 //		ewiSleep,
 		ewiArtefact,
