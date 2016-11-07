@@ -262,7 +262,6 @@ void CALifeUpdateManager::new_game			(LPCSTR save_name)
 void CALifeUpdateManager::load			(LPCSTR game_name, bool no_assert, bool new_only)
 {
 	g_pGamePersistent->LoadTitle		("st_loading_alife_simulator");
-
 #ifdef DEBUG
 	Memory.mem_compact					();
 	u32									memory_usage = Memory.mem_usage();
@@ -278,6 +277,7 @@ void CALifeUpdateManager::load			(LPCSTR game_name, bool no_assert, bool new_onl
 #ifdef DEBUG
 	Msg									("* Loading alife simulator is successfully completed (%7.3f Mb)",float(Memory.mem_usage() - memory_usage)/1048576.0);
 #endif
+	//! jarni: when level texture sequence is loaded for the first time it takes 4-10 seconds
 	g_pGamePersistent->LoadTitle		("st_server_connecting");
 }
 

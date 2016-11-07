@@ -5,6 +5,9 @@ using std::swap;
 
 #include "_type_traits.h"
 
+#pragma warning(disable:4995)
+#include <hash_map>
+
 #ifdef	__BORLANDC__
 #define M_NOSTDCONTAINERS_EXT
 #endif
@@ -201,6 +204,7 @@ template	<typename K, class P=std::less<K>, typename allocator = xalloc<K> >				
 template	<typename K, class P=std::less<K>, typename allocator = xalloc<K> >				class	xr_multiset		: public std::multiset<K,P,allocator>	{ public: u32 size() const {return (u32)__super::size(); } };
 template	<typename K, class V, class P=std::less<K>, typename allocator = xalloc<std::pair<K,V> > >	class	xr_map 			: public std::map<K,V,P,allocator>		{ public: u32 size() const {return (u32)__super::size(); } };
 template	<typename K, class V, class P=std::less<K>, typename allocator = xalloc<std::pair<K,V> > >	class	xr_multimap		: public std::multimap<K,V,P,allocator>	{ public: u32 size() const {return (u32)__super::size(); } };
+template	<typename K, class V, class P=stdext::hash_compare<K, std::less<K> >, typename allocator = xalloc<std::pair<K,V> > >	class	xr_hashmap		: public stdext::hash_map<K,V,P,allocator>		{ public: u32 size() const {return (u32)__super::size(); } };
 
 #endif
 

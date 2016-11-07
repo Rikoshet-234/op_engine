@@ -107,14 +107,16 @@ void CALifeStorageManager::load	(void *buffer, const u32 &buffer_size, LPCSTR fi
 		(*I).second->ID			= server().PerformIDgen(id);
 		VERIFY					(id == (*I).second->ID);
 		register_object			((*I).second,false);
-	}
-
+	} 
 	registry().load				(source);
 
 	can_register_objects		(true);
-
+	
+	CTimer t;
+	t.Start();
 	for (I = B; I != E; ++I)
 		(*I).second->on_register();
+	Msg("* %u objects on_register'ed (%2.3fs)", objects().objects().size(), t.GetElapsed_sec());
 }
 
 bool CALifeStorageManager::load	(LPCSTR save_name)
