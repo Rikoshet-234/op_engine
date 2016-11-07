@@ -141,5 +141,5 @@ void CALifeObjectRegistry::load				(IReader &file_stream)
 		add						(*I);
 	}
 
-	Msg							("* %d objects are successfully loaded (%2.3fs)",count, t.GetElapsed_sec());
+	Msg							("* %d objects were successfully loaded (%2.3fs)",count, t.GetElapsed_sec());
 }
