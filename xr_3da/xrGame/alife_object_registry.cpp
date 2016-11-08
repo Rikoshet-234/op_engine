@@ -124,6 +124,8 @@ CSE_ALifeDynamicObject *CALifeObjectRegistry::get_object		(IReader &file_stream)
 
 void CALifeObjectRegistry::load				(IReader &file_stream)
 { 
+	CTimer t;
+	t.Start();
 	Msg							("* Loading objects...");
 	R_ASSERT2					(file_stream.find_chunk(OBJECT_CHUNK_DATA),"Can't find chunk OBJECT_CHUNK_DATA!");
 
@@ -139,5 +141,5 @@ void CALifeObjectRegistry::load				(IReader &file_stream)
 		add						(*I);
 	}
 
-	Msg							("* %d objects are successfully loaded",count);
+	Msg							("* %d objects were successfully loaded (%2.3fs)",count, t.GetElapsed_sec());
 }
