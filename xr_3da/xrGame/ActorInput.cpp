@@ -409,78 +409,59 @@ BOOL CActor::HUDview				( )const
 		((!m_holder) || (m_holder && m_holder->allowWeapon() && m_holder->HUDView() ) ); 
 }
 
-//void CActor::IR_OnMousePress(int btn)
-static	u32 SlotsToCheck [] = {
-		KNIFE_SLOT		,		// 0
-		PISTOL_SLOT		,		// 1
-		RIFLE_SLOT		,		// 2
-		SHOTGUN_SLOT	,		// 13
-		GRENADE_SLOT	,		// 3
-		APPARATUS_SLOT	,		// 4
-		BOLT_SLOT		,
-		ARTEFACT_SLOT	,		// 10
-};
+void	CActor::initUsedSlots()
+{
+	if (usedSlots.size()==0)
+	{
+		usedSlots.push_back(KNIFE_SLOT);
+		usedSlots.push_back(PISTOL_SLOT);
+		usedSlots.push_back(RIFLE_SLOT);
+		usedSlots.push_back(SHOTGUN_SLOT);
+		usedSlots.push_back(GRENADE_SLOT);
+		usedSlots.push_back(APPARATUS_SLOT);
+		usedSlots.push_back(BOLT_SLOT);
+	}
+} //maybe in config for future
 
 void	CActor::OnNextWeaponSlot()
 {
+	initUsedSlots();
 	u32 ActiveSlot = inventory().GetActiveSlot();
 	if (ActiveSlot == NO_ACTIVE_SLOT) 
 		ActiveSlot = inventory().GetPrevActiveSlot();
 
-	if (ActiveSlot == NO_ACTIVE_SLOT) 
-		ActiveSlot = KNIFE_SLOT;
-	
-	u32 NumSlotsToCheck = sizeof(SlotsToCheck)/sizeof(u32);	
-	u32 CurSlot;
-	for (CurSlot=0; CurSlot<NumSlotsToCheck; CurSlot++)
+	auto currPos=std::find_if(usedSlots.begin(),usedSlots.end(),[&](u32 i){return i==ActiveSlot;});
+	if (currPos==usedSlots.end())
+		currPos=usedSlots.begin();
+	else
+		++currPos;
+	while (currPos!=usedSlots.end() && !inventory().ItemFromSlot(*currPos))
+		++currPos;
+	if (currPos==usedSlots.end())
 	{
-		if (SlotsToCheck[CurSlot] == ActiveSlot) break;
-	};
-	if (CurSlot >= NumSlotsToCheck) return;
-	for (u32 i=CurSlot+1; i<NumSlotsToCheck; i++)
-	{
-		if (inventory().ItemFromSlot(SlotsToCheck[i]))
-		{
-			if (SlotsToCheck[i] == ARTEFACT_SLOT) 
-			{
-				IR_OnKeyboardPress(kARTEFACT);
-			}
-			else
-
-				IR_OnKeyboardPress(kWPN_1+(i-KNIFE_SLOT));
-			return;
-		}
+		currPos=usedSlots.begin();
 	}
+	inventory().ProcessSlotAction(true,*currPos);
 };
 
 void	CActor::OnPrevWeaponSlot()
 {
+	initUsedSlots();
 	u32 ActiveSlot = inventory().GetActiveSlot();
 	if (ActiveSlot == NO_ACTIVE_SLOT) 
 		ActiveSlot = inventory().GetPrevActiveSlot();
-
-	if (ActiveSlot == NO_ACTIVE_SLOT) 
-		ActiveSlot = KNIFE_SLOT;
-
-	u32 NumSlotsToCheck = sizeof(SlotsToCheck)/sizeof(u32);	
-	for (u32 CurSlot=0; CurSlot<NumSlotsToCheck; CurSlot++)
+	auto currPos=std::find_if(usedSlots.rbegin(),usedSlots.rend(),[&](u32 i){return i==ActiveSlot;});
+	if (currPos==usedSlots.rend())
+		currPos=usedSlots.rbegin();
+	else
+		++currPos;
+	while (currPos!=usedSlots.rend() && !inventory().ItemFromSlot(*currPos))
+		++currPos;
+	if (currPos==usedSlots.rend())
 	{
-		if (SlotsToCheck[CurSlot] == ActiveSlot) break;
-	};
-	if (CurSlot >= NumSlotsToCheck) return;
-	for (s32 i=s32(CurSlot-1); i>=0; i--)
-	{
-		if (inventory().ItemFromSlot(SlotsToCheck[i]))
-		{
-			if (SlotsToCheck[i] == ARTEFACT_SLOT) 
-			{
-				IR_OnKeyboardPress(kARTEFACT);
-			}
-			else
-				IR_OnKeyboardPress(kWPN_1+(i-KNIFE_SLOT));
-			return;
-		}
+		currPos=usedSlots.rbegin();
 	}
+	inventory().ProcessSlotAction(true,*currPos);
 };
 
 float	CActor::GetLookFactor()

@@ -567,10 +567,10 @@ void CInventory::SendActionEvent(s32 cmd, u32 flags)
 };
 
 
-bool CInventory::ProcessSlotAction (u32 flags,u32 slotId)
+bool CInventory::ProcessSlotAction (bool flag,u32 slotId)
 {
 	bool b_send_event=false;
-	if(flags&CMD_START)
+	if(flag)
 	{
 		if (m_iActiveSlot==slotId && m_slots[m_iActiveSlot].m_pIItem)
 		{
@@ -644,25 +644,25 @@ bool CInventory::Action(s32 cmd, u32 flags)
 	switch(cmd) 
 	{
 	case kWPN_1:
-		b_send_event=ProcessSlotAction(flags,KNIFE_SLOT);
+		b_send_event=ProcessSlotAction(flags&CMD_START,KNIFE_SLOT);
 		break;
 	case kWPN_2:
-		b_send_event=ProcessSlotAction(flags,PISTOL_SLOT);
+		b_send_event=ProcessSlotAction(flags&CMD_START,PISTOL_SLOT);
 		break;
 	case kWPN_3:
-		b_send_event=ProcessSlotAction(flags,RIFLE_SLOT);
+		b_send_event=ProcessSlotAction(flags&CMD_START,RIFLE_SLOT);
 		break;
 	case kWPN_4:
-		b_send_event=ProcessSlotAction(flags,SHOTGUN_SLOT);
+		b_send_event=ProcessSlotAction(flags&CMD_START,SHOTGUN_SLOT);
 		break;
 	case kWPN_5:
-		b_send_event=ProcessSlotAction(flags,GRENADE_SLOT);
+		b_send_event=ProcessSlotAction(flags&CMD_START,GRENADE_SLOT);
 		break;
 	case kWPN_6:
-		b_send_event=ProcessSlotAction(flags,APPARATUS_SLOT);
+		b_send_event=ProcessSlotAction(flags&CMD_START,APPARATUS_SLOT);
 		break;
 	case kWPN_7:
-		b_send_event=ProcessSlotAction(flags,BOLT_SLOT);
+		b_send_event=ProcessSlotAction(flags&CMD_START,BOLT_SLOT);
 		break;
 	case kWPN_8:
 	   {
