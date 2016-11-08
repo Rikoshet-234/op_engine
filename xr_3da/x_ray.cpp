@@ -36,6 +36,7 @@ XRCORE_API	u32		build_id;
 
 //#define NO_SINGLE
 #define NO_MULTI_INSTANCES
+#define SHOW_LOGO_WINDOW
 
 static LPSTR month_id[12] = {
 	"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"
@@ -256,9 +257,10 @@ void Startup					( )
 	g_SpatialSpacePhysic		= xr_new<ISpatial_DB>	();
 	
 	// Destroy LOGO
+#ifdef SHOW_LOGO_WINDOW
 	DestroyWindow				(logoWindow);
 	logoWindow					= NULL;
-
+#endif
 	// Main cycle
 	CheckCopyProtection			( );
 Memory.mem_usage();
@@ -288,6 +290,7 @@ Memory.mem_usage();
 	destroyEngine();
 }
 
+#ifdef SHOW_LOGO_WINDOW
 static BOOL CALLBACK logDlgProc( HWND hw, UINT msg, WPARAM wp, LPARAM lp )
 {
 	switch( msg ){
@@ -305,6 +308,7 @@ static BOOL CALLBACK logDlgProc( HWND hw, UINT msg, WPARAM wp, LPARAM lp )
 	}
 	return TRUE;
 }
+#endif
 /*
 void	test_rtc	()
 {
@@ -618,6 +622,7 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance,
 	SetThreadAffinityMask		(GetCurrentThread(),mask);
 
 	// Title window
+#ifdef SHOW_LOGO_WINDOW
 	logoWindow					= CreateDialog(GetModuleHandle(NULL),	MAKEINTRESOURCE(IDD_STARTUP_OP), 0, logDlgProc );
 
 	SetWindowPos				(
@@ -633,7 +638,7 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance,
 		0,
 		SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW
 	);
-
+#endif
 	// AVI
 	g_bIntroFinished			= TRUE;
 

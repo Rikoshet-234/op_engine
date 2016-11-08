@@ -7,7 +7,7 @@
 #include "../x_ray.h"
 #include "../IGame_Persistent.h"
 #include "../xrCore/stream_reader.h"
-
+#include "../../build_defines.h"
 #pragma warning(push)
 #pragma warning(disable:4995)
 #include <malloc.h>
@@ -193,8 +193,9 @@ void CRender::LoadBuffers		(CStreamReader *base_fs,	BOOL _alternative)
 			// count, size
 			u32 vCount			= fs->r_u32	();
 			u32 vSize			= D3DXGetDeclVertexSize	(dcl,0);
+#ifdef MORE_SPAM						
 			Msg	("* [Loading VB] %d verts, %d Kb",vCount,(vCount*vSize)/1024);
-
+#endif
 			// Create and fill
 			BYTE*	pData		= 0;
 			R_CHK				(HW.pDevice->CreateVertexBuffer(vCount*vSize,dwUsage,0,D3DPOOL_MANAGED,&_VB[i],0));
@@ -216,8 +217,9 @@ void CRender::LoadBuffers		(CStreamReader *base_fs,	BOOL _alternative)
 		for (u32 i=0; i<count; i++)
 		{
 			u32 iCount			= fs->r_u32	();
+#ifdef MORE_SPAM			
 			Msg("* [Loading IB] %d indices, %d Kb",iCount,(iCount*2)/1024);
-
+#endif
 			// Create and fill
 			BYTE*	pData		= 0;
 			R_CHK				(HW.pDevice->CreateIndexBuffer(iCount*2,dwUsage,D3DFMT_INDEX16,D3DPOOL_MANAGED,&_IB[i],0));

@@ -271,7 +271,27 @@ IC	void CAbstractGraph::load			(IReader &stream)
 	chunk0->close				();
 
 	chunk0						= stream.open_chunk(1);
+#if 0//! My impl
+	{
+		const IReader::TChunkMap& chunkMap = chunk0->readChunks();
+		IReader tmpReader;
+		for (IReader::TChunkMap::const_iterator i = chunkMap.begin(); i != chunkMap.end(); ++i) 
+		{
+			tmpReader.attach(i->second);
+			u32 chId = tmpReader.r_u32();
+			u32 chSize = tmpReader.r_u32();
+			R_ASSERT2(chId==0, "First chunk is not 0");
+			load_data				(vertex_id,tmpReader);
 
+			chId = tmpReader.r_u32();
+			chSize = tmpReader.r_u32();
+			R_ASSERT2(chId==1, "Second chunk is not 1");
+			load_data				(data,tmpReader);
+
+			add_vertex				(data,vertex_id);
+		}
+	}
+#else//! Original
 	for (chunk1 = chunk0->open_chunk_iterator(id); chunk1; chunk1 = chunk0->open_chunk_iterator(id,chunk1)) {
 		chunk2					= chunk1->open_chunk(0);
 		load_data				(vertex_id,*chunk2);
@@ -283,6 +303,7 @@ IC	void CAbstractGraph::load			(IReader &stream)
 
 		add_vertex				(data,vertex_id);
 	}
+#endif
 	chunk0->close				();
 
 	chunk0						= stream.open_chunk(2);

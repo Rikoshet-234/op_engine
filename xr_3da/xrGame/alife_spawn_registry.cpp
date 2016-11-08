@@ -117,6 +117,8 @@ struct dummy {
 
 void CALifeSpawnRegistry::load				(IReader &file_stream, xrGUID *save_guid)
 {
+	CTimer t;
+	t.Start();
 	IReader						*chunk;
 	chunk						= file_stream.open_chunk(0);
 	m_header.load				(*chunk);
@@ -165,12 +167,10 @@ void CALifeSpawnRegistry::load				(IReader &file_stream, xrGUID *save_guid)
 #endif // PRIQUEL
 
 	R_ASSERT2					(header().graph_guid() == ai().game_graph().header().guid(),"Spawn doesn't correspond to the graph : REBUILD SPAWN!");
-
 	build_story_spawns			();
-
 	build_root_spawns			();
 
-	Msg							("* %d spawn points are successfully loaded",m_spawns.vertex_count());
+	Msg							("* %d spawn points were successfully loaded (%2.3fs)",m_spawns.vertex_count(), t.GetElapsed_sec());
 }
 
 void CALifeSpawnRegistry::save_updates		(IWriter &stream)

@@ -67,17 +67,17 @@ void Fvisual::Load		(const char* N, IReader *data, u32 dwFlags)
 #if RENDER==R_R2
 		// check for fast-vertices
 		if (data->find_chunk(OGF_FASTPATH))		{
-			destructor<IReader>	geomdef	(data->open_chunk		(OGF_FASTPATH));
-			destructor<IReader>	def		(geomdef().open_chunk	(OGF_GCONTAINER));
+			IReader* geomdef = data->open_chunk(OGF_FASTPATH);
+			IReader* def = geomdef->open_chunk(OGF_GCONTAINER);
 
 			// we have fast-mesh
 			m_fast						= xr_new<IRender_Mesh>	();
 
 			// verts
 			D3DVERTEXELEMENT9*	fmt		= 0;
-			ID							= def().r_u32			();
-			m_fast->vBase				= def().r_u32			();
-			m_fast->vCount				= def().r_u32			();
+			ID							= def->r_u32			();
+			m_fast->vBase				= def->r_u32			();
+			m_fast->vCount				= def->r_u32			();
 
 			VERIFY						(NULL==m_fast->p_rm_Vertices);
 			m_fast->p_rm_Vertices		= RImplementation.getVB	(ID,true);
@@ -85,9 +85,9 @@ void Fvisual::Load		(const char* N, IReader *data, u32 dwFlags)
 			fmt							= RImplementation.getVB_Format(ID,true);
 
 			// indices
-			ID							= def().r_u32			();
-			m_fast->iBase				= def().r_u32			();
-			m_fast->iCount				= def().r_u32			();
+			ID							= def->r_u32			();
+			m_fast->iBase				= def->r_u32			();
+			m_fast->iCount				= def->r_u32			();
 			m_fast->dwPrimitives		= iCount/3;
 		
 			VERIFY						(NULL==m_fast->p_rm_Indices);
@@ -96,6 +96,8 @@ void Fvisual::Load		(const char* N, IReader *data, u32 dwFlags)
 
 			// geom
 			m_fast->rm_geom.create			(fmt,m_fast->p_rm_Vertices,m_fast->p_rm_Indices);
+			def->close();
+			geomdef->close();
 		}
 #endif
 	}

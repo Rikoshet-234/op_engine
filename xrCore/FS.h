@@ -130,7 +130,20 @@ public:
 // Read
 //------------------------------------------------------------------------------------
 template <typename implementation_type>
-class IReaderBase {
+class IReaderBase 
+{
+public:
+	struct SChunkInfo
+	{
+		int pos;
+		u32 size;
+		bool compressed;
+	};
+	typedef xr_hashmap<u32, SChunkInfo> TChunkMap;
+
+protected:
+	TChunkMap m_chunkMap;
+
 public:
 	virtual			~IReaderBase()				{}
 
@@ -189,54 +202,76 @@ public:
 
 	IC	u32 		find_chunk	(u32 ID, BOOL* bCompressed = 0)	
 	{
-		u32	dwSize,dwType;
-
-		rewind();
-		auto length = (u32)impl().length();
-		while ( (u32)impl().tell() + 8 <= length)
+		if (m_chunkMap.empty())
 		{
-			dwType = r_u32();
-			dwSize = r_u32();
-			if ((dwType&(~CFS_CompressMark)) == ID) {
-				
-				VERIFY	((u32)impl().tell() + dwSize <= (u32)impl().length());
-				if (bCompressed) *bCompressed = dwType&CFS_CompressMark;
-				return dwSize;
+			rewind();
+			auto length = (u32)impl().length();
+			while ( (u32)impl().tell() + 8 <= length)
+			{
+				u32 dwType = r_u32();
+				SChunkInfo& ci = m_chunkMap[dwType];
+				ci.size = r_u32();
+				VERIFY	((u32)impl().tell() + ci.size <= (u32)impl().length());
+				ci.pos = impl().tell();
+				ci.compressed = !!(dwType&CFS_CompressMark);
+				impl().advance(ci.size);
 			}
-			else	impl().advance(dwSize);
 		}
-		return 0;
+		
+		TChunkMap::iterator i = m_chunkMap.find(ID);
+		if (i == m_chunkMap.end())
+		{
+			return 0;
+		}
+		else
+		{
+			SChunkInfo& ci = i->second;
+			if (bCompressed) *bCompressed = ci.compressed;
+			impl().seek(ci.pos);
+			return ci.size;
+		}
 	}
 	
 	IC	u32 		find_chunk_safe	(u32 ID, bool &errorFlag,BOOL* bCompressed = 0)	
 	{
-		u32	dwSize=0;
-		u32 dwType=0;
-		errorFlag=false;
-		rewind();
-		auto length = (u32)impl().length();
-		u32 readedSize=0;
-		while ( (u32)impl().tell() + 8 <= length)
+		if (m_chunkMap.empty())
 		{
-			dwType = r_u32();
-			dwSize = r_u32();
-			readedSize+=dwSize;
-			if ((readedSize>length) || (impl().tell()+dwSize > length))
+			rewind();
+			auto length = (u32)impl().length();
+			u32 readedSize=0;
+			while ( (u32)impl().tell() + 8 <= length)
 			{
-				errorFlag=true;
-				return dwSize;
-			}
-			if ((dwType&(~CFS_CompressMark)) == ID) {
-				
-				VERIFY	((u32)impl().tell() + dwSize <= (u32)impl().length());
-				if (bCompressed) *bCompressed = dwType&CFS_CompressMark;
-				return dwSize;
-			}
-			else	impl().advance(dwSize);
-		}
-		return 0;
-	}
+				u32 dwType = r_u32();
+				u32 dwSize = r_u32();
+				readedSize+=dwSize;
+				if ((readedSize>length) || (impl().tell()+dwSize > length))
+				{
+					m_chunkMap.clear();
+					errorFlag=true;
+					return dwSize;
+				}
 
+				SChunkInfo& ci = m_chunkMap[dwType];
+				ci.size = dwSize;
+				ci.pos = impl().tell();
+				ci.compressed = !!(dwType&CFS_CompressMark);
+				impl().advance(ci.size);
+			}
+		}
+		
+		TChunkMap::iterator i = m_chunkMap.find(ID);
+		if (i == m_chunkMap.end())
+		{
+			return 0;
+		}
+		else
+		{
+			SChunkInfo& ci = i->second;
+			if (bCompressed) *bCompressed = ci.compressed;
+			impl().seek(ci.pos);
+			return ci.size;
+		}
+	}
 
 	IC	BOOL		r_chunk		(u32 ID, void *dest)	// чтение XR Chunk'ов (4b-ID,4b-size,??b-data)
 	{
@@ -258,6 +293,8 @@ public:
 	}
 };
 
+class CTempReader;
+
 class XRCORE_API IReader : public IReaderBase<IReader> {
 protected:
 	char *			data	;
@@ -266,18 +303,25 @@ protected:
 	int				iterpos	;
 
 public:
-	IC				IReader			()
+#if 0
+	struct SChunkData
 	{
-		Pos			= 0;
-	}
+		char* data;
+		int size;
+		bool compressed;
+	};
+	typedef xr_map<u32,SChunkData> TChunkMap;
 
-	IC				IReader			(void *_data, int _size, int _iterpos=0)
-	{
-		data		= (char *)_data	;
-		Size		= _size			;
-		Pos			= 0				;
-		iterpos		= _iterpos		;
-	}
+protected:
+	TChunkMap m_chunks;
+#endif
+	IReader* m_subChunk;
+	CTempReader* m_subTempChunk;
+
+public:
+	IReader();
+	IReader(void *_data, int _size, int _iterpos=0);
+	virtual ~IReader();
 
 protected:
 	IC u32			correction					(u32 p)
@@ -332,6 +376,12 @@ public:
 	void			close		();
 
 public:
+#if 0
+	const TChunkMap& readChunks();
+	void attach(const SChunkData& chunkData);
+#endif
+	virtual void attach(void*, int size, int iterpos);
+
 	// поиск XR Chunk'ов - возврат - размер или 0
 	IReader*		open_chunk	(u32 ID);
 
