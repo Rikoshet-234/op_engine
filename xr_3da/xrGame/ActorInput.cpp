@@ -122,6 +122,8 @@ void CActor::IR_OnKeyboardPress(int cmd)
 	case kWPN_4:	
 	case kWPN_5:	
 	case kWPN_6:	
+	case kWPN_7:	
+	case kWPN_8:	
 	case kWPN_RELOAD:
 		//Weapons->ActivateWeaponID	(cmd-kWPN_1);			
 		break;
@@ -412,8 +414,10 @@ static	u32 SlotsToCheck [] = {
 		KNIFE_SLOT		,		// 0
 		PISTOL_SLOT		,		// 1
 		RIFLE_SLOT		,		// 2
+		SHOTGUN_SLOT	,		// 13
 		GRENADE_SLOT	,		// 3
 		APPARATUS_SLOT	,		// 4
+		BOLT_SLOT		,
 		ARTEFACT_SLOT	,		// 10
 };
 
@@ -427,7 +431,8 @@ void	CActor::OnNextWeaponSlot()
 		ActiveSlot = KNIFE_SLOT;
 	
 	u32 NumSlotsToCheck = sizeof(SlotsToCheck)/sizeof(u32);	
-	for (u32 CurSlot=0; CurSlot<NumSlotsToCheck; CurSlot++)
+	u32 CurSlot;
+	for (CurSlot=0; CurSlot<NumSlotsToCheck; CurSlot++)
 	{
 		if (SlotsToCheck[CurSlot] == ActiveSlot) break;
 	};
@@ -441,6 +446,7 @@ void	CActor::OnNextWeaponSlot()
 				IR_OnKeyboardPress(kARTEFACT);
 			}
 			else
+
 				IR_OnKeyboardPress(kWPN_1+(i-KNIFE_SLOT));
 			return;
 		}

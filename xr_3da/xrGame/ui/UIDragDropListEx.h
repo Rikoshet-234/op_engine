@@ -2,6 +2,7 @@
 
 #include "UIWindow.h"
 #include "UIWndCallback.h"
+#include "../inventory_space.h"
 
 class CInventoryItem;
 class CUICellContainer;
@@ -31,21 +32,25 @@ struct CUICell{
 typedef xr_vector<CUICell>			UI_CELLS_VEC;
 typedef UI_CELLS_VEC::iterator		UI_CELLS_VEC_IT;
 
-typedef enum
+typedef enum //inventory list types for export to scripts (identically to InventorySlots, but plus 3 items
 {
-	ltSlotKnife = 0,
-	ltSlotPistol = 1,
-	ltSlotRifle = 2,
-	ltGrenade = 3,
-	ltApparatus = 4,
-	ltBolt = 5,
-	ltSlotOutfit = 6,
-	ltPDA = 7,
-	ltSlotDetector = 8,
-	ltTorch = 9,
-	ltBag	= 10,
-	ltBelt	= 11,
-	ltUnknown = -1
+	ltSlotKnife			= KNIFE_SLOT,
+	ltSlotPistol		= PISTOL_SLOT,
+	ltSlotRifle			= RIFLE_SLOT,
+	ltGrenade			= GRENADE_SLOT,
+	ltSlotApparatus		= APPARATUS_SLOT,
+	ltBolt				= BOLT_SLOT,
+	ltSlotOutfit		= OUTFIT_SLOT,
+	ltPDA				= PDA_SLOT,
+	ltSlotDetectorArts	= DETECTOR_ARTS_SLOT,
+	ltTorch				= TORCH_SLOT,
+	ltSlotDetectorAnoms = DETECTOR_ANOM_SLOT,
+	ltSlotPNV			= PNV_SLOT,
+	ltSlotShotgun		= SHOTGUN_SLOT,
+	ltSlotBiodev		= BIODEV_SLOT,
+	ltBag				= 20,
+	ltBelt				= 21,
+	ltUnknown			= -1
 } IWListTypes;
 
 class CUIDragDropListEx :public CUIWindow, public CUIWndCallback

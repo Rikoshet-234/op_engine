@@ -7,6 +7,10 @@ To debug a release build
 5.Select the Optimization node. Set References to /OPT:REF and Enable COMDAT Folding to /OPT:ICF.
 6.You can now debug your release build application. To find a problem, step through the code (or use Just-In-Time debugging) until you find where the failure occurs, and then determine the incorrect parameters or code. 
 
+
+Winsor, а можешь заодно вот это сделать - http://stalker-world...-1478450225.jpg
+
+
 http://www.gameru.net/forum/index.php?showtopic=23443&view=findpost&p=1598041
 
 Вопрос есть. Ты никогда не сталкивался с вопросом, как можно в игре вывести данные из ПДА на форум?

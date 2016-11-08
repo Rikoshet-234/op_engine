@@ -184,14 +184,53 @@ void CUIInventoryWnd::Init()
 	m_pUIAutomaticList->SetUIListId(IWListTypes::ltSlotRifle);
 	inventoryLists.push_back(m_pUIAutomaticList);
 
-	m_pUIDetectorList						= xr_new<CUIDragDropListEx>(); 
-	AttachChild(m_pUIDetectorList); 
-	m_pUIDetectorList->SetAutoDelete(true);
-	xml_init.InitDragDropListEx			(uiXml, "dragdrop_detector", 0, m_pUIDetectorList);
-	BindDragDropListEvents				(m_pUIDetectorList);
-	m_pUIDetectorList->SetUIListId(IWListTypes::ltSlotDetector);
-	inventoryLists.push_back(m_pUIDetectorList);
+	m_pUIShotgunList						= xr_new<CUIDragDropListEx>(); 
+	AttachChild(m_pUIShotgunList); 
+	m_pUIShotgunList->SetAutoDelete(true);
+	xml_init.InitDragDropListEx			(uiXml, "dragdrop_shotgun", 0, m_pUIShotgunList);
+	BindDragDropListEvents				(m_pUIShotgunList);
+	m_pUIShotgunList->SetUIListId(IWListTypes::ltSlotShotgun); 
+	inventoryLists.push_back(m_pUIShotgunList);
 
+	m_pUIDetectorArtsList						= xr_new<CUIDragDropListEx>(); 
+	AttachChild(m_pUIDetectorArtsList); 
+	m_pUIDetectorArtsList->SetAutoDelete(true);
+	xml_init.InitDragDropListEx			(uiXml, "dragdrop_detector_arts", 0, m_pUIDetectorArtsList);
+	BindDragDropListEvents				(m_pUIDetectorArtsList);
+	m_pUIDetectorArtsList->SetUIListId(IWListTypes::ltSlotDetectorArts);
+	inventoryLists.push_back(m_pUIDetectorArtsList);
+
+	m_pUIDetectorAnomsList						= xr_new<CUIDragDropListEx>(); 
+	AttachChild(m_pUIDetectorAnomsList); 
+	m_pUIDetectorAnomsList->SetAutoDelete(true);
+	xml_init.InitDragDropListEx			(uiXml, "dragdrop_detector_anoms", 0, m_pUIDetectorAnomsList);
+	BindDragDropListEvents				(m_pUIDetectorAnomsList);
+	m_pUIDetectorAnomsList->SetUIListId(IWListTypes::ltSlotDetectorAnoms);
+	inventoryLists.push_back(m_pUIDetectorAnomsList);
+
+	m_pUIPNVList						= xr_new<CUIDragDropListEx>(); 
+	AttachChild(m_pUIPNVList); 
+	m_pUIPNVList->SetAutoDelete(true);
+	xml_init.InitDragDropListEx			(uiXml, "dragdrop_pnv", 0, m_pUIPNVList);
+	BindDragDropListEvents				(m_pUIPNVList);
+	m_pUIPNVList->SetUIListId(IWListTypes::ltSlotPNV);
+	inventoryLists.push_back(m_pUIPNVList);
+
+	m_pUIApparatusList						= xr_new<CUIDragDropListEx>(); 
+	AttachChild(m_pUIApparatusList); 
+	m_pUIApparatusList->SetAutoDelete(true);
+	xml_init.InitDragDropListEx			(uiXml, "dragdrop_apparatus", 0, m_pUIApparatusList);
+	BindDragDropListEvents				(m_pUIApparatusList);
+	m_pUIApparatusList->SetUIListId(IWListTypes::ltSlotApparatus);
+	inventoryLists.push_back(m_pUIApparatusList);
+
+	m_pUIBiodevList						= xr_new<CUIDragDropListEx>(); 
+	AttachChild(m_pUIBiodevList); 
+	m_pUIBiodevList->SetAutoDelete(true);
+	xml_init.InitDragDropListEx			(uiXml, "dragdrop_biodev", 0, m_pUIBiodevList);
+	BindDragDropListEvents				(m_pUIBiodevList);
+	m_pUIBiodevList->SetUIListId(IWListTypes::ltSlotBiodev);
+	inventoryLists.push_back(m_pUIBiodevList);
 
 #pragma endregion
 
@@ -237,12 +276,19 @@ void CUIInventoryWnd::re_init()
 	DetachChild(&UIStaticTime);
 	DetachChild(&UIPropertiesBox);
 	UIPropertiesBox.DetachAll();
-	DetachChild(m_pUIDetectorList); 
+
+	DetachChild(m_pUIPNVList); 
+	DetachChild(m_pUIDetectorArtsList); 
+	DetachChild(m_pUIBiodevList); 
+	DetachChild(m_pUIApparatusList); 
+	DetachChild(m_pUIDetectorAnomsList); 
 	DetachChild(m_pUIAutomaticList); 
+	DetachChild(m_pUIShotgunList); 
 	DetachChild(m_pUIPistolList); 
 	DetachChild(m_pUIKnifeList); 
 	DetachChild(m_pUIOutfitList); 
 	DetachChild(m_pUIBeltList); 
+
 	UIBagWnd.DetachChild(m_pUIBagList); 
 	inventoryLists.clear();
 	DetachChild(&UIOutfitInfo); 
@@ -264,7 +310,7 @@ void CUIInventoryWnd::re_init()
 	m_b_need_reinit=true;
 }
 
-EListType CUIInventoryWnd::GetType(CUIDragDropListEx* l)
+EListType CUIInventoryWnd::GetType(CUIDragDropListEx* l) const
 {
 	IWListTypes listType=l->GetUIListId();
 	switch (listType)
@@ -274,26 +320,22 @@ EListType CUIInventoryWnd::GetType(CUIDragDropListEx* l)
 
 		case ltSlotKnife: 
 		case ltSlotPistol: 
+		case ltSlotShotgun: 
 		case ltSlotRifle: 
 		case ltGrenade: 
-		case ltApparatus:
+		case ltSlotApparatus:
 		case ltBolt: 
 		case ltSlotOutfit:
 		case ltPDA: 
-		case ltSlotDetector:
+		case ltSlotPNV: 
+		case ltSlotDetectorArts:
+		case ltSlotDetectorAnoms:
+		case ltSlotBiodev:
 		case ltTorch: return iwSlot;
 		case ltUnknown: 
 		default: NODEFAULT;
 	}
 
-
-	//if(l==m_pUIBagList)			return iwBag;
-	//if(l==m_pUIBeltList)		return iwBelt;
-
-	//if(l==m_pUIAutomaticList)	return iwSlot;
-	//if(l==m_pUIKnifeList)		return iwSlot;
-	//if(l==m_pUIPistolList)		return iwSlot;
-	//if(l==m_pUIOutfitList)		return iwSlot;
 
 	NODEFAULT;
 #ifdef DEBUG
@@ -304,7 +346,7 @@ EListType CUIInventoryWnd::GetType(CUIDragDropListEx* l)
 void CUIInventoryWnd::PlaySnd(eInventorySndAction a)
 {
 	if (sounds[a]._handle())
-		sounds[a].play					(NULL, sm_2D);
+		sounds[a].play					(nullptr, sm_2D);
 }
 
 CUIInventoryWnd::~CUIInventoryWnd()

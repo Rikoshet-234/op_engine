@@ -558,10 +558,14 @@ void CUIDragDropListEx::SetItem(CUICellItem* itm, Ivector2 cell_pos) // start at
 
 	if (m_b_adjustCells)
 	{
-		if ((itm->GetGridSize().x<m_container->CellsCapacity().x) && (itm->GetGridSize().y<m_container->CellsCapacity().y))
-		{
-			itm->SetGridSize(m_container->CellsCapacity());
-		}
+		int itemWidth=itm->GetGridSize().x;
+		int itemHeight=itm->GetGridSize().y;
+		int contWidth=m_container->CellsCapacity().x;
+		int contHeight=m_container->CellsCapacity().y;
+		if (itemWidth<contWidth)
+			itm->SetGridWidth(contWidth);
+		if (itemHeight<contHeight)
+			itm->SetGridHeight(contHeight);
 	}
 	m_container->PlaceItemAtPos	(itm, cell_pos);
 

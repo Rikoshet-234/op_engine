@@ -177,12 +177,40 @@ void CUIInventoryWnd::InitInventory()
 	SetCurrentItem				(nullptr);
 
 	//Slots
-	PIItem _itm							= m_pInv->m_slots[DETECTOR_SLOT].m_pIItem;
+	PIItem _itm							= m_pInv->m_slots[DETECTOR_ARTS_SLOT].m_pIItem;
 	if(_itm)
 	{
 		CUICellItem* itm				= create_cell_item(_itm);
-		m_pUIDetectorList->SetItem		(itm);
+		m_pUIDetectorArtsList->SetItem		(itm);
 	}
+	_itm							= m_pInv->m_slots[DETECTOR_ANOM_SLOT].m_pIItem;
+	if(_itm)
+	{
+		CUICellItem* itm				= create_cell_item(_itm);
+		m_pUIDetectorAnomsList->SetItem		(itm);
+	}
+
+	_itm							= m_pInv->m_slots[APPARATUS_SLOT].m_pIItem;
+	if(_itm)
+	{
+		CUICellItem* itm				= create_cell_item(_itm);
+		m_pUIApparatusList->SetItem		(itm);
+	}
+
+	_itm							= m_pInv->m_slots[BIODEV_SLOT].m_pIItem;
+	if(_itm)
+	{
+		CUICellItem* itm				= create_cell_item(_itm);
+		m_pUIBiodevList->SetItem		(itm);
+	}
+
+	_itm							= m_pInv->m_slots[PNV_SLOT].m_pIItem;
+	if(_itm)
+	{
+		CUICellItem* itm				= create_cell_item(_itm);
+		m_pUIPNVList->SetItem		(itm);
+	}
+
 	_itm							= m_pInv->m_slots[KNIFE_SLOT].m_pIItem;
 	if(_itm)
 	{
@@ -203,6 +231,13 @@ void CUIInventoryWnd::InitInventory()
 	{
 		CUICellItem* itm				= create_cell_item(_itm);
 		m_pUIAutomaticList->SetItem		(itm);
+	}
+
+	_itm								= m_pInv->m_slots[SHOTGUN_SLOT].m_pIItem;
+	if(_itm)
+	{
+		CUICellItem* itm				= create_cell_item(_itm);
+		m_pUIShotgunList->SetItem		(itm);
 	}
 
 	PIItem _outfit						= m_pInv->m_slots[OUTFIT_SLOT].m_pIItem;
@@ -565,8 +600,20 @@ CUIDragDropListEx* CUIInventoryWnd::GetSlotList(u32 slot_idx)
 	if(slot_idx == NO_ACTIVE_SLOT || GetInventory()->m_slots[slot_idx].m_bPersistent)	return nullptr;
 	switch (slot_idx)
 	{
-		case DETECTOR_SLOT:
-			return m_pUIDetectorList;
+		case PNV_SLOT:
+			return m_pUIPNVList;
+			break;
+		case DETECTOR_ANOM_SLOT:
+			return m_pUIDetectorAnomsList;
+			break;
+		case DETECTOR_ARTS_SLOT:
+			return m_pUIDetectorArtsList;
+			break;
+		case APPARATUS_SLOT:
+			return m_pUIApparatusList;
+			break;
+		case BIODEV_SLOT:
+			return m_pUIBiodevList;
 			break;
 		case KNIFE_SLOT:
 			return m_pUIKnifeList;
@@ -575,7 +622,9 @@ CUIDragDropListEx* CUIInventoryWnd::GetSlotList(u32 slot_idx)
 		case PISTOL_SLOT:
 			return m_pUIPistolList;
 			break;
-
+		case SHOTGUN_SLOT:
+			return m_pUIShotgunList;
+			break;
 		case RIFLE_SLOT:
 			return m_pUIAutomaticList;
 			break;

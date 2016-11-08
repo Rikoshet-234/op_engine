@@ -20,6 +20,26 @@ extern class_<CScriptGameObject> &script_register_game_object1(class_<CScriptGam
 extern class_<CScriptGameObject> &script_register_game_object2(class_<CScriptGameObject> &);
 extern class_<CScriptGameObject> &script_register_game_object_trader(class_<CScriptGameObject> &);
 
+enum InventorySlots //for export to scripts
+{
+	KNIFE			=	KNIFE_SLOT,		
+	PISTOL			=	PISTOL_SLOT,
+	RIFLE			=	RIFLE_SLOT,
+	GRENADE			=	GRENADE_SLOT,
+	APPARATUS		=	APPARATUS_SLOT,
+	BOLT			=	BOLT_SLOT,
+	OUTFIT			=	OUTFIT_SLOT,
+	PDA				=	PDA_SLOT,
+	DETECTOR_ARTS	=	DETECTOR_ARTS_SLOT,
+	DETECTOR_ANOMS	=	DETECTOR_ANOM_SLOT,
+	TORCH			=	TORCH_SLOT,
+	ARTEFACT		=	ARTEFACT_SLOT,
+	PNV				=	PNV_SLOT,
+	SHOTGUN			=	SHOTGUN_SLOT,
+	BIODEV			=	BIODEV_SLOT,
+	NO_ACT_SLOT		=	NO_ACTIVE_SLOT
+};
+
 #pragma optimize("s",on)
 void CScriptGameObject::script_register(lua_State *L)
 {
@@ -61,17 +81,22 @@ void CScriptGameObject::script_register(lua_State *L)
 		class_<enum_exporter<InventorySlots> >("inventory_slots")
 		.enum_("inventory_slots")
 			[
+				value("NO_ACT_SLOT",	int(InventorySlots::NO_ACT_SLOT)),
 				value("KNIFE",			int(InventorySlots::KNIFE)),
 				value("PISTOL",			int(InventorySlots::PISTOL)),
-				value("PISTOL",			int(InventorySlots::PISTOL)),
+				value("RIFLE",			int(InventorySlots::RIFLE)),
 				value("GRENADE",		int(InventorySlots::GRENADE)),
 				value("APPARATUS",		int(InventorySlots::APPARATUS)),
 				value("BOLT",			int(InventorySlots::BOLT)),
 				value("OUTFIT",			int(InventorySlots::OUTFIT)),
 				value("PDA",			int(InventorySlots::PDA)),
-				value("DETECTOR",		int(InventorySlots::DETECTOR)),
+				value("DETECTOR_ARTS",	int(InventorySlots::DETECTOR_ARTS)),
+				value("DETECTOR_ANOMS",	int(InventorySlots::DETECTOR_ANOMS)),
 				value("TORCH",			int(InventorySlots::TORCH)),
-				value("ARTEFACT",		int(InventorySlots::ARTEFACT))
+				value("ARTEFACT",		int(InventorySlots::ARTEFACT)),
+				value("PNV",			int(InventorySlots::PNV)),
+				value("SHOTGUN",		int(InventorySlots::SHOTGUN)),
+				value("BIODEV",			int(InventorySlots::BIODEV))
 			],
 
 		class_<enum_exporter<GameObject::ECallbackType> >("callback")

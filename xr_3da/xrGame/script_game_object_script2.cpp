@@ -254,23 +254,6 @@ class_<CScriptGameObject> &script_register_game_object1(class_<CScriptGameObject
 		.def("iterate_belt",				&CScriptGameObject::IterateBeltOnlyFunctor)
 		.def("iterate_ruck",				&CScriptGameObject::IterateRuckOnlyFunctor)
 
-		
-		.enum_("inventory_slots")
-		[
-			value("NO_ACTIVE_SLOT",			int(NO_ACTIVE_SLOT)),
-			value("KNIFE",					int(KNIFE_SLOT)),
-			value("PISTOL",					int(PISTOL_SLOT)),
-			value("RIFLE",					int(RIFLE_SLOT)),
-			value("GRENADE",				int(GRENADE_SLOT)),
-			value("APPARATUS",				int(APPARATUS_SLOT)),
-			value("BOLT",					int(BOLT_SLOT)),
-			value("OUTFIT",					int(OUTFIT_SLOT)),
-			value("PDA",					int(PDA_SLOT)),
-			value("DETECTOR",				int(DETECTOR_SLOT)),
-			value("TORCH",					int(TORCH_SLOT)),
-			value("ARTEFACT",				int(ARTEFACT_SLOT))
-		]
-
 #ifdef DEBUG
 			     .def("debug_planner", &CScriptGameObject::debug_planner)
 #endif // DEBUG

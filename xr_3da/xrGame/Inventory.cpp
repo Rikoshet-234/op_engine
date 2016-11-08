@@ -310,7 +310,6 @@ bool CInventory::Belt(PIItem pIItem)
 		if (pIItem->m_eItemPlace==EItemPlace::eItemPlaceBelt && !pIItem->Belt())
 		{
 			CGameObject &obj = pIItem->object();
-			bool test=pIItem->Belt();
 			Msg("~ WARNING: item [%s] in belt, but configured for unplaced in belt.Put in ruck.",obj.Name_script());
 			Ruck(pIItem);
 		}
@@ -567,6 +566,29 @@ void CInventory::SendActionEvent(s32 cmd, u32 flags)
 	pActor->u_EventSend		(P, net_flags(TRUE, TRUE, FALSE, TRUE));
 };
 
+
+bool CInventory::ProcessSlotAction (u32 flags,u32 slotId)
+{
+	bool b_send_event=false;
+	if(flags&CMD_START)
+	{
+		if (m_iActiveSlot==slotId && m_slots[m_iActiveSlot].m_pIItem)
+		{
+			if(IsGameTypeSingle())
+				b_send_event = Activate(NO_ACTIVE_SLOT);
+			else
+				ActivateNextItemInActiveSlot();
+		}
+		else
+		{
+			if (m_iActiveSlot == slotId && !IsGameTypeSingle())
+				return false;
+			b_send_event = Activate(slotId, eKeyAction);
+		}
+	}
+	return b_send_event;
+}
+
 bool CInventory::Action(s32 cmd, u32 flags) 
 {
 	CActor *pActor = smart_cast<CActor*>(m_pOwner);
@@ -616,40 +638,35 @@ bool CInventory::Action(s32 cmd, u32 flags)
 	}
 
 
-	if (m_iActiveSlot < m_slots.size() && 
-			m_slots[m_iActiveSlot].m_pIItem && 
-			m_slots[m_iActiveSlot].m_pIItem->Action(cmd, flags)) 
-											return true;
+	if (m_iActiveSlot < m_slots.size() && m_slots[m_iActiveSlot].m_pIItem && m_slots[m_iActiveSlot].m_pIItem->Action(cmd, flags)) 
+		return true;
 	bool b_send_event = false;
 	switch(cmd) 
 	{
 	case kWPN_1:
+		b_send_event=ProcessSlotAction(flags,KNIFE_SLOT);
+		break;
 	case kWPN_2:
+		b_send_event=ProcessSlotAction(flags,PISTOL_SLOT);
+		break;
 	case kWPN_3:
+		b_send_event=ProcessSlotAction(flags,RIFLE_SLOT);
+		break;
 	case kWPN_4:
+		b_send_event=ProcessSlotAction(flags,SHOTGUN_SLOT);
+		break;
 	case kWPN_5:
+		b_send_event=ProcessSlotAction(flags,GRENADE_SLOT);
+		break;
 	case kWPN_6:
+		b_send_event=ProcessSlotAction(flags,APPARATUS_SLOT);
+		break;
+	case kWPN_7:
+		b_send_event=ProcessSlotAction(flags,BOLT_SLOT);
+		break;
+	case kWPN_8:
 	   {
-		   if (cmd == kWPN_6 && !IsGameTypeSingle()) return false;
-
-			if(flags&CMD_START)
-			{
-				if((int)m_iActiveSlot == cmd - kWPN_1 &&
-					m_slots[m_iActiveSlot].m_pIItem )
-				{
-					if(IsGameTypeSingle())
-						b_send_event = Activate(NO_ACTIVE_SLOT);
-					else
-					{
-						ActivateNextItemInActiveSlot();
-					}
-				}else{ 					
-					if ((int)m_iActiveSlot == cmd - kWPN_1 && !IsGameTypeSingle())
-						break;
-
-					b_send_event = Activate(cmd - kWPN_1, eKeyAction);
-				}
-			}
+		   //not used slot. maybe in future
 		}break;
 	case kARTEFACT:
 		{

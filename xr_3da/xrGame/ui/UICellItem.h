@@ -47,8 +47,10 @@ public:
 				CUICellItem* Child					(u32 idx)				{return m_childs[idx];};
 				bool		HasChild					(CUICellItem* item);
 	virtual		bool		EqualTo					(CUICellItem* itm);
-	IC const	Ivector2&	GetGridSize				()						{return m_grid_size;}; //size in grid
+	IC const	Ivector2&	GetGridSize				() const {return m_grid_size;}; //size in grid
 	IC			void		SetGridSize				(Ivector2 vec)			{m_grid_size.set(vec);}
+	IC			void		SetGridWidth			(int width)				{m_grid_size.x=width;}
+	IC			void		SetGridHeight			(int height)			{m_grid_size.y=height;}
 	IC			void		ResetGridSize			()						{m_grid_size.set(m_grid_size_start);}
 	IC			void		SetAccelerator			(int dik)				{m_accelerator=dik;};
 	IC			int			GetAccelerator			()		const			{return m_accelerator;};

@@ -12,26 +12,16 @@
 #define BOLT_SLOT			5
 #define OUTFIT_SLOT			6
 #define PDA_SLOT			7
-#define DETECTOR_SLOT		8
+#define DETECTOR_ARTS_SLOT	8
 #define TORCH_SLOT			9
 #define ARTEFACT_SLOT		10
-#define SLOTS_TOTAL			11
+#define	DETECTOR_ANOM_SLOT	11
+#define	PNV_SLOT			12
+#define SHOTGUN_SLOT		13
+#define	BIODEV_SLOT			14
 
-enum InventorySlots //for export to scripts
-{
-	KNIFE			=	KNIFE_SLOT,		
-	PISTOL			=	PISTOL_SLOT,
-	RIFLE			=	RIFLE_SLOT,
-	GRENADE			=	GRENADE_SLOT,
-	APPARATUS		=	APPARATUS_SLOT,
-	BOLT			=	BOLT_SLOT,
-	OUTFIT			=	OUTFIT_SLOT,
-	PDA				=	PDA_SLOT,
-	DETECTOR		=	DETECTOR_SLOT,
-	TORCH			=	TORCH_SLOT,
-	ARTEFACT		=	ARTEFACT_SLOT,
-	NO_ACT_SLOT	=	NO_ACTIVE_SLOT
-};
+#define SLOTS_TOTAL			15
+
 
 #define RUCK_HEIGHT			280
 #define RUCK_WIDTH			7

@@ -90,7 +90,12 @@ protected:
 	CUIDragDropListEx*			m_pUIKnifeList;
 	CUIDragDropListEx*			m_pUIPistolList;
 	CUIDragDropListEx*			m_pUIAutomaticList;
-	CUIDragDropListEx*			m_pUIDetectorList;
+	CUIDragDropListEx*			m_pUIShotgunList;
+	CUIDragDropListEx*			m_pUIDetectorArtsList;
+	CUIDragDropListEx*			m_pUIDetectorAnomsList;
+	CUIDragDropListEx*			m_pUIPNVList;
+	CUIDragDropListEx*			m_pUIApparatusList;
+	CUIDragDropListEx*			m_pUIBiodevList;
 	CUIOutfitDragDropList*		m_pUIOutfitList;
 
 
@@ -99,7 +104,7 @@ protected:
 	void						ClearAllLists				();
 	void						BindDragDropListEvents		(CUIDragDropListEx* lst);
 	
-	EListType					GetType						(CUIDragDropListEx* l);
+	EListType					GetType						(CUIDragDropListEx* l) const;
 	CUIDragDropListEx*			GetSlotList					(u32 slot_idx);
 
 	bool		xr_stdcall		OnItemDrop					(CUICellItem* itm);

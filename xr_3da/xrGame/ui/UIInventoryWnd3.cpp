@@ -123,7 +123,9 @@ void CUIInventoryWnd::ActivatePropertiesBox()
 		if (!b_picked 
 			&& CurrentItem()->OwnerList()!=m_pUIAutomaticList 
 			&& CurrentItem()->OwnerList()!=m_pUIPistolList
-			&& CurrentItem()->OwnerList()!=m_pUIKnifeList) //не надо издеваться над CanPutInSlot , ему и так по жизни трудно
+			&& CurrentItem()->OwnerList()!=m_pUIKnifeList
+			&& CurrentItem()->OwnerList()!=m_pUIShotgunList
+			&& CurrentItem()->OwnerList()!=m_pUIApparatusList) //не надо издеваться над CanPutInSlot , ему и так по жизни трудно
 			UIPropertiesBox.AddItem(getComplexString("st_move_to_slot",CurrentIItem()).c_str(),  nullptr, INVENTORY_TO_SLOT_ACTION);
 
 		if(pWeapon->GrenadeLauncherAttachable() && pWeapon->IsGrenadeLauncherAttached())

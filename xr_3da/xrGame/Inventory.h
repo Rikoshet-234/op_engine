@@ -137,6 +137,7 @@ protected:
 	void					UpdateDropTasks		();
 	void					UpdateDropItem		(PIItem pIItem);
 
+	bool					ProcessSlotAction				(u32 flags,u32 slotId);
 	// Активный слот и слот который станет активным после смены
     //значения совпадают в обычном состоянии (нет смены слотов)
 	u32 				m_iActiveSlot;
