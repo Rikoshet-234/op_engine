@@ -2,12 +2,13 @@
 
 #include "UIStatic.h"
 #include "../script_export_space.h"
-
+#include "UIBtnHint.h"
 
 class CUIButton : public CUIStatic
 {
 private:
 	typedef			CUIStatic				inherited;
+	CUIButtonHint*  m_hint;
 public:
 					CUIButton				();
 	virtual			~CUIButton				();
@@ -20,10 +21,13 @@ public:
 	virtual void	DrawText				();
 	virtual void	DrawHighlightedText		();
 
+	void			Show					(bool status) override;
 	virtual void	Update					();
 	virtual void	Enable					(bool status);
 	virtual bool	OnKeyboard				(int dik, EUIMessages keyboard_action);
 	virtual void	OnFocusLost				();
+
+
 
 	//режимы в которых можно нажимать кнопку
 	typedef enum{NORMAL_PRESS, //кнопка нажимается при 

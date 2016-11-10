@@ -496,7 +496,7 @@ void	CUILevelMap::SendMessage			(CUIWindow* pWnd, s16 msg, void* pData)
 
 	if(msg==MAP_SHOW_HINT){
 		CMapSpot* sp =smart_cast<CMapSpot*>(pWnd);VERIFY(sp);
-		MapWnd()->ShowHint(pWnd, sp->GetHint());
+		MapWnd()->ShowHint(pWnd, sp);
 	}else
 	if(msg==MAP_HIDE_HINT){
 		MapWnd()->HideHint(pWnd);

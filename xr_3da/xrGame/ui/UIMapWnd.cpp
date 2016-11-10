@@ -722,6 +722,12 @@ bool is_in(const Frect& b1, const Frect& b2){
 	return (b1.x1<b2.x1)&&(b1.x2>b2.x2)&&(b1.y1<b2.y1)&&(b1.y2>b2.y2);
 }
 
+
+void CUIMapWnd::ShowHint					(CUIWindow* parent, CMapSpot* spot)
+{
+	ShowHint(parent,spot->GetHint());
+}
+
 void CUIMapWnd::ShowHint					(CUIWindow* parent, LPCSTR text)
 {
 	if(m_hint->GetOwner())	return;

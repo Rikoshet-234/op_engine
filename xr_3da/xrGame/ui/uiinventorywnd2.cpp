@@ -13,12 +13,14 @@
 #include "UIDragDropListEx.h"
 #include "UI3tButton.h"
 #include "../grenadelauncher.h"
+#include "../CustomOutfit.h"
 #include "../silencer.h"
 #include "../scope.h"
 #include "../script_callback_ex.h"
 #include "../grenadelauncher.h"
 #include "../game_object_space.h"
 #include "../script_callback_ex.h"
+#include <typeinfo>
 
 
 CUICellItem* CUIInventoryWnd::CurrentItem()
@@ -176,7 +178,7 @@ void CUIInventoryWnd::InitInventory()
 	m_pMouseCapturer			= nullptr;
 	SetCurrentItem				(nullptr);
 
-	//Slots
+#pragma region put items in slots
 	PIItem _itm							= m_pInv->m_slots[DETECTOR_ARTS_SLOT].m_pIItem;
 	if(_itm)
 	{
@@ -243,6 +245,7 @@ void CUIInventoryWnd::InitInventory()
 	PIItem _outfit						= m_pInv->m_slots[OUTFIT_SLOT].m_pIItem;
 	CUICellItem* outfit					= (_outfit)?create_cell_item(_outfit):NULL;
 	m_pUIOutfitList->SetItem			(outfit);
+#pragma endregion
 
 	TIItemContainer::iterator it, it_e;
 	for(it=m_pInv->m_belt.begin(),it_e=m_pInv->m_belt.end(); it!=it_e; ++it) 
@@ -349,7 +352,7 @@ bool CUIInventoryWnd::ToSlot(CUICellItem* itm, bool force_place)
 
 bool CUIInventoryWnd::ToBag(CUICellItem* itm, bool b_use_cursor_pos)
 {
-	PIItem	iitem						= (PIItem)itm->m_pData;
+	PIItem	iitem						= static_cast<PIItem>(itm->m_pData);
 
 	if(GetInventory()->CanPutInRuck(iitem))
 	{
@@ -380,12 +383,12 @@ bool CUIInventoryWnd::ToBag(CUICellItem* itm, bool b_use_cursor_pos)
 
 bool CUIInventoryWnd::ToBelt(CUICellItem* itm, bool b_use_cursor_pos)
 {
-	PIItem	iitem						= (PIItem)itm->m_pData;
+	PIItem	iitem						= static_cast<PIItem>(itm->m_pData);
 
 	if(GetInventory()->CanPutInBelt(iitem))
 	{
 		CUIDragDropListEx*	old_owner		= itm->OwnerList();
-		CUIDragDropListEx*	new_owner		= NULL;
+		CUIDragDropListEx*	new_owner		= nullptr;
 		if(b_use_cursor_pos){
 				new_owner					= CUIDragDropListEx::m_drag_item->BackList();
 				VERIFY						(new_owner==m_pUIBeltList);

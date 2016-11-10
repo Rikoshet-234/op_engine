@@ -23,8 +23,11 @@
 #define				ACTOR_CHARACTER_XML		"pda_dialog_character.xml"
 
 
-CUIActorInfoWnd::CUIActorInfoWnd()
-{}
+CUIActorInfoWnd::CUIActorInfoWnd():
+	UIInfoFrame(nullptr), UIInfoHeader(nullptr), UICharIconFrame(nullptr), UICharIconHeader(nullptr), UIAnimatedIcon(nullptr), UICharacterWindow(nullptr), UICharacterInfo(nullptr), UIMasterList(nullptr), UIDetailList(nullptr)
+{
+	m_i_startSelectedId = -1;
+}
 
 
 void CUIActorInfoWnd::Init()
@@ -63,6 +66,7 @@ void CUIActorInfoWnd::Init()
 	UIMasterList							= xr_new<CUIScrollView>();UIMasterList->SetAutoDelete(true);
 	UICharIconFrame->AttachChild			(UIMasterList);
 	xml_init.InitScrollView					(uiXml, "master_list", 0, UIMasterList);
+
 
 	UICharacterWindow						= xr_new<CUIWindow>();UICharacterWindow->SetAutoDelete(true);
 	UICharIconFrame->AttachChild			(UICharacterWindow);
@@ -104,8 +108,10 @@ void CUIActorInfoWnd::FillPointsInfo			()
 	for(int i=0; i<items_num; ++i)
 	{
 		CUIActorStaticticHeader* itm		= xr_new<CUIActorStaticticHeader>(this);
-		itm->Init							(&uiXml, "master_part", i);
-		
+		bool selected;
+		itm->Init							(&uiXml, "master_part", i,selected);
+		if (m_i_startSelectedId==-1 && selected)
+			m_i_startSelectedId=i;
 		if(itm->m_id!="foo")
 		{
 
@@ -142,7 +148,9 @@ void CUIActorInfoWnd::FillPointsInfo			()
 	}
 	FillMasterPart						(&uiXml, "total");
 #endif
-	UIMasterList->SetSelected(UIMasterList->GetItem(1) );
+	if (m_i_startSelectedId==-1)
+		m_i_startSelectedId=0;
+	UIMasterList->SetSelected(UIMasterList->GetItem(m_i_startSelectedId));
 }
 
 void CUIActorInfoWnd::FillMasterPart(CUIXml* xml, const shared_str& key_name)
@@ -150,7 +158,8 @@ void CUIActorInfoWnd::FillMasterPart(CUIXml* xml, const shared_str& key_name)
 	CUIActorStaticticHeader* itm		= xr_new<CUIActorStaticticHeader>(this);
 	string128							buff;
 	strconcat							(sizeof(buff), buff, "actor_stats_wnd:master_part_", key_name.c_str() );
-	itm->Init							(xml, buff, 0);
+	bool unk;
+	itm->Init							(xml, buff, 0,unk);
 
 	if(key_name!="foo")
 	{
@@ -158,6 +167,7 @@ void CUIActorInfoWnd::FillMasterPart(CUIXml* xml, const shared_str& key_name)
 		if(key_name=="reputation")
 		{
 			itm->m_text2->SetTextST				(InventoryUtilities::GetReputationAsText(Actor()->Reputation()));
+			itm->m_text2->SetTextAlignment(ETextAlignment::alRight);
 			itm->m_text2->SetTextColor			(InventoryUtilities::GetReputationColor(Actor()->Reputation()));
 		}else
 		{
@@ -205,6 +215,7 @@ void CUIActorInfoWnd::FillPointsDetail(const shared_str& id)
 	vStatDetailData::const_iterator it		= section.data.begin();
 	vStatDetailData::const_iterator it_e	= section.data.end();
 
+	xr_vector<CUIActorStaticticDetail*> uiDataItems;
 	int _cntr = 0;
 	string64 buff;
 	for(;it!=it_e;++it,++_cntr)
@@ -212,23 +223,22 @@ void CUIActorInfoWnd::FillPointsDetail(const shared_str& id)
 		CUIActorStaticticDetail* itm		= xr_new<CUIActorStaticticDetail>();
 		itm->Init							(&uiXml, path, 0);
 
-		sprintf_s							(buff,"%d.",_cntr);
-		itm->m_text0->SetText				(buff);
-
 		itm->m_text1->SetTextST				(*CStringTable().translate((*it).key));
 		itm->m_text1->AdjustHeightToText	();
 
 		if( 0==(*it).str_value.size() )
 		{
 			sprintf_s							(buff,"x%d", (*it).int_count);
-			itm->m_text2->SetTextST				(buff);
+			itm->m_text2->SetText				(buff);
+			itm->int_count=(*it).int_count;
 
 			sprintf_s							(buff,"%d", (*it).int_points);
-			itm->m_text3->SetTextST				(buff);
+			itm->m_text3->SetText				(buff);
+			itm->int_points=(*it).int_points;
 		}else
 		{
 			itm->m_text2->SetTextST				((*it).str_value.c_str());
-			itm->m_text3->SetTextST				("");
+			itm->m_text3->SetText				("");
 		}
 
 		Fvector2 sz							= itm->GetWndSize();
@@ -236,9 +246,23 @@ void CUIActorInfoWnd::FillPointsDetail(const shared_str& id)
 		_height								= _max(sz.y, itm->m_text1->GetWndPos().y+itm->m_text1->GetWndSize().y+3);
 		sz.y								= _height;
 		itm->SetWndSize						(sz);
-		UIDetailList->AddWindow				(itm, true);
+		uiDataItems.push_back(itm);
 	}
+	std::sort(uiDataItems.begin(),uiDataItems.end(),[](CUIActorStaticticDetail* item1,CUIActorStaticticDetail* item2)
+	{
+		return item1->int_count>item2->int_count;
+	});
+	int number=0;
+	std::for_each(uiDataItems.begin(),uiDataItems.end(),[&](CUIActorStaticticDetail* item)
+	{
+		string64 nbuff;
+		number++;
+		sprintf_s							(nbuff,"%d.",number);
+		item->m_text0->SetText				(nbuff);
+		UIDetailList->AddWindow(item, true);
+	});
 }
+
 void	CUIActorInfoWnd::Reset()
 {
 	inherited::Reset();
@@ -260,6 +284,7 @@ void	CUIActorInfoWnd::FillReputationDetails(CUIXml* xml, LPCSTR path)
 
 
 	string64 buff;
+	xr_vector<CUIActorStaticticDetail*> uiDataItems;
 	for(int i=0;i<cnt;++i)
 	{
 		CUIActorStaticticDetail* itm		= xr_new<CUIActorStaticticDetail>();
@@ -273,12 +298,19 @@ void	CUIActorInfoWnd::FillReputationDetails(CUIXml* xml, LPCSTR path)
 
 		itm->m_text2->SetTextST				(InventoryUtilities::GetGoodwillAsText(gw));
 		itm->m_text2->SetTextColor			(InventoryUtilities::GetGoodwillColor(gw));
-
 		sprintf_s							(buff,"%d", gw);
-		itm->m_text3->SetTextST				(buff);
-
-		UIDetailList->AddWindow				(itm, true);
+		itm->m_text3->SetText				(buff);
+		itm->int_points=gw;
+		uiDataItems.push_back(itm);
 	}
+	std::sort(uiDataItems.begin(),uiDataItems.end(),[](CUIActorStaticticDetail* item1,CUIActorStaticticDetail* item2)
+	{
+		return item1->int_points>item2->int_points;
+	});
+	std::for_each(uiDataItems.begin(),uiDataItems.end(),[&](CUIActorStaticticDetail* item)
+	{
+		UIDetailList->AddWindow(item, true);
+	});
 }
 
 
@@ -287,7 +319,7 @@ CUIActorStaticticHeader::CUIActorStaticticHeader(CUIActorInfoWnd* w)
 {}
 
 
-void CUIActorStaticticHeader::Init	(CUIXml* xml, LPCSTR path, int idx_in_xml)
+void CUIActorStaticticHeader::Init	(CUIXml* xml, LPCSTR path, int idx_in_xml,bool& selected)
 {
 	XML_NODE* _stored_root				= xml->GetLocalRoot();
 
@@ -306,14 +338,16 @@ void CUIActorStaticticHeader::Init	(CUIXml* xml, LPCSTR path, int idx_in_xml)
 
 	xml_init.InitAutoStaticGroup		(*xml, "auto", 0, this);
 
+	
 #ifndef PRIQUEL
-	m_id								= xml->ReadAttrib(xml->GetLocalRoot(),"id",NULL);
+	m_id								= xml->ReadAttrib(xml->GetLocalRoot(),"id", nullptr);
 #else
 	LPCSTR _id							= strstr(path,"master_part_")+xr_strlen("master_part_");
 	m_id								= _id;
 #endif
 
 	m_stored_alpha						= color_get_A(m_text1->GetTextColor());
+	selected							= xml->ReadAttribInt(xml->GetLocalRoot(),"selected",0)?true:false;
 	xml->SetLocalRoot					(_stored_root);
 
 }
