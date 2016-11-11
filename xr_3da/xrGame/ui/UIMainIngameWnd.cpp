@@ -490,9 +490,14 @@ void CUIMainIngameWnd::Update()
 				u32 color=color_argb(0xFF, clampr<u32>(static_cast<u32>(255 * ((v - min) / (max - min) * 2)), 0, 255), 
 					clampr<u32>(static_cast<u32>(255 * (2.0f - (v - min) / (max - min) * 2)), 0, 255),
 					0);
+				if (i==ewiRadiation)
+				{
+					if (!m_pActor->inventory().ItemFromSlot(DETECTOR_ANOM_SLOT))
+						color=0x00ffffff;
+					if (value>=0.7)
+						UIStaticRadiationDanger.SetVisible(color!=0x00ffffff);
+				}
 				SetWarningIconColor(i, color);
-				if (i==ewiRadiation && value>=0.7)
-					UIStaticRadiationDanger.SetVisible(true);
 			}else
 			{
 				TurnOffWarningIcon(i);
@@ -504,7 +509,7 @@ void CUIMainIngameWnd::Update()
 		}
 	}
 
-	float radiation=m_pActor->conditions().GetRadiation();
+	float radiation=m_pActor->inventory().ItemFromSlot(DETECTOR_ANOM_SLOT) ? m_pActor->conditions().GetRadiation() : 0;
 	UIRadiationBar.SetProgressPos(radiation*100.0f);
 	
 	u32 year = 0, month = 0, day = 0, hours = 0, mins = 0, secs = 0, milisecs = 0;
@@ -1005,9 +1010,6 @@ void CUIMainIngameWnd::SetWarningIconColor(EWarningIcons icon, const u32 cl)
 	case ewiWeaponJammed:
 		SetWarningIconColor		(&UIWeaponJammedIcon, cl);
 		if (bMagicFlag) break;
-	case ewiRadiation:
-		SetWarningIconColor		(&UIRadiaitionIcon, cl);
-		if (bMagicFlag) break;
 	case ewiWound:
 		SetWarningIconColor		(&UIWoundIcon, cl);
 		if (bMagicFlag) break;
@@ -1023,6 +1025,10 @@ void CUIMainIngameWnd::SetWarningIconColor(EWarningIcons icon, const u32 cl)
 		break;
 	case ewiArtefact:
 		SetWarningIconColor		(&UIArtefactIcon, cl);
+		break;
+	case ewiRadiation:
+		SetWarningIconColor		(&UIRadiaitionIcon, cl);
+		if (bMagicFlag) break;
 		break;
 	case ewiWeight:
 		SetWarningIconColor		(&UIWeightIcon, cl);

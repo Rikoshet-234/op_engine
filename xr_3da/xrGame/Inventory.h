@@ -61,7 +61,7 @@ public:
 
 	bool					Activate			(u32 slot, EActivationReason reason=eGeneral, bool bForce=false);
 	void					Activate_deffered	(u32 slot, u32 _frame);
-	PIItem					ActiveItem			()const					{return m_iActiveSlot==NO_ACTIVE_SLOT ? NULL :m_slots[m_iActiveSlot].m_pIItem;}
+	PIItem ActiveItem(int flag=0) const;
 	PIItem					ItemFromSlot		(u32 slot) const;
 	void					ActivateNextItemInActiveSlot();
 	bool					Action				(s32 cmd, u32 flags);
@@ -98,7 +98,7 @@ public:
 	u32						GetPrevActiveSlot	() const			{return m_iPrevActiveSlot;}
 	u32						GetNextActiveSlot	() const			{return m_iNextActiveSlot;}
 
-	void					SetActiveSlot		(u32 ActiveSlot)	{m_iActiveSlot = m_iNextActiveSlot = ActiveSlot; }
+	void SetActiveSlot(u32 ActiveSlot);
 
 	bool 					IsSlotsUseful		() const			{return m_bSlotsUseful;}	 
 	void 					SetSlotsUseful		(bool slots_useful) {m_bSlotsUseful = slots_useful;}
@@ -134,12 +134,14 @@ public:
 	void				Items_SetCurrentEntityHud	(bool current_entity);
 	bool				isBeautifulForActiveSlot	(CInventoryItem *pIItem);
 	bool				ProcessSlotAction			(bool flag,u32 slotId);
+
+	u32 getLoadActiveSlot() const {return m_iLoadActiveSlot;}
 protected:
 	void					UpdateDropTasks		();
 	void					UpdateDropItem		(PIItem pIItem);
 
 	// Активный слот и слот который станет активным после смены
-    //значения совпадают в обычном состоянии (нет смены слотов)
+	//значения совпадают в обычном состоянии (нет смены слотов)
 	u32 				m_iActiveSlot;
 	u32 				m_iNextActiveSlot;
 	u32 				m_iPrevActiveSlot;

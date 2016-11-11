@@ -397,12 +397,12 @@ void CUIInventoryWnd::Update()
 		v = pEntityAlive->conditions().GetPsyHealth()*100.0f;
 		UIProgressBarPsyHealth.SetProgressPos	(v);
 
-		v = pEntityAlive->conditions().GetRadiation()*100.0f;
+		CInventoryOwner* pOurInvOwner	= smart_cast<CInventoryOwner*>(pEntityAlive);
+
+		v = pOurInvOwner->inventory().ItemFromSlot(DETECTOR_ANOM_SLOT) ? pEntityAlive->conditions().GetRadiation()*100.0f : 0 ;
 		UIProgressBarRadiation.SetProgressPos	(v);
 
-		CInventoryOwner* pOurInvOwner	= smart_cast<CInventoryOwner*>(pEntityAlive);
 		u32 _money						= 0;
-
 		if (GameID() != GAME_SINGLE){
 			game_PlayerState* ps = Game().GetPlayerByGameID(pEntityAlive->ID());
 			if (ps){

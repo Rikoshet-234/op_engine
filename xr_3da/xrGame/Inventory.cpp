@@ -73,8 +73,12 @@ CInventory::CInventory()
 
 	m_slots[PDA_SLOT].m_bVisible				= false;
 	m_slots[OUTFIT_SLOT].m_bVisible				= false;
-	//m_slots[DETECTOR_SLOT].m_bVisible			= false;
+	m_slots[ARTEFACT_SLOT].m_bVisible			= false;
 	m_slots[TORCH_SLOT].m_bVisible				= false;
+	m_slots[DETECTOR_ARTS_SLOT].m_bVisible		= false;
+	m_slots[DETECTOR_ANOM_SLOT].m_bVisible		= false;
+	m_slots[PNV_SLOT].m_bVisible				= false;
+	m_slots[BIODEV_SLOT].m_bVisible				= false;
 
 	m_bSlotsUseful								= true;
 	m_bBeltUseful								= false;
@@ -391,6 +395,11 @@ void CInventory::Activate_deffered	(u32 slot, u32 _frame)
 	 m_iLoadActiveSlotFrame		= _frame;
 }
 
+PIItem CInventory::ActiveItem(int flag) const
+{
+	return m_iActiveSlot == NO_ACTIVE_SLOT ? nullptr : m_slots[m_iActiveSlot].m_pIItem;
+}
+
 void  CInventory::ActivateNextItemInActiveSlot()
 {
 	if(m_iActiveSlot==NO_ACTIVE_SLOT)	return;
@@ -449,7 +458,7 @@ bool CInventory::Activate(u32 slot, EActivationReason reason, bool bForce)
 		return false;
 
 	bool res = false;
-
+	 
 	if(Device.dwFrame == m_iLoadActiveSlotFrame) 
 	{
 		 if( (m_iLoadActiveSlot == slot) && m_slots[slot].m_pIItem )
@@ -672,8 +681,7 @@ bool CInventory::Action(s32 cmd, u32 flags)
 		{
 			if(flags&CMD_START)
 			{
-				if((int)m_iActiveSlot == ARTEFACT_SLOT &&
-					m_slots[m_iActiveSlot].m_pIItem && IsGameTypeSingle())
+				if(static_cast<int>(m_iActiveSlot) == ARTEFACT_SLOT && m_slots[m_iActiveSlot].m_pIItem && IsGameTypeSingle())
 				{
 					b_send_event = Activate(NO_ACTIVE_SLOT);
 				}else {
@@ -721,8 +729,7 @@ void CInventory::Update()
 
 	if(m_iNextActiveSlot != m_iActiveSlot && !bActiveSlotVisible)
 	{
-		if(m_iNextActiveSlot != NO_ACTIVE_SLOT &&
-			m_slots[m_iNextActiveSlot].m_pIItem)
+		if(m_iNextActiveSlot != NO_ACTIVE_SLOT && m_slots[m_iNextActiveSlot].m_pIItem)
 			m_slots[m_iNextActiveSlot].m_pIItem->Activate();
 
 		m_iActiveSlot = m_iNextActiveSlot;
@@ -982,6 +989,12 @@ bool CInventory::Eat(PIItem pIItem)
 		return		false;
 	}
 	return			true;
+}
+
+void CInventory::SetActiveSlot(u32 ActiveSlot)
+{
+	m_iActiveSlot = ActiveSlot;
+	m_iNextActiveSlot = ActiveSlot;
 }
 
 bool CInventory::InSlot(PIItem pIItem) const
