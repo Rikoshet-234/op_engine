@@ -701,7 +701,6 @@ void CActor::net_Destroy	()
 	if(!g_dedicated_server)
 		Level().MapManager		().RemoveMapLocationByObjectID(ID());
 
-#pragma todo("Dima to MadMax : do not comment inventory owner net_Destroy!!!")
 	CInventoryOwner::net_Destroy();
 	cam_UnsetLadder();	
 	character_physics_support()->movement()->DestroyCharacter();
@@ -741,7 +740,7 @@ void CActor::net_Destroy	()
 void CActor::net_Relcase	(CObject* O)
 {
 	
- 	VERIFY(O);
+	VERIFY(O);
 	CGameObject* GO = smart_cast<CGameObject*>(O);
 	if(GO&&m_pObjectWeLookingAt==GO){
 		m_pObjectWeLookingAt=NULL;
@@ -1511,7 +1510,7 @@ void	CActor::OnRender_Network()
 		};
 
 		//drawing speed vectors
-		for (i=0; i<2; i++)
+		for (int i=0; i<2; i++)
 		{
 			c = float(i);
 			for (u32 k=0; k<3; k++)

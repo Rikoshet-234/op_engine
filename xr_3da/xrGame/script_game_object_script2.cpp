@@ -253,6 +253,8 @@ class_<CScriptGameObject> &script_register_game_object1(class_<CScriptGameObject
 		.def("item_in_slot",				static_cast<bool (CScriptGameObject::*)(LPCSTR, u32) const>(&CScriptGameObject::ItemInSlot))	
 		.def("iterate_belt",				&CScriptGameObject::IterateBeltOnlyFunctor)
 		.def("iterate_ruck",				&CScriptGameObject::IterateRuckOnlyFunctor)
+		.def("is_crouch",					&CScriptGameObject::actor_is_crouch)
+		.def("set_crouch",					&CScriptGameObject::actor_set_crouch)
 
 #ifdef DEBUG
 			     .def("debug_planner", &CScriptGameObject::debug_planner)

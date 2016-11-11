@@ -279,6 +279,9 @@ public:
 			void				IterateInventory	(luabind::functor<void> functor, luabind::object object);
 			void				IterateInventoryOnlyFunctor	(luabind::functor<void> functor);
 			void				IterateInventorySimple	(luabind::functor<void> functor);
+			bool				actor_is_crouch() const;
+			void				actor_set_crouch();
+
 			void				MarkItemDropped		(CScriptGameObject *item);
 			bool				MarkedDropped		(CScriptGameObject *item);
 			void				UnloadMagazine		();
