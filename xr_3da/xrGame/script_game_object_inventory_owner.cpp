@@ -34,6 +34,8 @@
 #include "AI/Monsters/BaseMonster/base_monster.h"
 #include "weaponmagazined.h"
 #include "ai/stalker/ai_stalker.h"
+#include "ui/UIMainIngameWnd.h"
+#include "UI.h"
 
 bool CScriptGameObject::GiveInfoPortion(LPCSTR info_id)
 {
@@ -203,6 +205,60 @@ void CScriptGameObject::ForEachInventoryItems(const luabind::functor<void> &func
 			functor(inv_go->lua_game_object(),this);
 		}
 	}
+}
+
+void CScriptGameObject::IterateRuckOnlyFunctor(luabind::functor<void> functor) 
+{
+	CInventoryOwner			*inventory_owner = smart_cast<CInventoryOwner*>(&this->object());
+	if (!inventory_owner) {
+		ai().script_engine().script_log		(ScriptStorage::eLuaMessageTypeError,"CScriptGameObject::IterateInventory non-CInventoryOwner object !!!");
+		return;
+	}
+	TIItemContainer::iterator	I = inventory_owner->inventory().m_ruck.begin();
+	TIItemContainer::iterator	E = inventory_owner->inventory().m_ruck.end();
+	for ( ; I != E; ++I)
+		functor				((*I)->object().lua_game_object());
+}
+
+void CScriptGameObject::IterateBeltOnlyFunctor(luabind::functor<void> functor) 
+{
+	CInventoryOwner			*inventory_owner = smart_cast<CInventoryOwner*>(&this->object());
+	if (!inventory_owner) {
+		ai().script_engine().script_log		(ScriptStorage::eLuaMessageTypeError,"CScriptGameObject::IterateInventory non-CInventoryOwner object !!!");
+		return;
+	}
+	TIItemContainer::iterator	I = inventory_owner->inventory().m_belt.begin();
+	TIItemContainer::iterator	E = inventory_owner->inventory().m_belt.end();
+	for ( ; I != E; ++I)
+		functor				((*I)->object().lua_game_object());
+}
+
+void CScriptGameObject::actor_set_crouch()
+{
+	CActor* actor= smart_cast<CActor*>(&this->object());
+	if (!actor)
+	{
+		ai().script_engine().script_log		(ScriptStorage::eLuaMessageTypeError,"CActor::set_crouch non-Actor object !!!");
+		return;
+	}
+	extern bool g_bAutoClearCrouch;
+	g_bAutoClearCrouch=false;
+	actor->character_physics_support()->movement()->EnableCharacter();
+	actor->character_physics_support()->movement()->ActivateBoxDynamic(1);
+	actor->set_state(actor->get_state() | mcCrouch);
+	actor->set_state_wishful(actor->get_state_wishful() | mcCrouch);
+	HUD().GetUI()->UIMainIngameWnd->MotionIcon().ShowState(CUIMotionIcon::stCrouch);
+}
+
+bool CScriptGameObject::actor_is_crouch() const
+{
+	CActor* actor= smart_cast<CActor*>(&this->object());
+	if (!actor)
+	{
+		ai().script_engine().script_log		(ScriptStorage::eLuaMessageTypeError,"CActor::is_crouch non-Actor object !!!");
+		return false;
+	}
+	return !!(actor->get_state()&mcCrouch);
 }
 
 void CScriptGameObject::IterateInventorySimple	(luabind::functor<void> functor)

@@ -239,15 +239,28 @@ class_<CScriptGameObject> &script_register_game_object1(class_<CScriptGameObject
 
 		.def("vertex_in_direction",			&CScriptGameObject::vertex_in_direction)
 
-		.def("item_in_slot",				&CScriptGameObject::item_in_slot)
-		.def("active_slot",				&CScriptGameObject::active_slot)
+		
+		.def("active_slot",					&CScriptGameObject::active_slot)
 		.def("activate_slot",				&CScriptGameObject::activate_slot)
+		.def("max_weight",					&CScriptGameObject::GetActorMaxWeight)
+		.def("total_weight",				&CScriptGameObject::GetTotalWeight)
+		.def("item_weight",					&CScriptGameObject::Weight)
+		.def("item_in_belt",				static_cast<bool (CScriptGameObject::*)(CScriptGameObject*) const>(&CScriptGameObject::ItemInBelt))
+		.def("item_in_belt",				static_cast<bool (CScriptGameObject::*)(LPCSTR) const>(&CScriptGameObject::ItemInBelt))
+		.def("item_in_slot",				&CScriptGameObject::item_in_slot)
+		.def("item_in_slot",				static_cast<bool (CScriptGameObject::*)(CScriptGameObject*) const>(&CScriptGameObject::ItemInSlot))
+		.def("item_in_slot",				static_cast<bool (CScriptGameObject::*)(CScriptGameObject*, u32) const>(&CScriptGameObject::ItemInSlot))
+		.def("item_in_slot",				static_cast<bool (CScriptGameObject::*)(LPCSTR, u32) const>(&CScriptGameObject::ItemInSlot))	
+		.def("iterate_belt",				&CScriptGameObject::IterateBeltOnlyFunctor)
+		.def("iterate_ruck",				&CScriptGameObject::IterateRuckOnlyFunctor)
+		.def("is_crouch",					&CScriptGameObject::actor_is_crouch)
+		.def("set_crouch",					&CScriptGameObject::actor_set_crouch)
 
 #ifdef DEBUG
-		.def("debug_planner",				&CScriptGameObject::debug_planner)
+			     .def("debug_planner", &CScriptGameObject::debug_planner)
 #endif // DEBUG
-		.def("invulnerable",				(bool (CScriptGameObject::*)() const)&CScriptGameObject::invulnerable)
-		.def("invulnerable",				(void (CScriptGameObject::*)(bool))&CScriptGameObject::invulnerable)
+			     .def("invulnerable", static_cast<bool (CScriptGameObject::*)() const>(&CScriptGameObject::invulnerable))
+			     .def("invulnerable", static_cast<void (CScriptGameObject::*)(bool)>(&CScriptGameObject::invulnerable))
 
 	;return	(instance);
 }
