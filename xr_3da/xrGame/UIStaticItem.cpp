@@ -52,11 +52,11 @@ void CUIStaticItem::SetShader(const ref_shader& sh)
 	hShader = sh;
 }
 
-void CUIStaticItem::Init(LPCSTR tex, LPCSTR sh, float left, float top, u32 align)
+void CUIStaticItem::Init(const shared_str& tex, LPCSTR sh, float left, float top, u32 align)
 {
 	uFlags &= !flValidRect;
-
-	CreateShader	(tex,sh);
+	m_textureName = tex;
+	CreateShader	(*tex,sh);
 	SetPos			(left,top);
 	SetAlign		(align);
 }

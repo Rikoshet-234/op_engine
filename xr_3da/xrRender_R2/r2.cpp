@@ -301,10 +301,10 @@ IRender_Visual*			CRender::model_Create			(LPCSTR name, IReader* data)		{ return
 IRender_Visual*			CRender::model_CreateChild		(LPCSTR name, IReader* data)		{ return Models->CreateChild(name,data);}
 IRender_Visual*			CRender::model_Duplicate		(IRender_Visual* V)					{ return Models->Instance_Duplicate(V);	}
 void					CRender::model_Delete			(IRender_Visual* &V, BOOL bDiscard)	{ Models->Delete(V, bDiscard);			}
-IRender_DetailModel*	CRender::model_CreateDM			(IReader*	F)
+IRender_DetailModel*	CRender::model_CreateDM			(IReader* F, IReader* FO)
 {
 	CDetail*	D		= xr_new<CDetail> ();
-	D->Load				(F);
+	D->Load				(F, FO);
 	return D;
 }
 void					CRender::model_Delete			(IRender_DetailModel* & F)

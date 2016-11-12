@@ -187,4 +187,51 @@ public:
 	}
 };
 
+class XRCORE_API CTimerStat
+{
+public:
+	CTimer m_t;
+	u64 m_accum;
+	u32 m_count;
+	u64 m_min;
+	u64 m_max;
+
+public:
+	CTimerStat() : m_accum(0), m_count(0), m_min((u64)-1), m_max(0) {}
+
+	void Begin(){ ++m_count; m_t.Start(); }
+	void End()
+	{ 
+		u64 elapsed = m_t.GetElapsed_ticks(); 
+		m_accum += elapsed;
+		if (elapsed < m_min) m_min = elapsed;
+		if (elapsed > m_max) m_max = elapsed;
+	}
+
+	IC  u64 GetElapsed_ms() const { return (m_accum * 1000) / CPU::qpc_freq; }
+	IC  u32 GetCount() const { return m_count; }
+	IC  double GetMin() const { return (double)(m_min * 1000) / CPU::qpc_freq; }
+	IC  double GetMax() const { return (double)(m_max * 1000) / CPU::qpc_freq; }
+	IC  double GetAvg() const { return ((double)(m_accum * 1000) / CPU::qpc_freq) / (double)m_count; }
+	
+	void Reset()
+	{
+		m_accum = 0;
+		m_count = 0;
+		m_min = (u64)-1;
+		m_max = 0;
+	}
+};
+
+class XRCORE_API CTimerStatScoped
+{
+public:
+	CTimerStatScoped(CTimerStat& rTimer) : m_rTimer(rTimer) { m_rTimer.Begin(); }
+	~CTimerStatScoped() { m_rTimer.End(); }
+private:
+	CTimerStatScoped(const CTimerStatScoped& rTimer);
+	CTimerStatScoped& operator=(const CTimerStatScoped& rTimer);
+	CTimerStat& m_rTimer;
+};
+
 #endif // FTimerH

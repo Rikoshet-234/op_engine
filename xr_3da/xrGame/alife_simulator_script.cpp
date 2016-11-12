@@ -344,13 +344,43 @@ private:
 	shared_str element;
 };
 
+extern bool g_measure;
+CTimerStat g_has_info;
+CTimerStat g_has_info_registry;
+CTimerStat g_has_info_find_if;
+CTimerStat g_dummy_ip;
+#define MEAS(timer) g_measure ? timer : g_dummy_ip
+
 bool has_info									(const CALifeSimulator *self, const ALife::_OBJECT_ID &id, LPCSTR info_id)
 {
+	CTimerStatScoped _(MEAS(g_has_info));
+
+	if (g_measure)
+	{
+		g_has_info_registry.Begin();
+	}
 	const KNOWN_INFO_VECTOR				*known_info = registry(self,id);
+	if (g_measure)
+	{
+		g_has_info_registry.End();
+	}
 	if (!known_info)
 		return							(false);
 
-	if (std::find_if(known_info->begin(), known_info->end(), CFindByIDPred(info_id)) == known_info->end())
+	if (g_measure)
+	{
+		g_has_info_find_if.Begin();
+	}
+	//bool found = std::find_if(known_info->begin(), known_info->end(), CFindByIDPred(info_id)) != known_info->end();
+	shared_str info_id_str(info_id);
+	bool found = known_info->exist(info_id_str);
+
+	if (g_measure)
+	{
+		g_has_info_find_if.End();
+	}
+
+	if (!found)
 		return							(false);
 
 	return								(true);

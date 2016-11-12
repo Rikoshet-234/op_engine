@@ -23,6 +23,88 @@ void INFO_DATA::save (IWriter& stream)
 	save_data(receive_time, stream);
 }
 
+void KNOWN_INFO_VECTOR::load(IReader& stream) 
+{
+	//! A bit hackish reading
+	u32 count = stream.r_u32();
+	for (u32 i = 0; i < count; ++i)
+	{
+		INFO_DATA temp;
+		load_data(temp, stream);
+		m_unordered_multimap.insert(value_type(temp.info_id._get()->dwCRC, temp));
+	}
+}
+
+void KNOWN_INFO_VECTOR::save(IWriter& stream) 
+{
+	u32 count = m_unordered_multimap.size();
+	stream.w_u32(count);
+	for (auto i = m_unordered_multimap.begin(); i != m_unordered_multimap.end(); ++i)
+	{
+		save_data(i->second, stream);
+	}
+}
+
+void KNOWN_INFO_VECTOR::insert(const value_type& vt)
+{
+	bool found = exist(vt.second.info_id);
+	
+	if (!found)
+	{
+		m_unordered_multimap.insert(vt);
+	}
+}
+
+bool KNOWN_INFO_VECTOR::exist(const shared_str& key) const
+{
+	auto range = equal_range(key);
+	bool found = false;
+	for(auto i = range.first; i != range.second && !found; ++i)
+	{
+		found = i->second.info_id == key;
+	}
+	return found;
+}
+
+KNOWN_INFO_VECTOR::const_iterator KNOWN_INFO_VECTOR::find(const shared_str& key) const
+{
+	auto range = equal_range(key);
+	bool found = false;
+	for(auto i = range.first; i != range.second && !found; ++i)
+	{
+		if(i->second.info_id == key)
+			return i;
+	}
+	return m_unordered_multimap.end();
+}
+
+//iterator begin() { return m_unordered_multimap.begin(); }
+KNOWN_INFO_VECTOR::const_iterator KNOWN_INFO_VECTOR::begin() const
+{
+	return m_unordered_multimap.begin();
+}
+
+//iterator end() { return m_unordered_multimap.end(); }
+KNOWN_INFO_VECTOR::const_iterator KNOWN_INFO_VECTOR::end() const
+{
+	return m_unordered_multimap.end();
+}
+
+//void erase(iterator& i)
+//{
+//	m_unordered_multimap.erase(i);
+//}
+
+void KNOWN_INFO_VECTOR::erase(const_iterator& i) 
+{ 
+	m_unordered_multimap.erase(i);
+}
+
+void KNOWN_INFO_VECTOR::clear()
+{
+	m_unordered_multimap.clear();
+}
+
 
 SInfoPortionData::SInfoPortionData ()
 {
@@ -143,4 +225,57 @@ void _destroy_item_data_vector_cont(T_VECTOR* vec)
 	}
 //.	Log("_tmp.size()",_tmp.size());
 	delete_data	(_tmp);
+}
+
+void XRStringMap::insert(const shared_str& key, T_VECTOR::size_type value)
+{
+	bool found = exist(key);
+	
+	if (!found)
+	{
+		m_multimap.insert(TMap::value_type(key._get()->dwCRC, TMapValue(key, value) ));
+	}
+}
+
+bool XRStringMap::exist(const shared_str& key) const
+{
+	auto range = m_multimap.equal_range(key._get()->dwCRC);
+	bool found = false;
+	for(auto i = range.first; i != range.second && !found; ++i)
+	{
+		found = i->second.key == key;
+	}
+	return found;
+}
+
+XRStringMap::const_iterator XRStringMap::find(const shared_str& key) const
+{
+	auto range = m_multimap.equal_range(key._get()->dwCRC);
+	bool found = false;
+	for(auto i = range.first; i != range.second && !found; ++i)
+	{
+		if(i->second.key == key)
+			return i;
+	}
+	return m_multimap.end();
+}
+
+XRStringMap::const_iterator XRStringMap::begin() const
+{
+	return m_multimap.begin();
+}
+
+XRStringMap::const_iterator XRStringMap::end() const
+{
+	return m_multimap.end();
+}
+
+void XRStringMap::erase(const_iterator& i) 
+{ 
+	m_multimap.erase(i);
+}
+
+void XRStringMap::clear()
+{
+	m_multimap.clear();
 }

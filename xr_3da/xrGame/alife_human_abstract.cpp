@@ -62,12 +62,44 @@ CSE_ALifeItemWeapon *CSE_ALifeHumanAbstract::tpfGetBestWeapon		(ALife::EHitType 
 	return									(brain().objects().best_weapon());
 }
 
+extern bool g_measure;
+extern CTimerStat g_human;
+extern CTimerStat g_human_inherited;
+extern CTimerStat g_human_brain;
+extern CTimerStat g_human_specific;
+
 void CSE_ALifeHumanAbstract::on_register							()
 {
+	if (g_measure)
+	{
+		g_human.Begin();
+		g_human_inherited.Begin();
+	}
+
 	inherited2::on_register					();
+
+	if (g_measure)
+	{
+		g_human_inherited.End();
+		g_human_brain.Begin();
+	}
+
 	brain().on_register						();
+
+	if (g_measure)
+	{
+		g_human_brain.End();
+		g_human_specific.Begin();
+	}
+
 	// because we need to load profile to setup graph vertex masks
 	specific_character						();
+
+	if (g_measure)
+	{
+		g_human_specific.End();
+		g_human.End();
+	}
 }
 
 void CSE_ALifeHumanAbstract::on_unregister							()

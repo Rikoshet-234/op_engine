@@ -190,13 +190,12 @@ void CUICarBodyWnd::InitCarBody(CInventoryOwner* pOur, CInventoryOwner* pOthers)
 		known_info_registry->registry().init		(other_id);
 		KNOWN_INFO_VECTOR& known_info				= known_info_registry->registry().objects();
 
-		KNOWN_INFO_VECTOR_IT it = known_info.begin();
+		KNOWN_INFO_VECTOR_CIT it = known_info.begin();
 		for(int i=0;it!=known_info.end();++it,++i){
-			(*it).info_id;	
 			NET_Packet		P;
 			CGameObject::u_EventGen		(P,GE_INFO_TRANSFER, our_id);
 			P.w_u16						(0);//not used
-			P.w_stringZ					((*it).info_id);			//сообщение
+			P.w_stringZ					((*it).second.info_id.c_str());			//сообщение
 			P.w_u8						(1);						//добавление сообщения
 			CGameObject::u_EventSend	(P);
 		}
