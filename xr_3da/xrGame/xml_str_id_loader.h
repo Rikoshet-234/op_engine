@@ -193,7 +193,7 @@ ETS_DECLARE(g_iiFIFind);
 TEMPLATE_SPECIALIZATION
 typename void	CSXML_IdToIndex::InitInternal ()
 {
-	VERIFY(!m_pItemDataVector ** !m_pItemDataMap);
+	VERIFY(!m_pItemDataVector && !m_pItemDataMap);
 	T_INIT::InitXmlIdToIndex();
 
 	m_pItemDataVector = xr_new<T_VECTOR>();
