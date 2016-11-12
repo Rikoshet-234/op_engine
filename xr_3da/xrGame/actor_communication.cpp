@@ -181,7 +181,7 @@ void   CActor::UpdateAvailableDialogs	(CPhraseDialogManager* partner)
 		{
 			//подгрузить кусочек информации с которым мы работаем
 			CInfoPortion info_portion;
-			info_portion.Load((*it).info_id);
+			info_portion.Load((*it).second.info_id);
 
 			for(u32 i = 0; i<info_portion.DialogNames().size(); i++)
 				AddAvailableDialog(*info_portion.DialogNames()[i], partner);

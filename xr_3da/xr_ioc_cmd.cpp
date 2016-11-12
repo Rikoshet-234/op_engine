@@ -528,8 +528,9 @@ void CCC_Register()
 	CMD3(CCC_Mask,		"mt_particles",			&psDeviceFlags,			mtParticles);
 
 	CMD1(CCC_DbgStrCheck,	"dbg_str_check"		);
+#endif
 	CMD1(CCC_DbgStrDump,	"dbg_str_dump"		);
-
+#ifdef DEBUG
 	CMD3(CCC_Mask,		"mt_sound",				&psDeviceFlags,			mtSound);
 	CMD3(CCC_Mask,		"mt_physics",			&psDeviceFlags,			mtPhysics);
 	CMD3(CCC_Mask,		"mt_network",			&psDeviceFlags,			mtNetwork);

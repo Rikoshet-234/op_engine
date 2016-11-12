@@ -18,6 +18,7 @@ class CUIStaticItem: public IUISimpleTextureControl, public CUICustomItem
 	float			iRemX;
 	float			iRemY;
 	int				alpha_ref;
+	shared_str		m_textureName;
 protected:
 	typedef CUICustomItem inherited;
 public:
@@ -38,7 +39,7 @@ public:
 	virtual void	SetOriginalRectEx(const Frect& r)									{iOriginalRect = r; uFlags|=flValidOriginalRect; SetRect(0,0,r.width(),r.height());}
 
 
-	void			Init			(LPCSTR tex, LPCSTR sh, float left, float top, u32 align);
+	void			Init			(const shared_str& tex, LPCSTR sh, float left, float top, u32 align);
 	
 	
 	
@@ -62,6 +63,7 @@ public:
 	IC u32			GetColor		() const					{return dwColor;}
 	IC u32&			GetColorRef		()							{return dwColor;}
 	IC ref_shader&	GetShader		()							{return hShader;}
+	IC const shared_str&	GetTextureName()					{return m_textureName;}
 };
 
 extern ENGINE_API BOOL g_bRendering; 

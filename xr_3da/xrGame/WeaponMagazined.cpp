@@ -954,10 +954,16 @@ void CWeaponMagazined::InitAddons()
 			scope_tex_name = pSettings->r_string(*m_sScopeName, "scope_texture");
 			m_fScopeZoomFactor = pSettings->r_float	(*m_sScopeName, "scope_zoom_factor");
 			
-			if(m_UIScope) xr_delete(m_UIScope);
-			m_UIScope = xr_new<CUIStaticItem>();
+			if(m_UIScope && (!m_UIScope->GetTextureName() || m_UIScope->GetTextureName().equal(scope_tex_name)))
+			{
+				xr_delete(m_UIScope);
+			}
 
-			m_UIScope->Init(*scope_tex_name, "hud\\default", 0, 0, alNone);
+			if (!m_UIScope)
+			{
+				m_UIScope = xr_new<CUIStaticItem>();
+				m_UIScope->Init(scope_tex_name, "hud\\default", 0, 0, alNone);
+			}
 
 		}
 		else if(m_eScopeStatus == ALife::eAddonPermanent)
@@ -966,9 +972,16 @@ void CWeaponMagazined::InitAddons()
 			shared_str scope_tex_name;
 			scope_tex_name = pSettings->r_string(cNameSect(), "scope_texture");
 
-			if(m_UIScope) xr_delete(m_UIScope);
-			m_UIScope = xr_new<CUIStaticItem>();
-			m_UIScope->Init(*scope_tex_name, "hud\\default", 0, 0, alNone);
+			if(m_UIScope && (!m_UIScope->GetTextureName() || !m_UIScope->GetTextureName().equal(scope_tex_name)))
+			{
+				xr_delete(m_UIScope);
+			}
+
+			if (!m_UIScope)
+			{
+				m_UIScope = xr_new<CUIStaticItem>();
+				m_UIScope->Init(scope_tex_name, "hud\\default", 0, 0, alNone);
+			}
 
 		}
 	}

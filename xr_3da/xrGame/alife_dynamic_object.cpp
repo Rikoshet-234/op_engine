@@ -24,8 +24,18 @@ void CSE_ALifeDynamicObject::on_spawn				()
 #endif
 }
 
+extern bool g_measure;
+extern CTimerStat g_dynamic;
+extern CTimerStat g_dynamic_td;
+extern CTimerStat g_dynamic_bu;
 void CSE_ALifeDynamicObject::on_register			()
 {
+	if (g_measure)
+	{
+		g_dynamic_td.End();
+		g_dynamic.Begin();
+	}
+
 	CSE_ALifeObject		*object = this;
 	while (object->ID_Parent != ALife::_OBJECT_ID(-1)) {
 		object			= ai().alife().objects().object(object->ID_Parent);
@@ -34,6 +44,12 @@ void CSE_ALifeDynamicObject::on_register			()
 
 	if (!alife().graph().level().object(object->ID,true) && !keep_saved_data_anyway())
 		client_data.clear					();
+
+	if (g_measure)
+	{
+		g_dynamic.End();
+		g_dynamic_bu.Begin();
+	}
 }
 
 void CSE_ALifeDynamicObject::on_before_register		()

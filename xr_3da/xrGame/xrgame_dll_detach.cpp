@@ -41,23 +41,98 @@ extern void CreateUIGeom							();
 extern void DestroyUIGeom							();
 
 #include "../IGame_Persistent.h"
+
+#ifndef TS_ENABLE
+//#define TS_ENABLE
+#endif
+
+#ifdef TS_ENABLE
+#define TS_DECLARE(x) CTimerStat x
+#define TS_BEGIN(x) x.Begin()
+#define TS_END(x) x.End()
+#define TS_RESET(x) x.Reset()
+#define TS_P(x,name) Msg( name ": Count = %u, Elapsed = %I64u ms, Average = %2.3f ms, Max = %2.3f ms, Min = %2.3f ms", x.GetCount(), x.GetElapsed_ms(), x.GetAvg(), x.GetMax(), x.GetMin())
+#define TS_PR(x,name) Msg( name ": Count = %u, Elapsed = %I64u ms, Average = %2.3f ms, Max = %2.3f ms, Min = %2.3f ms", x.GetCount(), x.GetElapsed_ms(), x.GetAvg(), x.GetMax(), x.GetMin()); x.Reset()
+#define TS_EPR(x,name) x.End(); Msg( name ": Count = %u, Elapsed = %I64u ms, Average = %2.3f ms, Max = %2.3f ms, Min = %2.3f ms", x.GetCount(), x.GetElapsed_ms(), x.GetAvg(), x.GetMax(), x.GetMin()); x.Reset()
+#else
+#define TS_DECLARE(x)
+#define TS_BEGIN(x)
+#define TS_END(x)
+#define TS_RESET(x)
+#define TS_P(x,name)
+#define TS_EPR(x,name)
+#define TS_PR(x,name)
+#endif
+
+TS_DECLARE(g_initInternal);
+TS_DECLARE(g_iiForOuter);
+TS_DECLARE(g_iiForInner);
+TS_DECLARE(g_iiFIFind);
+
 void init_game_globals()
 {
 	CreateUIGeom									();
 
 	if(!g_dedicated_server)
 	{
+		TS_BEGIN(g_initInternal);
 		CInfoPortion::InitInternal						();
+		TS_EPR(g_initInternal,	"CInfoPortion");
+		TS_PR(g_iiForOuter,		"CInfoPortion::FO");
+		TS_PR(g_iiForInner,		"CInfoPortion::FI");
+		TS_PR(g_iiFIFind,		"CInfoPortion::FF");
+		TS_BEGIN(g_initInternal);
 		CEncyclopediaArticle::InitInternal				();
+		TS_EPR(g_initInternal,	"CEncyclopediaArticle");
+		TS_PR(g_iiForOuter,		"CEncyclopediaArticle::FO");
+		TS_PR(g_iiForInner,		"CEncyclopediaArticle::FI");
+		TS_PR(g_iiFIFind,		"CEncyclopediaArticle::FF");
+		TS_BEGIN(g_initInternal);
 		CPhraseDialog::InitInternal						();
+		TS_EPR(g_initInternal,	"CPhraseDialog");
+		TS_PR(g_iiForOuter,		"CPhraseDialog::FO");
+		TS_PR(g_iiForInner,		"CPhraseDialog::FI");
+		TS_PR(g_iiFIFind,		"CPhraseDialog::FF");
+		TS_BEGIN(g_initInternal);
 		InventoryUtilities::CreateShaders				();
+		TS_EPR(g_initInternal,	"InventoryUtilities::CreateShaders");
 	};
+	TS_BEGIN(g_initInternal);
 	CCharacterInfo::InitInternal					();
+	TS_EPR(g_initInternal,	"CCharacterInfo");
+	TS_PR(g_iiForOuter,		"CCharacterInfo::FO");
+	TS_PR(g_iiForInner,		"CCharacterInfo::FI");
+	TS_PR(g_iiFIFind,		"CCharacterInfo::FF");
+	TS_BEGIN(g_initInternal);
 	CSpecificCharacter::InitInternal				();
+	TS_EPR(g_initInternal,	"CSpecificCharacter");
+	TS_PR(g_iiForOuter,		"CSpecificCharacter::FO");
+	TS_PR(g_iiForInner,		"CSpecificCharacter::FI");
+	TS_PR(g_iiFIFind,		"CSpecificCharacter::FF");
+	TS_BEGIN(g_initInternal);
 	CHARACTER_COMMUNITY::InitInternal				();
+	TS_EPR(g_initInternal,	"CHARACTER_COMMUNITY");
+	TS_PR(g_iiForOuter,		"CHARACTER_COMMUNITY::FO");
+	TS_PR(g_iiForInner,		"CHARACTER_COMMUNITY::FI");
+	TS_PR(g_iiFIFind,		"CHARACTER_COMMUNITY::FF");
+	TS_BEGIN(g_initInternal);
 	CHARACTER_RANK::InitInternal					();
+	TS_EPR(g_initInternal,	"CHARACTER_RANK");
+	TS_PR(g_iiForOuter,		"CHARACTER_RANK::FO");
+	TS_PR(g_iiForInner,		"CHARACTER_RANK::FI");
+	TS_PR(g_iiFIFind,		"CHARACTER_RANK::FF");
+	TS_BEGIN(g_initInternal);
 	CHARACTER_REPUTATION::InitInternal				();
+	TS_EPR(g_initInternal,	"CHARACTER_REPUTATION");
+	TS_PR(g_iiForOuter,		"CHARACTER_REPUTATION::FO");
+	TS_PR(g_iiForInner,		"CHARACTER_REPUTATION::FI");
+	TS_PR(g_iiFIFind,		"CHARACTER_REPUTATION::FF");
+	TS_BEGIN(g_initInternal);
 	MONSTER_COMMUNITY::InitInternal					();
+	TS_EPR(g_initInternal,	"MONSTER_COMMUNITY");
+	TS_PR(g_iiForOuter,		"MONSTER_COMMUNITY::FO");
+	TS_PR(g_iiForInner,		"MONSTER_COMMUNITY::FI");
+	TS_PR(g_iiFIFind,		"MONSTER_COMMUNITY::FF");
 }
 
 extern CUIXml*	g_gameTaskXml;
