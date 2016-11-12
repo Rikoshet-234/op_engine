@@ -43,7 +43,7 @@ extern void DestroyUIGeom							();
 #include "../IGame_Persistent.h"
 
 #ifndef TS_ENABLE
-#define TS_ENABLE
+//#define TS_ENABLE
 #endif
 
 #ifdef TS_ENABLE
@@ -55,13 +55,13 @@ extern void DestroyUIGeom							();
 #define TS_PR(x,name) Msg( name ": Count = %u, Elapsed = %I64u ms, Average = %2.3f ms, Max = %2.3f ms, Min = %2.3f ms", x.GetCount(), x.GetElapsed_ms(), x.GetAvg(), x.GetMax(), x.GetMin()); x.Reset()
 #define TS_EPR(x,name) x.End(); Msg( name ": Count = %u, Elapsed = %I64u ms, Average = %2.3f ms, Max = %2.3f ms, Min = %2.3f ms", x.GetCount(), x.GetElapsed_ms(), x.GetAvg(), x.GetMax(), x.GetMin()); x.Reset()
 #else
-#define TS_DECLARE(x) ((void)0)
-#define TS_BEGIN(x) ((void)0)
-#define TS_END(x) ((void)0)
-#define TS_RESET(x) ((void)0)
-#define TS_P(x,name) ((void)0)
-#define TS_EPR(x,name) ((void)0)
-#define TS_PR(x,name) ((void)0)
+#define TS_DECLARE(x)
+#define TS_BEGIN(x)
+#define TS_END(x)
+#define TS_RESET(x)
+#define TS_P(x,name)
+#define TS_EPR(x,name)
+#define TS_PR(x,name)
 #endif
 
 TS_DECLARE(g_initInternal);

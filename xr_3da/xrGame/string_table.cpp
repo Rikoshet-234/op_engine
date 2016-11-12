@@ -51,7 +51,7 @@ void CStringTable::Init		()
 }
 
 #ifndef TS_ENABLE
-#define TS_ENABLE
+//#define TS_ENABLE
 #endif
 
 #ifndef ETS_DECLARE
@@ -61,10 +61,10 @@ void CStringTable::Init		()
 		#define ETS_BEGIN(x) x.Begin()
 		#define ETS_END(x) x.End()
 	#else
-		#define ETS_DECLARE(x) ((void)0)
-		#define ETSS_DECLARE(x,y) ((void)0)
-		#define ETS_BEGIN(x) ((void)0)
-		#define ETS_END(x) ((void)0)
+		#define ETS_DECLARE(x)
+		#define ETSS_DECLARE(x,y)
+		#define ETS_BEGIN(x)
+		#define ETS_END(x)
 	#endif
 #endif //ETS_DECLARE
 
