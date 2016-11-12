@@ -52,15 +52,15 @@ private:
 	shared_str element;
 };
 
-
 bool CInventoryOwner::OnReceiveInfo(shared_str info_id) const
 {
 	VERIFY( info_id.size() );
 	//добавить запись в реестр
 	KNOWN_INFO_VECTOR& known_info = m_known_info_registry->registry().objects();
-	KNOWN_INFO_VECTOR_IT it = std::find_if(known_info.begin(), known_info.end(), CFindByIDPred(info_id));
-	if( known_info.end() == it)
-		known_info.push_back(INFO_DATA(info_id, Level().GetGameTime()));
+	//KNOWN_INFO_VECTOR_IT it = std::find_if(known_info.begin(), known_info.end(), CFindByIDPred(info_id));
+
+	if(!known_info.exist(info_id))
+		known_info.insert(KNOWN_INFO_VECTOR::value_type(info_id._get()->dwCRC, INFO_DATA(info_id, Level().GetGameTime())));
 	else
 		return false;
 
@@ -104,17 +104,16 @@ void CInventoryOwner::DumpInfo(shared_str ids) const
 		std::vector<std::string>::iterator lit=listIds.begin();
 		for(lit;lit!=listIds.end();++lit)
 		{
-			KNOWN_INFO_VECTOR_IT search_it = std::find_if(known_info.begin(), known_info.end(), CFindByIDPred(lit->c_str()));
-			Msg("info %s%s",(*lit).c_str(),search_it!=known_info.end() ? " present" : " not present");		
+			bool present = known_info.exist(lit->c_str());
+			Msg("info %s%s",(*lit).c_str(), present ? " present" : " not present");		
 		}
 	}
 	else
 	{
-		KNOWN_INFO_VECTOR_IT it = known_info.begin();
+		KNOWN_INFO_VECTOR_CIT it = known_info.begin();
 		for(int i=0;it!=known_info.end();++it,++i)
 		{
-			std::string info_id((*it).info_id.c_str());
-			Msg("known info[%d]:%s",i,*(*it).info_id);	
+			Msg("known info[%d]:%s",i,(*it).second.info_id.c_str());	
 		}
 	}
 	Msg("------------------------------------------");	
@@ -133,7 +132,7 @@ void CInventoryOwner::OnDisableInfo(shared_str info_id) const
 
 	KNOWN_INFO_VECTOR& known_info = m_known_info_registry->registry().objects();
 
-	KNOWN_INFO_VECTOR_IT it = std::find_if(known_info.begin(), known_info.end(), CFindByIDPred(info_id));
+	KNOWN_INFO_VECTOR::const_iterator it = known_info.find(info_id);
 	if( known_info.end() == it)	return;
 	known_info.erase(it);
 }
@@ -167,10 +166,7 @@ bool CInventoryOwner::HasInfo(shared_str info_id) const
 	const KNOWN_INFO_VECTOR* known_info = m_known_info_registry->registry().objects_ptr ();
 	if(!known_info) return false;
 
-	if(std::find_if(known_info->begin(), known_info->end(), CFindByIDPred(info_id)) == known_info->end())
-		return false;
-
-	return true;
+	return known_info->exist(info_id);
 }
 
 bool CInventoryOwner::GetInfo	(shared_str info_id, INFO_DATA& info_data) const
@@ -179,10 +175,10 @@ bool CInventoryOwner::GetInfo	(shared_str info_id, INFO_DATA& info_data) const
 	const KNOWN_INFO_VECTOR* known_info = m_known_info_registry->registry().objects_ptr ();
 	if(!known_info) return false;
 
-	KNOWN_INFO_VECTOR::const_iterator it = std::find_if(known_info->begin(), known_info->end(), CFindByIDPred(info_id));
+	KNOWN_INFO_VECTOR::const_iterator it = known_info->find(info_id);
 	if(known_info->end() == it)
 		return false;
 
-	info_data = *it;
+	info_data = it->second;
 	return true;
 }

@@ -170,7 +170,7 @@ public:
 	
 	// Models
 	virtual IRender_Visual*			model_CreateParticles	(LPCSTR name);
-	virtual IRender_DetailModel*	model_CreateDM			(IReader*F);
+	virtual IRender_DetailModel*	model_CreateDM			(IReader*F, IReader* FO);
 	virtual IRender_Visual*			model_Create			(LPCSTR name, IReader*data=0);
 	virtual IRender_Visual*			model_CreateChild		(LPCSTR name, IReader*data);
 	virtual IRender_Visual*			model_Duplicate			(IRender_Visual*	V);

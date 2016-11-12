@@ -119,14 +119,34 @@ void CALifeMonsterBrain::process_task			()
 	movement().detail().target		(*task);
 }
 
+#define MEAS_BEGIN(timer) if (g_measure) { timer.Begin(); }
+#define MEAS_END(timer) if (g_measure) { timer.End(); }
+#define MEAS(timer) g_measure ? timer : g_dummy
+
+extern bool g_measure;
+CTimerStat g_brain_select_task;
+CTimerStat g_brain_st;
+CTimerStat g_brain_al;
+CTimerStat g_brain_for;
+CTimerStat g_brain_for_en;
+CTimerStat g_brain_reg;
+CTimerStat g_dummy;
+
 void CALifeMonsterBrain::select_task			()
 {
-	if (object().m_smart_terrain_id != 0xffff)
-		return;
+	CTimerStatScoped _(MEAS(g_brain_select_task));
 
-	if (!can_choose_alife_tasks())
-		return;
+	{
+		CTimerStatScoped _l(MEAS(g_brain_st));
+		if (object().m_smart_terrain_id != 0xffff)
+			return;
+	}
 
+	{
+		CTimerStatScoped _l(MEAS(g_brain_al));
+		if (!can_choose_alife_tasks())
+			return;
+	}
 	ALife::_TIME_ID					current_time = ai().alife().time_manager().game_time();
 
 	if (m_last_search_time + m_time_interval > current_time)
@@ -137,20 +157,28 @@ void CALifeMonsterBrain::select_task			()
 	float							best_value = flt_min;
 	CALifeSmartTerrainRegistry::OBJECTS::const_iterator	I = ai().alife().smart_terrains().objects().begin();
 	CALifeSmartTerrainRegistry::OBJECTS::const_iterator	E = ai().alife().smart_terrains().objects().end();
-	for ( ; I != E; ++I) {
-		if (!(*I).second->enabled(&object()))
-			continue;
+	{
+		CTimerStatScoped _l(MEAS(g_brain_for));
+		for ( ; I != E; ++I) 
+		{
+			CTimerStatScoped _l_en(MEAS(g_brain_for_en));
+			if (!(*I).second->enabled(&object()))
+				continue;
 
-		float						value = (*I).second->suitable(&object());
-		if (value > best_value) {
-			best_value				= value;
-			object().m_smart_terrain_id	= (*I).second->ID;
+			float						value = (*I).second->suitable(&object());
+			if (value > best_value) {
+				best_value				= value;
+				object().m_smart_terrain_id	= (*I).second->ID;
+			}
 		}
 	}
 
-	if (object().m_smart_terrain_id != 0xffff) {
-		smart_terrain().register_npc	(&object());
-		m_last_search_time				= 0;
+	{
+		CTimerStatScoped _l(MEAS(g_brain_reg));
+		if (object().m_smart_terrain_id != 0xffff) {
+			smart_terrain().register_npc	(&object());
+			m_last_search_time				= 0;
+		}
 	}
 }
 

@@ -84,6 +84,24 @@ void CALifeStorageManager::save	(LPCSTR save_name, bool update_name)
 		strcpy					(m_save_name,save);
 }
 
+bool g_measure = false;
+CTimerStat g_dynamic_td;
+CTimerStat g_dynamic;
+CTimerStat g_dynamic_bu;
+CTimerStat g_human;
+CTimerStat g_human_inherited;
+CTimerStat g_human_brain;
+CTimerStat g_human_specific;
+extern CTimerStat g_brain_select_task;
+extern CTimerStat g_brain_st;
+extern CTimerStat g_brain_al;
+extern CTimerStat g_brain_for;
+extern CTimerStat g_brain_for_en;
+extern CTimerStat g_brain_reg;
+extern CTimerStat g_has_info;
+extern CTimerStat g_has_info_registry;
+extern CTimerStat g_has_info_find_if;
+
 void CALifeStorageManager::load	(void *buffer, const u32 &buffer_size, LPCSTR file_name)
 {
 	IReader						source(buffer,buffer_size);
@@ -112,11 +130,127 @@ void CALifeStorageManager::load	(void *buffer, const u32 &buffer_size, LPCSTR fi
 
 	can_register_objects		(true);
 	
+	//g_measure = true;
 	CTimer t;
 	t.Start();
-	for (I = B; I != E; ++I)
+	int i = 0;
+	double new_max = 0.;
+	for (I = B; I != E; ++I, ++i)
+	{
+		if (g_measure)
+		{
+			g_dynamic_td.Begin();
+		}
 		(*I).second->on_register();
+		if(g_measure)
+		{
+			g_dynamic_bu.End();
+			if (g_dynamic_bu.GetMax() > new_max)
+			{
+				new_max = g_dynamic_bu.GetMax();
+				Msg("*  Dynam_BU: New max(%d) = %2.3f ms", i, new_max);
+			}
+		}
+	}
 	Msg("* %u objects on_register'ed (%2.3fs)", objects().objects().size(), t.GetElapsed_sec());
+	Msg("*  Dynam_TD: Count = %u, Elapsed = %I64u ms, Average = %2.3f ms, Max = %2.3f ms, Min = %2.3f ms"
+		, g_dynamic_td.GetCount()
+		, g_dynamic_td.GetElapsed_ms()
+		, g_dynamic_td.GetAvg()
+		, g_dynamic_td.GetMax()
+		, g_dynamic_td.GetMin());
+	Msg("*  Dynamic: Count = %u, Elapsed = %I64u ms, Average = %2.3f ms, Max = %2.3f ms, Min = %2.3f ms"
+		, g_dynamic.GetCount()
+		, g_dynamic.GetElapsed_ms()
+		, g_dynamic.GetAvg()
+		, g_dynamic.GetMax()
+		, g_dynamic.GetMin());
+	Msg("*    Dynam_BR_ST: Count = %u, Elapsed = %I64u ms, Average = %2.3f ms, Max = %2.3f ms, Min = %2.3f ms"
+		, g_brain_st.GetCount()
+		, g_brain_st.GetElapsed_ms()
+		, g_brain_st.GetAvg()
+		, g_brain_st.GetMax()
+		, g_brain_st.GetMin());
+	Msg("*    Dynam_BR_AL: Count = %u, Elapsed = %I64u ms, Average = %2.3f ms, Max = %2.3f ms, Min = %2.3f ms"
+		, g_brain_al.GetCount()
+		, g_brain_al.GetElapsed_ms()
+		, g_brain_al.GetAvg()
+		, g_brain_al.GetMax()
+		, g_brain_al.GetMin());
+	Msg("*       HasInfo::registry: Count = %u, Elapsed = %I64u ms, Average = %2.3f ms, Max = %2.3f ms, Min = %2.3f ms"
+		, g_has_info_registry.GetCount()
+		, g_has_info_registry.GetElapsed_ms()
+		, g_has_info_registry.GetAvg()
+		, g_has_info_registry.GetMax()
+		, g_has_info_registry.GetMin());
+	Msg("*       HasInfo::find_if: Count = %u, Elapsed = %I64u ms, Average = %2.3f ms, Max = %2.3f ms, Min = %2.3f ms"
+		, g_has_info_find_if.GetCount()
+		, g_has_info_find_if.GetElapsed_ms()
+		, g_has_info_find_if.GetAvg()
+		, g_has_info_find_if.GetMax()
+		, g_has_info_find_if.GetMin());
+	Msg("*      HasInfo: Count = %u, Elapsed = %I64u ms, Average = %2.3f ms, Max = %2.3f ms, Min = %2.3f ms"
+		, g_has_info.GetCount()
+		, g_has_info.GetElapsed_ms()
+		, g_has_info.GetAvg()
+		, g_has_info.GetMax()
+		, g_has_info.GetMin());
+	Msg("*     Dynam_BR_FO_EN: Count = %u, Elapsed = %I64u ms, Average = %2.3f ms, Max = %2.3f ms, Min = %2.3f ms"
+		, g_brain_for_en.GetCount()
+		, g_brain_for_en.GetElapsed_ms()
+		, g_brain_for_en.GetAvg()
+		, g_brain_for_en.GetMax()
+		, g_brain_for_en.GetMin());
+	
+	Msg("*    Dynam_BR_FO: Count = %u, Elapsed = %I64u ms, Average = %2.3f ms, Max = %2.3f ms, Min = %2.3f ms"
+		, g_brain_for.GetCount()
+		, g_brain_for.GetElapsed_ms()
+		, g_brain_for.GetAvg()
+		, g_brain_for.GetMax()
+		, g_brain_for.GetMin());
+	Msg("*    Dynam_BR_RE: Count = %u, Elapsed = %I64u ms, Average = %2.3f ms, Max = %2.3f ms, Min = %2.3f ms"
+		, g_brain_reg.GetCount()
+		, g_brain_reg.GetElapsed_ms()
+		, g_brain_reg.GetAvg()
+		, g_brain_reg.GetMax()
+		, g_brain_reg.GetMin());
+	Msg("*   Dynam_BR: Count = %u, Elapsed = %I64u ms, Average = %2.3f ms, Max = %2.3f ms, Min = %2.3f ms"
+		, g_brain_select_task.GetCount()
+		, g_brain_select_task.GetElapsed_ms()
+		, g_brain_select_task.GetAvg()
+		, g_brain_select_task.GetMax()
+		, g_brain_select_task.GetMin());
+	Msg("*  Dynam_BU: Count = %u, Elapsed = %I64u ms, Average = %2.3f ms, Max = %2.3f ms, Min = %2.3f ms"
+		, g_dynamic_bu.GetCount()
+		, g_dynamic_bu.GetElapsed_ms()
+		, g_dynamic_bu.GetAvg()
+		, g_dynamic_bu.GetMax()
+		, g_dynamic_bu.GetMin());
+	Msg("*   HumanI: Count = %u, Elapsed = %I64u ms, Average = %2.3f ms, Max = %2.3f ms, Min = %2.3f ms"
+		, g_human_inherited.GetCount()
+		, g_human_inherited.GetElapsed_ms()
+		, g_human_inherited.GetAvg()
+		, g_human_inherited.GetMax()
+		, g_human_inherited.GetMin());
+	Msg("*   HumanB: Count = %u, Elapsed = %I64u ms, Average = %2.3f ms, Max = %2.3f ms, Min = %2.3f ms"
+		, g_human_brain.GetCount()
+		, g_human_brain.GetElapsed_ms()
+		, g_human_brain.GetAvg()
+		, g_human_brain.GetMax()
+		, g_human_brain.GetMin());
+	Msg("*   HumanS: Count = %u, Elapsed = %I64u ms, Average = %2.3f ms, Max = %2.3f ms, Min = %2.3f ms"
+		, g_human_specific.GetCount()
+		, g_human_specific.GetElapsed_ms()
+		, g_human_specific.GetAvg()
+		, g_human_specific.GetMax()
+		, g_human_specific.GetMin());
+	Msg("*  Human__: Count = %u, Elapsed = %I64u ms, Average = %2.3f ms, Max = %2.3f ms, Min = %2.3f ms"
+		, g_human.GetCount()
+		, g_human.GetElapsed_ms()
+		, g_human.GetAvg()
+		, g_human.GetMax()
+		, g_human.GetMin());
+	g_measure = false;
 }
 
 bool CALifeStorageManager::load	(LPCSTR save_name)
