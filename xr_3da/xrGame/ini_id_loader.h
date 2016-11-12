@@ -16,6 +16,26 @@
 //T_INIT		-	класс где определена статическая InitIdToIndex
 //					функция инициализации section_name и line_name
 
+#ifndef TS_ENABLE
+#define TS_ENABLE
+#endif
+
+#ifndef ETS_DECLARE
+	#ifdef TS_ENABLE
+		#define ETS_DECLARE(x) extern CTimerStat x
+		#define ETS_BEGIN(x) x.Begin()
+		#define ETS_END(x) x.End()
+	#else
+		#define ETS_DECLARE(x) ((void)0)
+		#define ETS_BEGIN(x) ((void)0)
+		#define ETS_END(x) ((void)0)
+	#endif
+#endif //ETS_DECLARE
+
+ETS_DECLARE(g_iiForOuter);
+ETS_DECLARE(g_iiForInner);
+ETS_DECLARE(g_iiFIFind);
+
 #define TEMPLATE_SPECIALIZATION		template<u32 ITEM_REC_NUM, typename ITEM_DATA, typename T_ID, typename T_INDEX, typename T_INIT>
 #define CSINI_IdToIndex CIni_IdToIndex	<ITEM_REC_NUM, ITEM_DATA, T_ID, T_INDEX, T_INIT>
 
@@ -38,8 +58,9 @@ protected:
 	}
 
 	template <>
-		static  void				LoadItemData<0>  (u32 count, LPCSTR cfgRecord)
+	static  void				LoadItemData<0>  (u32 count, LPCSTR cfgRecord)
 	{
+		ETS_BEGIN(g_iiForInner);
 		for (u32 k = 0; k < count; k+= 1)
 		{
 			string64 buf;
@@ -50,11 +71,13 @@ protected:
 			m_pItemDataVector->push_back(item_data);
 			xr_free(id_str_lwr);
 		}
+		ETS_END(g_iiForInner);
 	}
 
 	template <>
-		static  void				LoadItemData<1>  (u32 count, LPCSTR cfgRecord)
+	static  void				LoadItemData<1>  (u32 count, LPCSTR cfgRecord)
 	{
+		ETS_BEGIN(g_iiForInner);
 		for (u32 k = 0; k < count; k+= 2)
 		{
 			string64 buf, buf1;
@@ -66,6 +89,7 @@ protected:
 			m_pItemDataVector->push_back(item_data);
 			xr_free(id_str_lwr);
 		}
+		ETS_END(g_iiForInner);
 	}
 
 	//имя секции и линии откуда будут загружаться id
@@ -161,6 +185,7 @@ void CSINI_IdToIndex::DeleteIdToIndexData	()
 TEMPLATE_SPECIALIZATION
 typename void	CSINI_IdToIndex::InitInternal ()
 {
+	ETS_BEGIN(g_iiForOuter);
 	VERIFY(!m_pItemDataVector);
 	T_INIT::InitIdToIndex();
 	{
@@ -174,6 +199,7 @@ typename void	CSINI_IdToIndex::InitInternal ()
 		LoadItemData<ITEM_REC_NUM>(count, cfgRecord);
 
 	}
+	ETS_END(g_iiForOuter);
 }
 	
 

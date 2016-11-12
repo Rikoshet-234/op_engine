@@ -71,7 +71,7 @@ void CDetail::transfer	(Fmatrix& mXform, fvfVertexOut* vDest, u32 C, u16* iDest,
 	}
 }
 
-void CDetail::Load		(IReader* S)
+void CDetail::Load(IReader* S, IReader* SO)
 {
 	// Shader
 	string256		fnT,fnS;
@@ -87,16 +87,43 @@ void CDetail::Load		(IReader* S)
 	number_indices	= S->r_u32	();
 	R_ASSERT		(0==(number_indices%3));
 	
-	// Vertices                             
-	u32				size_vertices		= number_vertices*sizeof(fvfVertexIn); 
-	vertices		= xr_alloc<CDetail::fvfVertexIn>	(number_vertices);
-	S->r			(vertices,size_vertices);
+	IReader* cacheSpecific = NULL;
+	if (SO)
+	{
+		cacheSpecific = SO->open_chunk(HW.Caps.geometry.dwVertexCache);
+	}
+
+	if (!cacheSpecific)
+	{
+		// Vertices                             
+		u32				size_vertices		= number_vertices*sizeof(fvfVertexIn); 
+		vertices		= xr_alloc<CDetail::fvfVertexIn>	(number_vertices);
+		S->r			(vertices,size_vertices);
 	
-	// Indices
-	u32				size_indices		= number_indices*sizeof(u16);
-	indices			= xr_alloc<u16>						(number_indices);
-	S->r			(indices,size_indices);
+		// Indices
+		u32				size_indices		= number_indices*sizeof(u16);
+		indices			= xr_alloc<u16>						(number_indices);
+		S->r			(indices,size_indices);
+	}
+	else
+	{
+		u32 cs_number_vertices = cacheSpecific->r_u32();
+		u32 cs_number_indices = cacheSpecific->r_u32();
+		R_ASSERT(cs_number_vertices == number_vertices);
+		R_ASSERT(cs_number_indices == number_indices);
+
+		// Vertices                             
+		u32 size_vertices = number_vertices*sizeof(fvfVertexIn); 
+		vertices = xr_alloc<CDetail::fvfVertexIn>(cs_number_vertices);
+		cacheSpecific->r(vertices,size_vertices);
 	
+		// Indices
+		u32 size_indices = number_indices*sizeof(u16);
+		indices = xr_alloc<u16>(cs_number_indices);
+		cacheSpecific->r(indices,size_indices);
+
+		cacheSpecific->close();
+	}
 	// Validate indices
 #ifdef DEBUG
 	for (u32 idx = 0; idx<number_indices; idx++)
@@ -109,9 +136,13 @@ void CDetail::Load		(IReader* S)
 		bv_bb.modify	(vertices[i].P);
 	bv_bb.getsphere		(bv_sphere.P,bv_sphere.R);
 
+	// models
+	if (!cacheSpecific)
+	{
 #ifndef _EDITOR
-	Optimize	();
+		Optimize();
 #endif
+	}
 }
 
 #ifndef _EDITOR

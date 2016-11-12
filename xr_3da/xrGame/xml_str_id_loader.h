@@ -24,6 +24,40 @@ struct ITEM_DATA
 };
 typedef xr_vector<ITEM_DATA>	T_VECTOR;
 
+template<typename K, typename V, class P=stdext::hash_compare<K, std::less<K> >, typename allocator = xalloc<K> >
+class xr_unordered_multimap2 : public stdext::hash_multimap<K,V,P,allocator>
+{ 
+public: 
+	u32 size() const { return (u32)__super::size(); } 
+};
+
+class XRStringMap
+{
+	struct TMapValue
+	{
+		TMapValue(const shared_str& _key, T_VECTOR::size_type _data) : key(_key), data(_data){}
+		shared_str key;
+		T_VECTOR::size_type data;
+	};
+	typedef xr_unordered_multimap2<u32, TMapValue> TMap;
+
+public:
+	typedef TMap::const_iterator const_iterator;
+
+public:
+	void insert(const shared_str& key, T_VECTOR::size_type value);
+	bool exist(const shared_str& key) const;
+	const_iterator find(const shared_str& key) const;
+	const_iterator begin() const;
+	const_iterator end() const;
+
+	void erase(const_iterator& i);
+	void clear();
+
+private:
+	TMap m_multimap;
+};
+
 void _destroy_item_data_vector_cont(T_VECTOR* vec);
 
 #define TEMPLATE_SPECIALIZATION template<typename T_INIT>
@@ -36,6 +70,7 @@ public:
 
 private:
 	static	T_VECTOR*				m_pItemDataVector;
+	static	XRStringMap*			m_pItemDataMap;
 
 protected:
 	//имена xml файлов (разделенных запятой) из которых 
@@ -72,6 +107,8 @@ public:
 
 TEMPLATE_SPECIALIZATION
 typename T_VECTOR* CSXML_IdToIndex::m_pItemDataVector = NULL;
+TEMPLATE_SPECIALIZATION
+typename XRStringMap* CSXML_IdToIndex::m_pItemDataMap = NULL;
 
 TEMPLATE_SPECIALIZATION
 LPCSTR CSXML_IdToIndex::file_str = NULL;
@@ -96,15 +133,9 @@ const typename ITEM_DATA* CSXML_IdToIndex::GetById (const shared_str& str_id, bo
 {
 	T_INIT::InitXmlIdToIndex();
 
-	T_VECTOR::iterator it;	
-	for(it = m_pItemDataVector->begin();
-		m_pItemDataVector->end() != it; it++)
-	{
-		if( (*it).id == str_id)
-			break;
-	}
+	auto map_i = m_pItemDataMap->find(str_id);
 
-	if(m_pItemDataVector->end() == it)
+	if(m_pItemDataMap->end() == map_i)
 	{
 		int i=0;
 		for(T_VECTOR::iterator it = m_pItemDataVector->begin();	m_pItemDataVector->end() != it; it++,i++)
@@ -113,8 +144,8 @@ const typename ITEM_DATA* CSXML_IdToIndex::GetById (const shared_str& str_id, bo
 		R_ASSERT3(no_assert, "item not found, id", *str_id);
 		return NULL;
 	}
-		
-	return &(*it);
+	
+	return &(*m_pItemDataVector)[map_i->second.data];
 }
 
 TEMPLATE_SPECIALIZATION
@@ -131,19 +162,42 @@ const typename ITEM_DATA* CSXML_IdToIndex::GetByIndex(int index, bool no_assert)
 TEMPLATE_SPECIALIZATION
 void CSXML_IdToIndex::DeleteIdToIndexData	()
 {
-	VERIFY						(m_pItemDataVector);
+	VERIFY(m_pItemDataVector);
+	VERIFY(m_pItemDataMap);
 	_destroy_item_data_vector_cont	(m_pItemDataVector);
 
-	xr_delete	(m_pItemDataVector);
+	xr_delete(m_pItemDataVector);
+	xr_delete(m_pItemDataMap);
 }
+
+#ifndef TS_ENABLE
+#define TS_ENABLE
+#endif
+
+#ifndef ETS_DECLARE
+	#ifdef TS_ENABLE
+		#define ETS_DECLARE(x) extern CTimerStat x
+		#define ETS_BEGIN(x) x.Begin()
+		#define ETS_END(x) x.End()
+	#else
+		#define ETS_DECLARE(x) ((void)0)
+		#define ETS_BEGIN(x) ((void)0)
+		#define ETS_END(x) ((void)0)
+	#endif
+#endif //ETS_DECLARE
+
+ETS_DECLARE(g_iiForOuter);
+ETS_DECLARE(g_iiForInner);
+ETS_DECLARE(g_iiFIFind);
 
 TEMPLATE_SPECIALIZATION
 typename void	CSXML_IdToIndex::InitInternal ()
 {
-	VERIFY(!m_pItemDataVector);
+	VERIFY(!m_pItemDataVector ** !m_pItemDataMap);
 	T_INIT::InitXmlIdToIndex();
 
 	m_pItemDataVector = xr_new<T_VECTOR>();
+	m_pItemDataMap = xr_new<XRStringMap>();
 
 	VERIFY(file_str);
 	VERIFY(tag_name);
@@ -151,6 +205,7 @@ typename void	CSXML_IdToIndex::InitInternal ()
 	string_path	xml_file;
 	int			count = _GetItemCount	(file_str);
 	int			index = 0;
+	ETS_BEGIN(g_iiForOuter);
 	for (int it=0; it<count; ++it)	
 	{
 		_GetItem	(file_str, it, xml_file);
@@ -165,38 +220,41 @@ typename void	CSXML_IdToIndex::InitInternal ()
 		//общий список
 		int items_num			= uiXml->GetNodesNum(uiXml->GetRoot(), tag_name);
 
+		ETS_BEGIN(g_iiForInner);
 		for(int i=0; i<items_num; ++i)
 		{
 			LPCSTR item_name	= uiXml->ReadAttrib(uiXml->GetRoot(), tag_name, i, "id", NULL);
 
-			string256			buf;
-			sprintf_s				(buf, "id for item don't set, number %d in %s", i, xml_file);
-			R_ASSERT2			(item_name, buf);
-
+			if(!item_name)
+			{
+				string256 buf;
+				sprintf_s(buf, "id for item don't set, number %d in %s", i, xml_file);
+				R_ASSERT2(item_name, buf);
+			}
+			
 
 			//проверетить ID на уникальность
-			T_VECTOR::iterator t_it = m_pItemDataVector->begin();
-			for(;m_pItemDataVector->end() != t_it; t_it++)
-			{
-				if(shared_str((*t_it).id) == shared_str(item_name))
-					break;
-			}
-
-			R_ASSERT3(m_pItemDataVector->end() == t_it, "duplicate item id", item_name);
+			ETS_BEGIN(g_iiFIFind);
+			shared_str id(item_name);
+			bool exist = m_pItemDataMap->exist(id);
+			ETS_END(g_iiFIFind);
+			R_ASSERT3(!exist, "duplicate item id", item_name);
 
 			ITEM_DATA			data;
-			data.id				= item_name;
+			data.id				= id;
 			data.index			= index;
 			data.pos_in_file	= i;
-//.				data.file_name		= xml_file;
 			data._xml			= uiXml;
+			m_pItemDataMap->insert(id, m_pItemDataVector->size());
 			m_pItemDataVector->push_back(data);
 
 			index++; 
 		}
+		ETS_END(g_iiForInner);
 		if(0==items_num)
 			delete_data(uiXml);
 	}
+	ETS_END(g_iiForOuter);
 }
 
 #undef TEMPLATE_SPECIALIZATION

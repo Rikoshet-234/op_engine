@@ -120,6 +120,36 @@ void CGamePersistent::RegisterModel(IRender_Visual* V)
 extern void clean_game_globals	();
 extern void init_game_globals	();
 
+#ifndef TS_ENABLE
+#define TS_ENABLE
+#endif
+
+#ifdef TS_ENABLE
+#define TS_DECLARE(x) CTimerStat x
+#define TS_BEGIN(x) x.Begin()
+#define TS_END(x) x.End()
+#define TS_RESET(x) x.Reset()
+#define TS_P(x,name) Msg( name ": Count = %u, Elapsed = %I64u ms, Average = %2.3f ms, Max = %2.3f ms, Min = %2.3f ms", x.GetCount(), x.GetElapsed_ms(), x.GetAvg(), x.GetMax(), x.GetMin())
+#define TS_PR(x,name) Msg( name ": Count = %u, Elapsed = %I64u ms, Average = %2.3f ms, Max = %2.3f ms, Min = %2.3f ms", x.GetCount(), x.GetElapsed_ms(), x.GetAvg(), x.GetMax(), x.GetMin()); x.Reset()
+#define TS_EPR(x,name) x.End(); Msg( name ": Count = %u, Elapsed = %I64u ms, Average = %2.3f ms, Max = %2.3f ms, Min = %2.3f ms", x.GetCount(), x.GetElapsed_ms(), x.GetAvg(), x.GetMax(), x.GetMin()); x.Reset()
+#else
+#define TS_DECLARE(x) ((void)0)
+#define TS_BEGIN(x) ((void)0)
+#define TS_END(x) ((void)0)
+#define TS_RESET(x) ((void)0)
+#define TS_P(x,name) ((void)0)
+#define TS_EPR(x,name) ((void)0)
+#define TS_PR(x,name) ((void)0)
+#endif
+
+TS_DECLARE(g_mmLoad);
+TS_DECLARE(g_mmForOuter);
+TS_DECLARE(g_mmFOFind);
+TS_DECLARE(g_mmFORead);
+TS_DECLARE(g_mmFOIf);
+TS_DECLARE(g_mmFOElse);
+TS_DECLARE(g_detailLoad);
+
 void CGamePersistent::OnAppStart()
 {
 	auto chrono1 = std::chrono::high_resolution_clock::now();
@@ -135,6 +165,7 @@ void CGamePersistent::OnAppStart()
 	chrono1 = std::chrono::high_resolution_clock::now();
 	__super::OnAppStart			();
 	chrono2 = std::chrono::high_resolution_clock::now();
+	TS_P(g_detailLoad, "CDetail::Load");
 	Msg("App_Start loaded at %lli msec",std::chrono::duration_cast<std::chrono::milliseconds>(chrono2-chrono1).count());
 
 	chrono1 = std::chrono::high_resolution_clock::now();
@@ -145,6 +176,12 @@ void CGamePersistent::OnAppStart()
 	chrono1 = std::chrono::high_resolution_clock::now();
 	m_pMainMenu					= xr_new<CMainMenu>();
 	chrono2 = std::chrono::high_resolution_clock::now();
+	TS_P(g_mmLoad, "MainMenu::Load");
+	TS_P(g_mmForOuter, "MainMenu::FO");
+	TS_P(g_mmFOFind, "MainMenu::FOFind");
+	TS_P(g_mmFORead, "MainMenu::FORead");
+	TS_P(g_mmFOIf, "MainMenu::FOIf");
+	TS_P(g_mmFOElse, "MainMenu::FOElse");
 	Msg("Main_Menu loaded at %lli msec",std::chrono::duration_cast<std::chrono::milliseconds>(chrono2-chrono1).count());
 }
 

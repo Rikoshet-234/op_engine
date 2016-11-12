@@ -124,7 +124,7 @@ void CDetailManager::Load		()
 	{
 		CDetail*		dt	= xr_new<CDetail> ();
 		IReader* S			= m_fs->open_chunk(m_id);
-		dt->Load			(S);
+		dt->Load			(S, 0);
 		objects.push_back	(dt);
 		S->close			();
 	}

@@ -35,12 +35,22 @@ SThunderboltDesc::SThunderboltDesc(CInifile* pIni, LPCSTR sect)
 	m_GradientCenter.hShader.create(*m_GradientCenter.shader,*m_GradientCenter.texture);
 
     // models
-    IReader* F			= 0;
+    IReader* F = 0, *FO = 0;
     LPCSTR m_name;
 	m_name				= pSettings->r_string(sect,"lightning_model");
-	F					= FS.r_open("$game_meshes$",m_name); R_ASSERT2(F,"Empty 'lightning_model'.");
-	l_model				= ::Render->model_CreateDM(F);
-    FS.r_close			(F);
+	F = FS.r_open("$game_meshes$",m_name); R_ASSERT2(F,"Empty 'lightning_model'.");
+	
+	string_path dmo_path;
+	strcpy(dmo_path, m_name);
+	size_t dmo_path_len = strlen(dmo_path);
+	dmo_path[dmo_path_len] = 'o';
+	dmo_path[dmo_path_len+1] = 0;
+	FO = FS.r_open("$game_meshes$",dmo_path);
+	
+	l_model = ::Render->model_CreateDM(F, FO);
+    
+	FS.r_close(F);
+	if (FO) FS.r_close(FO);
 
     // sound
 	m_name				= pSettings->r_string(sect,"sound");
