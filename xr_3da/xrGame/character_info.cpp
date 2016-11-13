@@ -82,7 +82,7 @@ void CCharacterInfo::load_shared	(LPCSTR)
 	CUIXml*		pXML		= item_data._xml;
 	pXML->SetLocalRoot		(pXML->GetRoot());
 
-	XML_NODE* item_node = pXML->NavigateToNode(id_to_index::tag_name, item_data.pos_in_file);
+	XML_NODE* item_node = pXML->NavigateToNode(id_to_index::GetTagName(), item_data.pos_in_file);
 	R_ASSERT3(item_node, "profile id=", *item_data.id);
 
 	pXML->SetLocalRoot(item_node);
@@ -182,10 +182,10 @@ void CCharacterInfo::save	(NET_Packet& stream)
 
 
 
-void CCharacterInfo::InitXmlIdToIndex()
+void CCharacterInfo::InitXmlIdToIndex(LPCSTR& file_str, LPCSTR& tag_name)
 {
-	if(!id_to_index::tag_name)
-		id_to_index::tag_name = "character";
-	if(!id_to_index::file_str)
-		id_to_index::file_str = pSettings->r_string("profiles", "files");
+	if(!tag_name)
+		tag_name = "character";
+	if(!file_str)
+		file_str = pSettings->r_string("profiles", "files");
 }

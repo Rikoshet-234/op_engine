@@ -13,6 +13,9 @@
 #include "ai_space.h"
 #include "alife_simulator.h"
 #include "alife_group_registry.h"
+//#define TS_ENABLE
+#include "../xrCore/FTimerStat.h"
+#undef TS_ENABLE
 
 void CSE_ALifeHumanAbstract::update									()
 {
@@ -63,42 +66,42 @@ CSE_ALifeItemWeapon *CSE_ALifeHumanAbstract::tpfGetBestWeapon		(ALife::EHitType 
 }
 
 extern bool g_measure;
-extern CTimerStat g_human;
-extern CTimerStat g_human_inherited;
-extern CTimerStat g_human_brain;
-extern CTimerStat g_human_specific;
+TSE_DECLARE(g_human);
+TSE_DECLARE(g_human_inherited);
+TSE_DECLARE(g_human_brain);
+TSE_DECLARE(g_human_specific);
 
 void CSE_ALifeHumanAbstract::on_register							()
 {
 	if (g_measure)
 	{
-		g_human.Begin();
-		g_human_inherited.Begin();
+		TS_BEGIN(g_human);
+		TS_BEGIN(g_human_inherited);
 	}
 
-	inherited2::on_register					();
+	inherited2::on_register();
 
 	if (g_measure)
 	{
-		g_human_inherited.End();
-		g_human_brain.Begin();
+		TS_END(g_human_inherited);
+		TS_BEGIN(g_human_brain);
 	}
 
-	brain().on_register						();
+	brain().on_register();
 
 	if (g_measure)
 	{
-		g_human_brain.End();
-		g_human_specific.Begin();
+		TS_END(g_human_brain);
+		TS_BEGIN(g_human_specific);
 	}
 
 	// because we need to load profile to setup graph vertex masks
-	specific_character						();
+	specific_character();
 
 	if (g_measure)
 	{
-		g_human_specific.End();
-		g_human.End();
+		TS_END(g_human_specific);
+		TS_END(g_human);
 	}
 }
 

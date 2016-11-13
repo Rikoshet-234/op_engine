@@ -2,10 +2,10 @@
 
 #include "shared_data.h"
 #include "PhraseScript.h"
-
+//
 #include "xml_str_id_loader.h"
 #include "encyclopedia_article_defs.h"
-
+//
 #include "GameTaskDefs.h"
 #include "PhraseDialogDefs.h"
 
@@ -43,11 +43,11 @@ class CInfoPortion;
 
 //квант  - порция информации
 class CInfoPortion : public CSharedClass<SInfoPortionData, shared_str, false>,
-					 public CXML_IdToIndex<CInfoPortion>
+					 public CXML_IdToIndexBase<CInfoPortion>
 {
 private:
 	typedef CSharedClass<SInfoPortionData, shared_str, false>	inherited_shared;
-	typedef CXML_IdToIndex<CInfoPortion>						id_to_index;
+	typedef CXML_IdToIndexBase<CInfoPortion>						id_to_index;
 
 	friend id_to_index;
 public:
@@ -79,5 +79,5 @@ protected:
 	SInfoPortionData* info_data						() { VERIFY(inherited_shared::get_sd()); return inherited_shared::get_sd();}
 	const SInfoPortionData* info_data				() const { VERIFY(inherited_shared::get_sd()); return inherited_shared::get_sd();}
 
-	static void InitXmlIdToIndex();
+	static void InitXmlIdToIndex(LPCSTR& file_str, LPCSTR& tag_name);
 };

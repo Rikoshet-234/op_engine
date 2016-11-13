@@ -188,9 +188,9 @@ void CUICarBodyWnd::InitCarBody(CInventoryOwner* pOur, CInventoryOwner* pOthers)
 	if(!monster){
 		CInfoPortionWrapper	*known_info_registry	= xr_new<CInfoPortionWrapper>();
 		known_info_registry->registry().init		(other_id);
-		KNOWN_INFO_VECTOR& known_info				= known_info_registry->registry().objects();
+		CKnownInfoContainer& known_info				= known_info_registry->registry().objects();
 
-		KNOWN_INFO_VECTOR_CIT it = known_info.begin();
+		auto it = known_info.begin();
 		for(int i=0;it!=known_info.end();++it,++i){
 			NET_Packet		P;
 			CGameObject::u_EventGen		(P,GE_INFO_TRANSFER, our_id);

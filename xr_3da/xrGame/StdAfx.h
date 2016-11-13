@@ -7,6 +7,8 @@
 #pragma warning( 4 : 4244 )
 #pragma warning(disable:4505)
 
+#include <queue> //! STD headers belong to stdafx.h
+
 // this include MUST be here, since smart_cast is used >1800 times in the project
 #include "smart_cast.h"
 

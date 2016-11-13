@@ -47,11 +47,11 @@ class CInventoryOwner;
 class CSE_ALifeTraderAbstract;
 
 class CCharacterInfo: public CSharedClass<SCharacterProfile, shared_str, false>,
-					  public CXML_IdToIndex<CCharacterInfo>
+					  public CXML_IdToIndexBase<CCharacterInfo>
 {
 private:
 	typedef CSharedClass	<SCharacterProfile, shared_str, false>	inherited_shared;
-	typedef CXML_IdToIndex	<CCharacterInfo>						id_to_index;
+	typedef CXML_IdToIndexBase	<CCharacterInfo>					id_to_index;
 
 	friend id_to_index;
 	friend CInventoryOwner;
@@ -80,7 +80,7 @@ protected:
 	const SCharacterProfile*	data				() const	{ VERIFY(inherited_shared::get_sd()); return inherited_shared::get_sd();}
 	SCharacterProfile*			data				()				{ VERIFY(inherited_shared::get_sd()); return inherited_shared::get_sd();}
 
-	static void					InitXmlIdToIndex	();
+	static void					InitXmlIdToIndex	(LPCSTR& file_str, LPCSTR& tag_name);
 
 
 	//загрузка из XML файла

@@ -16,6 +16,9 @@
 #include "game_level_cross_table.h"
 #include "game_graph.h"
 #include "xrServer.h"
+//#define TS_ENABLE
+#include "../xrCore/FTimerStat.h"
+#undef TS_ENABLE
 
 void CSE_ALifeDynamicObject::on_spawn				()
 {
@@ -25,15 +28,15 @@ void CSE_ALifeDynamicObject::on_spawn				()
 }
 
 extern bool g_measure;
-extern CTimerStat g_dynamic;
-extern CTimerStat g_dynamic_td;
-extern CTimerStat g_dynamic_bu;
+TSE_DECLARE(g_dynamic);
+TSE_DECLARE(g_dynamic_td);
+TSE_DECLARE(g_dynamic_bu);
 void CSE_ALifeDynamicObject::on_register			()
 {
 	if (g_measure)
 	{
-		g_dynamic_td.End();
-		g_dynamic.Begin();
+		TS_END(g_dynamic_td);
+		TS_BEGIN(g_dynamic);
 	}
 
 	CSE_ALifeObject		*object = this;
@@ -47,8 +50,8 @@ void CSE_ALifeDynamicObject::on_register			()
 
 	if (g_measure)
 	{
-		g_dynamic.End();
-		g_dynamic_bu.Begin();
+		TS_END(g_dynamic);
+		TS_BEGIN(g_dynamic_bu);
 	}
 }
 

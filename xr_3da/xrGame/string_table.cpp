@@ -5,6 +5,10 @@
 #include "xr_level_controller.h"
 #include "../xrCore/OPFuncs/utils.h"
 
+//#define TS_ENABLE
+#include "../xrCore/FTimerStat.h"
+#undef TS_ENABLE
+
 #include <vector>
 #include <sstream>
 #include <iterator>
@@ -50,34 +54,16 @@ void CStringTable::Init		()
 	}
 }
 
-#ifndef TS_ENABLE
-//#define TS_ENABLE
-#endif
-
-#ifndef ETS_DECLARE
-	#ifdef TS_ENABLE
-		#define ETS_DECLARE(x) extern CTimerStat x
-		#define ETSS_DECLARE(x,y) CTimerStatScoped x(y)
-		#define ETS_BEGIN(x) x.Begin()
-		#define ETS_END(x) x.End()
-	#else
-		#define ETS_DECLARE(x)
-		#define ETSS_DECLARE(x,y)
-		#define ETS_BEGIN(x)
-		#define ETS_END(x)
-	#endif
-#endif //ETS_DECLARE
-
-ETS_DECLARE(g_mmLoad);
-ETS_DECLARE(g_mmForOuter);
-ETS_DECLARE(g_mmFOFind);
-ETS_DECLARE(g_mmFORead);
-ETS_DECLARE(g_mmFOIf);
-ETS_DECLARE(g_mmFOElse);
+TSE_DECLARE(g_mmLoad);
+TSE_DECLARE(g_mmForOuter);
+TSE_DECLARE(g_mmFOFind);
+TSE_DECLARE(g_mmFORead);
+TSE_DECLARE(g_mmFOIf);
+TSE_DECLARE(g_mmFOElse);
 
 void CStringTable::Load	(LPCSTR xml_file)
 {
-	ETSS_DECLARE(mmLoad, g_mmLoad);
+	TSS_DECLARE(mmLoad, g_mmLoad);
 
 	CUIXml						uiXml;
 	string_path					xml_file_full;
@@ -91,24 +77,24 @@ void CStringTable::Load	(LPCSTR xml_file)
 
 	//общий список всех записей таблицы в файле
 	int string_num = uiXml.GetNodesNum		(uiXml.GetRoot(), "string");
-	ETS_BEGIN(g_mmForOuter);
+	TS_BEGIN(g_mmForOuter);
 	for(int i=0; i<string_num; ++i)
 	{
 		LPCSTR string_name = uiXml.ReadAttrib(uiXml.GetRoot(), "string", i, "id", NULL);
 
 		//VERIFY3					(pData->m_StringTable.find(string_name) == pData->m_StringTable.end(), "duplicate string table id", string_name);
-		ETS_BEGIN(g_mmFOFind);
+		TS_BEGIN(g_mmFOFind);
 		if (!(pData->m_StringTable.find(string_name) == pData->m_StringTable.end()))
 		{
 			Msg("! WARNING: duplicate string table id %s. Ignoring.", string_name);
 		};
-		ETS_END(g_mmFOFind);
-		ETS_BEGIN(g_mmFORead);
+		TS_END(g_mmFOFind);
+		TS_BEGIN(g_mmFORead);
 		LPCSTR string_text		= uiXml.Read(uiXml.GetRoot(), "string:text", i,  NULL);
-		ETS_END(g_mmFORead);
+		TS_END(g_mmFORead);
 		if (lstrlen(string_text)>fixedSize) //winsor
 		{
-			ETSS_DECLARE(mmFOIf, g_mmFOIf);
+			TSS_DECLARE(mmFOIf, g_mmFOIf);
 			//split long text into more lines	
 			//Msg("Text in '%s' too long,splitted.",string_name);
 			std::string string_value(string_text);
@@ -127,7 +113,7 @@ void CStringTable::Load	(LPCSTR xml_file)
 		}
 		else
 		{
-			ETSS_DECLARE(mmFOElse, g_mmFOElse);
+			TSS_DECLARE(mmFOElse, g_mmFOElse);
 			if(m_bWriteErrorsToLog && string_text)
 				Msg("[string table] '%s' no translation in '%s'", string_name, *(pData->m_sLanguage));
 			if (!string_text)
@@ -140,7 +126,7 @@ void CStringTable::Load	(LPCSTR xml_file)
 			pData->m_StringTable[string_name] = str_val;
 		}
 	}
-	ETS_END(g_mmForOuter);
+	TS_END(g_mmForOuter);
 }
 void CStringTable::ReparseKeyBindings()
 {

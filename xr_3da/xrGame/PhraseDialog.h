@@ -36,12 +36,12 @@ class CPhraseDialog;
 class CPhraseDialogManager;
 
 class CPhraseDialog	: public CSharedClass<SPhraseDialogData, shared_str, false>,
-					  public CXML_IdToIndex<CPhraseDialog>,
+					  public CXML_IdToIndexBase<CPhraseDialog>,
 					  public intrusive_base
 {
 private:
 	typedef CSharedClass<SPhraseDialogData, shared_str, false>				inherited_shared;
-	typedef CXML_IdToIndex<CPhraseDialog>									id_to_index;
+	typedef CXML_IdToIndexBase<CPhraseDialog>									id_to_index;
 
 	friend id_to_index;
 public:
@@ -135,5 +135,5 @@ public:
 
 protected:
 
-	static void				InitXmlIdToIndex();
+	static void				InitXmlIdToIndex(LPCSTR& file_str, LPCSTR& tag_name);
 };

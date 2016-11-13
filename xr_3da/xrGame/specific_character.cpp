@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "specific_character.h"
+#include "ui/xrUIXmlParser.h"
 
 #ifdef  XRGAME_EXPORTS
 #include "PhraseDialog.h"
@@ -45,12 +46,12 @@ CSpecificCharacter::~CSpecificCharacter()
 }
 
 
-void CSpecificCharacter::InitXmlIdToIndex()
+void CSpecificCharacter::InitXmlIdToIndex(LPCSTR& file_str, LPCSTR& tag_name)
 {
-	if(!id_to_index::tag_name)
-		id_to_index::tag_name = "specific_character";
-	if(!id_to_index::file_str)
-		id_to_index::file_str = pSettings->r_string("profiles", "specific_characters_files");
+	if(!tag_name)
+		tag_name = "specific_character";
+	if(!file_str)
+		file_str = pSettings->r_string("profiles", "specific_characters_files");
 }
 
 
@@ -75,7 +76,7 @@ void CSpecificCharacter::load_shared	(LPCSTR)
 	pXML->SetLocalRoot		(pXML->GetRoot());
 
 
-	XML_NODE* item_node = pXML->NavigateToNode(id_to_index::tag_name, item_data.pos_in_file);
+	XML_NODE* item_node = pXML->NavigateToNode(id_to_index::GetTagName(), item_data.pos_in_file);
 	R_ASSERT3(item_node, "specific_character id=", *item_data.id);
 
 	pXML->SetLocalRoot(item_node);

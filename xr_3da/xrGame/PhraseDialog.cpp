@@ -3,6 +3,7 @@
 #include "phrasedialogmanager.h"
 #include "gameobject.h"
 #include "ai_debug.h"
+#include "ui/xrUIXmlParser.h"
 
 SPhraseDialogData::SPhraseDialogData ()
 {
@@ -195,7 +196,7 @@ void CPhraseDialog::load_shared	(LPCSTR)
 	pXML->SetLocalRoot		(pXML->GetRoot());
 
 	//loading from XML
-	XML_NODE* dialog_node = pXML->NavigateToNode(id_to_index::tag_name, item_data.pos_in_file);
+	XML_NODE* dialog_node = pXML->NavigateToNode(id_to_index::GetTagName(), item_data.pos_in_file);
 	THROW3(dialog_node, "dialog id=", *item_data.id);
 
 	pXML->SetLocalRoot(dialog_node);
@@ -298,12 +299,12 @@ bool  CPhraseDialog::Precondition(const CGameObject* pSpeaker1, const CGameObjec
 	return data()->m_PhraseScript.Precondition(pSpeaker1, pSpeaker2, m_DialogId.c_str(), "", "");
 }
 
-void   CPhraseDialog::InitXmlIdToIndex()
+void   CPhraseDialog::InitXmlIdToIndex(LPCSTR& file_str, LPCSTR& tag_name)
 {
-	if(!id_to_index::tag_name)
-		id_to_index::tag_name = "dialog";
-	if(!id_to_index::file_str)
-		id_to_index::file_str = pSettings->r_string("dialogs", "files");
+	if(!tag_name)
+		tag_name = "dialog";
+	if(!file_str)
+		file_str = pSettings->r_string("dialogs", "files");
 }
 
 bool CPhraseDialog::allIsDummy	()
