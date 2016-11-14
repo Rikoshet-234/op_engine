@@ -541,6 +541,9 @@
     <ClInclude Include="OPFuncs\ExpandedCmdParams.h">
       <Filter>OPFuncs</Filter>
     </ClInclude>
+    <ClInclude Include="FTimerStat.h">
+      <Filter>Kernel</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="xrCore.rc">

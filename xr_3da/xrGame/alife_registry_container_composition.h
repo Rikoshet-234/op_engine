@@ -31,7 +31,7 @@ template <typename _index_type, typename _data_type>
 class CALifeAbstractRegistry;
 
 //для всех персонажей, те порции информации, которые они помнят
-typedef CALifeAbstractRegistry<u16, KNOWN_INFO_VECTOR > CInfoPortionRegistry;
+typedef CALifeAbstractRegistry<u16, CKnownInfoContainer> CInfoPortionRegistry;
 add_to_registry_type_list(CInfoPortionRegistry)
 #define info_portions define_constant(CInfoPortionRegistry) 
 #define registry_type_list save_registry_type_list(CInfoPortionRegistry)

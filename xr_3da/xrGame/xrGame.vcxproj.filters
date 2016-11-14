@@ -9728,6 +9728,9 @@
     <ClCompile Include="ui\UIIconInfo.cpp">
       <Filter>UI\Common\ItemInfo</Filter>
     </ClCompile>
+    <ClCompile Include="xml_str_id_loader.cpp">
+      <Filter>Core\Client\Objects\tasks_info_dialogs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="graph_abstract.h">

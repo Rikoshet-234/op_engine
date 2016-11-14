@@ -21,6 +21,9 @@
 #include <chrono>
 #include <functional>
 
+//#define TS_ENABLE
+#include "../xrCore/FTimerStat.h"
+#undef TS_ENABLE
 
 #ifndef MASTER_GOLD
 #	include "custommonster.h"
@@ -119,28 +122,6 @@ void CGamePersistent::RegisterModel(IRender_Visual* V)
 
 extern void clean_game_globals	();
 extern void init_game_globals	();
-
-#ifndef TS_ENABLE
-//#define TS_ENABLE
-#endif
-
-#ifdef TS_ENABLE
-#define TS_DECLARE(x) CTimerStat x
-#define TS_BEGIN(x) x.Begin()
-#define TS_END(x) x.End()
-#define TS_RESET(x) x.Reset()
-#define TS_P(x,name) Msg( name ": Count = %u, Elapsed = %I64u ms, Average = %2.3f ms, Max = %2.3f ms, Min = %2.3f ms", x.GetCount(), x.GetElapsed_ms(), x.GetAvg(), x.GetMax(), x.GetMin())
-#define TS_PR(x,name) Msg( name ": Count = %u, Elapsed = %I64u ms, Average = %2.3f ms, Max = %2.3f ms, Min = %2.3f ms", x.GetCount(), x.GetElapsed_ms(), x.GetAvg(), x.GetMax(), x.GetMin()); x.Reset()
-#define TS_EPR(x,name) x.End(); Msg( name ": Count = %u, Elapsed = %I64u ms, Average = %2.3f ms, Max = %2.3f ms, Min = %2.3f ms", x.GetCount(), x.GetElapsed_ms(), x.GetAvg(), x.GetMax(), x.GetMin()); x.Reset()
-#else
-#define TS_DECLARE(x)
-#define TS_BEGIN(x)
-#define TS_END(x)
-#define TS_RESET(x)
-#define TS_P(x,name)
-#define TS_EPR(x,name)
-#define TS_PR(x,name)
-#endif
 
 TS_DECLARE(g_mmLoad);
 TS_DECLARE(g_mmForOuter);

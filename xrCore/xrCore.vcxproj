@@ -499,6 +499,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FTimer.h" />
+    <ClInclude Include="FTimerStat.h" />
     <ClInclude Include="OPFuncs\ExpandedCmdParams.h" />
     <ClInclude Include="OPFuncs\op_engine_version.h" />
     <ClInclude Include="OPFuncs\utils.h" />

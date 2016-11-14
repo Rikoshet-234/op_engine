@@ -176,7 +176,7 @@ void   CActor::UpdateAvailableDialogs	(CPhraseDialogManager* partner)
 
 	if(CInventoryOwner::m_known_info_registry->registry().objects_ptr())
 	{
-		for(KNOWN_INFO_VECTOR::const_iterator it = CInventoryOwner::m_known_info_registry->registry().objects_ptr()->begin();
+		for(auto it = CInventoryOwner::m_known_info_registry->registry().objects_ptr()->begin();
 			CInventoryOwner::m_known_info_registry->registry().objects_ptr()->end() != it; ++it)
 		{
 			//подгрузить кусочек информации с которым мы работаем

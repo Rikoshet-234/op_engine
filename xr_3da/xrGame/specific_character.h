@@ -96,11 +96,11 @@ class CSE_ALifeTraderAbstract;
 
 
 class CSpecificCharacter: public CSharedClass<SSpecificCharacterData, shared_str, false>,
-						  public CXML_IdToIndex<CSpecificCharacter>
+						  public CXML_IdToIndexBase<CSpecificCharacter>
 {
 private:
 	typedef CSharedClass	<SSpecificCharacterData, shared_str, false>				inherited_shared;
-	typedef CXML_IdToIndex	<CSpecificCharacter>									id_to_index;
+	typedef CXML_IdToIndexBase	<CSpecificCharacter>									id_to_index;
 
 	friend id_to_index;
 	friend CInventoryOwner;
@@ -119,7 +119,7 @@ protected:
 
 	//загрузка из XML файла
 	virtual void				load_shared				(LPCSTR);
-	static void					InitXmlIdToIndex		();
+	static void					InitXmlIdToIndex		(LPCSTR& file_str, LPCSTR& tag_name);
 
 	shared_str		m_OwnId;
 public:

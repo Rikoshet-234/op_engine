@@ -31,6 +31,10 @@
 #	endif
 #endif
 
+//#define TS_ENABLE
+#include "../xrCore/FTimerStat.h"
+#undef TS_ENABLE
+
 #define MAX_ITEM_FOOD_COUNT			3
 #define MAX_ITEM_MEDIKIT_COUNT		3
 #define MAX_AMMO_ATTACH_COUNT		10
@@ -119,31 +123,31 @@ void CALifeMonsterBrain::process_task			()
 	movement().detail().target		(*task);
 }
 
-#define MEAS_BEGIN(timer) if (g_measure) { timer.Begin(); }
-#define MEAS_END(timer) if (g_measure) { timer.End(); }
+#define MEAS_BEGIN(timer) if (g_measure) { TS_BEGIN(timer); }
+#define MEAS_END(timer) if (g_measure) { TS_END(timer); }
 #define MEAS(timer) g_measure ? timer : g_dummy
 
 extern bool g_measure;
-CTimerStat g_brain_select_task;
-CTimerStat g_brain_st;
-CTimerStat g_brain_al;
-CTimerStat g_brain_for;
-CTimerStat g_brain_for_en;
-CTimerStat g_brain_reg;
-CTimerStat g_dummy;
+TS_DECLARE(g_brain_select_task);
+TS_DECLARE(g_brain_st);
+TS_DECLARE(g_brain_al);
+TS_DECLARE(g_brain_for);
+TS_DECLARE(g_brain_for_en);
+TS_DECLARE(g_brain_reg);
+TS_DECLARE(g_dummy);
 
 void CALifeMonsterBrain::select_task			()
 {
-	CTimerStatScoped _(MEAS(g_brain_select_task));
+	TSS_DECLARE(_, MEAS(g_brain_select_task));
 
 	{
-		CTimerStatScoped _l(MEAS(g_brain_st));
+		TSS_DECLARE(_l, MEAS(g_brain_st));
 		if (object().m_smart_terrain_id != 0xffff)
 			return;
 	}
 
 	{
-		CTimerStatScoped _l(MEAS(g_brain_al));
+		TSS_DECLARE(_l, MEAS(g_brain_al));
 		if (!can_choose_alife_tasks())
 			return;
 	}
@@ -158,10 +162,10 @@ void CALifeMonsterBrain::select_task			()
 	CALifeSmartTerrainRegistry::OBJECTS::const_iterator	I = ai().alife().smart_terrains().objects().begin();
 	CALifeSmartTerrainRegistry::OBJECTS::const_iterator	E = ai().alife().smart_terrains().objects().end();
 	{
-		CTimerStatScoped _l(MEAS(g_brain_for));
+		TSS_DECLARE(_l, MEAS(g_brain_for));
 		for ( ; I != E; ++I) 
 		{
-			CTimerStatScoped _l_en(MEAS(g_brain_for_en));
+			TSS_DECLARE(_l_en, MEAS(g_brain_for_en));
 			if (!(*I).second->enabled(&object()))
 				continue;
 
@@ -174,7 +178,7 @@ void CALifeMonsterBrain::select_task			()
 	}
 
 	{
-		CTimerStatScoped _l(MEAS(g_brain_reg));
+		TSS_DECLARE(_l, MEAS(g_brain_reg));
 		if (object().m_smart_terrain_id != 0xffff) {
 			smart_terrain().register_npc	(&object());
 			m_last_search_time				= 0;
