@@ -59,7 +59,7 @@ void CEncyclopediaArticle::load_shared	(LPCSTR)
 	pXML->SetLocalRoot		(pXML->GetRoot());
 
 	//loading from XML
-	XML_NODE* pNode = pXML->NavigateToNode(id_to_index::tag_name, item_data.pos_in_file);
+	XML_NODE* pNode = pXML->NavigateToNode(id_to_index::GetTagName(), item_data.pos_in_file);
 	THROW3(pNode, "encyclopedia article id=", *item_data.id);
 
 	//текст
@@ -133,10 +133,10 @@ void CEncyclopediaArticle::load_shared	(LPCSTR)
 	data()->ui_template_name = pXML->ReadAttrib(pNode, "ui_template", "common");
 }
 
-void CEncyclopediaArticle::InitXmlIdToIndex()
+void CEncyclopediaArticle::InitXmlIdToIndex(LPCSTR& file_str, LPCSTR& tag_name)
 {
-	if(!id_to_index::tag_name)
-		id_to_index::tag_name = "article";
-	if(!id_to_index::file_str)
-		id_to_index::file_str = pSettings->r_string("encyclopedia", "files");
+	if(!tag_name)
+		tag_name = "article";
+	if(!file_str)
+		file_str = pSettings->r_string("encyclopedia", "files");
 }

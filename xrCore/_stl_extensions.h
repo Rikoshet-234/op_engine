@@ -204,8 +204,9 @@ template	<typename K, class P=std::less<K>, typename allocator = xalloc<K> >				
 template	<typename K, class P=std::less<K>, typename allocator = xalloc<K> >				class	xr_multiset		: public std::multiset<K,P,allocator>	{ public: u32 size() const {return (u32)__super::size(); } };
 template	<typename K, class V, class P=std::less<K>, typename allocator = xalloc<std::pair<K,V> > >	class	xr_map 			: public std::map<K,V,P,allocator>		{ public: u32 size() const {return (u32)__super::size(); } };
 template	<typename K, class V, class P=std::less<K>, typename allocator = xalloc<std::pair<K,V> > >	class	xr_multimap		: public std::multimap<K,V,P,allocator>	{ public: u32 size() const {return (u32)__super::size(); } };
-template	<typename K, class V, class P=stdext::hash_compare<K, std::less<K> >, typename allocator = xalloc<std::pair<K,V> > >	class	xr_hashmap		: public stdext::hash_map<K,V,P,allocator>		{ public: u32 size() const {return (u32)__super::size(); } };
-
+template	<typename K, class V, class P=stdext::hash_compare<K, std::less<K> >, typename allocator = xalloc<std::pair<K,V> > >	class xr_hashmap		: public stdext::hash_map<K,V,P,allocator>		{ public: u32 size() const {return (u32)__super::size(); } };
+template	<typename K, class V, class P=stdext::hash_compare<K, std::less<K> >, typename allocator = xalloc<std::pair<K,V> > >	class xr_hashmultimap	: public stdext::hash_multimap<K,V,P,allocator> { public: u32 size() const { return (u32)__super::size(); }
+};
 #endif
 
 template	<class _Ty1, class _Ty2> inline	std::pair<_Ty1, _Ty2>		mk_pair		(_Ty1 _Val1, _Ty2 _Val2)	{	return (std::pair<_Ty1, _Ty2>(_Val1, _Val2));	}

@@ -56,11 +56,10 @@ bool CInventoryOwner::OnReceiveInfo(shared_str info_id) const
 {
 	VERIFY( info_id.size() );
 	//добавить запись в реестр
-	KNOWN_INFO_VECTOR& known_info = m_known_info_registry->registry().objects();
-	//KNOWN_INFO_VECTOR_IT it = std::find_if(known_info.begin(), known_info.end(), CFindByIDPred(info_id));
+	CKnownInfoContainer& known_info = m_known_info_registry->registry().objects();
 
 	if(!known_info.exist(info_id))
-		known_info.insert(KNOWN_INFO_VECTOR::value_type(info_id._get()->dwCRC, INFO_DATA(info_id, Level().GetGameTime())));
+		known_info.insert(INFO_DATA(info_id, Level().GetGameTime()));
 	else
 		return false;
 
@@ -95,7 +94,7 @@ bool CInventoryOwner::OnReceiveInfo(shared_str info_id) const
 
 void CInventoryOwner::DumpInfo(shared_str ids) const
 {
-	KNOWN_INFO_VECTOR& known_info = m_known_info_registry->registry().objects();
+	CKnownInfoContainer& known_info = m_known_info_registry->registry().objects();
 	std::vector<std::string> listIds=OPFuncs::splitString(ids.c_str(),',');
 	Msg("Start KnownInfos dump for [%s]",Name());	
 	
@@ -110,7 +109,7 @@ void CInventoryOwner::DumpInfo(shared_str ids) const
 	}
 	else
 	{
-		KNOWN_INFO_VECTOR_CIT it = known_info.begin();
+		auto it = known_info.begin();
 		for(int i=0;it!=known_info.end();++it,++i)
 		{
 			Msg("known info[%d]:%s",i,(*it).second.info_id.c_str());	
@@ -130,9 +129,9 @@ void CInventoryOwner::OnDisableInfo(shared_str info_id) const
 		Msg("[%s] Disabled Info [%s]", Name(), *info_id);
 #endif
 
-	KNOWN_INFO_VECTOR& known_info = m_known_info_registry->registry().objects();
+	CKnownInfoContainer& known_info = m_known_info_registry->registry().objects();
 
-	KNOWN_INFO_VECTOR::const_iterator it = known_info.find(info_id);
+	auto it = known_info.find(info_id);
 	if( known_info.end() == it)	return;
 	known_info.erase(it);
 }
@@ -163,7 +162,7 @@ void CInventoryOwner::TransferInfo(shared_str info_id, bool add_info) const
 bool CInventoryOwner::HasInfo(shared_str info_id) const
 {
 	VERIFY( info_id.size() );
-	const KNOWN_INFO_VECTOR* known_info = m_known_info_registry->registry().objects_ptr ();
+	const CKnownInfoContainer* known_info = m_known_info_registry->registry().objects_ptr ();
 	if(!known_info) return false;
 
 	return known_info->exist(info_id);
@@ -172,10 +171,10 @@ bool CInventoryOwner::HasInfo(shared_str info_id) const
 bool CInventoryOwner::GetInfo	(shared_str info_id, INFO_DATA& info_data) const
 {
 	VERIFY( info_id.size() );
-	const KNOWN_INFO_VECTOR* known_info = m_known_info_registry->registry().objects_ptr ();
+	const CKnownInfoContainer* known_info = m_known_info_registry->registry().objects_ptr ();
 	if(!known_info) return false;
 
-	KNOWN_INFO_VECTOR::const_iterator it = known_info->find(info_id);
+	auto it = known_info->find(info_id);
 	if(known_info->end() == it)
 		return false;
 
