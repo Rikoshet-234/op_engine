@@ -22,7 +22,7 @@ using namespace InventoryUtilities;
 #include "../level.h"
 #include "../game_base_space.h"
 #include "../entitycondition.h"
-
+#include "../../xrSound/Sound.h"
 #include "../game_cl_base.h"
 #include "UISleepWnd.h"
 #include "../ActorCondition.h"

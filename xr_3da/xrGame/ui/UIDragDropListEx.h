@@ -66,6 +66,7 @@ private:
 	Flags8					m_flags;
 	CUICellItem*			m_selected_item;
 	Ivector2				m_orig_cell_capacity;
+	bool					m_b_showConditionBar;;
 
 protected:
 	
@@ -83,7 +84,8 @@ protected:
 
 	IWListTypes				listId;
 public:
-	
+	bool					GetShowConditionBar() const {return m_b_showConditionBar;}
+	void					SetShowConditionBar(bool state)	 {m_b_showConditionBar=state;}
 	IWListTypes				GetUIListId() const			{return listId; };
 	void					SetUIListId(IWListTypes id)	{listId=id; };
 	bool					m_b_adjustCells;

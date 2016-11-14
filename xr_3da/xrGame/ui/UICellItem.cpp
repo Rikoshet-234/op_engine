@@ -5,6 +5,13 @@
 #include "../HUDManager.h"
 #include "../level.h"
 #include "../object_broker.h"
+#include "xrUIXmlParser.h"
+#include "UIXmlInit.h"
+#include "UIDragDropListEx.h"
+#include "../Weapon.h"
+#include "../ExoOutfit.h"
+
+#define CELL_ITEM_XML "cell_item.xml"
 
 CUICellItem::CUICellItem()
 {
@@ -18,10 +25,13 @@ CUICellItem::CUICellItem()
 	m_focused=false;
 	m_selected=false;
 	m_suitable=false;
+	p_ConditionProgressBar=nullptr;
+	init();
 }
 
 CUICellItem::~CUICellItem()
 {
+
 	if(m_b_destroy_childs)
 		delete_data	(m_childs);
 
@@ -86,6 +96,7 @@ CUIDragItem* CUICellItem::CreateDragItem()
 void CUICellItem::SetOwnerList(CUIDragDropListEx* p)	
 {
 	m_pParentList=p;
+	updateConditionBar();
 }
 
 bool CUICellItem::EqualTo(CUICellItem* itm)
@@ -132,6 +143,43 @@ void CUICellItem::UpdateItemText()
 
 	SetText				(str);
 }
+
+void CUICellItem::init()
+{
+	CUIXml	uiXml;
+	uiXml.Init( CONFIG_PATH, UI_PATH, CELL_ITEM_XML );
+	CUIXmlInit							xml_init;
+	p_ConditionProgressBar=xr_new<CUIProgressBar>();
+	p_ConditionProgressBar->SetAutoDelete(true);
+	AttachChild (p_ConditionProgressBar);
+	xml_init.InitProgressBar (uiXml, "progress_item_condition", 0, p_ConditionProgressBar);
+	p_ConditionProgressBar->Show(true);
+}
+
+void CUICellItem::updateConditionBar()
+{
+	if (m_pParentList && m_pParentList->GetShowConditionBar())
+	{
+		PIItem itm = static_cast<PIItem>(m_pData);
+		CWeapon* pWeapon = smart_cast<CWeapon*>(itm);
+		CCustomOutfit* pOutfit=smart_cast<CCustomOutfit*>(itm);
+		if (pWeapon || pOutfit)
+		{
+			Ivector2 itm_grid_size = GetGridSize();
+			Ivector2 cell_size = m_pParentList->CellSize();
+			float x = 1.f;
+			float y = itm_grid_size.y * cell_size.y - p_ConditionProgressBar->GetHeight()-1;
+
+			p_ConditionProgressBar->SetWndPos(Fvector2().set(x,y));
+			//p_ConditionProgressBar->SetWidth(float(itm_grid_size.x*cell_size.x-5));
+			p_ConditionProgressBar->SetProgressPos(itm->GetCondition()*100+1.0f-EPS);
+			p_ConditionProgressBar->Show(true);
+			return;
+		}
+	}
+	p_ConditionProgressBar->Show(false);
+}
+
 
 void CUICellItem::SetCustomDraw			(ICustomDrawCell* c){
 	if (m_custom_draw)

@@ -4,6 +4,7 @@
 #include "UIDialogWnd.h"
 #include "../inventory_item.h"
 #include "UIColorAnimatorWrapper.h"
+#include "UIProgressBar.h"
 
 class CUIDragItem;
 class CUIDragDropListEx;
@@ -28,7 +29,10 @@ protected:
 	Ivector2				m_grid_size_start;
 	ICustomDrawCell*		m_custom_draw;
 	int						m_accelerator;
+	CUIProgressBar*			p_ConditionProgressBar;
 	virtual void			UpdateItemText			();
+	void					init();
+	void					updateConditionBar();
 public:
 							CUICellItem				();
 	virtual					~CUICellItem			();
