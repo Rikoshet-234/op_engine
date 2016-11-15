@@ -3,6 +3,10 @@
 
 #include <string>
 #include "../ai/stalker/ai_stalker.h"
+#include "../../xrCore/FTimerStat.h"
+extern CTimerStat forCellCreation; 
+extern CTimerStat forFillActor; 
+extern CTimerStat forFillOther; 
 
 namespace OPFuncs
 {

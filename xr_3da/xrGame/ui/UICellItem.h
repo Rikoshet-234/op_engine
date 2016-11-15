@@ -31,8 +31,7 @@ protected:
 	int						m_accelerator;
 	CUIProgressBar*			p_ConditionProgressBar;
 	virtual void			UpdateItemText			();
-	void					init();
-	void					updateConditionBar();
+
 public:
 							CUICellItem				();
 	virtual					~CUICellItem			();
@@ -44,7 +43,7 @@ public:
 				
 	virtual		void		OnAfterChild			()						{};
 
-				u32			ChildsCount				();
+				u32			ChildsCount				() const;
 				bool		HasChilds() const		{return m_childs.size()>0;}
 				void		 PushChild				(CUICellItem*);
 				CUICellItem* PopChild				();

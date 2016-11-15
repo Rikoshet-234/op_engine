@@ -1111,7 +1111,7 @@ u32  CInventory::BeltWidth() const
 	return m_iMaxBelt;
 }
 
-void  CInventory::AddAvailableItems(TIItemContainer& items_container, bool for_trade) const
+void  CInventory::AddAvailableItems(TIItemContainer& items_container, bool for_trade,bool useBelt,bool useSlots) const
 {
 	for(TIItemContainer::const_iterator it = m_ruck.begin(); m_ruck.end() != it; ++it) 
 	{
@@ -1120,7 +1120,7 @@ void  CInventory::AddAvailableItems(TIItemContainer& items_container, bool for_t
 			items_container.push_back(pIItem);
 	}
 
-	if(m_bBeltUseful)
+	if(m_bBeltUseful&& useBelt)
 	{
 		for(TIItemContainer::const_iterator it = m_belt.begin(); m_belt.end() != it; ++it) 
 		{
@@ -1130,7 +1130,7 @@ void  CInventory::AddAvailableItems(TIItemContainer& items_container, bool for_t
 		}
 	}
 	
-	if(m_bSlotsUseful)
+	if(m_bSlotsUseful && useSlots)
 	{
 		TISlotArr::const_iterator slot_it			= m_slots.begin();
 		TISlotArr::const_iterator slot_it_e			= m_slots.end();

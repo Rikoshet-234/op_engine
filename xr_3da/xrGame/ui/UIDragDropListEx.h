@@ -3,6 +3,7 @@
 #include "UIWindow.h"
 #include "UIWndCallback.h"
 #include "../inventory_space.h"
+#include "UIProgressBar.h"
 
 class CInventoryItem;
 class CUICellContainer;
@@ -32,7 +33,7 @@ struct CUICell{
 typedef xr_vector<CUICell>			UI_CELLS_VEC;
 typedef UI_CELLS_VEC::iterator		UI_CELLS_VEC_IT;
 
-typedef enum //inventory list types for export to scripts (identically to InventorySlots, but plus 3 items
+typedef enum //inventory list types for export to scripts (identically to InventorySlots, but plus more items
 {
 	ltSlotKnife			= KNIFE_SLOT,
 	ltSlotPistol		= PISTOL_SLOT,
@@ -50,6 +51,10 @@ typedef enum //inventory list types for export to scripts (identically to Invent
 	ltSlotBiodev		= BIODEV_SLOT,
 	ltBag				= 20,
 	ltBelt				= 21,
+	ltTradeOurBag		= 22,
+	ltTradeOtherBag		= 23,
+	ltTradeOurTrade		= 24,
+	ltTradeOtherTrade	= 25,
 	ltUnknown			= -1
 } IWListTypes;
 
@@ -85,7 +90,8 @@ protected:
 	IWListTypes				listId;
 public:
 	bool					GetShowConditionBar() const {return m_b_showConditionBar;}
-	void					SetShowConditionBar(bool state)	 {m_b_showConditionBar=state;}
+	void SetShowConditionBar(bool state);
+	void PutConditionBarUIData(CUIProgressBar* progress);
 	IWListTypes				GetUIListId() const			{return listId; };
 	void					SetUIListId(IWListTypes id)	{listId=id; };
 	bool					m_b_adjustCells;
@@ -93,7 +99,7 @@ public:
 	int						m_i_scroll_pos;
 							CUIDragDropListEx	();
 	virtual					~CUIDragDropListEx	();
-				void		Init				(float x, float y, float w, float h);
+	void					Init				(float x, float y, float w, float h);
 
 	typedef					fastdelegate::FastDelegate1<CUICellItem*, bool>		DRAG_DROP_EVENT;
 

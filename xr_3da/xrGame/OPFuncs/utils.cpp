@@ -1,7 +1,9 @@
 ﻿#include "stdafx.h"
 
 #include "utils.h"
-
+CTimerStat forCellCreation; 
+CTimerStat forFillActor; 
+CTimerStat forFillOther; 
 namespace OPFuncs
 {
 	

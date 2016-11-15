@@ -1,11 +1,18 @@
 #pragma once
 #include "UIWindow.h"
 #include "../inventory_space.h"
+#include "UIStatic.h"
+#include "UIMultiTextStatic.h"
+#include "UIDragDropListEx.h"
+#include "uicharacterinfo.h"
+#include "UI3tButton.h"
+#include "UIItemInfo.h"
+#include "../uigamecustom.h"
+#include "UIPropertiesBox.h"
 
 class CInventoryOwner;
 class CEatableItem;
 class CTrade;
-struct CUITradeInternal;
 
 class CUIDragDropListEx;
 class CUICellItem;
@@ -36,8 +43,39 @@ public:
 	void 				StartTrade					();
 	void 				StopTrade					();
 protected:
+	CUIStatic			UIStaticTop;
+	CUIStatic			UIStaticBottom;
 
-	CUITradeInternal*	m_uidata;
+	CUIStatic			UIOurBagWnd;
+	CUIStatic			UIOurMoneyStatic;
+	CUIStatic			UIOthersBagWnd;
+	CUIStatic			UIOtherMoneyStatic;
+	CUIDragDropListEx	UIOurBagList;
+	CUIDragDropListEx	UIOthersBagList;
+
+	CUIStatic			UIOurTradeWnd;
+	CUIStatic			UIOthersTradeWnd;
+	CUIMultiTextStatic	UIOurPriceCaption;
+	CUIMultiTextStatic	UIOthersPriceCaption;
+	CUIDragDropListEx	UIOurTradeList;
+	CUIDragDropListEx	UIOthersTradeList;
+
+	xr_vector<CUIDragDropListEx*>	tradeLists;
+	//кнопки
+	CUI3tButton			UIPerformTradeButton;
+	CUI3tButton			UIToTalkButton;
+
+	//информация о персонажах 
+	CUIStatic			UIOurIcon;
+	CUIStatic			UIOthersIcon;
+	CUICharacterInfo	UICharacterInfoLeft;
+	CUICharacterInfo	UICharacterInfoRight;
+
+	//информация о перетаскиваемом предмете
+	CUIStatic			UIDescWnd;
+	CUIItemInfo			UIItemInfo;
+
+	SDrawStaticStruct*	UIDealMsg;
 
 	bool				bStarted;
 	bool 				ToOurTrade					();
@@ -81,15 +119,29 @@ protected:
 
 
 	void				SetCurrentItem				(CUICellItem* itm);
+	void				SetItemSelected				(CUICellItem* itm);
 	CUICellItem*		CurrentItem					();
 	PIItem				CurrentIItem				();
+
 
 	bool		xr_stdcall		OnItemDrop			(CUICellItem* itm);
 	bool		xr_stdcall		OnItemStartDrag		(CUICellItem* itm);
 	bool		xr_stdcall		OnItemDbClick		(CUICellItem* itm);
 	bool		xr_stdcall		OnItemSelected		(CUICellItem* itm);
 	bool		xr_stdcall		OnItemRButtonClick	(CUICellItem* itm);
+	bool		xr_stdcall		OnItemFocusLost		(CUICellItem* itm);
+	bool		xr_stdcall		OnItemFocusReceive	(CUICellItem* itm);
 
-	void				BindDragDropListEnents		(CUIDragDropListEx* lst);
-
+	void						BindDragDropListEnents		(CUIDragDropListEx* lst);
+	void						UpdateItemUICost(CUICellItem* cellItem);
+public:
+	void						re_init();
+	void						ClearAllSuitables();
+	void						ClearSuitablesInList(IWListTypes listType);
+	void						SetSuitableBySection(LPCSTR section);
+	void						SetSuitableBySection(luabind::object const &sections);
+	void						SetSuitableBySectionInList(IWListTypes listType,LPCSTR section);
+	void						SetSuitableBySectionInList(IWListTypes listType,luabind::object const& sections);
+private:
+	xr_vector<LPCSTR>			getStringsFromLua(luabind::object const& table) const;
 };

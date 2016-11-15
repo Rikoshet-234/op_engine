@@ -12,6 +12,7 @@
 #include "UIInventoryWnd.h"
 #include "UICellItem.h"
 #include "UIMainIngameWnd.h"
+#include "UITradeWnd.h"
 #include "../Level.h"
 #include "../UIGameCustom.h"
 #include "../UIGameSP.h"
@@ -202,6 +203,16 @@ void CUIWindow::script_register(lua_State *L)
 		.def("SetSuitableBySectionInList",	static_cast<void (CUIInventoryWnd::*)(IWListTypes,LPCSTR)>					(&CUIInventoryWnd::SetSuitableBySectionInList))
 		.def("SetSuitableBySectionInList",	static_cast<void (CUIInventoryWnd::*)(IWListTypes,luabind::object const& )>	(&CUIInventoryWnd::SetSuitableBySectionInList)),
 
+		class_<CUITradeWnd, CUIWindow>("CUIInventoryWnd")
+		.def("re_init",						&CUITradeWnd::re_init)
+		.def("GetUIWindowType",				&CUITradeWnd::GetUIWindowType)
+		.def("ClearAllSuitables",			&CUITradeWnd::ClearAllSuitables)
+		.def("ClearSuitablesInList",		&CUITradeWnd::ClearSuitablesInList)
+		.def("SetSuitableBySection",		static_cast<void (CUITradeWnd::*)(LPCSTR)>					(&CUITradeWnd::SetSuitableBySection))
+		.def("SetSuitableBySection",		static_cast<void (CUITradeWnd::*)(luabind::object const& )>	(&CUITradeWnd::SetSuitableBySection))
+		.def("SetSuitableBySectionInList",	static_cast<void (CUITradeWnd::*)(IWListTypes,LPCSTR)>					(&CUITradeWnd::SetSuitableBySectionInList))
+		.def("SetSuitableBySectionInList",	static_cast<void (CUITradeWnd::*)(IWListTypes,luabind::object const& )>	(&CUITradeWnd::SetSuitableBySectionInList)),
+
 		class_<CUIDragDropListEx, CUIWindow,CUIWndCallback>("CUIDragDropListEx")
 		.def("GetUIListId",				&CUIDragDropListEx::GetUIListId),
 
@@ -238,6 +249,10 @@ void CUIWindow::script_register(lua_State *L)
 				value("LT_BELT",				int(ltBelt)),
 				value("LT_SHOTGUN",				int(ltSlotShotgun)),
 				value("LT_BIODEV",				int(ltSlotBiodev)),
+				value("LT_TRADE_OUR_BAG",		int(ltTradeOurBag)),
+				value("LT_TRADE_OUR_TRADE",		int(ltTradeOurTrade)),
+				value("LT_TRADE_OTHER_BAG",		int(ltTradeOtherBag)),
+				value("LT_TRADE_OTHER_TRADE",	int(ltTradeOtherTrade)),
 				value("LT_UNKNOWN",				int(ltUnknown))
 			],
 

@@ -5,13 +5,13 @@
 #include "../HUDManager.h"
 #include "../level.h"
 #include "../object_broker.h"
-#include "xrUIXmlParser.h"
-#include "UIXmlInit.h"
 #include "UIDragDropListEx.h"
 #include "../Weapon.h"
-#include "../ExoOutfit.h"
-
-#define CELL_ITEM_XML "cell_item.xml"
+#include "../CustomOutfit.h"
+#include "../../defines.h"
+#include "../smart_cast.h"
+#include "UITradeWnd.h"
+#include "../OPFuncs/utils.h"
 
 CUICellItem::CUICellItem()
 {
@@ -25,8 +25,9 @@ CUICellItem::CUICellItem()
 	m_focused=false;
 	m_selected=false;
 	m_suitable=false;
-	p_ConditionProgressBar=nullptr;
-	init();
+	p_ConditionProgressBar=xr_new<CUIProgressBar>();
+	p_ConditionProgressBar->SetAutoDelete(true);
+	CUIWindow::AttachChild(p_ConditionProgressBar);
 }
 
 CUICellItem::~CUICellItem()
@@ -37,7 +38,6 @@ CUICellItem::~CUICellItem()
 
 	delete_data		(m_custom_draw);
 }
-
 
 void CUICellItem::Draw()
 {
@@ -96,7 +96,24 @@ CUIDragItem* CUICellItem::CreateDragItem()
 void CUICellItem::SetOwnerList(CUIDragDropListEx* p)	
 {
 	m_pParentList=p;
-	updateConditionBar();
+	if (!m_pParentList)
+		return;
+	PIItem itm = static_cast<PIItem>(m_pData);
+	CWeapon* pWeapon = smart_cast<CWeapon*>(itm);
+	CCustomOutfit* pOutfit=smart_cast<CCustomOutfit*>(itm);
+	bool visible=false;
+	if ((pWeapon || pOutfit) && m_pParentList->GetShowConditionBar() && g_uCommonFlags.test(E_COMMON_FLAGS::uiShowConditions))
+	{
+		m_pParentList->PutConditionBarUIData(p_ConditionProgressBar);
+		Ivector2 itm_grid_size = GetGridSize();
+		Ivector2 cell_size = m_pParentList->CellSize();
+		float x = 1.f;
+		float y = itm_grid_size.y * cell_size.y - p_ConditionProgressBar->GetHeight();
+		p_ConditionProgressBar->SetWndPos(Fvector2().set(x,y));
+		p_ConditionProgressBar->SetProgressPos(itm->GetCondition()*100+1.0f-EPS);
+		visible=true;
+	}
+	p_ConditionProgressBar->Show(visible);
 }
 
 bool CUICellItem::EqualTo(CUICellItem* itm)
@@ -104,7 +121,7 @@ bool CUICellItem::EqualTo(CUICellItem* itm)
 	return (m_grid_size.x==itm->GetGridSize().x) && (m_grid_size.y==itm->GetGridSize().y);
 }
 
-u32 CUICellItem::ChildsCount()
+u32 CUICellItem::ChildsCount() const
 {
 	return m_childs.size();
 }
@@ -144,43 +161,6 @@ void CUICellItem::UpdateItemText()
 	SetText				(str);
 }
 
-void CUICellItem::init()
-{
-	CUIXml	uiXml;
-	uiXml.Init( CONFIG_PATH, UI_PATH, CELL_ITEM_XML );
-	CUIXmlInit							xml_init;
-	p_ConditionProgressBar=xr_new<CUIProgressBar>();
-	p_ConditionProgressBar->SetAutoDelete(true);
-	AttachChild (p_ConditionProgressBar);
-	xml_init.InitProgressBar (uiXml, "progress_item_condition", 0, p_ConditionProgressBar);
-	p_ConditionProgressBar->Show(true);
-}
-
-void CUICellItem::updateConditionBar()
-{
-	if (m_pParentList && m_pParentList->GetShowConditionBar())
-	{
-		PIItem itm = static_cast<PIItem>(m_pData);
-		CWeapon* pWeapon = smart_cast<CWeapon*>(itm);
-		CCustomOutfit* pOutfit=smart_cast<CCustomOutfit*>(itm);
-		if (pWeapon || pOutfit)
-		{
-			Ivector2 itm_grid_size = GetGridSize();
-			Ivector2 cell_size = m_pParentList->CellSize();
-			float x = 1.f;
-			float y = itm_grid_size.y * cell_size.y - p_ConditionProgressBar->GetHeight()-1;
-
-			p_ConditionProgressBar->SetWndPos(Fvector2().set(x,y));
-			//p_ConditionProgressBar->SetWidth(float(itm_grid_size.x*cell_size.x-5));
-			p_ConditionProgressBar->SetProgressPos(itm->GetCondition()*100+1.0f-EPS);
-			p_ConditionProgressBar->Show(true);
-			return;
-		}
-	}
-	p_ConditionProgressBar->Show(false);
-}
-
-
 void CUICellItem::SetCustomDraw			(ICustomDrawCell* c){
 	if (m_custom_draw)
 		xr_delete(m_custom_draw);
@@ -203,7 +183,7 @@ CUIDragItem::CUIDragItem(CUICellItem* parent)
 {
 	m_back_list						= nullptr;
 	m_pParent						= parent;
-	CUIWindow::AttachChild						(&m_static);
+	CUIWindow::AttachChild			(&m_static);
 	Device.seqRender.Add			(this, REG_PRIORITY_LOW-5000);
 	Device.seqFrame.Add				(this, REG_PRIORITY_LOW-5000);
 	VERIFY							(m_pParent->GetMessageTarget());

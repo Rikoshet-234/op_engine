@@ -27,6 +27,7 @@ public:
 	Fcolor				m_minColor;
 	Fcolor				m_maxColor;
 	float				m_inertion;	//
+	void				SetBackgroundPresent(bool state) {m_bBackgroundPresent=state;}
 public:
 	CUIStatic			m_UIProgressItem;
 	CUIStatic			m_UIBackgroundItem;

@@ -4574,6 +4574,8 @@
     <ClCompile Include="xml_str_id_loader.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">StdAfx.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(ProjectName).pch</PrecompiledHeaderOutputFile>
+	  <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">StdAfx.h</PrecompiledHeaderFile>
+	  <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(ProjectName).pch</PrecompiledHeaderOutputFile>
     </ClCompile>
     <ClCompile Include="xr_Client_BattlEye.cpp" />
     <ClCompile Include="CameraFirstEye.cpp" />

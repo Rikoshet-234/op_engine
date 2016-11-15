@@ -18,15 +18,34 @@
 #include "../game_object_space.h"
 #include "../script_callback_ex.h"
 #include "../script_game_object.h"
+#include "xrUIXmlParser.h"
+#include "UIXmlInit.h"
 
 
 CUIDragItem* CUIDragDropListEx::m_drag_item = NULL;
 
+struct TCachedData
+{
+	bool initialized;
+	float x;
+	float y;
+	float width;
+	float height;
+	float min_pos;
+	float max_pos;
+	float pos;
+	u32 min_color;
+	u32 max_color;
+	shared_str texture;
+	shared_str textureBack;
+} ;
+static TCachedData cacheData;
+
 void CUICell::Clear()
 {
 	m_bMainItem = false;
-	if(m_item)	m_item->SetOwnerList(NULL);
-	m_item		= NULL; 
+	if(m_item)	m_item->SetOwnerList(nullptr);
+	m_item		= nullptr; 
 }
 
 CUIDragDropListEx::CUIDragDropListEx()
@@ -37,6 +56,7 @@ CUIDragDropListEx::CUIDragDropListEx()
 	m_vScrollBar				= xr_new<CUIScrollBar>();
 	m_vScrollBar->SetAutoDelete	(true);
 	m_selected_item				= nullptr;
+	m_b_showConditionBar		= false;
 
 	SetCellSize					(Ivector2().set(50,50));
 	SetCellsCapacity			(Ivector2().set(0,0));
@@ -55,6 +75,7 @@ CUIDragDropListEx::CUIDragDropListEx()
 	AddCallback					("cell_item",	WINDOW_FOCUS_RECEIVED,			CUIWndCallback::void_function		(this, &CUIDragDropListEx::OnItemFocusReceived)			);
 	AddCallback					("cell_item",	WINDOW_FOCUS_LOST,				CUIWndCallback::void_function		(this, &CUIDragDropListEx::OnItemFocusLost)			);
 	m_i_scroll_pos=-1;
+	cacheData.initialized=false;
 }
 
 CUIDragDropListEx::~CUIDragDropListEx()
@@ -220,6 +241,51 @@ void CUIDragDropListEx::OnItemFocusLost(CUIWindow* w, void* pData)
 		m_f_item_focus_lost				(itm);
 	}
 
+}
+
+void CUIDragDropListEx::PutConditionBarUIData(CUIProgressBar* progress)
+{
+	if (progress)
+	{
+		progress->Init(cacheData.x,cacheData.y,cacheData.width,cacheData.height,true);
+		progress->SetRange(cacheData.min_pos,cacheData.max_pos);
+		progress->SetProgressPos(cacheData.pos);
+
+		progress->m_UIProgressItem.SetOriginalRect(cacheData.x,cacheData.y,cacheData.width,cacheData.height);
+		progress->m_UIProgressItem.InitTexture(cacheData.texture.c_str());
+		progress->m_UIProgressItem.SetWndSize(progress->GetWndSize());
+		
+		progress->m_UIBackgroundItem.SetOriginalRect(cacheData.x,cacheData.y,cacheData.width,cacheData.height);
+		progress->m_UIBackgroundItem.InitTexture(cacheData.textureBack.c_str());
+		progress->SetBackgroundPresent(true);
+		progress->m_UIBackgroundItem.SetWndSize(progress->GetWndSize());
+
+		progress->m_minColor.set(cacheData.min_color);
+		progress->m_maxColor.set(cacheData.max_color);
+		progress->m_bUseColor=true;
+	}
+}
+
+void CUIDragDropListEx::SetShowConditionBar(bool state)
+{
+	m_b_showConditionBar = state;
+	if (m_b_showConditionBar && !cacheData.initialized)
+	{
+		CUIXml	uiXml;
+		uiXml.Init( CONFIG_PATH, UI_PATH, "cell_item.xml" );
+		cacheData.x = uiXml.ReadAttribFlt("progress_item_condition", 0, "x");
+		cacheData.y = uiXml.ReadAttribFlt("progress_item_condition", 0, "y");
+		cacheData.width = uiXml.ReadAttribFlt("progress_item_condition", 0, "width");
+		cacheData.height = uiXml.ReadAttribFlt("progress_item_condition", 0, "height");
+		cacheData.min_pos = uiXml.ReadAttribFlt("progress_item_condition", 0, "min");
+		cacheData.max_pos = uiXml.ReadAttribFlt("progress_item_condition", 0, "max");
+		cacheData.pos = uiXml.ReadAttribFlt("progress_item_condition", 0, "pos");
+		cacheData.texture=uiXml.Read("progress_item_condition:progress:texture", 0, nullptr);
+		cacheData.textureBack=uiXml.Read("progress_item_condition:background:texture", 0, nullptr);
+		cacheData.min_color=CUIXmlInit::GetColor(uiXml,"progress_item_condition:min_color",0,0xff);
+		cacheData.max_color=CUIXmlInit::GetColor(uiXml,"progress_item_condition:max_color",0,0xff);
+		cacheData.initialized=true;
+	}
 }
 
 void CUIDragDropListEx::OnItemSelected(CUIWindow* w, void* pData)
@@ -585,7 +651,7 @@ bool CUIDragDropListEx::CanSetItem(CUICellItem* itm){
 CUICellItem* CUIDragDropListEx::RemoveItem(CUICellItem* itm, bool force_root)
 {
 	CUICellItem* i				= m_container->RemoveItem		(itm, force_root);
-	i->SetOwnerList				((CUIDragDropListEx*)NULL);
+	i->SetOwnerList				(nullptr);
 	i->ResetGridSize();
 	return						i;
 }
@@ -664,7 +730,7 @@ bool CUICellContainer::AddSimilar(CUICellItem* itm)
 		itm->SetOwnerList		(m_pParentDragDropList);
 	}
 	
-	return (i!=NULL);
+	return (i!= nullptr);
 }
 
 CUICellItem* CUICellContainer::FindSimilar(CUICellItem* itm)
@@ -741,7 +807,7 @@ CUICellItem* CUICellContainer::RemoveItem(CUICellItem* itm, bool force_root)
 			C.Clear			();
 		}
 
-	itm->SetOwnerList		(NULL); 
+	itm->SetOwnerList		(nullptr); 
 	DetachChild				(itm);
 	return					itm;
 }
@@ -978,13 +1044,13 @@ void CUICellContainer::Draw()
 			u32 back_color=0xFFFFFFFF;
 			if (!ui_cell.Empty() )
 			{
-				if ( ui_cell.m_item->m_focused )
+				if ( ui_cell.m_item->m_focused && g_uCommonFlags.test(E_COMMON_FLAGS::uiShowFocused))
 				{
 					back_color=m_focused_color.get();
 					select_mode = back_color==0xFFFFFFFF ? 0 : 1;
 					//ui_cell.m_item->SetClrLightAnim(nullptr, true, false, false, true);
 				} 
-				else if ( ui_cell.m_item->m_selected )
+				else if ( ui_cell.m_item->m_selected && g_uCommonFlags.test(E_COMMON_FLAGS::uiShowSelected))
 				{
 					back_color=m_selected_color.get();
 					select_mode = back_color==0xFFFFFFFF ? 0 : 2;

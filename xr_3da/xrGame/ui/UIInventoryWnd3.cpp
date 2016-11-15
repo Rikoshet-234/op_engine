@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "../../defines.h"
 #include "UIInventoryWnd.h"
 #include "../actor.h"
 #include "../silencer.h"
@@ -16,13 +17,14 @@
 #include "UIListBoxItem.h"
 #include "../CustomOutfit.h"
 #include "../string_table.h"
+#include "../WeaponMagazinedWGrenade.h"
 #include "../game_object_space.h"
 #include "../script_callback_ex.h"
 #include "../script_game_object.h"
 
 void CUIInventoryWnd::EatItem(PIItem itm)
 {
-	SetCurrentItem							(NULL);
+	SetCurrentItem							(nullptr);
 	if(!itm->Useful())						return;
 
 	SendEvent_Item_Eat						(itm);
@@ -38,7 +40,7 @@ void CUIInventoryWnd::EatItem(PIItem itm)
 std::string getComplexString(std::string untranslatedString,PIItem item,std::string untranslatedString2="")
 {
 	std::string translateString=*CStringTable().translate(untranslatedString.c_str());
-	if (psActorFlags.test(AF_INV_SHOW_EXT_DESC))
+	if (g_uCommonFlags.test(E_COMMON_FLAGS::uiShowExtDesc))
 	{
 		std::string additionString;
 		if (item!=nullptr)
@@ -152,7 +154,7 @@ void CUIInventoryWnd::ActivatePropertiesBox()
 				CUICellItem * itm = CurrentItem();
 				for(size_t i=0; i<itm->ChildsCount(); ++i)
 				{
-					pWeapon		= smart_cast<CWeaponMagazined*>((CWeapon*)itm->Child(i)->m_pData);
+					pWeapon		= smart_cast<CWeaponMagazined*>(static_cast<CWeapon*>(itm->Child(i)->m_pData));
 					if(pWeapon->GetAmmoElapsed())
 					{
 						b = true;
@@ -283,6 +285,18 @@ void CUIInventoryWnd::ActivatePropertiesBox()
 	}
 }
 
+void UnloadWeapon(CWeaponMagazined* weapon)
+{
+	weapon->UnloadMagazine();
+	CWeaponMagazinedWGrenade* weaponWithGrenade = smart_cast<CWeaponMagazinedWGrenade*>(weapon);
+	if (weaponWithGrenade) //unload other ammos
+	{
+		weaponWithGrenade->PerformSwitchGL();
+		weaponWithGrenade->UnloadMagazine();
+		weaponWithGrenade->PerformSwitchGL();
+	}
+}
+
 void CUIInventoryWnd::ProcessPropertiesBoxClicked	()
 {
 	if(UIPropertiesBox.GetClickedItem())
@@ -337,15 +351,15 @@ void CUIInventoryWnd::ProcessPropertiesBoxClicked	()
 				CWeapon* weapon=static_cast<CWeapon*>(itm->m_pData);
 				if (!weapon)
 					break;
-				CWeaponMagazined* wm=smart_cast<CWeaponMagazined*>(weapon);
-				if (!wm)
+				CWeaponMagazined* wg = smart_cast<CWeaponMagazined*>(weapon);
+				if (!wg)
 					break;
-				wm->PlayEmptySnd();
-				wm->UnloadMagazine();
+				wg->PlayEmptySnd();
+				UnloadWeapon(wg);
 				for(size_t i=0; i<itm->ChildsCount(); ++i)
 				{
 					CUICellItem * child_itm			= itm->Child(i);
-					(smart_cast<CWeaponMagazined*>((CWeapon*)child_itm->m_pData))->UnloadMagazine();
+					UnloadWeapon(smart_cast<CWeaponMagazined*>(static_cast<CWeapon*>(child_itm->m_pData)));
 				}
 
 			}break;
@@ -359,6 +373,8 @@ void CUIInventoryWnd::ProcessPropertiesBoxClicked	()
 		}
 	}
 }
+
+
 
 bool CUIInventoryWnd::TryUseItem(PIItem itm)
 {

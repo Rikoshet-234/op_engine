@@ -13,6 +13,8 @@
 #include "script_game_object.h"
 #include "game_object_space.h"
 #include "trade_parameters.h"
+#include "WeaponAmmo.h"
+#include "WeaponMagazinedWGrenade.h"
 
 bool CTrade::CanTrade()
 {
@@ -124,7 +126,7 @@ void CTrade::TransferItem(CInventoryItem* pItem, bool bBuying)
 }
 
 
-CInventory& CTrade::GetTradeInv(SInventoryOwner owner)
+CInventory& CTrade::GetTradeInv(SInventoryOwner owner) const
 {
 	R_ASSERT(TT_NONE != owner.type);
 
@@ -132,18 +134,25 @@ CInventory& CTrade::GetTradeInv(SInventoryOwner owner)
 	return owner.inv_owner->inventory();
 }
 
-CTrade*	CTrade::GetPartnerTrade()
+CTrade*	CTrade::GetPartnerTrade() const
 {
 	return pPartner.inv_owner->GetTrade();
 }
-CInventory*	CTrade::GetPartnerInventory()
+CInventory*	CTrade::GetPartnerInventory() const
 {
 	return &GetTradeInv(pPartner);
 }
 
-CInventoryOwner* CTrade::GetPartner()
+CInventoryOwner* CTrade::GetPartner() const
 {
 	return pPartner.inv_owner;
+}
+
+float GetAmmoCostInWeapon(shared_str ammoSection)
+{
+	auto boxCost=pSettings->r_float(ammoSection.c_str(),"cost");
+	auto boxSize=pSettings->r_float(ammoSection.c_str(),"box_size");
+	return boxCost/boxSize;
 }
 
 u32	CTrade::GetItemPrice(PIItem pItem, bool b_buying)
@@ -155,10 +164,38 @@ u32	CTrade::GetItemPrice(PIItem pItem, bool b_buying)
 	if (pArtefact && (pThis.type == TT_ACTOR) && (pPartner.type == TT_TRADER)) {
 		CAI_Trader			*pTrader = smart_cast<CAI_Trader*>(pPartner.inv_owner);
 		VERIFY				(pTrader);
-		base_cost			= (float)pTrader->ArtefactPrice(pArtefact);
+		base_cost			= static_cast<float>(pTrader->ArtefactPrice(pArtefact));
 	}
 	else
-		base_cost			= (float)pItem->Cost();
+	{
+		float itemCost=static_cast<float>(pItem->Cost());
+		CWeaponAmmo *ammo= smart_cast<CWeaponAmmo*>(pItem);
+		CWeaponMagazined* weapon=smart_cast<CWeaponMagazined*>(pItem);
+		base_cost=-1;
+		if (ammo)
+		{
+			base_cost=itemCost/ammo->m_boxSize*ammo->m_boxCurr;
+		}
+		else if (weapon)
+		{
+			base_cost=itemCost;
+			if (weapon->IsGrenadeLauncherAttached() && weapon->GrenadeLauncherAttachable())
+				base_cost+=pSettings->r_float(weapon->GetGrenadeLauncherName(),"cost");
+			if (weapon->IsScopeAttached() && weapon->ScopeAttachable())
+				base_cost+=pSettings->r_float(weapon->GetScopeName(),"cost");
+			if (weapon->IsSilencerAttached() && weapon->SilencerAttachable())
+				base_cost+=pSettings->r_float(weapon->GetSilencerName(),"cost");
+			int ammoInWeapon=weapon->GetAmmoElapsed();
+			if (ammoInWeapon>0)
+				base_cost+=GetAmmoCostInWeapon(weapon->m_magazine.back().m_ammoSect)*ammoInWeapon;
+			CWeaponMagazinedWGrenade* weaponG=smart_cast<CWeaponMagazinedWGrenade*>(pItem);
+			if (weaponG)
+				if (weaponG->m_magazine2.size()>0)
+					base_cost+=GetAmmoCostInWeapon(weaponG->m_magazine2.back().m_ammoSect)*weaponG->m_magazine2.size();
+		}
+		if (base_cost==-1)
+			base_cost			= itemCost;
+	}
 	
 	// computing condition factor
 	// for "dead" weapon we use 10% from base cost, for "good" weapon we use full base cost
@@ -176,7 +213,7 @@ u32	CTrade::GetItemPrice(PIItem pItem, bool b_buying)
 
 	clamp					(relation_factor,0.f,1.f);
 
-	const SInventoryOwner	*_partner = 0;
+	const SInventoryOwner	*_partner = nullptr;
 	bool					buying = true;
 	bool					is_actor = (pThis.type == TT_ACTOR) || (pPartner.type == TT_ACTOR);
 	if (is_actor) {

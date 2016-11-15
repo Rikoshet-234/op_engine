@@ -16,6 +16,8 @@ class CInventory;
 #include "UIItemInfo.h"
 #include "../inventory_space.h"
 
+
+
 class CArtefact;
 class CUI3tButton;
 class CUIDragDropListEx;
