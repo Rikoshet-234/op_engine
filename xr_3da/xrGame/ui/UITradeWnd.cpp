@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "stdafx.h"
 #include "UITradeWnd.h"
 #include "../../defines.h"
 #include "xrUIXmlParser.h"
@@ -13,13 +12,14 @@
 #include "../UIGameSP.h"
 #include "UIInventoryUtilities.h"
 #include "../inventoryowner.h"
-#include "../eatable_item.h"
+#include "UIPropertiesBox.h"
 #include "../inventory.h"
 #include "../level.h"
 #include "../string_table.h"
 #include "../character_info.h"
 #include "UIMultiTextStatic.h"
 #include "UI3tButton.h"
+#include "UIListBoxItem.h"
 #include "UIItemInfo.h"
 #include "../script_callback_ex.h"
 #include "../game_object_space.h"
@@ -28,6 +28,7 @@
 #include "UICellItem.h"
 #include "UICellItemFactory.h"
 #include "../OPFuncs/utils.h"
+#include "UIInventoryWnd.h"
 
 
 #define				TRADE_XML			"trade.xml"
@@ -139,6 +140,9 @@ void CUITradeWnd::Init()
 
 	UIDealMsg					= nullptr;
 
+	AttachChild							(&UIPropertiesBox);
+	UIPropertiesBox.Init				(0,0,300,300);
+	UIPropertiesBox.Hide				();
 
 }
 
@@ -163,11 +167,17 @@ void CUITradeWnd::InitTrade(CInventoryOwner* pOur, CInventoryOwner* pOthers)
 	EnableAll							();
 
 	UpdateLists							(eBoth);
+	UIPropertiesBox.Hide		();
+
 }  
 
 void CUITradeWnd::SendMessage(CUIWindow *pWnd, s16 msg, void *pData)
 {
-	if(pWnd == &UIToTalkButton && msg == BUTTON_CLICKED)
+	if(pWnd == &UIPropertiesBox &&	msg==PROPERTY_CLICKED)
+	{
+		ProcessPropertiesBoxClicked	();
+	}
+	else if(pWnd == &UIToTalkButton && msg == BUTTON_CLICKED)
 	{
 		SwitchToTalk();
 	}
@@ -492,6 +502,7 @@ bool CUITradeWnd::OnItemSelected(CUICellItem* itm)
 bool CUITradeWnd::OnItemRButtonClick(CUICellItem* itm)
 {
 	SetCurrentItem				(itm);
+	ActivatePropertiesBox		();
 	return						false;
 }
 
@@ -507,6 +518,20 @@ bool CUITradeWnd::OnItemFocusReceive(CUICellItem* itm)
 	if (itm)
 		itm->m_focused=true;
 	return						false;
+}
+
+bool CUITradeWnd::OnMouse(float x, float y, EUIMessages mouse_action)
+{
+	if(mouse_action == WINDOW_RBUTTON_DOWN)
+	{
+		if(UIPropertiesBox.IsShown())
+		{
+			UIPropertiesBox.Hide		();
+			return						true;
+		}
+	}
+	CUIWindow::OnMouse					(x, y, mouse_action);
+	return true; 
 }
 
 bool CUITradeWnd::OnItemDrop(CUICellItem* itm)
@@ -710,4 +735,39 @@ void CUITradeWnd::SetSuitableBySectionInList(IWListTypes listType, LPCSTR sectio
 	{
 		(*listIt)->select_items_by_section(section);
 	};
+}
+
+void CUITradeWnd::ProcessPropertiesBoxClicked	()
+{
+	if(UIPropertiesBox.GetClickedItem())
+	{
+		switch(UIPropertiesBox.GetClickedItem()->GetTAG())
+		{
+		case INVENTORY_TO_SLOT_ACTION:
+			Msg("from new action");
+			break;
+		default:break;
+		}
+	}
+}
+
+void CUITradeWnd::ActivatePropertiesBox()
+{
+	UIPropertiesBox.RemoveAll();
+
+		UIPropertiesBox.AddItem("test string",  nullptr, INVENTORY_TO_SLOT_ACTION);
+	
+
+	UIPropertiesBox.AutoUpdateSize	();
+	UIPropertiesBox.BringAllToTop	();
+	Fvector2						cursor_pos;
+	Frect							vis_rect;
+	GetAbsoluteRect					(vis_rect);
+	cursor_pos						= GetUICursor()->GetCursorPosition();
+	cursor_pos.sub					(vis_rect.lt);
+	UIPropertiesBox.Show			(vis_rect, cursor_pos);
+	//PlaySnd							(CUIInventoryWnd::eInvProperties);
+	SetCapture(static_cast<CUIWindow*>(&UIPropertiesBox),true);
+
+	
 }

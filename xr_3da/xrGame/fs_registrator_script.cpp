@@ -1,6 +1,8 @@
 #include "pch_script.h"
 #include "fs_registrator.h"
 #include "LocatorApi.h"
+#include "script_writer.h"
+#include "script_engine_export.h"
 
 using namespace luabind;
 
@@ -33,7 +35,7 @@ struct FS_item
 {
 	string_path name;
 	u32			size;
-    u32			modif;
+	u32			modif;
 	string256	buff;
 
 	LPCSTR		NameShort		()								{ return name;}
@@ -152,6 +154,17 @@ LPCSTR get_file_age_str(CLocatorAPI* fs, LPCSTR nm)
 	return asctime( newtime );
 }
 
+void r_close(CLocatorAPI* self,IReader* reader)
+{
+	self->r_close(*&reader);
+}
+
+
+void w_close(CLocatorAPI* self,IWriter* writer)
+{
+	self->w_close(*&writer);
+}
+
 #pragma optimize("s",on)
 void fs_registrator::script_register(lua_State *L)
 {
@@ -212,8 +225,8 @@ void fs_registrator::script_register(lua_State *L)
 			.def("get_path",							&CLocatorAPI::get_path)
 			.def("append_path",							&CLocatorAPI::append_path)
 			
-			.def("file_delete",							(void	(CLocatorAPI::*)(LPCSTR,LPCSTR)) (&CLocatorAPI::file_delete))
-			.def("file_delete",							(void	(CLocatorAPI::*)(LPCSTR)) (&CLocatorAPI::file_delete))
+			.def("file_delete",							static_cast<void (CLocatorAPI::*)(LPCSTR, LPCSTR)>(&CLocatorAPI::file_delete))
+			.def("file_delete",							static_cast<void (CLocatorAPI::*)(LPCSTR)>(&CLocatorAPI::file_delete))
 
 			.def("dir_delete",							&dir_delete_script)
 			.def("dir_delete",							&dir_delete_script_2)
@@ -222,18 +235,18 @@ void fs_registrator::script_register(lua_State *L)
 			.def("file_length",							&CLocatorAPI::file_length)
 			.def("file_copy",							&CLocatorAPI::file_copy)
 
-			.def("exist",								(const CLocatorAPI::file*	(CLocatorAPI::*)(LPCSTR)) (&CLocatorAPI::exist))
-			.def("exist",								(const CLocatorAPI::file*	(CLocatorAPI::*)(LPCSTR, LPCSTR)) (&CLocatorAPI::exist))
+			.def("exist",								static_cast<const CLocatorAPI::file* (CLocatorAPI::*)(LPCSTR)>(&CLocatorAPI::exist))
+			.def("exist",								static_cast<const CLocatorAPI::file* (CLocatorAPI::*)(LPCSTR, LPCSTR)>(&CLocatorAPI::exist))
 
 			.def("get_file_age",						&CLocatorAPI::get_file_age)
 			.def("get_file_age_str",					&get_file_age_str)
-			.def("r_open",								(IReader*	(CLocatorAPI::*)(LPCSTR,LPCSTR)) (&CLocatorAPI::r_open))
-			.def("r_open",								(IReader*	(CLocatorAPI::*)(LPCSTR)) (&CLocatorAPI::r_open))
-			.def("r_close",								(void (CLocatorAPI::*)(IReader *&))(&CLocatorAPI::r_close))
+			.def("r_open",								static_cast<IReader* (CLocatorAPI::*)(LPCSTR, LPCSTR)>(&CLocatorAPI::r_open))
+			.def("r_open",								static_cast<IReader* (CLocatorAPI::*)(LPCSTR)>(&CLocatorAPI::r_open))
+			.def("r_close",								static_cast<void (*)(CLocatorAPI*,IReader *)>(&r_close))
 
-			.def("w_open",								(IWriter*	(CLocatorAPI::*)(LPCSTR,LPCSTR)) (&CLocatorAPI::w_open))
-			.def("w_open",								(IWriter*	(CLocatorAPI::*)(LPCSTR)) (&CLocatorAPI::w_close))
-			.def("w_close",								&CLocatorAPI::w_close)
+			.def("w_open",								static_cast<IWriter* (CLocatorAPI::*)(LPCSTR, LPCSTR)>(&CLocatorAPI::w_open))
+			.def("w_open",								static_cast<IWriter* (CLocatorAPI::*)(LPCSTR)>(&CLocatorAPI::w_open))
+			.def("w_close",								static_cast<void (*)(CLocatorAPI*,IWriter *)>(&w_close))
 
 			.def("file_list_open",						&file_list_open_script)
 			.def("file_list_open",						&file_list_open_script_2)

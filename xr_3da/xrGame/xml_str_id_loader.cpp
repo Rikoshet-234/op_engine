@@ -172,8 +172,8 @@ void CXML_IdToIndex::InitInternal(CXML_IdToIndex::InitFunc& f)
 	VERIFY(!m_pItemDataVector && !m_pItemDataMap);
 	f(m_file_str, m_tag_name);
 
-	VERIFY(file_str);
-	VERIFY(tag_name);
+	//VERIFY(file_str);
+	//VERIFY(tag_name);
 
 	m_pItemDataVector = xr_new<T_VECTOR>();
 	m_pItemDataMap = xr_new<XRStringMap>();

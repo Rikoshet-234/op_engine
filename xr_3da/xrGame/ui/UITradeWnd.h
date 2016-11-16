@@ -75,6 +75,11 @@ protected:
 	CUIStatic			UIDescWnd;
 	CUIItemInfo			UIItemInfo;
 
+	CUIPropertiesBox			UIPropertiesBox;
+	void						ProcessPropertiesBoxClicked	();
+	void						ActivatePropertiesBox		();
+
+
 	SDrawStaticStruct*	UIDealMsg;
 
 	bool				bStarted;
@@ -131,6 +136,9 @@ protected:
 	bool		xr_stdcall		OnItemRButtonClick	(CUICellItem* itm);
 	bool		xr_stdcall		OnItemFocusLost		(CUICellItem* itm);
 	bool		xr_stdcall		OnItemFocusReceive	(CUICellItem* itm);
+
+	bool			OnMouse						(float x, float y, EUIMessages mouse_action) override;
+
 
 	void						BindDragDropListEnents		(CUIDragDropListEx* lst);
 	void						UpdateItemUICost(CUICellItem* cellItem);
