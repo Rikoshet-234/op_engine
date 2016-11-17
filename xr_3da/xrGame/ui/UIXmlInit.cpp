@@ -880,6 +880,7 @@ bool CUIXmlInit::InitCustomEdit(CUIXml& xml_doc, const char* path, int index, CU
 	if (cnt!=0)
 		pWnd->SetMaxCharCount	(cnt);
 
+	pWnd->LoadSettings(path);
 	return true;
 
 }

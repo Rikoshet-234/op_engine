@@ -38,6 +38,7 @@ public:
 			
 			void	SetLightAnim			(LPCSTR lanim);
 
+			void	LoadSettings(LPCSTR path);
 protected:
 	bool KeyPressed(int dik);
 	bool KeyReleased(int dik);
@@ -47,6 +48,9 @@ protected:
 	
 	void CheckSwitchInputLanguage();
 	void ChangeInputLanguage();
+
+	void SaveSettings();
+
 protected:
 	bool m_bInputFocus;
 	bool m_bShift;
@@ -70,4 +74,6 @@ protected:
 
 	CUIStatic m_languageIcon;
 	size_t m_currentSelectedLanguage;
+
+	xr_string m_path;//! Doesn't have to be shared string because it is not shared
 };
