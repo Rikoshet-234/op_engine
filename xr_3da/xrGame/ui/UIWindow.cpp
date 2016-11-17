@@ -396,6 +396,7 @@ bool CUIWindow::OnDbClick(){
 }
 
 bool CUIWindow::OnMouseDown(int mouse_btn){
+	SetKeyboardCapture(this, false);
 	return false;
 }
 
@@ -516,7 +517,13 @@ void CUIWindow::SetKeyboardCapture(CUIWindow* pChildWindow, bool capture_status)
 		m_pKeyboardCapturer = pChildWindow;
 	}
 	else
+	{
+			//оповестить дочернее окно о потере фокуса клавиатуры
+		if(NULL!=m_pKeyboardCapturer)
+			m_pKeyboardCapturer->SendMessage(this, WINDOW_KEYBOARD_CAPTURE_LOST);
+	
 		m_pKeyboardCapturer = NULL;
+	}
 }
 
 
