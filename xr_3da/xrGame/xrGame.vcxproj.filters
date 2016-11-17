@@ -2296,6 +2296,9 @@
     <Filter Include="OPFuncs">
       <UniqueIdentifier>{15463ffe-ed9f-40f4-8033-aac62541ece6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="AI\AScript\ScriptClasses\ScriptWriter">
+      <UniqueIdentifier>{ff9932b1-559d-429e-ad4b-0426c90611ce}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mt_config.h">
@@ -6570,6 +6573,9 @@
     <ClInclude Include="ui\UIIconInfo.h">
       <Filter>UI\Common\ItemInfo</Filter>
     </ClInclude>
+    <ClInclude Include="script_writer.h">
+      <Filter>AI\AScript\ScriptClasses\ScriptWriter</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -9730,6 +9736,9 @@
     </ClCompile>
     <ClCompile Include="xml_str_id_loader.cpp">
       <Filter>Core\Client\Objects\tasks_info_dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="script_writer_script.cpp">
+      <Filter>AI\AScript\ScriptClasses\ScriptWriter</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
