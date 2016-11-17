@@ -9,6 +9,7 @@
 #include "pch_script.h"
 #include "script_reader.h"
 
+
 using namespace luabind;
 
 bool r_eof(IReader *self)
@@ -73,3 +74,5 @@ void CScriptReader::script_register(lua_State *L)
 			.def("r_eof",			&r_eof					)
 	];
 }
+
+

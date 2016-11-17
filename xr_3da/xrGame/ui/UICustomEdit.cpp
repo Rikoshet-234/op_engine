@@ -7,7 +7,9 @@
 #include "../RegistryFuncs.h"
 #include "../../LightAnimLibrary.h"
 #include "UIInventoryUtilities.h"
+#include "../xrCore/xr_ini.h"
 
+typedef xr_vector<xr_string> TLanguageNames;
 static enum ELayoutSwitchShortcut
 {
 	ELSS_AltShift = 0,
@@ -19,7 +21,7 @@ static enum ELayoutSwitchShortcut
 
 static u8 gs_KBState[256];
 static xr_vector<HKL> gs_hklList;
-static xr_vector<xr_string> gs_langNames;
+static TLanguageNames gs_langNames;
 
 #ifdef USE_GLOBAL_LANGUAGE
 static size_t gs_currentSelectedLanguage = 0;
@@ -151,6 +153,42 @@ void CUICustomEdit::SetTextColorD(u32 color){
 	m_textColor[1] = color;
 }
 
+void CUICustomEdit::LoadSettings(LPCSTR path)
+{
+	m_path = path;
+	std::replace(m_path.begin(), m_path.end(), ':', '_');
+
+	IReader* fr = FS.r_open("$game_settings$","ceb.settings");
+	if (fr)
+	{
+		CInifile cebSettings(fr);
+#ifndef USE_GLOBAL_SETTINGS
+		LPCSTR inputLanguage = cebSettings.line_exist(m_path.c_str(), "input_language") ? cebSettings.r_string(m_path.c_str(), "input_language") : NULL;
+#else
+		LPCSTR inputLanguage = cebSettings.line_exist("Global", "input_language") ? cebSettings.r_string("Global", "input_language") : NULL;
+#endif
+		if (inputLanguage)
+		{
+			const size_t inLength = xr_strlen(inputLanguage);
+			for (TLanguageNames::size_type i = 0; i < gs_langNames.size(); ++i)
+			{
+				const size_t maxLen = std::max(gs_langNames[i].length(), inLength);
+				if (0 == strncmp(gs_langNames[i].c_str(), inputLanguage, maxLen))//! Compare up to longest string to not match same substrings
+				{
+					CURRENT_SELECTED_LANGUAGE = i;
+					m_languageIcon.SetText(!m_bNumbersOnly ? gs_langNames[CURRENT_SELECTED_LANGUAGE].c_str() : "");
+					break;
+				}
+			}
+		}
+		else
+		{
+			//! Input language not yet stored in settings file
+		}
+		fr->close();
+	}
+}
+
 void CUICustomEdit::Init(float x, float y, float width, float height)
 {
 	CUIWindow::Init(x,y,width,height);
@@ -234,7 +272,7 @@ bool CUICustomEdit::OnMouse(float x, float y, EUIMessages mouse_action)
 		m_languageIcon.SetText(!m_bNumbersOnly ? gs_langNames[CURRENT_SELECTED_LANGUAGE].c_str() : "");
 		m_lines.MoveCursorToEnd();
 	}
-	return false;
+	return true;
 }
 
 
@@ -522,4 +560,22 @@ void CUICustomEdit::ChangeInputLanguage()
 {
 	CURRENT_SELECTED_LANGUAGE = (CURRENT_SELECTED_LANGUAGE + 1) % gs_hklList.size();
 	m_languageIcon.SetText(!m_bNumbersOnly ? gs_langNames[CURRENT_SELECTED_LANGUAGE].c_str() : "");
+
+	if (!m_bNumbersOnly)
+	{
+		string_path fname; 
+		FS.update_path(fname,"$game_settings$","ceb.settings");
+		CInifile cebSettings(fname, FALSE, TRUE, TRUE);
+#ifndef USE_GLOBAL_SETTINGS
+		LPCSTR section_name = m_path.c_str();
+#else
+		LPCSTR section_name = "Global";
+#endif
+		cebSettings.w_string(section_name, "input_language", gs_langNames[CURRENT_SELECTED_LANGUAGE].c_str());
+	}
+	else
+	{
+		//! Do not store language settings for number only edit box
+	}
+	
 }
