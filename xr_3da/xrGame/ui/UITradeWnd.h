@@ -144,7 +144,7 @@ protected:
 	void						BindDragDropListEnents		(CUIDragDropListEx* lst);
 	void						UpdateItemUICost(CUICellItem* cellItem);
 
-	enum eInventorySndAction{	eInvSndOpen	=0,
+	enum eTradeSoundActions{	eInvSndOpen	=0,
 								eInvSndClose,
 								eInvProperties,
 								eInvDropItem,
@@ -154,7 +154,7 @@ protected:
 								eInvTradeDone,
 								eInvSndMax};
 	ref_sound					sounds					[eInvSndMax];
-	void PlaySnd(eInventorySndAction a);
+	void PlaySnd(eTradeSoundActions a);
 
 public:
 	void						re_init();

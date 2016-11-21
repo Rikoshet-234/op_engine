@@ -6,7 +6,8 @@
 #include "../../../xrCore/xr_ini.h"
 #include "../../defines.h"
 #include "../inventory_item.h"
-
+#include "../../xrSound/Sound.h"
+#include "../ui/xrUIXmlParser.h"
 
 CTimerStat forCellCreation; 
 CTimerStat forFillActor; 

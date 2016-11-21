@@ -19,7 +19,6 @@
 #include "../string_table.h"
 #include "../character_info.h"
 #include "UIMultiTextStatic.h"
-#include "UI3tButton.h"
 #include "UIListBoxItem.h"
 #include "UIItemInfo.h"
 #include "../script_callback_ex.h"
@@ -61,7 +60,7 @@ void CUITradeWnd::Init()
 	CUIXmlInit							xml_init;
 
 	xml_init.InitWindow					(uiXml, "main", 0, this);
-
+#pragma region common ui elements
 	//статические элементы интерфейса
 	AttachChild							(&UIStaticTop);
 	xml_init.InitStatic					(uiXml, "top_background", 0, &UIStaticTop);
@@ -147,16 +146,24 @@ void CUITradeWnd::Init()
 	AttachChild							(&UIPropertiesBox);
 	UIPropertiesBox.Init				(0,0,300,300);
 	UIPropertiesBox.Hide				();
+#pragma endregion
 
 	uiXml.SetLocalRoot					(uiXml.NavigateToNode		("action_sounds",0));
-	::Sound->create						(sounds[eInvSndOpen],		uiXml.Read("snd_open",			0,	nullptr),st_Effect,sg_SourceType);
-	::Sound->create						(sounds[eInvSndClose],		uiXml.Read("snd_close",			0,	nullptr),st_Effect,sg_SourceType);
-	::Sound->create						(sounds[eInvProperties],	uiXml.Read("snd_properties",	0,	nullptr),st_Effect,sg_SourceType);
-	::Sound->create						(sounds[eInvDropItem],		uiXml.Read("snd_drop_item",		0,	nullptr),st_Effect,sg_SourceType);
-	//::Sound->create						(sounds[eInvAttachAddon],	uiXml.Read("snd_attach_addon",	0,	nullptr),st_Effect,sg_SourceType);
-	::Sound->create						(sounds[eInvDetachAddon],	uiXml.Read("snd_detach_addon",	0,	nullptr),st_Effect,sg_SourceType);
-	::Sound->create						(sounds[eInvItemUse],		uiXml.Read("snd_item_use",		0,	nullptr),st_Effect,sg_SourceType);
-	::Sound->create						(sounds[eInvTradeDone],		uiXml.Read("snd_trade_done",	0,	nullptr),st_Effect,sg_SourceType);
+
+	if (LPCSTR data=uiXml.Read("snd_open",		0,	nullptr))
+		::Sound->create						(sounds[eInvSndOpen],data,st_Effect,sg_SourceType);
+	if (LPCSTR data=uiXml.Read("snd_close",		0,	nullptr))
+		::Sound->create						(sounds[eInvSndClose],data,st_Effect,sg_SourceType);
+	if (LPCSTR data=uiXml.Read("snd_properties",		0,	nullptr))
+		::Sound->create						(sounds[eInvProperties],data,st_Effect,sg_SourceType);
+	if (LPCSTR data=uiXml.Read("snd_drop_item",		0,	nullptr))
+		::Sound->create						(sounds[eInvDropItem],data,st_Effect,sg_SourceType);
+	if (LPCSTR data=uiXml.Read("snd_detach_addon",		0,	nullptr))
+		::Sound->create						(sounds[eInvDetachAddon],data,st_Effect,sg_SourceType);
+	if (LPCSTR data=uiXml.Read("snd_item_use",		0,	nullptr))
+		::Sound->create						(sounds[eInvItemUse],data,st_Effect,sg_SourceType);
+	if (LPCSTR data=uiXml.Read("snd_trade_done",		0,	nullptr))
+		::Sound->create						(sounds[eInvTradeDone],data,st_Effect,sg_SourceType);
 
 }
 
@@ -676,7 +683,7 @@ void CUITradeWnd::BindDragDropListEnents(CUIDragDropListEx* lst)
 	lst->m_f_item_focus_received	= CUIDragDropListEx::DRAG_DROP_EVENT(this,&CUITradeWnd::OnItemFocusReceive);
 }
 
-void CUITradeWnd::PlaySnd(eInventorySndAction a)
+void CUITradeWnd::PlaySnd(eTradeSoundActions a)
 {
 	if (sounds[a]._handle())
 		sounds[a].play(nullptr, sm_2D);
