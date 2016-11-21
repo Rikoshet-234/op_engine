@@ -66,7 +66,10 @@ void CBaseMonster::Load(LPCSTR section)
 
 	m_eHitType=ALife::EHitType::eHitTypeWound;
 	if (pSettings->line_exist(section,"hit_type"))
-		m_eHitType						= ALife::g_tfString2HitType(pSettings->r_string(section, "hit_type"));
+	{
+		shared_str hitStr=pSettings->r_string(section, "hit_type");
+		m_eHitType						= ALife::g_tfString2HitType(hitStr.c_str());
+	}
 
 }
 

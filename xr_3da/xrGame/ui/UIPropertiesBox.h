@@ -29,6 +29,7 @@ public:
 	virtual bool		OnMouse								(float x, float y, EUIMessages mouse_action);
 	virtual bool		OnKeyboard							(int dik, EUIMessages keyboard_action);
 
+
 	bool				AddItem								(const char*  str, void* pData = NULL, u32 tag_value = 0);
 	bool				AddItem_script						(const char*  str){return AddItem(str);};
 	//void				AddSubItem							(LPCSTR str,luabind::functor<void> &lua_function);

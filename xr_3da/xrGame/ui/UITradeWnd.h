@@ -9,6 +9,7 @@
 #include "UIItemInfo.h"
 #include "../uigamecustom.h"
 #include "UIPropertiesBox.h"
+#include "../UIListsManipulations.h"
 
 class CInventoryOwner;
 class CEatableItem;
@@ -17,7 +18,7 @@ class CTrade;
 class CUIDragDropListEx;
 class CUICellItem;
 
-class CUITradeWnd: public CUIWindow
+class CUITradeWnd: public CUIWindow,public CUIListManipulations
 {
 private:
 	typedef CUIWindow inherited;
@@ -60,7 +61,6 @@ protected:
 	CUIDragDropListEx	UIOurTradeList;
 	CUIDragDropListEx	UIOthersTradeList;
 
-	xr_vector<CUIDragDropListEx*>	tradeLists;
 	//кнопки
 	CUI3tButton			UIPerformTradeButton;
 	CUI3tButton			UIToTalkButton;
@@ -78,7 +78,7 @@ protected:
 	CUIPropertiesBox			UIPropertiesBox;
 	void						ProcessPropertiesBoxClicked	();
 	void						ActivatePropertiesBox		();
-
+	void						DetachAddon(const char* addon_name);
 
 	SDrawStaticStruct*	UIDealMsg;
 
@@ -139,17 +139,24 @@ protected:
 
 	bool			OnMouse						(float x, float y, EUIMessages mouse_action) override;
 
+	void						SendEvent_Item_Drop			(PIItem	pItem);
 
 	void						BindDragDropListEnents		(CUIDragDropListEx* lst);
 	void						UpdateItemUICost(CUICellItem* cellItem);
+
+	enum eInventorySndAction{	eInvSndOpen	=0,
+								eInvSndClose,
+								eInvProperties,
+								eInvDropItem,
+								//eInvAttachAddon,
+								eInvDetachAddon,
+								eInvItemUse,
+								eInvTradeDone,
+								eInvSndMax};
+	ref_sound					sounds					[eInvSndMax];
+	void PlaySnd(eInventorySndAction a);
+
 public:
 	void						re_init();
-	void						ClearAllSuitables();
-	void						ClearSuitablesInList(IWListTypes listType);
-	void						SetSuitableBySection(LPCSTR section);
-	void						SetSuitableBySection(luabind::object const &sections);
-	void						SetSuitableBySectionInList(IWListTypes listType,LPCSTR section);
-	void						SetSuitableBySectionInList(IWListTypes listType,luabind::object const& sections);
-private:
-	xr_vector<LPCSTR>			getStringsFromLua(luabind::object const& table) const;
+
 };

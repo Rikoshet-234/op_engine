@@ -6576,6 +6576,9 @@
     <ClInclude Include="script_writer.h">
       <Filter>AI\AScript\ScriptClasses\ScriptWriter</Filter>
     </ClInclude>
+    <ClInclude Include="UIListsManipulations.h">
+      <Filter>UI\Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -9739,6 +9742,9 @@
     </ClCompile>
     <ClCompile Include="script_writer_script.cpp">
       <Filter>AI\AScript\ScriptClasses\ScriptWriter</Filter>
+    </ClCompile>
+    <ClCompile Include="UIListsManipulations.cpp">
+      <Filter>UI\Common</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

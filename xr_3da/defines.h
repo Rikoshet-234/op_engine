@@ -53,12 +53,13 @@ ENGINE_API enum E_COMMON_FLAGS
 {
 	flAiUseTorchDynamicLights	= 1 <<0,
 	enShowObjectHit				= 1<<1,
-	//mwShowInvulnerableIcon		= 1<<2,
+	mwShowInvulnerableIcon		= 1<<2,
 	uiShowConditions			= 1<<3,
 	uiShowSelected				= 1<<4,
 	uiShowExtDesc				= 1<<5,
 	uiShowTradeSB				= 1<<6,
-	uiShowFocused				= 1<<7
+	uiShowFocused				= 1<<7,
+	invReloadWeapon				= 1<<8
 };
 
 

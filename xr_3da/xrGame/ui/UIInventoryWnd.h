@@ -1,6 +1,7 @@
 #pragma once
 #pragma once
 #include <string>
+#include "../UIListsManipulations.h"
 
 class CInventory;
 
@@ -23,7 +24,7 @@ class CUI3tButton;
 class CUIDragDropListEx;
 class CUICellItem;
 
-class CUIInventoryWnd: public CUIDialogWnd
+class CUIInventoryWnd: public CUIDialogWnd,public CUIListManipulations
 {
 private:
 	typedef CUIDialogWnd	inherited;
@@ -101,8 +102,6 @@ protected:
 	CUIOutfitDragDropList*		m_pUIOutfitList;
 
 
-	xr_vector<CUIDragDropListEx*>	inventoryLists;
-
 	void						ClearAllLists				();
 	void						BindDragDropListEvents		(CUIDragDropListEx* lst);
 	
@@ -168,14 +167,5 @@ protected:
 	TIItemContainer				ruck_list;
 	u32							m_iCurrentActiveSlot;
 
-public:
-	void						ClearAllSuitables();
-	void						ClearSuitablesInList(IWListTypes listType);
-	void						SetSuitableBySection(LPCSTR section);
-	void						SetSuitableBySection(luabind::object const &sections);
-	void						SetSuitableBySectionInList(IWListTypes listType,LPCSTR section);
-	void						SetSuitableBySectionInList(IWListTypes listType,luabind::object const& sections);
-private:
-	xr_vector<LPCSTR>			getStringsFromLua(luabind::object const& table) const;
 };
 

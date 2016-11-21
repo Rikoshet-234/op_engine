@@ -5,6 +5,7 @@
 #include "UIXmlInit.h"
 
 #include "../Entity.h"
+#include "../Weapon.h"
 #include "../HUDManager.h"
 #include "../WeaponAmmo.h"
 #include "../Actor.h"
@@ -29,6 +30,9 @@
 #include "UICellItemFactory.h"
 #include "../OPFuncs/utils.h"
 #include "UIInventoryWnd.h"
+#include "../medkit.h"
+#include "../antirad.h"
+#include "../bottleitem.h"
 
 
 #define				TRADE_XML			"trade.xml"
@@ -38,15 +42,15 @@
 
 CUITradeWnd::CUITradeWnd() : bStarted(false),m_bDealControlsVisible	(false),m_pTrade(nullptr),m_pOthersTrade(nullptr)
 {
+	m_pCurrentCellItem=nullptr;
 	CUITradeWnd::Init();
 	CUITradeWnd::Hide();
-	SetCurrentItem			(nullptr);
 	SetUIWindowType(EAWindowType::wtTrade);
 }
 
 CUITradeWnd::~CUITradeWnd()
 {
-	std::for_each(tradeLists.begin(),tradeLists.end(),[](CUIDragDropListEx* list){list->ClearAll(true);});
+	std::for_each(sourceDragDropLists.begin(),sourceDragDropLists.end(),[](CUIDragDropListEx* list){list->ClearAll(true);});
 }
 
 void CUITradeWnd::Init()
@@ -102,25 +106,25 @@ void CUITradeWnd::Init()
 	UIOurBagWnd.AttachChild	(&UIOurBagList);	
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_list_our_bag", 0, &UIOurBagList);
 	UIOurBagList.SetUIListId(IWListTypes::ltTradeOurBag);
-	tradeLists.push_back(&UIOurBagList);
+	sourceDragDropLists.push_back(&UIOurBagList);
 
 	UIOthersBagWnd.AttachChild(&UIOthersBagList);	
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_list_other_bag", 0, &UIOthersBagList);
 	UIOthersBagList.SetUIListId(IWListTypes::ltTradeOtherBag);
-	tradeLists.push_back(&UIOthersBagList);
+	sourceDragDropLists.push_back(&UIOthersBagList);
 
 
 	UIOurTradeWnd.AttachChild	(&UIOurTradeList);	
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_list_our_trade", 0, &UIOurTradeList);
 	UIOurTradeList.SetUIListId(IWListTypes::ltTradeOurTrade);
-	tradeLists.push_back(&UIOurTradeList);
+	sourceDragDropLists.push_back(&UIOurTradeList);
 
 
 	UIOthersTradeWnd.AttachChild(&UIOthersTradeList);	
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_list_other_trade", 0, &UIOthersTradeList);
 	UIOthersTradeList.SetUIListId(IWListTypes::ltTradeOtherTrade);
-	tradeLists.push_back(&UIOthersTradeList);
-	std::for_each(tradeLists.begin(),tradeLists.end(),[this](CUIDragDropListEx* list){BindDragDropListEnents(list);});
+	sourceDragDropLists.push_back(&UIOthersTradeList);
+	std::for_each(sourceDragDropLists.begin(),sourceDragDropLists.end(),[this](CUIDragDropListEx* list){BindDragDropListEnents(list);});
 
 	
 	AttachChild							(&UIDescWnd);
@@ -143,6 +147,16 @@ void CUITradeWnd::Init()
 	AttachChild							(&UIPropertiesBox);
 	UIPropertiesBox.Init				(0,0,300,300);
 	UIPropertiesBox.Hide				();
+
+	uiXml.SetLocalRoot					(uiXml.NavigateToNode		("action_sounds",0));
+	::Sound->create						(sounds[eInvSndOpen],		uiXml.Read("snd_open",			0,	nullptr),st_Effect,sg_SourceType);
+	::Sound->create						(sounds[eInvSndClose],		uiXml.Read("snd_close",			0,	nullptr),st_Effect,sg_SourceType);
+	::Sound->create						(sounds[eInvProperties],	uiXml.Read("snd_properties",	0,	nullptr),st_Effect,sg_SourceType);
+	::Sound->create						(sounds[eInvDropItem],		uiXml.Read("snd_drop_item",		0,	nullptr),st_Effect,sg_SourceType);
+	//::Sound->create						(sounds[eInvAttachAddon],	uiXml.Read("snd_attach_addon",	0,	nullptr),st_Effect,sg_SourceType);
+	::Sound->create						(sounds[eInvDetachAddon],	uiXml.Read("snd_detach_addon",	0,	nullptr),st_Effect,sg_SourceType);
+	::Sound->create						(sounds[eInvItemUse],		uiXml.Read("snd_item_use",		0,	nullptr),st_Effect,sg_SourceType);
+	::Sound->create						(sounds[eInvTradeDone],		uiXml.Read("snd_trade_done",	0,	nullptr),st_Effect,sg_SourceType);
 
 }
 
@@ -235,6 +249,7 @@ void CUITradeWnd::Show()
 	SetCurrentItem					(nullptr);
 	ResetAll						();
 	UIDealMsg				= nullptr;
+	PlaySnd								(eInvSndOpen);
 }
 
 void CUITradeWnd::Hide()
@@ -243,7 +258,10 @@ void CUITradeWnd::Hide()
 	inherited::Show					(false);
 	inherited::Enable				(false);
 	if(bStarted)
+	{
 		StopTrade					();
+		PlaySnd								(eInvSndClose);
+	}
 	
 	UIDealMsg				= nullptr;
 
@@ -251,7 +269,7 @@ void CUITradeWnd::Hide()
 		HUD().GetUI()->UIGame()->RemoveCustomStatic("not_enough_money_mine");
 		HUD().GetUI()->UIGame()->RemoveCustomStatic("not_enough_money_other");
 	}
-	std::for_each(tradeLists.begin(),tradeLists.end(),[](CUIDragDropListEx* list){list->ClearAll(true);});
+	std::for_each(sourceDragDropLists.begin(),sourceDragDropLists.end(),[](CUIDragDropListEx* list){list->ClearAll(true);});
 }
 
 void CUITradeWnd::StartTrade()
@@ -379,6 +397,7 @@ void CUITradeWnd::PerformTrade()
 
 	if(our_money>=0 && others_money>=0 && (m_iOurTradePrice>=0 || m_iOthersTradePrice>0))
 	{
+		PlaySnd(eInvTradeDone);
 		m_pOthersTrade->OnPerformTrade(m_iOthersTradePrice, m_iOurTradePrice);
 		
 		TransferItems		(&UIOurTradeList,		&UIOthersBagList, m_pOthersTrade,	true);
@@ -398,12 +417,12 @@ void CUITradeWnd::PerformTrade()
 
 void CUITradeWnd::DisableAll()
 {
-	std::for_each(tradeLists.begin(),tradeLists.end(),[](CUIDragDropListEx* list){list->Enable(false);});
+	std::for_each(sourceDragDropLists.begin(),sourceDragDropLists.end(),[](CUIDragDropListEx* list){list->Enable(false);});
 }
 
 void CUITradeWnd::EnableAll()
 {
-	std::for_each(tradeLists.begin(),tradeLists.end(),[](CUIDragDropListEx* list){list->Enable(true);});
+	std::for_each(sourceDragDropLists.begin(),sourceDragDropLists.end(),[](CUIDragDropListEx* list){list->Enable(true);});
 }
 
 void CUITradeWnd::UpdatePrices()
@@ -534,6 +553,20 @@ bool CUITradeWnd::OnMouse(float x, float y, EUIMessages mouse_action)
 	return true; 
 }
 
+void CUITradeWnd::SendEvent_Item_Drop(PIItem pItem)
+{
+	pItem->SetDropManual			(TRUE);
+
+	if( OnClient() )
+	{
+		NET_Packet					P;
+		pItem->object().u_EventGen	(P, GE_OWNERSHIP_REJECT, pItem->object().H_Parent()->ID());
+		P.w_u16						(pItem->object().ID());
+		pItem->object().u_EventSend(P);
+	}
+	PlaySnd				(eInvDropItem);
+}
+
 bool CUITradeWnd::OnItemDrop(CUICellItem* itm)
 {
 	CUIDragDropListEx*	old_owner		= itm->OwnerList();
@@ -549,7 +582,8 @@ bool CUITradeWnd::OnItemDrop(CUICellItem* itm)
 		ToOthersTrade			();
 	else if(old_owner==&UIOthersTradeList && new_owner==&UIOthersBagList)
 		ToOthersBag				();
-
+	else if (old_owner==new_owner && new_owner==&UIOurTradeList)
+		Msg("drop item not implement.");
 	return true;
 }
 
@@ -583,14 +617,6 @@ PIItem CUITradeWnd::CurrentIItem()
 	return	(m_pCurrentCellItem)?static_cast<PIItem>(m_pCurrentCellItem->m_pData) : NULL;
 }
 
-void CUITradeWnd::ClearAllSuitables()
-{
-	std::for_each(tradeLists.begin(),tradeLists.end(),[](CUIDragDropListEx * list)
-	{
-		list->GetCellContainer()->clear_select_suitables();
-	});
-}
-
 void CUITradeWnd::UpdateItemUICost(CUICellItem* cellItem)
 {
 	if(cellItem && UIItemInfo.UICost)
@@ -616,7 +642,7 @@ void CUITradeWnd::SetCurrentItem(CUICellItem* itm)
 
 	bool processed=false;
 	auto currentIItem=CurrentIItem();
-	std::for_each(tradeLists.begin(),tradeLists.end(),[&processed,currentIItem](CUIDragDropListEx* list)
+	std::for_each(sourceDragDropLists.begin(),sourceDragDropLists.end(),[&processed,currentIItem](CUIDragDropListEx* list)
 	{
 		bool ls=list->select_suitables_by_item(currentIItem);
 		processed=processed || ls;
@@ -627,7 +653,7 @@ void CUITradeWnd::SetCurrentItem(CUICellItem* itm)
 
 void CUITradeWnd::SetItemSelected(CUICellItem* itm)
 {
-	auto curr=CurrentItem();
+	CUICellItem* curr=CurrentItem();
 	if (curr!=nullptr  && curr->m_selected)
 		curr->m_selected=false;
 	if (itm!=nullptr && !itm->m_selected)	
@@ -650,6 +676,12 @@ void CUITradeWnd::BindDragDropListEnents(CUIDragDropListEx* lst)
 	lst->m_f_item_focus_received	= CUIDragDropListEx::DRAG_DROP_EVENT(this,&CUITradeWnd::OnItemFocusReceive);
 }
 
+void CUITradeWnd::PlaySnd(eInventorySndAction a)
+{
+	if (sounds[a]._handle())
+		sounds[a].play(nullptr, sm_2D);
+}
+
 void CUITradeWnd::re_init()
 {
 	Msg("NOT IMPLEMENT");
@@ -661,93 +693,107 @@ void CUITradeWnd::ColorizeItem(CUICellItem* itm, bool b)
 		itm->SetColor				(color_rgba(255,100,100,255));
 }
 
-void CUITradeWnd::ClearSuitablesInList(IWListTypes listType)
+void CUITradeWnd::DetachAddon(const char* addon_name)
 {
-	auto listIt=std::find_if(tradeLists.begin(),tradeLists.end(),[listType](CUIDragDropListEx* list)
+	PlaySnd										(eInvDetachAddon);
+	if (OnClient())
 	{
-		return list->GetUIListId()==listType;
-	});
-	if (listIt!=tradeLists.end())
+		NET_Packet								P;
+		CurrentIItem()->object().u_EventGen		(P, GE_ADDON_DETACH, CurrentIItem()->object().ID());
+		P.w_stringZ								(addon_name);
+		CurrentIItem()->object().u_EventSend	(P);
+	};
+	CurrentIItem()->Detach						(addon_name, true);
+
+	CActor *pActor								= smart_cast<CActor*>(Level().CurrentEntity());
+	if(pActor && CurrentIItem() == pActor->inventory().ActiveItem())
 	{
-		(*listIt)->GetCellContainer()->clear_select_suitables();
+			//m_iCurrentActiveSlot				= pActor->inventory().GetActiveSlot();
+			pActor->inventory().Activate		(NO_ACTIVE_SLOT);
 	}
-}
-
-void CUITradeWnd::SetSuitableBySection(LPCSTR section)
-{
-	std::for_each(tradeLists.begin(),tradeLists.end(),[section](CUIDragDropListEx* list)
-	{
-		list->select_items_by_section(section);
-	});
-}
-
-xr_vector<LPCSTR> CUITradeWnd::getStringsFromLua(luabind::object const& table) const
-{
-	xr_vector<LPCSTR> luaStrings;
-	if (table!=nullptr && table.is_valid() && table.type()==LUA_TTABLE)
-		for(luabind::object::iterator iter=table.begin(); iter != table.end(); ++iter)
-		{
-			switch(iter->type())
-			{
-			case LUA_TSTRING:
-		   			luaStrings.push_back(luabind::object_cast<LPCSTR>(*iter));
-					break;
-			default: break;
-			}
-		}
-	return luaStrings;
-}
-
-void CUITradeWnd::SetSuitableBySection(luabind::object const& sections)
-{
-	xr_vector<LPCSTR> list=getStringsFromLua(sections);
-	if (list.size()>0)
-		std::for_each(list.begin(),list.end(),[&](LPCSTR section)
-		{
-			SetSuitableBySection(section);
-		});
-}
-
-void CUITradeWnd::SetSuitableBySectionInList(IWListTypes listType, luabind::object const& sections)
-{
-	auto listIt=std::find_if(tradeLists.begin(),tradeLists.end(),[listType](CUIDragDropListEx* list)
-	{
-		return list->GetUIListId()==listType;
-	});
-	if (listIt!=tradeLists.end())
-	{
-		xr_vector<LPCSTR> listStrings=getStringsFromLua(sections);
-		if (listStrings.size()>0)
-			std::for_each(listStrings.begin(),listStrings.end(),[&](LPCSTR section)
-			{
-				(*listIt)->select_items_by_section(section);
-			});
-	};
-}
-
-void CUITradeWnd::SetSuitableBySectionInList(IWListTypes listType, LPCSTR section)
-{
-	auto listIt=std::find_if(tradeLists.begin(),tradeLists.end(),[listType](CUIDragDropListEx* list)
-	{
-		return list->GetUIListId()==listType;
-	});
-	if (listIt!=tradeLists.end())
-	{
-		(*listIt)->select_items_by_section(section);
-	};
+	SetCurrentItem(nullptr);
 }
 
 void CUITradeWnd::ProcessPropertiesBoxClicked	()
 {
-	if(UIPropertiesBox.GetClickedItem())
+	CUIListBoxItem* clickedItem=UIPropertiesBox.GetClickedItem();
+	if(clickedItem)
 	{
-		switch(UIPropertiesBox.GetClickedItem()->GetTAG())
+		switch(clickedItem->GetTAG())
 		{
-		case INVENTORY_TO_SLOT_ACTION:
-			Msg("from new action");
+		case INVENTORY_DETACH_GRENADE_LAUNCHER_ADDON:
+			DetachAddon(*(smart_cast<CWeapon*>(CurrentIItem()))->GetGrenadeLauncherName());
+			break;
+		case INVENTORY_DETACH_SCOPE_ADDON:
+			DetachAddon(*(smart_cast<CWeapon*>(CurrentIItem()))->GetScopeName());
+			break;
+		case INVENTORY_DETACH_SILENCER_ADDON:
+			DetachAddon(*(smart_cast<CWeapon*>(CurrentIItem()))->GetSilencerName());
+			break;
+
+		case INVENTORY_UNLOAD_MAGAZINE:
+			{
+				CUICellItem * itm = CurrentItem();
+				CWeapon* weapon=static_cast<CWeapon*>(itm->m_pData);
+				if (!weapon)
+					break;
+				CWeaponMagazined* wg = smart_cast<CWeaponMagazined*>(weapon);
+				if (!wg)
+					break;
+				wg->PlayEmptySnd();
+				OPFuncs::UnloadWeapon(wg);
+				for(size_t i=0; i<itm->ChildsCount(); ++i)
+				{
+					CUICellItem * child_itm			= itm->Child(i);
+					OPFuncs::UnloadWeapon(smart_cast<CWeaponMagazined*>(static_cast<CWeapon*>(child_itm->m_pData)));
+				}
+				SetCurrentItem(nullptr);
+			}
+			break;
+		case INVENTORY_DROP_ACTION:
+			{
+				void* d = clickedItem->GetData();
+				bool b_all = (d== reinterpret_cast<void*>(33));
+
+				CActor *pActor			= smart_cast<CActor*>(Level().CurrentEntity());
+				if(!pActor)				return;
+				if(!b_all && CurrentIItem() && !CurrentIItem()->IsQuestItem())
+				{
+					SendEvent_Item_Drop		(CurrentIItem());
+					SetCurrentItem			(nullptr);
+					//InventoryUtilities::UpdateWeight			(UIBagWnd, true);
+					break;
+				}
+				if(b_all && CurrentIItem() && !CurrentIItem()->IsQuestItem())
+				{
+						u32 cnt = CurrentItem()->ChildsCount();
+						for(u32 i=0; i<cnt; ++i){
+							CUICellItem*	itm				= CurrentItem()->PopChild();
+							PIItem			iitm			= static_cast<PIItem>(itm->m_pData);
+							SendEvent_Item_Drop				(iitm);
+					}
+					SendEvent_Item_Drop					(CurrentIItem());
+					SetCurrentItem						(nullptr);
+					//InventoryUtilities::UpdateWeight	(UIBagWnd, true);
+					break;
+				}
+			}
+			break;
+		case INVENTORY_EAT_ACTION:
+			{
+				CInventoryItem* itm=CurrentIItem();
+				SetCurrentItem							(nullptr);
+				if(!itm->Useful())						return;
+				NET_Packet						P;
+				itm->object().u_EventGen		(P, GEG_PLAYER_ITEM_EAT, itm->object().H_Parent()->ID());
+				P.w_u16							(itm->object().ID());
+				itm->object().u_EventSend		(P);
+				PlaySnd									(eInvItemUse);
+			}
 			break;
 		default:break;
 		}
+		UpdateItemUICost(CurrentItem());
 	}
 }
 
@@ -755,19 +801,87 @@ void CUITradeWnd::ActivatePropertiesBox()
 {
 	UIPropertiesBox.RemoveAll();
 
-		UIPropertiesBox.AddItem("test string",  nullptr, INVENTORY_TO_SLOT_ACTION);
-	
+	bool b_show=false;
+	CWeapon*			pWeapon				= smart_cast<CWeapon*>			(CurrentIItem());
+	CMedkit*			pMedkit				= smart_cast<CMedkit*>			(CurrentIItem());
+	CAntirad*			pAntirad			= smart_cast<CAntirad*>			(CurrentIItem());
+	CEatableItem*		pEatableItem		= smart_cast<CEatableItem*>		(CurrentIItem());
+	CBottleItem*		pBottleItem			= smart_cast<CBottleItem*>		(CurrentIItem());
 
-	UIPropertiesBox.AutoUpdateSize	();
-	UIPropertiesBox.BringAllToTop	();
-	Fvector2						cursor_pos;
-	Frect							vis_rect;
-	GetAbsoluteRect					(vis_rect);
-	cursor_pos						= GetUICursor()->GetCursorPosition();
-	cursor_pos.sub					(vis_rect.lt);
-	UIPropertiesBox.Show			(vis_rect, cursor_pos);
-	//PlaySnd							(CUIInventoryWnd::eInvProperties);
-	SetCapture(static_cast<CUIWindow*>(&UIPropertiesBox),true);
+	if (pWeapon)
+	{
+		if(pWeapon->GrenadeLauncherAttachable() && pWeapon->IsGrenadeLauncherAttached())
+		{
+			UIPropertiesBox.AddItem(OPFuncs::getComplexString("st_detach_gl",nullptr, OPFuncs::getAddonInvName(pWeapon->GetGrenadeLauncherName().c_str())).c_str(),  nullptr, INVENTORY_DETACH_GRENADE_LAUNCHER_ADDON);
+		b_show			= true;
+		}
+		if(pWeapon->ScopeAttachable() && pWeapon->IsScopeAttached())
+		{
+			UIPropertiesBox.AddItem(OPFuncs::getComplexString("st_detach_scope",nullptr, OPFuncs::getAddonInvName(pWeapon->GetScopeName().c_str())).c_str(),  nullptr, INVENTORY_DETACH_SCOPE_ADDON);
+		b_show			= true;
+		}
+		if(pWeapon->SilencerAttachable() && pWeapon->IsSilencerAttached())
+		{
+			UIPropertiesBox.AddItem(OPFuncs::getComplexString("st_detach_silencer",nullptr, OPFuncs::getAddonInvName(pWeapon->GetSilencerName().c_str())).c_str(),  nullptr, INVENTORY_DETACH_SILENCER_ADDON);
+		b_show			= true;
+		}
+		if(smart_cast<CWeaponMagazined*>(pWeapon) && IsGameTypeSingle())
+		{
+			bool b = (0!=pWeapon->GetAmmoElapsed());
+			if(!b)
+			{
+				CUICellItem * itm = CurrentItem();
+				for(size_t i=0; i<itm->ChildsCount(); ++i)
+				{
+					pWeapon		= smart_cast<CWeaponMagazined*>(static_cast<CWeapon*>(itm->Child(i)->m_pData));
+					if(pWeapon->GetAmmoElapsed())
+					{
+						b = true;
+						break;
+					}
+				}
+			}
+			if(b){
+				UIPropertiesBox.AddItem(OPFuncs::getComplexString("st_unload_magazine",pWeapon).c_str(),  nullptr, INVENTORY_UNLOAD_MAGAZINE);
+				b_show			= true;
+			}
+		}
+	}
+	LPCSTR _action = nullptr;
+	if(pMedkit || pAntirad)
+		_action					= "st_use";
+	else if(pEatableItem)
+		if(pBottleItem)
+			_action					= "st_drink";
+		else
+			_action					= "st_eat";
 
-	
+	if(_action){
+		UIPropertiesBox.AddItem(_action,  nullptr, INVENTORY_EAT_ACTION);
+		b_show			= true;
+	}
+
+	if(!CurrentIItem()->IsQuestItem())
+	{
+
+		UIPropertiesBox.AddItem("st_drop", nullptr, INVENTORY_DROP_ACTION);
+		b_show			= true;
+
+		if(CurrentItem()->ChildsCount())
+			UIPropertiesBox.AddItem("st_drop_all", reinterpret_cast<void*>(33), INVENTORY_DROP_ACTION);
+	}
+
+	if (b_show)
+	{
+		UIPropertiesBox.AutoUpdateSize	();
+		UIPropertiesBox.BringAllToTop	();
+		Fvector2						cursor_pos;
+		Frect							vis_rect;
+		GetAbsoluteRect					(vis_rect);
+		cursor_pos						= GetUICursor()->GetCursorPosition();
+		cursor_pos.sub					(vis_rect.lt);
+		UIPropertiesBox.Show			(vis_rect, cursor_pos);
+		PlaySnd							(eInvProperties);
+		SetCapture(static_cast<CUIWindow*>(&UIPropertiesBox),true);
+	}	
 }

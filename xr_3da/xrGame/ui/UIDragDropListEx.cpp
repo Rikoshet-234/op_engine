@@ -34,10 +34,12 @@ struct TCachedData
 	float min_pos;
 	float max_pos;
 	float pos;
+	float inertion;
 	u32 min_color;
 	u32 max_color;
 	shared_str texture;
 	shared_str textureBack;
+	
 } ;
 static TCachedData cacheData;
 
@@ -251,6 +253,8 @@ void CUIDragDropListEx::PutConditionBarUIData(CUIProgressBar* progress)
 		progress->SetRange(cacheData.min_pos,cacheData.max_pos);
 		progress->SetProgressPos(cacheData.pos);
 
+		progress->m_inertion		= cacheData.inertion;
+
 		progress->m_UIProgressItem.SetOriginalRect(cacheData.x,cacheData.y,cacheData.width,cacheData.height);
 		progress->m_UIProgressItem.InitTexture(cacheData.texture.c_str());
 		progress->m_UIProgressItem.SetWndSize(progress->GetWndSize());
@@ -284,6 +288,7 @@ void CUIDragDropListEx::SetShowConditionBar(bool state)
 		cacheData.textureBack=uiXml.Read("progress_item_condition:background:texture", 0, nullptr);
 		cacheData.min_color=CUIXmlInit::GetColor(uiXml,"progress_item_condition:min_color",0,0xff);
 		cacheData.max_color=CUIXmlInit::GetColor(uiXml,"progress_item_condition:max_color",0,0xff);
+		cacheData.inertion=uiXml.ReadAttribFlt("progress_item_condition", 0, "inertion", 0.0f);
 		cacheData.initialized=true;
 	}
 }

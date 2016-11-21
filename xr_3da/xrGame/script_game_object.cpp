@@ -559,7 +559,7 @@ void CScriptGameObject::invulnerable		(bool invulnerable)
 
 bool				CScriptGameObject::actor_invulnerable						() const
 {
-	return psActorFlags.test(AF_GODMODE_PARTIAL);
+	return !!psActorFlags.test(AF_GODMODE_PARTIAL);
 }
 
 void				CScriptGameObject::actor_invulnerable						(bool invulnerable)

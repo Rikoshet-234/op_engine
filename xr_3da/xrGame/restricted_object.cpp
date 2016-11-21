@@ -136,7 +136,7 @@ bool CRestrictedObject::accessible			(const Fvector &position, float radius) con
 bool CRestrictedObject::accessible			(u32 level_vertex_id) const
 {
 	START_PROFILE("Restricted Object/Accessible");
-	VERIFY						(ai().level_graph().valid_vertex_id(level_vertex_id));
+//	VERIFY						(ai().level_graph().valid_vertex_id(level_vertex_id));
 	return						(accessible(level_vertex_id,EPS_L));
 	STOP_PROFILE;
 }
@@ -144,7 +144,7 @@ bool CRestrictedObject::accessible			(u32 level_vertex_id) const
 bool CRestrictedObject::accessible			(u32 level_vertex_id, float radius) const
 {
 	START_PROFILE("Restricted Object/Accessible");
-	VERIFY						(ai().level_graph().valid_vertex_id(level_vertex_id));
+	//VERIFY						(ai().level_graph().valid_vertex_id(level_vertex_id));
 	return						(Level().space_restriction_manager().accessible(object().ID(),level_vertex_id,radius));
 	STOP_PROFILE;
 }
@@ -153,7 +153,7 @@ void CRestrictedObject::add_border			(u32 start_vertex_id, float radius) const
 {
 	START_PROFILE("Restricted Object/Add Border");	
 	
-	VERIFY						(ai().level_graph().valid_vertex_id(start_vertex_id));
+	//VERIFY						(ai().level_graph().valid_vertex_id(start_vertex_id));
 	VERIFY						(!m_applied);
 	VERIFY						(m_removed);
 	m_removed					= false;

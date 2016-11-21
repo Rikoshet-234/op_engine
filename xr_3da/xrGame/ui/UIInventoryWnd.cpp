@@ -142,7 +142,7 @@ void CUIInventoryWnd::Init()
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_bag", 0, m_pUIBagList);
 	BindDragDropListEvents				(m_pUIBagList);
 	m_pUIBagList->SetUIListId(IWListTypes::ltBag);
-	inventoryLists.push_back(m_pUIBagList);
+	sourceDragDropLists.push_back(m_pUIBagList);
 
 	m_pUIBeltList						= xr_new<CUIDragDropListEx>(); 
 	AttachChild(m_pUIBeltList); 
@@ -150,7 +150,7 @@ void CUIInventoryWnd::Init()
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_belt", 0, m_pUIBeltList);
 	BindDragDropListEvents				(m_pUIBeltList);
 	m_pUIBeltList->SetUIListId(IWListTypes::ltBelt);
-	inventoryLists.push_back(m_pUIBeltList);
+	sourceDragDropLists.push_back(m_pUIBeltList);
 
 	m_pUIOutfitList						= xr_new<CUIOutfitDragDropList>(); 
 	AttachChild(m_pUIOutfitList); 
@@ -158,7 +158,7 @@ void CUIInventoryWnd::Init()
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_outfit", 0, m_pUIOutfitList);
 	BindDragDropListEvents				(m_pUIOutfitList);
 	m_pUIOutfitList->SetUIListId(IWListTypes::ltSlotOutfit);
-	inventoryLists.push_back(m_pUIOutfitList);
+	sourceDragDropLists.push_back(m_pUIOutfitList);
 	
 	m_pUIKnifeList						= xr_new<CUIDragDropListEx>(); 
 	AttachChild(m_pUIKnifeList); 
@@ -166,7 +166,7 @@ void CUIInventoryWnd::Init()
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_knife", 0, m_pUIKnifeList);
 	BindDragDropListEvents				(m_pUIKnifeList);
 	m_pUIKnifeList->SetUIListId(IWListTypes::ltSlotKnife);
-	inventoryLists.push_back(m_pUIKnifeList);
+	sourceDragDropLists.push_back(m_pUIKnifeList);
 
 	m_pUIPistolList						= xr_new<CUIDragDropListEx>(); 
 	AttachChild(m_pUIPistolList); 
@@ -174,7 +174,7 @@ void CUIInventoryWnd::Init()
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_pistol", 0, m_pUIPistolList);
 	BindDragDropListEvents				(m_pUIPistolList);
 	m_pUIPistolList->SetUIListId(IWListTypes::ltSlotPistol);
-	inventoryLists.push_back(m_pUIPistolList);
+	sourceDragDropLists.push_back(m_pUIPistolList);
 
 	m_pUIAutomaticList						= xr_new<CUIDragDropListEx>(); 
 	AttachChild(m_pUIAutomaticList); 
@@ -182,7 +182,7 @@ void CUIInventoryWnd::Init()
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_automatic", 0, m_pUIAutomaticList);
 	BindDragDropListEvents				(m_pUIAutomaticList);
 	m_pUIAutomaticList->SetUIListId(IWListTypes::ltSlotRifle);
-	inventoryLists.push_back(m_pUIAutomaticList);
+	sourceDragDropLists.push_back(m_pUIAutomaticList);
 
 	m_pUIShotgunList						= xr_new<CUIDragDropListEx>(); 
 	AttachChild(m_pUIShotgunList); 
@@ -190,7 +190,7 @@ void CUIInventoryWnd::Init()
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_shotgun", 0, m_pUIShotgunList);
 	BindDragDropListEvents				(m_pUIShotgunList);
 	m_pUIShotgunList->SetUIListId(IWListTypes::ltSlotShotgun); 
-	inventoryLists.push_back(m_pUIShotgunList);
+	sourceDragDropLists.push_back(m_pUIShotgunList);
 
 	m_pUIDetectorArtsList						= xr_new<CUIDragDropListEx>(); 
 	AttachChild(m_pUIDetectorArtsList); 
@@ -198,7 +198,7 @@ void CUIInventoryWnd::Init()
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_detector_arts", 0, m_pUIDetectorArtsList);
 	BindDragDropListEvents				(m_pUIDetectorArtsList);
 	m_pUIDetectorArtsList->SetUIListId(IWListTypes::ltSlotDetectorArts);
-	inventoryLists.push_back(m_pUIDetectorArtsList);
+	sourceDragDropLists.push_back(m_pUIDetectorArtsList);
 
 	m_pUIDetectorAnomsList						= xr_new<CUIDragDropListEx>(); 
 	AttachChild(m_pUIDetectorAnomsList); 
@@ -206,7 +206,7 @@ void CUIInventoryWnd::Init()
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_detector_anoms", 0, m_pUIDetectorAnomsList);
 	BindDragDropListEvents				(m_pUIDetectorAnomsList);
 	m_pUIDetectorAnomsList->SetUIListId(IWListTypes::ltSlotDetectorAnoms);
-	inventoryLists.push_back(m_pUIDetectorAnomsList);
+	sourceDragDropLists.push_back(m_pUIDetectorAnomsList);
 
 	m_pUIPNVList						= xr_new<CUIDragDropListEx>(); 
 	AttachChild(m_pUIPNVList); 
@@ -214,7 +214,7 @@ void CUIInventoryWnd::Init()
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_pnv", 0, m_pUIPNVList);
 	BindDragDropListEvents				(m_pUIPNVList);
 	m_pUIPNVList->SetUIListId(IWListTypes::ltSlotPNV);
-	inventoryLists.push_back(m_pUIPNVList);
+	sourceDragDropLists.push_back(m_pUIPNVList);
 
 	m_pUIApparatusList						= xr_new<CUIDragDropListEx>(); 
 	AttachChild(m_pUIApparatusList); 
@@ -222,7 +222,7 @@ void CUIInventoryWnd::Init()
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_apparatus", 0, m_pUIApparatusList);
 	BindDragDropListEvents				(m_pUIApparatusList);
 	m_pUIApparatusList->SetUIListId(IWListTypes::ltSlotApparatus);
-	inventoryLists.push_back(m_pUIApparatusList);
+	sourceDragDropLists.push_back(m_pUIApparatusList);
 
 	m_pUIBiodevList						= xr_new<CUIDragDropListEx>(); 
 	AttachChild(m_pUIBiodevList); 
@@ -230,7 +230,7 @@ void CUIInventoryWnd::Init()
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_biodev", 0, m_pUIBiodevList);
 	BindDragDropListEvents				(m_pUIBiodevList);
 	m_pUIBiodevList->SetUIListId(IWListTypes::ltSlotBiodev);
-	inventoryLists.push_back(m_pUIBiodevList);
+	sourceDragDropLists.push_back(m_pUIBiodevList);
 
 #pragma endregion
 
@@ -290,7 +290,7 @@ void CUIInventoryWnd::re_init()
 	DetachChild(m_pUIBeltList); 
 
 	UIBagWnd.DetachChild(m_pUIBagList); 
-	inventoryLists.clear();
+	sourceDragDropLists.clear();
 	DetachChild(&UIOutfitInfo); 
 	UIPersonalWnd.DetachChild(&UIStaticPersonal);
 	UIProgressBack.DetachChild(&UIProgressBarHealth);

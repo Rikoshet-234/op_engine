@@ -1453,6 +1453,7 @@ void CCC_RegisterCommands()
 	psHUD_Flags.set(HUD_INFO,			true);
 	psHUD_Flags.set(HUD_MIN_CROSSHAIR,	true);
 	psHUD_Flags.set(HUD_DIALOG_NUMBERED,true);
+
 	CMD3(CCC_Mask,				"hud_weapon",			&psHUD_Flags,	HUD_WEAPON);
 	CMD3(CCC_Mask,				"hud_info",				&psHUD_Flags,	HUD_INFO);
 	CMD3(CCC_Mask,				"hud_crosshair",		&psHUD_Flags,	HUD_CROSSHAIR);
@@ -1480,6 +1481,7 @@ void CCC_RegisterCommands()
 	g_uCommonFlags.set(uiShowSelected, TRUE);
 	g_uCommonFlags.set(uiShowFocused, TRUE);
 	g_uCommonFlags.set(uiShowTradeSB, FALSE);
+	g_uCommonFlags.set(invReloadWeapon, FALSE);
 
 	CMD3(CCC_Mask,				"ai_use_torch_dynamic_lights",	&g_uCommonFlags,flAiUseTorchDynamicLights);
 	CMD3(CCC_Mask,				"engine_show_object_hit",		&g_uCommonFlags,enShowObjectHit);
@@ -1489,6 +1491,7 @@ void CCC_RegisterCommands()
 	CMD3(CCC_Mask,				"ui_show_selected",				&g_uCommonFlags,uiShowSelected);
 	CMD3(CCC_Mask,				"ui_show_focused",				&g_uCommonFlags,uiShowFocused);
 	CMD3(CCC_Mask,				"ui_show_trade_sb",				&g_uCommonFlags,uiShowTradeSB);
+	CMD3(CCC_Mask,				"winv_reload_enable",			&g_uCommonFlags,invReloadWeapon);
 
 	CMD1(CCC_GSCheckForUpdates, "check_for_updates"		);
 	CMD1(CCC_DumpInfos,			"dump_infos"			);

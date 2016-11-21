@@ -125,8 +125,6 @@ void CUIPropertiesBox::Hide()
 bool CUIPropertiesBox::OnMouse(float x, float y, EUIMessages mouse_action)
 {
 	bool cursor_on_box;
-
-
 	if(x>=0 && x<GetWidth() && y>=0 && y<GetHeight())
 		cursor_on_box = true;
 	else
@@ -138,7 +136,6 @@ bool CUIPropertiesBox::OnMouse(float x, float y, EUIMessages mouse_action)
 		Hide();
 		return true;
 	}
-
 	return inherited::OnMouse(x, y, mouse_action);
 }
 

@@ -95,7 +95,6 @@ bool CSpaceRestrictor::inside	(const Fsphere &sphere) const
 {
 	if (!actual())
 		prepare	();
-
 	if (!m_selfbounds.intersect(sphere))
 		return	(false);
 	
@@ -115,7 +114,7 @@ void CSpaceRestrictor::spatial_move		()
 
 void CSpaceRestrictor::prepare			() const
 {
-	Center							(m_selfbounds.P);
+	Center						(m_selfbounds.P);
 	m_selfbounds.R					= Radius();
 
 	m_spheres.resize				(0);
