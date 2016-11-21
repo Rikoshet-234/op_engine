@@ -53,9 +53,9 @@ public:
 
 	void					TransferItem			(CInventoryItem* pItem, bool bBuying);
 
-	CInventoryOwner*		GetPartner				();	
-	CTrade*					GetPartnerTrade			();
-	CInventory*				GetPartnerInventory		();
+	CInventoryOwner*		GetPartner				() const;	
+	CTrade*					GetPartnerTrade			() const;
+	CInventory*				GetPartnerInventory		() const;
 
 	u32						GetItemPrice			(CInventoryItem* pItem, bool b_buying);
 
@@ -64,5 +64,5 @@ private:
 	bool					SetPartner				(CEntity *p);
 	void					RemovePartner			();
 
-	CInventory&				GetTradeInv				(SInventoryOwner owner);
+	CInventory&				GetTradeInv				(SInventoryOwner owner) const;
 };

@@ -105,6 +105,7 @@ void CActor::SetWeaponHideState (u32 State, bool bSet)
 }
 static	u16 BestWeaponSlots [] = {
 	RIFLE_SLOT		,		// 2
+	SHOTGUN_SLOT	,
 	PISTOL_SLOT		,		// 1
 	GRENADE_SLOT	,		// 3
 	KNIFE_SLOT		,		// 0
@@ -135,7 +136,7 @@ void CActor::SelectBestWeapon	(CObject* O)
 	}
 	if (!NeedToSelectBestWeapon) return;
 	//-------------------------------------------------
-	for (int i=0; i<4; i++)
+	for (int i=0; i<(sizeof(BestWeaponSlots)/sizeof(BestWeaponSlots[0])); i++)
 	{
 		if (inventory().m_slots[BestWeaponSlots[i]].m_pIItem)
 		{

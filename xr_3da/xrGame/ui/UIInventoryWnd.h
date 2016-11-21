@@ -1,6 +1,7 @@
 #pragma once
 #pragma once
 #include <string>
+#include "../UIListsManipulations.h"
 
 class CInventory;
 
@@ -16,22 +17,25 @@ class CInventory;
 #include "UIItemInfo.h"
 #include "../inventory_space.h"
 
+
+
 class CArtefact;
 class CUI3tButton;
 class CUIDragDropListEx;
 class CUICellItem;
 
-class CUIInventoryWnd: public CUIDialogWnd
+class CUIInventoryWnd: public CUIDialogWnd,public CUIListManipulations
 {
 private:
 	typedef CUIDialogWnd	inherited;
 	bool					m_b_need_reinit;
+
 public:
 							CUIInventoryWnd				();
 	virtual					~CUIInventoryWnd			();
 
 	virtual void			Init						();
-
+	void					re_init						();
 	void					InitInventory				();
 	void					InitInventory_delayed		();
 	virtual bool			StopAnyMove					()					{return false;}
@@ -89,14 +93,19 @@ protected:
 	CUIDragDropListEx*			m_pUIKnifeList;
 	CUIDragDropListEx*			m_pUIPistolList;
 	CUIDragDropListEx*			m_pUIAutomaticList;
+	CUIDragDropListEx*			m_pUIShotgunList;
+	CUIDragDropListEx*			m_pUIDetectorArtsList;
+	CUIDragDropListEx*			m_pUIDetectorAnomsList;
+	CUIDragDropListEx*			m_pUIPNVList;
+	CUIDragDropListEx*			m_pUIApparatusList;
+	CUIDragDropListEx*			m_pUIBiodevList;
 	CUIOutfitDragDropList*		m_pUIOutfitList;
 
-	xr_vector<CUIDragDropListEx*>	inventoryLists;
 
 	void						ClearAllLists				();
 	void						BindDragDropListEvents		(CUIDragDropListEx* lst);
 	
-	EListType					GetType						(CUIDragDropListEx* l);
+	EListType					GetType						(CUIDragDropListEx* l) const;
 	CUIDragDropListEx*			GetSlotList					(u32 slot_idx);
 
 	bool		xr_stdcall		OnItemDrop					(CUICellItem* itm);
@@ -158,14 +167,5 @@ protected:
 	TIItemContainer				ruck_list;
 	u32							m_iCurrentActiveSlot;
 
-public:
-	void						ClearAllSuitables();
-	void						ClearSuitablesInList(IWListTypes listType);
-	void						SetSuitableBySection(LPCSTR section);
-	void						SetSuitableBySection(luabind::object const &sections);
-	void						SetSuitableBySectionInList(IWListTypes listType,LPCSTR section);
-	void						SetSuitableBySectionInList(IWListTypes listType,luabind::object const& sections);
-private:
-	xr_vector<LPCSTR>			getStringsFromLua(luabind::object const& table) const;
 };
 

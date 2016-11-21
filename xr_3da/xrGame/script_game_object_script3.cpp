@@ -271,5 +271,8 @@ class_<CScriptGameObject> &script_register_game_object2(class_<CScriptGameObject
 		.def("is_entity_alive",				&CScriptGameObject::IsEntityAlive)
 
 
+		
+
+
 	;return	(instance);
 }

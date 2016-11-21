@@ -1,20 +1,16 @@
 #include "pch_script.h"
 #include "UIInventoryWnd.h"
 
-#include "xrUIXmlParser.h"
 #include "UIXmlInit.h"
+
 #include "../string_table.h"
 
 #include "../actor.h"
 #include "../uigamesp.h"
 #include "../hudmanager.h"
-
 #include "../CustomOutfit.h"
-
 #include "../weapon.h"
-
 #include "../script_process.h"
-
 #include "../eatable_item.h"
 #include "../inventory.h"
 
@@ -26,7 +22,7 @@ using namespace InventoryUtilities;
 #include "../level.h"
 #include "../game_base_space.h"
 #include "../entitycondition.h"
-
+#include "../../xrSound/Sound.h"
 #include "../game_cl_base.h"
 #include "UISleepWnd.h"
 #include "../ActorCondition.h"
@@ -34,6 +30,7 @@ using namespace InventoryUtilities;
 #include "UIOutfitSlot.h"
 #include "UI3tButton.h"
 #include "UIWindow.h"
+
 
 #define				INVENTORY_ITEM_XML		"inventory_item.xml"
 #define				INVENTORY_XML			"inventory_new.xml"
@@ -62,10 +59,9 @@ void CUIInventoryWnd::Init()
 	CUIXml								uiXml;
 	bool xml_result						= uiXml.Init(CONFIG_PATH, UI_PATH, INVENTORY_XML);
 	R_ASSERT3							(xml_result, "file parsing error ", uiXml.m_xml_file_name);
-
 	CUIXmlInit							xml_init;
 	
-
+#pragma region Common UI elements
 	xml_init.InitWindow					(uiXml, "main", 0, this);
 
 	AttachChild							(&UIBeltSlots);
@@ -137,44 +133,108 @@ void CUIInventoryWnd::Init()
 		AttachChild(UIRankFrame);
 		UIRankFrame->AttachChild(UIRank);		
 	}
+#pragma endregion
 
-	m_pUIBagList						= xr_new<CUIDragDropListEx>(); UIBagWnd.AttachChild(m_pUIBagList); m_pUIBagList->SetAutoDelete(true);
+#pragma region Create dragdrop lists
+	m_pUIBagList						= xr_new<CUIDragDropListEx>(); 
+	UIBagWnd.AttachChild(m_pUIBagList); 
+	m_pUIBagList->SetAutoDelete(true);
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_bag", 0, m_pUIBagList);
 	BindDragDropListEvents				(m_pUIBagList);
 	m_pUIBagList->SetUIListId(IWListTypes::ltBag);
-	inventoryLists.push_back(m_pUIBagList);
+	sourceDragDropLists.push_back(m_pUIBagList);
 
-	m_pUIBeltList						= xr_new<CUIDragDropListEx>(); AttachChild(m_pUIBeltList); m_pUIBeltList->SetAutoDelete(true);
+	m_pUIBeltList						= xr_new<CUIDragDropListEx>(); 
+	AttachChild(m_pUIBeltList); 
+	m_pUIBeltList->SetAutoDelete(true);
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_belt", 0, m_pUIBeltList);
 	BindDragDropListEvents				(m_pUIBeltList);
 	m_pUIBeltList->SetUIListId(IWListTypes::ltBelt);
-	inventoryLists.push_back(m_pUIBeltList);
+	sourceDragDropLists.push_back(m_pUIBeltList);
 
-	m_pUIOutfitList						= xr_new<CUIOutfitDragDropList>(); AttachChild(m_pUIOutfitList); m_pUIOutfitList->SetAutoDelete(true);
+	m_pUIOutfitList						= xr_new<CUIOutfitDragDropList>(); 
+	AttachChild(m_pUIOutfitList); 
+	m_pUIOutfitList->SetAutoDelete(true);
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_outfit", 0, m_pUIOutfitList);
 	BindDragDropListEvents				(m_pUIOutfitList);
 	m_pUIOutfitList->SetUIListId(IWListTypes::ltSlotOutfit);
-	inventoryLists.push_back(m_pUIOutfitList);
-
-	m_pUIKnifeList						= xr_new<CUIDragDropListEx>(); AttachChild(m_pUIKnifeList); m_pUIKnifeList->SetAutoDelete(true);
+	sourceDragDropLists.push_back(m_pUIOutfitList);
+	
+	m_pUIKnifeList						= xr_new<CUIDragDropListEx>(); 
+	AttachChild(m_pUIKnifeList); 
+	m_pUIKnifeList->SetAutoDelete(true);
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_knife", 0, m_pUIKnifeList);
 	BindDragDropListEvents				(m_pUIKnifeList);
 	m_pUIKnifeList->SetUIListId(IWListTypes::ltSlotKnife);
-	inventoryLists.push_back(m_pUIKnifeList);
+	sourceDragDropLists.push_back(m_pUIKnifeList);
 
-	m_pUIPistolList						= xr_new<CUIDragDropListEx>(); AttachChild(m_pUIPistolList); m_pUIPistolList->SetAutoDelete(true);
+	m_pUIPistolList						= xr_new<CUIDragDropListEx>(); 
+	AttachChild(m_pUIPistolList); 
+	m_pUIPistolList->SetAutoDelete(true);
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_pistol", 0, m_pUIPistolList);
 	BindDragDropListEvents				(m_pUIPistolList);
 	m_pUIPistolList->SetUIListId(IWListTypes::ltSlotPistol);
-	inventoryLists.push_back(m_pUIPistolList);
+	sourceDragDropLists.push_back(m_pUIPistolList);
 
-	m_pUIAutomaticList						= xr_new<CUIDragDropListEx>(); AttachChild(m_pUIAutomaticList); m_pUIAutomaticList->SetAutoDelete(true);
+	m_pUIAutomaticList						= xr_new<CUIDragDropListEx>(); 
+	AttachChild(m_pUIAutomaticList); 
+	m_pUIAutomaticList->SetAutoDelete(true);
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_automatic", 0, m_pUIAutomaticList);
 	BindDragDropListEvents				(m_pUIAutomaticList);
 	m_pUIAutomaticList->SetUIListId(IWListTypes::ltSlotRifle);
-	inventoryLists.push_back(m_pUIAutomaticList);
+	sourceDragDropLists.push_back(m_pUIAutomaticList);
 
-	//pop-up menu
+	m_pUIShotgunList						= xr_new<CUIDragDropListEx>(); 
+	AttachChild(m_pUIShotgunList); 
+	m_pUIShotgunList->SetAutoDelete(true);
+	xml_init.InitDragDropListEx			(uiXml, "dragdrop_shotgun", 0, m_pUIShotgunList);
+	BindDragDropListEvents				(m_pUIShotgunList);
+	m_pUIShotgunList->SetUIListId(IWListTypes::ltSlotShotgun); 
+	sourceDragDropLists.push_back(m_pUIShotgunList);
+
+	m_pUIDetectorArtsList						= xr_new<CUIDragDropListEx>(); 
+	AttachChild(m_pUIDetectorArtsList); 
+	m_pUIDetectorArtsList->SetAutoDelete(true);
+	xml_init.InitDragDropListEx			(uiXml, "dragdrop_detector_arts", 0, m_pUIDetectorArtsList);
+	BindDragDropListEvents				(m_pUIDetectorArtsList);
+	m_pUIDetectorArtsList->SetUIListId(IWListTypes::ltSlotDetectorArts);
+	sourceDragDropLists.push_back(m_pUIDetectorArtsList);
+
+	m_pUIDetectorAnomsList						= xr_new<CUIDragDropListEx>(); 
+	AttachChild(m_pUIDetectorAnomsList); 
+	m_pUIDetectorAnomsList->SetAutoDelete(true);
+	xml_init.InitDragDropListEx			(uiXml, "dragdrop_detector_anoms", 0, m_pUIDetectorAnomsList);
+	BindDragDropListEvents				(m_pUIDetectorAnomsList);
+	m_pUIDetectorAnomsList->SetUIListId(IWListTypes::ltSlotDetectorAnoms);
+	sourceDragDropLists.push_back(m_pUIDetectorAnomsList);
+
+	m_pUIPNVList						= xr_new<CUIDragDropListEx>(); 
+	AttachChild(m_pUIPNVList); 
+	m_pUIPNVList->SetAutoDelete(true);
+	xml_init.InitDragDropListEx			(uiXml, "dragdrop_pnv", 0, m_pUIPNVList);
+	BindDragDropListEvents				(m_pUIPNVList);
+	m_pUIPNVList->SetUIListId(IWListTypes::ltSlotPNV);
+	sourceDragDropLists.push_back(m_pUIPNVList);
+
+	m_pUIApparatusList						= xr_new<CUIDragDropListEx>(); 
+	AttachChild(m_pUIApparatusList); 
+	m_pUIApparatusList->SetAutoDelete(true);
+	xml_init.InitDragDropListEx			(uiXml, "dragdrop_apparatus", 0, m_pUIApparatusList);
+	BindDragDropListEvents				(m_pUIApparatusList);
+	m_pUIApparatusList->SetUIListId(IWListTypes::ltSlotApparatus);
+	sourceDragDropLists.push_back(m_pUIApparatusList);
+
+	m_pUIBiodevList						= xr_new<CUIDragDropListEx>(); 
+	AttachChild(m_pUIBiodevList); 
+	m_pUIBiodevList->SetAutoDelete(true);
+	xml_init.InitDragDropListEx			(uiXml, "dragdrop_biodev", 0, m_pUIBiodevList);
+	BindDragDropListEvents				(m_pUIBiodevList);
+	m_pUIBiodevList->SetUIListId(IWListTypes::ltSlotBiodev);
+	sourceDragDropLists.push_back(m_pUIBiodevList);
+
+#pragma endregion
+
+#pragma region Common UI elements
 	AttachChild							(&UIPropertiesBox);
 	UIPropertiesBox.Init				(0,0,300,300);
 	UIPropertiesBox.Hide				();
@@ -185,29 +245,82 @@ void CUIInventoryWnd::Init()
 	UIStaticTime.AttachChild			(&UIStaticTimeString);
 	xml_init.InitStatic					(uiXml, "time_static_str", 0, &UIStaticTimeString);
 
-	UIExitButton						= xr_new<CUI3tButton>();UIExitButton->SetAutoDelete(true);
+	UIExitButton						= xr_new<CUI3tButton>();
+	UIExitButton->SetAutoDelete(true);
 	AttachChild							(UIExitButton);
 	xml_init.Init3tButton				(uiXml, "exit_button", 0, UIExitButton);
+#pragma endregion 
 
-//Load sounds
-
+#pragma region Load sounds
 	XML_NODE* stored_root				= uiXml.GetLocalRoot		();
 	uiXml.SetLocalRoot					(uiXml.NavigateToNode		("action_sounds",0));
-	::Sound->create						(sounds[eInvSndOpen],		uiXml.Read("snd_open",			0,	NULL),st_Effect,sg_SourceType);
-	::Sound->create						(sounds[eInvSndClose],		uiXml.Read("snd_close",			0,	NULL),st_Effect,sg_SourceType);
-	::Sound->create						(sounds[eInvItemToSlot],	uiXml.Read("snd_item_to_slot",	0,	NULL),st_Effect,sg_SourceType);
-	::Sound->create						(sounds[eInvItemToBelt],	uiXml.Read("snd_item_to_belt",	0,	NULL),st_Effect,sg_SourceType);
-	::Sound->create						(sounds[eInvItemToRuck],	uiXml.Read("snd_item_to_ruck",	0,	NULL),st_Effect,sg_SourceType);
-	::Sound->create						(sounds[eInvProperties],	uiXml.Read("snd_properties",	0,	NULL),st_Effect,sg_SourceType);
-	::Sound->create						(sounds[eInvDropItem],		uiXml.Read("snd_drop_item",		0,	NULL),st_Effect,sg_SourceType);
-	::Sound->create						(sounds[eInvAttachAddon],	uiXml.Read("snd_attach_addon",	0,	NULL),st_Effect,sg_SourceType);
-	::Sound->create						(sounds[eInvDetachAddon],	uiXml.Read("snd_detach_addon",	0,	NULL),st_Effect,sg_SourceType);
-	::Sound->create						(sounds[eInvItemUse],		uiXml.Read("snd_item_use",		0,	NULL),st_Effect,sg_SourceType);
+	if (LPCSTR data=uiXml.Read("snd_open",		0,	nullptr))
+		::Sound->create						(sounds[eInvSndOpen],data,st_Effect,sg_SourceType);
+	if (LPCSTR data=uiXml.Read("snd_close",		0,	nullptr))
+		::Sound->create						(sounds[eInvSndClose],data,st_Effect,sg_SourceType);
+	if (LPCSTR data=uiXml.Read("snd_item_to_slot",		0,	nullptr))
+		::Sound->create						(sounds[eInvItemToSlot],data,st_Effect,sg_SourceType);
+	if (LPCSTR data=uiXml.Read("snd_item_to_belt",		0,	nullptr))
+		::Sound->create						(sounds[eInvItemToBelt],data,st_Effect,sg_SourceType);
+	if (LPCSTR data=uiXml.Read("snd_item_to_ruck",		0,	nullptr))
+		::Sound->create						(sounds[eInvItemToRuck],data,st_Effect,sg_SourceType);
+	if (LPCSTR data=uiXml.Read("snd_properties",		0,	nullptr))
+		::Sound->create						(sounds[eInvProperties],data,st_Effect,sg_SourceType);
+	if (LPCSTR data=uiXml.Read("snd_drop_item",		0,	nullptr))
+		::Sound->create						(sounds[eInvDropItem],data,st_Effect,sg_SourceType);
+	if (LPCSTR data=uiXml.Read("snd_attach_addon",		0,	nullptr))
+		::Sound->create						(sounds[eInvAttachAddon],data,st_Effect,sg_SourceType);
+	if (LPCSTR data=uiXml.Read("snd_detach_addon",		0,	nullptr))
+		::Sound->create						(sounds[eInvDetachAddon],data,st_Effect,sg_SourceType);
+	if (LPCSTR data=uiXml.Read("snd_item_use",		0,	nullptr))
+		::Sound->create						(sounds[eInvItemUse],data,st_Effect,sg_SourceType);
+#pragma endregion 
 
 	uiXml.SetLocalRoot					(stored_root);
 }
 
-EListType CUIInventoryWnd::GetType(CUIDragDropListEx* l)
+void CUIInventoryWnd::re_init()
+{
+	DetachChild(UIExitButton);
+	UIStaticTime.DetachChild(&UIStaticTimeString);
+	DetachChild(&UIStaticTime);
+	DetachChild(&UIPropertiesBox);
+	UIPropertiesBox.DetachAll();
+
+	DetachChild(m_pUIPNVList); 
+	DetachChild(m_pUIDetectorArtsList); 
+	DetachChild(m_pUIBiodevList); 
+	DetachChild(m_pUIApparatusList); 
+	DetachChild(m_pUIDetectorAnomsList); 
+	DetachChild(m_pUIAutomaticList); 
+	DetachChild(m_pUIShotgunList); 
+	DetachChild(m_pUIPistolList); 
+	DetachChild(m_pUIKnifeList); 
+	DetachChild(m_pUIOutfitList); 
+	DetachChild(m_pUIBeltList); 
+
+	UIBagWnd.DetachChild(m_pUIBagList); 
+	sourceDragDropLists.clear();
+	DetachChild(&UIOutfitInfo); 
+	UIPersonalWnd.DetachChild(&UIStaticPersonal);
+	UIProgressBack.DetachChild(&UIProgressBarHealth);
+	UIProgressBack.DetachChild(&UIProgressBarPsyHealth);
+	UIProgressBack.DetachChild(&UIProgressBarRadiation);
+	DetachChild(&UIProgressBack);
+	DetachChild(&UIPersonalWnd);
+	UIDescrWnd.DetachChild(&UIItemInfo);
+	DetachChild(&UIDescrWnd);
+	DetachChild(&UIMoneyWnd);
+	DetachChild(&UIBagWnd);
+	DetachChild(&UIStaticBottom);
+	DetachChild(&UIBack);
+	DetachChild(&UIBeltSlots);
+	Init();
+	m_pCurrentCellItem=nullptr;
+	m_b_need_reinit=true;
+}
+
+EListType CUIInventoryWnd::GetType(CUIDragDropListEx* l) const
 {
 	IWListTypes listType=l->GetUIListId();
 	switch (listType)
@@ -217,26 +330,22 @@ EListType CUIInventoryWnd::GetType(CUIDragDropListEx* l)
 
 		case ltSlotKnife: 
 		case ltSlotPistol: 
+		case ltSlotShotgun: 
 		case ltSlotRifle: 
 		case ltGrenade: 
-		case ltApparatus:
+		case ltSlotApparatus:
 		case ltBolt: 
 		case ltSlotOutfit:
 		case ltPDA: 
-		case ltDetector:
+		case ltSlotPNV: 
+		case ltSlotDetectorArts:
+		case ltSlotDetectorAnoms:
+		case ltSlotBiodev:
 		case ltTorch: return iwSlot;
 		case ltUnknown: 
 		default: NODEFAULT;
 	}
 
-
-	//if(l==m_pUIBagList)			return iwBag;
-	//if(l==m_pUIBeltList)		return iwBelt;
-
-	//if(l==m_pUIAutomaticList)	return iwSlot;
-	//if(l==m_pUIKnifeList)		return iwSlot;
-	//if(l==m_pUIPistolList)		return iwSlot;
-	//if(l==m_pUIOutfitList)		return iwSlot;
 
 	NODEFAULT;
 #ifdef DEBUG
@@ -247,7 +356,7 @@ EListType CUIInventoryWnd::GetType(CUIDragDropListEx* l)
 void CUIInventoryWnd::PlaySnd(eInventorySndAction a)
 {
 	if (sounds[a]._handle())
-		sounds[a].play					(NULL, sm_2D);
+		sounds[a].play					(nullptr, sm_2D);
 }
 
 CUIInventoryWnd::~CUIInventoryWnd()
@@ -298,12 +407,12 @@ void CUIInventoryWnd::Update()
 		v = pEntityAlive->conditions().GetPsyHealth()*100.0f;
 		UIProgressBarPsyHealth.SetProgressPos	(v);
 
-		v = pEntityAlive->conditions().GetRadiation()*100.0f;
+		CInventoryOwner* pOurInvOwner	= smart_cast<CInventoryOwner*>(pEntityAlive);
+
+		v = pOurInvOwner->inventory().ItemFromSlot(DETECTOR_ANOM_SLOT) ? pEntityAlive->conditions().GetRadiation()*100.0f : 0 ;
 		UIProgressBarRadiation.SetProgressPos	(v);
 
-		CInventoryOwner* pOurInvOwner	= smart_cast<CInventoryOwner*>(pEntityAlive);
 		u32 _money						= 0;
-
 		if (GameID() != GAME_SINGLE){
 			game_PlayerState* ps = Game().GetPlayerByGameID(pEntityAlive->ID());
 			if (ps){
@@ -505,7 +614,7 @@ void CUIInventoryWnd::BindDragDropListEvents(CUIDragDropListEx* lst)
 	lst->m_f_item_selected			= CUIDragDropListEx::DRAG_DROP_EVENT(this,&CUIInventoryWnd::OnItemSelected);
 	lst->m_f_item_rbutton_click		= CUIDragDropListEx::DRAG_DROP_EVENT(this,&CUIInventoryWnd::OnItemRButtonClick);
 	lst->m_f_item_focus_lost		= CUIDragDropListEx::DRAG_DROP_EVENT(this,&CUIInventoryWnd::OnItemFocusLost);
-	lst->m_f_item_focus_received		= CUIDragDropListEx::DRAG_DROP_EVENT(this,&CUIInventoryWnd::OnItemFocusReceive);
+	lst->m_f_item_focus_received	= CUIDragDropListEx::DRAG_DROP_EVENT(this,&CUIInventoryWnd::OnItemFocusReceive);
 }
 
 

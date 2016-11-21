@@ -11,7 +11,13 @@
 #include "UIScrollView.h"
 #include "UIInventoryWnd.h"
 #include "UICellItem.h"
+#include "UIMainIngameWnd.h"
+#include "UITradeWnd.h"
+#include "../Level.h"
+#include "../UIGameCustom.h"
+#include "../UIGameSP.h"
 
+#pragma region Font manager
 CFontManager& mngr(){
 	return *(UI()->Font());
 }
@@ -47,7 +53,7 @@ CGameFont* GetFontGraffiti50Russian()
 {return mngr().pFontGraffiti50Russian;}
 CGameFont* GetFontLetterica25()
 {return mngr().pFontLetterica25;}
-
+#pragma endregion
 
 int GetARGB(u16 a, u16 r, u16 g, u16 b)
 {return color_argb(a,r,g,b);}
@@ -66,6 +72,12 @@ LPCSTR	get_texture_name(LPCSTR icon_name)
 TEX_INFO	get_texture_info(LPCSTR name, LPCSTR def_name)
 {
 	return CUITextureMaster::FindItem(name, def_name);
+}
+
+CUIInventoryWnd* get_inv_wnd()
+{
+	CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
+	return pGameSP->InventoryMenu;
 }
 
 using namespace luabind;
@@ -177,8 +189,12 @@ void CUIWindow::script_register(lua_State *L)
 
 		class_<CUIMMShniaga, CUIWindow>("CUIMMShniaga")
 		.def("SetVisibleMagnifier",			&CUIMMShniaga::SetVisibleMagnifier),
+
+		class_<CUIMainIngameWnd, CUIWindow>("CUIMainIngameWnd"),
+		//.def("re_init",&CUIMainIngameWnd::re_init),
 	
 		class_<CUIInventoryWnd, CUIWindow>("CUIInventoryWnd")
+		.def("re_init",				&CUIInventoryWnd::re_init)
 		.def("GetUIWindowType",				&CUIInventoryWnd::GetUIWindowType)
 		.def("ClearAllSuitables",			&CUIInventoryWnd::ClearAllSuitables)
 		.def("ClearSuitablesInList",		&CUIInventoryWnd::ClearSuitablesInList)
@@ -187,13 +203,21 @@ void CUIWindow::script_register(lua_State *L)
 		.def("SetSuitableBySectionInList",	static_cast<void (CUIInventoryWnd::*)(IWListTypes,LPCSTR)>					(&CUIInventoryWnd::SetSuitableBySectionInList))
 		.def("SetSuitableBySectionInList",	static_cast<void (CUIInventoryWnd::*)(IWListTypes,luabind::object const& )>	(&CUIInventoryWnd::SetSuitableBySectionInList)),
 
+		class_<CUITradeWnd, CUIWindow>("CUIInventoryWnd")
+		.def("re_init",						&CUITradeWnd::re_init)
+		.def("GetUIWindowType",				&CUITradeWnd::GetUIWindowType)
+		.def("ClearAllSuitables",			&CUITradeWnd::ClearAllSuitables)
+		.def("ClearSuitablesInList",		&CUITradeWnd::ClearSuitablesInList)
+		.def("SetSuitableBySection",		static_cast<void (CUITradeWnd::*)(LPCSTR)>					(&CUITradeWnd::SetSuitableBySection))
+		.def("SetSuitableBySection",		static_cast<void (CUITradeWnd::*)(luabind::object const& )>	(&CUITradeWnd::SetSuitableBySection))
+		.def("SetSuitableBySectionInList",	static_cast<void (CUITradeWnd::*)(IWListTypes,LPCSTR)>					(&CUITradeWnd::SetSuitableBySectionInList))
+		.def("SetSuitableBySectionInList",	static_cast<void (CUITradeWnd::*)(IWListTypes,luabind::object const& )>	(&CUITradeWnd::SetSuitableBySectionInList)),
+
 		class_<CUIDragDropListEx, CUIWindow,CUIWndCallback>("CUIDragDropListEx")
 		.def("GetUIListId",				&CUIDragDropListEx::GetUIListId),
 
-
-
+		def("get_inv_wnd",&get_inv_wnd),		
 		
-
 		class_<CUIScrollView, CUIWindow>("CUIScrollView")
 		.def(							constructor<>())
 		.def("AddWindow",				&CUIScrollView::AddWindow)
@@ -206,10 +230,6 @@ void CUIWindow::script_register(lua_State *L)
 		.def("GetCurrentScrollPos",		&CUIScrollView::GetCurrentScrollPos)
 		.def("SetScrollPos",			&CUIScrollView::SetScrollPos),
 
-
-//		.def("",						&CUIFrameLineWnd::)
-//		.def("",						&CUIFrameLineWnd::)
-//		.def("",						&CUIFrameLineWnd::)
 		class_<enum_exporter<IWListTypes>>("ui_iw_list_types")
 		.enum_("ui_iw_list_types")
 			[
@@ -217,14 +237,22 @@ void CUIWindow::script_register(lua_State *L)
 				value("LT_PISTOL",				int(ltSlotPistol)),
 				value("LT_RIFLE",				int(ltSlotRifle)),
 				value("LT_GRENADE",				int(ltGrenade)),
-				value("LT_APPARATUS",			int(ltApparatus)),
+				value("LT_APPARATUS",			int(ltSlotApparatus)),
 				value("LT_BOLT",				int(ltBolt)),
 				value("LT_OUTFIT",				int(ltSlotOutfit)),
 				value("LT_PDA",					int(ltPDA)),
-				value("LT_DETECTOR",			int(ltDetector)),
+				value("LT_DETECTOR_ARTS",		int(ltSlotDetectorArts)),
+				value("LT_DETECTOR_ANOMS",		int(ltSlotDetectorAnoms)),
+				value("LT_PNV",					int(ltSlotPNV)),
 				value("LT_TORCH",				int(ltTorch)),
 				value("LT_BAG",					int(ltBag)),
 				value("LT_BELT",				int(ltBelt)),
+				value("LT_SHOTGUN",				int(ltSlotShotgun)),
+				value("LT_BIODEV",				int(ltSlotBiodev)),
+				value("LT_TRADE_OUR_BAG",		int(ltTradeOurBag)),
+				value("LT_TRADE_OUR_TRADE",		int(ltTradeOurTrade)),
+				value("LT_TRADE_OTHER_BAG",		int(ltTradeOtherBag)),
+				value("LT_TRADE_OTHER_TRADE",	int(ltTradeOtherTrade)),
 				value("LT_UNKNOWN",				int(ltUnknown))
 			],
 

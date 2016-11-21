@@ -73,8 +73,12 @@ CInventory::CInventory()
 
 	m_slots[PDA_SLOT].m_bVisible				= false;
 	m_slots[OUTFIT_SLOT].m_bVisible				= false;
-	m_slots[DETECTOR_SLOT].m_bVisible			= false;
+	m_slots[ARTEFACT_SLOT].m_bVisible			= false;
 	m_slots[TORCH_SLOT].m_bVisible				= false;
+	m_slots[DETECTOR_ARTS_SLOT].m_bVisible		= false;
+	m_slots[DETECTOR_ANOM_SLOT].m_bVisible		= false;
+	m_slots[PNV_SLOT].m_bVisible				= false;
+	m_slots[BIODEV_SLOT].m_bVisible				= false;
 
 	m_bSlotsUseful								= true;
 	m_bBeltUseful								= false;
@@ -305,7 +309,16 @@ bool CInventory::Slot(PIItem pIItem, bool bNotActivate)
 
 bool CInventory::Belt(PIItem pIItem) 
 {
-	if(!CanPutInBelt(pIItem))	return false;
+	if(!CanPutInBelt(pIItem))
+	{
+		if (pIItem->m_eItemPlace==EItemPlace::eItemPlaceBelt && !pIItem->Belt())
+		{
+			CGameObject &obj = pIItem->object();
+			Msg("~ WARNING: item [%s] in belt, but configured for unplaced in belt.Put in ruck.",obj.Name_script());
+			Ruck(pIItem);
+		}
+		return false;
+	}
 	
 	//גושü בûכא ג סכמעו
 	bool in_slot = InSlot(pIItem);
@@ -382,6 +395,11 @@ void CInventory::Activate_deffered	(u32 slot, u32 _frame)
 	 m_iLoadActiveSlotFrame		= _frame;
 }
 
+PIItem CInventory::ActiveItem(int flag) const
+{
+	return m_iActiveSlot == NO_ACTIVE_SLOT ? nullptr : m_slots[m_iActiveSlot].m_pIItem;
+}
+
 void  CInventory::ActivateNextItemInActiveSlot()
 {
 	if(m_iActiveSlot==NO_ACTIVE_SLOT)	return;
@@ -440,7 +458,7 @@ bool CInventory::Activate(u32 slot, EActivationReason reason, bool bForce)
 		return false;
 
 	bool res = false;
-
+	 
 	if(Device.dwFrame == m_iLoadActiveSlotFrame) 
 	{
 		 if( (m_iLoadActiveSlot == slot) && m_slots[slot].m_pIItem )
@@ -557,6 +575,29 @@ void CInventory::SendActionEvent(s32 cmd, u32 flags)
 	pActor->u_EventSend		(P, net_flags(TRUE, TRUE, FALSE, TRUE));
 };
 
+
+bool CInventory::ProcessSlotAction (bool flag,u32 slotId)
+{
+	bool b_send_event=false;
+	if(flag)
+	{
+		if (m_iActiveSlot==slotId && m_slots[m_iActiveSlot].m_pIItem)
+		{
+			if(IsGameTypeSingle())
+				b_send_event = Activate(NO_ACTIVE_SLOT);
+			else
+				ActivateNextItemInActiveSlot();
+		}
+		else
+		{
+			if (m_iActiveSlot == slotId && !IsGameTypeSingle())
+				return false;
+			b_send_event = Activate(slotId, eKeyAction);
+		}
+	}
+	return b_send_event;
+}
+
 bool CInventory::Action(s32 cmd, u32 flags) 
 {
 	CActor *pActor = smart_cast<CActor*>(m_pOwner);
@@ -606,47 +647,41 @@ bool CInventory::Action(s32 cmd, u32 flags)
 	}
 
 
-	if (m_iActiveSlot < m_slots.size() && 
-			m_slots[m_iActiveSlot].m_pIItem && 
-			m_slots[m_iActiveSlot].m_pIItem->Action(cmd, flags)) 
-											return true;
+	if (m_iActiveSlot < m_slots.size() && m_slots[m_iActiveSlot].m_pIItem && m_slots[m_iActiveSlot].m_pIItem->Action(cmd, flags)) 
+		return true;
 	bool b_send_event = false;
 	switch(cmd) 
 	{
 	case kWPN_1:
+		b_send_event=ProcessSlotAction(flags&CMD_START,KNIFE_SLOT);
+		break;
 	case kWPN_2:
+		b_send_event=ProcessSlotAction(flags&CMD_START,PISTOL_SLOT);
+		break;
 	case kWPN_3:
+		b_send_event=ProcessSlotAction(flags&CMD_START,RIFLE_SLOT);
+		break;
 	case kWPN_4:
+		b_send_event=ProcessSlotAction(flags&CMD_START,SHOTGUN_SLOT);
+		break;
 	case kWPN_5:
+		b_send_event=ProcessSlotAction(flags&CMD_START,GRENADE_SLOT);
+		break;
 	case kWPN_6:
+		b_send_event=ProcessSlotAction(flags&CMD_START,APPARATUS_SLOT);
+		break;
+	case kWPN_7:
+		b_send_event=ProcessSlotAction(flags&CMD_START,BOLT_SLOT);
+		break;
+	case kWPN_8:
 	   {
-		   if (cmd == kWPN_6 && !IsGameTypeSingle()) return false;
-
-			if(flags&CMD_START)
-			{
-				if((int)m_iActiveSlot == cmd - kWPN_1 &&
-					m_slots[m_iActiveSlot].m_pIItem )
-				{
-					if(IsGameTypeSingle())
-						b_send_event = Activate(NO_ACTIVE_SLOT);
-					else
-					{
-						ActivateNextItemInActiveSlot();
-					}
-				}else{ 					
-					if ((int)m_iActiveSlot == cmd - kWPN_1 && !IsGameTypeSingle())
-						break;
-
-					b_send_event = Activate(cmd - kWPN_1, eKeyAction);
-				}
-			}
+		   //not used slot. maybe in future
 		}break;
 	case kARTEFACT:
 		{
 			if(flags&CMD_START)
 			{
-				if((int)m_iActiveSlot == ARTEFACT_SLOT &&
-					m_slots[m_iActiveSlot].m_pIItem && IsGameTypeSingle())
+				if(static_cast<int>(m_iActiveSlot) == ARTEFACT_SLOT && m_slots[m_iActiveSlot].m_pIItem && IsGameTypeSingle())
 				{
 					b_send_event = Activate(NO_ACTIVE_SLOT);
 				}else {
@@ -694,8 +729,7 @@ void CInventory::Update()
 
 	if(m_iNextActiveSlot != m_iActiveSlot && !bActiveSlotVisible)
 	{
-		if(m_iNextActiveSlot != NO_ACTIVE_SLOT &&
-			m_slots[m_iNextActiveSlot].m_pIItem)
+		if(m_iNextActiveSlot != NO_ACTIVE_SLOT && m_slots[m_iNextActiveSlot].m_pIItem)
 			m_slots[m_iNextActiveSlot].m_pIItem->Activate();
 
 		m_iActiveSlot = m_iNextActiveSlot;
@@ -957,6 +991,12 @@ bool CInventory::Eat(PIItem pIItem)
 	return			true;
 }
 
+void CInventory::SetActiveSlot(u32 ActiveSlot)
+{
+	m_iActiveSlot = ActiveSlot;
+	m_iNextActiveSlot = ActiveSlot;
+}
+
 bool CInventory::InSlot(PIItem pIItem) const
 {
 	if(pIItem->GetSlot() < m_slots.size() && 
@@ -1071,7 +1111,7 @@ u32  CInventory::BeltWidth() const
 	return m_iMaxBelt;
 }
 
-void  CInventory::AddAvailableItems(TIItemContainer& items_container, bool for_trade) const
+void  CInventory::AddAvailableItems(TIItemContainer& items_container, bool for_trade,bool useBelt,bool useSlots) const
 {
 	for(TIItemContainer::const_iterator it = m_ruck.begin(); m_ruck.end() != it; ++it) 
 	{
@@ -1080,7 +1120,7 @@ void  CInventory::AddAvailableItems(TIItemContainer& items_container, bool for_t
 			items_container.push_back(pIItem);
 	}
 
-	if(m_bBeltUseful)
+	if(m_bBeltUseful&& useBelt)
 	{
 		for(TIItemContainer::const_iterator it = m_belt.begin(); m_belt.end() != it; ++it) 
 		{
@@ -1090,7 +1130,7 @@ void  CInventory::AddAvailableItems(TIItemContainer& items_container, bool for_t
 		}
 	}
 	
-	if(m_bSlotsUseful)
+	if(m_bSlotsUseful && useSlots)
 	{
 		TISlotArr::const_iterator slot_it			= m_slots.begin();
 		TISlotArr::const_iterator slot_it_e			= m_slots.end();

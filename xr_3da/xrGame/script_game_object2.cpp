@@ -152,10 +152,13 @@ void CScriptGameObject::Hit(CScriptHit *tpLuaHit)
 	HS.power = tLuaHit.m_fPower;											//	P.w_float		(tLuaHit.m_fPower);
 	CKinematics		*V = smart_cast<CKinematics*>(object().Visual());		//	CKinematics		*V = smart_cast<CKinematics*>(object().Visual());
 	VERIFY			(V);													//	VERIFY			(V);
-	if (xr_strlen	(tLuaHit.m_caBoneName))									//	if (xr_strlen	(tLuaHit.m_caBoneName))
-		HS.boneID = 		(V->LL_BoneID(tLuaHit.m_caBoneName));			//		P.w_s16		(V->LL_BoneID(tLuaHit.m_caBoneName));
-	else																	//	else
-		HS.boneID = 		(s16(0));										//		P.w_s16		(s16(0));
+	if (!V)
+		HS.boneID = 		(s16(0));
+	else
+		if (xr_strlen	(tLuaHit.m_caBoneName))									//	if (xr_strlen	(tLuaHit.m_caBoneName))
+			HS.boneID = 		(V->LL_BoneID(tLuaHit.m_caBoneName));			//		P.w_s16		(V->LL_BoneID(tLuaHit.m_caBoneName));
+		else																	//	else
+			HS.boneID = 		(s16(0));										//		P.w_s16		(s16(0));
 	HS.p_in_bone_space = Fvector().set(0,0,0);								//	P.w_vec3		(Fvector().set(0,0,0));
 	HS.impulse = tLuaHit.m_fImpulse;										//	P.w_float		(tLuaHit.m_fImpulse);
 	HS.hit_type = (ALife::EHitType)(tLuaHit.m_tHitType);					//	P.w_u16			(u16(tLuaHit.m_tHitType));

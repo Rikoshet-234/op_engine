@@ -930,7 +930,7 @@ public		:
 		else if (EQ(args,"1"))		psActorFlags.set(AF_GODMODE,true);
 		else if (EQ(args,"0"))		psActorFlags.set(AF_GODMODE,false);
 		else InvalidSyntax();
-		g_uCommonFlags.set(mwShowInvulnerableIcon,psActorFlags.test(AF_GODMODE));
+		//g_uCommonFlags.set(mwShowInvulnerableIcon,psActorFlags.test(AF_GODMODE));
 	}
 	void	Status	(TStatus& S) override	{	strcpy_s(S,psActorFlags.test(AF_GODMODE)?"on":"off"); }
 	void	Info	(TInfo& I) override	{	strcpy_s(I,"'on/off' or '1/0'"); }
@@ -1453,6 +1453,7 @@ void CCC_RegisterCommands()
 	psHUD_Flags.set(HUD_INFO,			true);
 	psHUD_Flags.set(HUD_MIN_CROSSHAIR,	true);
 	psHUD_Flags.set(HUD_DIALOG_NUMBERED,true);
+
 	CMD3(CCC_Mask,				"hud_weapon",			&psHUD_Flags,	HUD_WEAPON);
 	CMD3(CCC_Mask,				"hud_info",				&psHUD_Flags,	HUD_INFO);
 	CMD3(CCC_Mask,				"hud_crosshair",		&psHUD_Flags,	HUD_CROSSHAIR);
@@ -1461,16 +1462,12 @@ void CCC_RegisterCommands()
 	CMD3(CCC_Mask,				"dialog_numbered",		&psHUD_Flags,	HUD_DIALOG_NUMBERED);
 	//CMD1(CCC_TexTest,			"textest");
 
-	psActorFlags.set(AF_INV_SHOW_EXT_DESC,true);
-	psActorFlags.set(AF_INV_SHOW_SELECTED,true);
-	CMD3(CCC_Mask,				"inv_extdesc",			&psActorFlags,	AF_INV_SHOW_EXT_DESC);
-	CMD3(CCC_Mask,				"inv_showselected",		&psActorFlags,	AF_INV_SHOW_SELECTED);
 
 	CMD1(CCC_DemoPlay,			"demo_play"				);
 	CMD1(CCC_DemoRecord,		"demo_record"			);
 	CMD1(CCC_PHFps,				"ph_frequency"																					);
 	CMD1(CCC_PHIterations,		"ph_iterations"																					);
-	CMD1(CCC_SetGodMode,				"g_god"			);
+	CMD1(CCC_SetGodMode,		"g_god"					);
 	CMD3(CCC_Mask,				"g_unlimitedammo",		&psActorFlags,	AF_UNLIMITEDAMMO);
 	CMD1(CCC_JumpToLevel,		"jump_to_level"			);
 	CMD3(CCC_Mask,				"cl_dynamiccrosshair",	&psHUD_Flags,	HUD_CROSSHAIR_DYNAMIC);
@@ -1479,9 +1476,23 @@ void CCC_RegisterCommands()
 	g_uCommonFlags.zero();
 	g_uCommonFlags.set(flAiUseTorchDynamicLights, TRUE);
 	g_uCommonFlags.set(enShowObjectHit, FALSE);
+	g_uCommonFlags.set(uiShowConditions, TRUE);
+	g_uCommonFlags.set(uiShowExtDesc, TRUE);
+	g_uCommonFlags.set(uiShowSelected, TRUE);
+	g_uCommonFlags.set(uiShowFocused, TRUE);
+	g_uCommonFlags.set(uiShowTradeSB, FALSE);
+	g_uCommonFlags.set(invReloadWeapon, FALSE);
 
-	CMD3(CCC_Mask,				"ai_use_torch_dynamic_lights",	&g_uCommonFlags, flAiUseTorchDynamicLights);
-	CMD3(CCC_Mask,				"engine_show_object_hit",		&g_uCommonFlags, enShowObjectHit);
+	CMD3(CCC_Mask,				"ai_use_torch_dynamic_lights",	&g_uCommonFlags,flAiUseTorchDynamicLights);
+	CMD3(CCC_Mask,				"engine_show_object_hit",		&g_uCommonFlags,enShowObjectHit);
+
+	CMD3(CCC_Mask,				"ui_show_conditions",			&g_uCommonFlags,uiShowConditions);
+	CMD3(CCC_Mask,				"ui_show_extdesc",				&g_uCommonFlags,uiShowExtDesc);
+	CMD3(CCC_Mask,				"ui_show_selected",				&g_uCommonFlags,uiShowSelected);
+	CMD3(CCC_Mask,				"ui_show_focused",				&g_uCommonFlags,uiShowFocused);
+	CMD3(CCC_Mask,				"ui_show_trade_sb",				&g_uCommonFlags,uiShowTradeSB);
+	CMD3(CCC_Mask,				"winv_reload_enable",			&g_uCommonFlags,invReloadWeapon);
+
 	CMD1(CCC_GSCheckForUpdates, "check_for_updates"		);
 	CMD1(CCC_DumpInfos,			"dump_infos"			);
 	CMD1(CCC_GiveInfos,			"give_infos"			);

@@ -31,13 +31,13 @@ ICF bool CLevelGraph::valid_vertex_id	(u32 id) const
 
 ICF	CLevelGraph::CVertex	*CLevelGraph::vertex(const u32 vertex_id) const
 {
-	VERIFY3				(valid_vertex_id(vertex_id),"Invalid vertex id",std::to_string(vertex_id).c_str());
+	//VERIFY3				(valid_vertex_id(vertex_id),"Invalid vertex id",std::to_string(vertex_id).c_str());
 	return				(m_nodes + vertex_id);
 }
 
 ICF	u32	CLevelGraph::vertex	(const CVertex *vertex_p) const
 {
-	VERIFY				((vertex_p >= m_nodes) && valid_vertex_id(u32(vertex_p - m_nodes)));
+	//VERIFY				((vertex_p >= m_nodes) && valid_vertex_id(u32(vertex_p - m_nodes)));
 	return				(u32(vertex_p - m_nodes));
 }
 
@@ -48,7 +48,7 @@ ICF	u32	CLevelGraph::vertex	(const CVertex &vertex_r) const
 
 IC	void CLevelGraph::unpack_xz(const CLevelGraph::CPosition &vertex_position, u32 &x, u32 &z) const
 {
-	VERIFY				(vertex_position.xz() < (1 << MAX_NODE_BIT_COUNT) - 1);
+	//VERIFY				(vertex_position.xz() < (1 << MAX_NODE_BIT_COUNT) - 1);
 	x					= vertex_position.xz() / m_row_length;
 	z					= vertex_position.xz() % m_row_length;
 }

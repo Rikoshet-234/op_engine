@@ -58,8 +58,8 @@ void CActor::OnEvent		(NET_Packet& P, u16 type)
 			if( inventory().CanTakeItem(smart_cast<CInventoryItem*>(_GO)) )
 			{
 				O->H_SetParent(smart_cast<CObject*>(this));
-
-				inventory().Take(_GO, false, true);
+				
+				inventory().Take(_GO, inventory().getLoadActiveSlot()==NO_ACTIVE_SLOT, true);
 
 				CUIGameSP* pGameSP = NULL;
 				CUI* ui = HUD().GetUI();
@@ -170,7 +170,8 @@ void CActor::OnEvent		(NET_Packet& P, u16 type)
 			case GEG_PLAYER_ACTIVATEARTEFACT:
 				{
 					CArtefact* pArtefact		= smart_cast<CArtefact*>(O);
-					pArtefact->ActivateArtefact	();
+					if (pArtefact)
+						pArtefact->ActivateArtefact	();
 				}break;
 			}
 		}break;

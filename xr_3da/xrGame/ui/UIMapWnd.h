@@ -2,7 +2,7 @@
 
 #include "UIWindow.h"
 #include "UIWndCallback.h"
-
+#include "../map_spot.h"
 
 class CUICustomMap;
 class CUIGlobalMap;
@@ -90,6 +90,7 @@ public:
 			void				SetZoom					(float value);
 
 			void				ShowHint				(CUIWindow* parent, LPCSTR text);
+			void				ShowHint				(CUIWindow* parent, CMapSpot* spot);
 			void				HideHint				(CUIWindow* parent);
 			void				Hint					(const shared_str& text);
 	virtual bool				OnMouse					(float x, float y, EUIMessages mouse_action);

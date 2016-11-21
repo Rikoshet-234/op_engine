@@ -7,7 +7,8 @@
 #include "../x_ray.h"
 #include "../IGame_Persistent.h"
 #include "../xrCore/stream_reader.h"
-#include "../../build_defines.h"
+#include "../build_defines.h"
+
 #pragma warning(push)
 #pragma warning(disable:4995)
 #include <malloc.h>

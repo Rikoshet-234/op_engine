@@ -4,6 +4,7 @@
 #include "UIDialogWnd.h"
 #include "../inventory_item.h"
 #include "UIColorAnimatorWrapper.h"
+#include "UIProgressBar.h"
 
 class CUIDragItem;
 class CUIDragDropListEx;
@@ -25,9 +26,12 @@ protected:
 
 	CUIDragDropListEx*		m_pParentList;
 	Ivector2				m_grid_size;
+	Ivector2				m_grid_size_start;
 	ICustomDrawCell*		m_custom_draw;
 	int						m_accelerator;
+	CUIProgressBar*			p_ConditionProgressBar;
 	virtual void			UpdateItemText			();
+
 public:
 							CUICellItem				();
 	virtual					~CUICellItem			();
@@ -39,14 +43,18 @@ public:
 				
 	virtual		void		OnAfterChild			()						{};
 
-				u32			ChildsCount				();
+				u32			ChildsCount				() const;
 				bool		HasChilds() const		{return m_childs.size()>0;}
 				void		 PushChild				(CUICellItem*);
 				CUICellItem* PopChild				();
 				CUICellItem* Child					(u32 idx)				{return m_childs[idx];};
 				bool		HasChild					(CUICellItem* item);
 	virtual		bool		EqualTo					(CUICellItem* itm);
-	IC const	Ivector2&	GetGridSize				()						{return m_grid_size;}; //size in grid
+	IC const	Ivector2&	GetGridSize				() const {return m_grid_size;}; //size in grid
+	IC			void		SetGridSize				(Ivector2 vec)			{m_grid_size.set(vec);}
+	IC			void		SetGridWidth			(int width)				{m_grid_size.x=width;}
+	IC			void		SetGridHeight			(int height)			{m_grid_size.y=height;}
+	IC			void		ResetGridSize			()						{m_grid_size.set(m_grid_size_start);}
 	IC			void		SetAccelerator			(int dik)				{m_accelerator=dik;};
 	IC			int			GetAccelerator			()		const			{return m_accelerator;};
 	

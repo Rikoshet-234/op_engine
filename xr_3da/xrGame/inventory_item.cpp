@@ -227,10 +227,13 @@ void CInventoryItem::Load(LPCSTR section)
 	if (pSettings->line_exist(section,SCRIPT_DESCRIPTION_LINE))
 	{
 		scriptDescriptionFunctorName=pSettings->r_string(section,SCRIPT_DESCRIPTION_LINE);
-		bool result	= ai().script_engine().functor(scriptDescriptionFunctorName.c_str(),scriptDescriptionFunctor);
-		if (!result)
+		if (!scriptDescriptionFunctorName.empty())
 		{
-			Msg("! ERROR script_description function [%s] not valid for [%s]",scriptDescriptionFunctorName.c_str(),section);
+			bool result	= ai().script_engine().functor(scriptDescriptionFunctorName.c_str(),scriptDescriptionFunctor);
+			if (!result)
+			{
+				Msg("! ERROR script_description function [%s] not valid for [%s]",scriptDescriptionFunctorName.c_str(),section);
+			}
 		}
 	}
 }

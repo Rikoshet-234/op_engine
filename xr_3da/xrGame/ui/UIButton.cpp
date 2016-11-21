@@ -35,10 +35,13 @@ CUIButton:: CUIButton()
 	SetTextAlignment			(CGameFont::alCenter); // this will create class instance for m_pLines
 	SetVTextAlignment			(valCenter);
 	m_bClickable				= true;
+	m_hint						= xr_new<CUIButtonHint>();
+	m_hint->Show(false);
 }
 
  CUIButton::~ CUIButton()
 {
+	xr_delete(m_hint);
 }
 
 void CUIButton::Reset()
@@ -53,7 +56,6 @@ void CUIButton::Reset()
 
 void CUIButton::Enable(bool status){
 	CUIStatic::Enable			(status);
-
 	if (!status)
 		m_bCursorOverWindow		= false;
 }
@@ -113,7 +115,7 @@ bool  CUIButton::OnMouse(float x, float y, EUIMessages mouse_action)
 		break;
 
 	case DOWN_PRESS:
-        if(mouse_action == WINDOW_MOUSE_MOVE)
+		if(mouse_action == WINDOW_MOUSE_MOVE)
 		{
 			if(m_bCursorOverWindow)
 			{
@@ -196,6 +198,11 @@ void CUIButton::DrawHighlightedText(){
 
 }
 
+void CUIButton::Show(bool status)
+{
+	inherited::Show(status);
+}
+
 void CUIButton::DrawText()
 {
 	float right_offset;
@@ -213,8 +220,8 @@ void CUIButton::DrawText()
 	}
 
 	CUIStatic::DrawText();
-	if(g_btnHint->Owner()==this)
-		g_btnHint->Draw_();
+	if (m_hint->GetVisible())
+		m_hint->Draw_();
 }
 
 
@@ -222,13 +229,14 @@ bool is_in2(const Frect& b1, const Frect& b2){
 	return (b1.x1<b2.x1)&&(b1.x2>b2.x2)&&(b1.y1<b2.y1)&&(b1.y2>b2.y2);
 }
 
+
 void  CUIButton::Update()
 {
 	CUIStatic::Update();
 
-	if(CursorOverWindow() && m_hint_text.size() && !g_btnHint->Owner() && Device.dwTimeGlobal>m_dwFocusReceiveTime+500)
+	if(CursorOverWindow() && m_hint_text.size() && !m_hint->GetVisible() && Device.dwTimeGlobal>m_dwFocusReceiveTime+500)
 	{
-		g_btnHint->SetHintText	(this,*m_hint_text);
+		m_hint->SetHintText	(this,*m_hint_text);
 
 		Fvector2 c_pos			= GetUICursor()->GetCursorPosition();
 		Frect vis_rect;
@@ -236,7 +244,7 @@ void  CUIButton::Update()
 
 		//select appropriate position
 		Frect r;
-		r.set					(0.0f, 0.0f, g_btnHint->GetWidth(), g_btnHint->GetHeight());
+		r.set					(0.0f, 0.0f, m_hint->GetWidth(), m_hint->GetHeight());
 		r.add					(c_pos.x, c_pos.y);
 
 		r.sub					(0.0f,r.height());
@@ -248,15 +256,15 @@ void  CUIButton::Update()
 		if (false==is_in2(vis_rect,r))
 			r.add				(r.width(), 45.0f);
 
-		g_btnHint->SetWndPos(r.lt);
+		m_hint->SetWndPos(r.lt);
+		m_hint->Show(true);
 	}
 }
 
 void CUIButton::OnFocusLost()
 {
 	inherited::OnFocusLost();
-	if(g_btnHint->Owner()==this)
-		g_btnHint->Discard	();
+	m_hint->Show(false);
 }
 
 bool CUIButton::OnKeyboard(int dik, EUIMessages keyboard_action)

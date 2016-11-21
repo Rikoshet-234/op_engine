@@ -2,6 +2,8 @@
 
 #include "UIWindow.h"
 #include "UIWndCallback.h"
+#include "../inventory_space.h"
+#include "UIProgressBar.h"
 
 class CInventoryItem;
 class CUICellContainer;
@@ -31,21 +33,29 @@ struct CUICell{
 typedef xr_vector<CUICell>			UI_CELLS_VEC;
 typedef UI_CELLS_VEC::iterator		UI_CELLS_VEC_IT;
 
-typedef enum
+typedef enum //inventory list types for export to scripts (identically to InventorySlots, but plus more items
 {
-	ltSlotKnife = 0,
-	ltSlotPistol = 1,
-	ltSlotRifle = 2,
-	ltGrenade = 3,
-	ltApparatus = 4,
-	ltBolt = 5,
-	ltSlotOutfit = 6,
-	ltPDA = 7,
-	ltDetector = 8,
-	ltTorch = 9,
-	ltBag	= 10,
-	ltBelt	= 11,
-	ltUnknown = -1
+	ltSlotKnife			= KNIFE_SLOT,
+	ltSlotPistol		= PISTOL_SLOT,
+	ltSlotRifle			= RIFLE_SLOT,
+	ltGrenade			= GRENADE_SLOT,
+	ltSlotApparatus		= APPARATUS_SLOT,
+	ltBolt				= BOLT_SLOT,
+	ltSlotOutfit		= OUTFIT_SLOT,
+	ltPDA				= PDA_SLOT,
+	ltSlotDetectorArts	= DETECTOR_ARTS_SLOT,
+	ltTorch				= TORCH_SLOT,
+	ltSlotDetectorAnoms = DETECTOR_ANOM_SLOT,
+	ltSlotPNV			= PNV_SLOT,
+	ltSlotShotgun		= SHOTGUN_SLOT,
+	ltSlotBiodev		= BIODEV_SLOT,
+	ltBag				= 20,
+	ltBelt				= 21,
+	ltTradeOurBag		= 22,
+	ltTradeOtherBag		= 23,
+	ltTradeOurTrade		= 24,
+	ltTradeOtherTrade	= 25,
+	ltUnknown			= -1
 } IWListTypes;
 
 class CUIDragDropListEx :public CUIWindow, public CUIWndCallback
@@ -61,6 +71,7 @@ private:
 	Flags8					m_flags;
 	CUICellItem*			m_selected_item;
 	Ivector2				m_orig_cell_capacity;
+	bool					m_b_showConditionBar;;
 
 protected:
 	
@@ -78,14 +89,17 @@ protected:
 
 	IWListTypes				listId;
 public:
-	
+	bool					GetShowConditionBar() const {return m_b_showConditionBar;}
+	void SetShowConditionBar(bool state);
+	void PutConditionBarUIData(CUIProgressBar* progress);
 	IWListTypes				GetUIListId() const			{return listId; };
 	void					SetUIListId(IWListTypes id)	{listId=id; };
+	bool					m_b_adjustCells;
 	static CUIDragItem*		m_drag_item;
 	int						m_i_scroll_pos;
 							CUIDragDropListEx	();
 	virtual					~CUIDragDropListEx	();
-				void		Init				(float x, float y, float w, float h);
+	void					Init				(float x, float y, float w, float h);
 
 	typedef					fastdelegate::FastDelegate1<CUICellItem*, bool>		DRAG_DROP_EVENT;
 

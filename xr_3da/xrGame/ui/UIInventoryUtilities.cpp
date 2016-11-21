@@ -20,18 +20,18 @@ const LPCSTR ratingField			= "rating_names";
 const LPCSTR reputationgField		= "reputation_names";
 const LPCSTR goodwillField			= "goodwill_names";
 
-ref_shader	g_BuyMenuShader			= NULL;
-ref_shader	g_EquipmentIconsShader	= NULL;
-ref_shader	g_MPCharIconsShader		= NULL;
-ref_shader	g_tmpWMShader			= NULL;
+ref_shader	g_BuyMenuShader			= nullptr;
+ref_shader	g_EquipmentIconsShader	= nullptr;
+ref_shader	g_MPCharIconsShader		= nullptr;
+ref_shader	g_tmpWMShader			= nullptr;
 static CUIStatic*	GetUIStatic				();
 
 typedef				std::pair<CHARACTER_RANK_VALUE, shared_str>	CharInfoStringID;
 DEF_MAP				(CharInfoStrings, CHARACTER_RANK_VALUE, shared_str);
 
-CharInfoStrings		*charInfoReputationStrings	= NULL;
-CharInfoStrings		*charInfoRankStrings		= NULL;
-CharInfoStrings		*charInfoGoodwillStrings	= NULL;
+CharInfoStrings		*charInfoReputationStrings	= nullptr;
+CharInfoStrings		*charInfoRankStrings		= nullptr;
+CharInfoStrings		*charInfoGoodwillStrings	= nullptr;
 
 void InventoryUtilities::CreateShaders()
 {
@@ -75,7 +75,7 @@ bool InventoryUtilities::GreaterRoomInRuck(PIItem item1, PIItem item2)
 
 bool InventoryUtilities::FreeRoom_inBelt	(TIItemContainer& item_list, PIItem _item, int width, int height)
 {
-	bool*				ruck_room	= (bool*)alloca(width*height);
+	bool*				ruck_room	= static_cast<bool*>(alloca(width * height));
 
 	int		i,j,k,m;
 	int		place_row = 0,  place_col = 0;
@@ -318,16 +318,17 @@ void InventoryUtilities::UpdateWeight(CUIStatic &wnd, bool withPrefix)
 	string32 prefix;
 	ZeroMemory(prefix, sizeof(prefix));
 
-	if (withPrefix)
-	{
-		sprintf_s(prefix, "%%c[default]%s ", *CStringTable().translate("ui_inv_weight"));
-	}
-	else
-	{
-		strcpy(prefix, "");
-	}
+	strcpy(prefix, ""); //code below disabled due to developers request... 
+	//if (withPrefix)
+	//{
+	//	sprintf_s(prefix, "%%c[default]%s ", *CStringTable().translate("ui_inv_weight"));
+	//}
+	//else
+	//{
+	//	strcpy(prefix, "");
+	//}
 
-	sprintf_s(buf, "%s%s%3.1f %s/%5.1f", prefix, cl, total, "%c[UI_orange]", max);
+	sprintf_s(buf, "%s%s%3.1f %s/ %5.1f", prefix, cl, total, "%c[UI_orange]", max);
 	wnd.SetText(buf);
 	//	UIStaticWeight.ClipperOff();
 }

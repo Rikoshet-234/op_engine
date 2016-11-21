@@ -57,7 +57,6 @@ CMainMenu::CMainMenu	()
 	if (Device.b_is_Ready)			OnDeviceCreate();  	
 	ReadTextureInfo					();
 	CUIXmlInit::InitColorDefs		();
-	g_btnHint						= NULL;
 	m_deactivated_frame				= 0;	
 	
 	m_sPatchURL						= "";
@@ -71,7 +70,6 @@ CMainMenu::CMainMenu	()
 
 	if(!g_dedicated_server)
 	{
-			g_btnHint						= xr_new<CUIButtonHint>();
 		m_pGameSpyFull					= xr_new<CGameSpy_Full>();
 		
 		for (u32 i=0; i<u32(ErrMax); i++)
@@ -94,7 +92,6 @@ CMainMenu::CMainMenu	()
 
 CMainMenu::~CMainMenu	()
 {
-	xr_delete						(g_btnHint);
 	xr_delete						(m_startDialog);
 	g_pGamePersistent->m_pMainMenu	= NULL;
 	xr_delete						(m_pGameSpyFull);

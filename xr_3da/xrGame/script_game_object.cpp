@@ -559,13 +559,12 @@ void CScriptGameObject::invulnerable		(bool invulnerable)
 
 bool				CScriptGameObject::actor_invulnerable						() const
 {
-	return GodMode()==TRUE;
+	return !!psActorFlags.test(AF_GODMODE_PARTIAL);
 }
 
 void				CScriptGameObject::actor_invulnerable						(bool invulnerable)
 {
-	psActorFlags.set(AF_GODMODE,invulnerable);
-	g_uCommonFlags.set(mwShowInvulnerableIcon,!invulnerable);	
+	psActorFlags.set(AF_GODMODE_PARTIAL,invulnerable);
 }
 
 float CScriptGameObject::GetActorMaxWeight() const

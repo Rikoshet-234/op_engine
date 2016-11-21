@@ -45,6 +45,11 @@ protected:
 	CUIStatic			UIStaticHealth;
 	CUIStatic			UIStaticArmor;
 	CUIStatic			UIStaticQuickHelp;
+	CUIStatic			UIStaticRadiation;
+	CUIStatic			UIStaticRadiationDanger;
+	CUIStatic			UIStaticHudTime;
+	shared_str			formatTimeString;
+	CUIProgressBar		UIRadiationBar;
 	CUIProgressBar		UIHealthBar;
 	CUIProgressBar		UIArmorBar;
 	CUICarPanel			UICarPanel;
@@ -70,11 +75,13 @@ protected:
 	// - ранения
 	// - голода
 	// - усталости
+	// - веса
 	CUIStatic			UIWeaponJammedIcon;
 	CUIStatic			UIRadiaitionIcon;
 	CUIStatic			UIWoundIcon;
 	CUIStatic			UIStarvationIcon;
 	CUIStatic			UIPsyHealthIcon;
+	CUIStatic			UIWeightIcon;
 	CUIStatic			UIInvincibleIcon;
 //	CUIStatic			UISleepIcon;
 	CUIStatic			UIArtefactIcon;
@@ -96,6 +103,7 @@ public:
 		ewiWound,
 		ewiStarvation,
 		ewiPsyHealth,
+		ewiWeight,
 		ewiInvincible,
 //		ewiSleep,
 		ewiArtefact,
@@ -153,6 +161,7 @@ public:
 	CUIMotionIcon&		MotionIcon							(){return UIMotionIcon;}
 	void				OnConnected							();
 	void				reset_ui							();
+	void				re_init();
 protected:
 	CInventoryItem*		m_pPickUpItem;
 	CUIStatic			UIPickUpItemIcon;

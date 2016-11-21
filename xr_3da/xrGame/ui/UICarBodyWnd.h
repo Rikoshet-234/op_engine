@@ -3,6 +3,7 @@
 #include "UIDialogWnd.h"
 #include "UIEditBox.h"
 #include "../inventory_space.h"
+#include "../UIListsManipulations.h"
 
 class CUIDragDropListEx;
 class CUIItemInfo;
@@ -13,14 +14,14 @@ class CUICellItem;
 class CInventoryBox;
 class CInventoryOwner;
 
-class CUICarBodyWnd: public CUIDialogWnd
+class CUICarBodyWnd: public CUIDialogWnd,public CUIListManipulations
 {
 private:
 	typedef CUIDialogWnd	inherited;
 	bool					m_b_need_update;
 public:
 							CUICarBodyWnd				();
-	virtual					~CUICarBodyWnd				();
+							~CUICarBodyWnd				();
 
 	virtual void			Init						();
 	virtual bool			StopAnyMove					(){return true;}

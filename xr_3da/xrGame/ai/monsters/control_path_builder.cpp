@@ -12,6 +12,7 @@
 #include "../../actor.h"
 #include "../../Actor_Memory.h"
 #include "../../visual_memory_manager.h"
+#include "../build_defines.h"
 
 #ifdef DEBUG
 extern bool show_restrictions(CRestrictedObject *object);
@@ -220,7 +221,7 @@ void CControlPathBuilder::fix_position(const Fvector &pos, u32 node, Fvector &re
 	if (!accessible(res_pos)) {
 		u32	level_vertex_id = restrictions().accessible_nearest(Fvector().set(res_pos),res_pos);
 		
-#ifdef DEBUG		
+#ifdef VERIFY_RESTRICTORS 		
 		if (level_vertex_id != node) {
 			Msg		("! src_node[%d] res_node[%d] src_pos[%f,%f,%f] res_pos[%f,%f,%f]",node,level_vertex_id,VPUSH(pos),VPUSH(res_pos));
 		}

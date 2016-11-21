@@ -40,7 +40,7 @@ namespace OPFuncs
 
 	u32	get_actor_slots_count()
 	{
-		return SLOTS_TOTAL-1; //from inventory_space.h
+		return SLOTS_TOTAL; //from inventory_space.h
 	}	
 
 	LPCSTR lua_GetOPEngineVersion()

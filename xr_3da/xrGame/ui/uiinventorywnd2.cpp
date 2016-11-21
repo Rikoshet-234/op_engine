@@ -13,13 +13,14 @@
 #include "UIDragDropListEx.h"
 #include "UI3tButton.h"
 #include "../grenadelauncher.h"
+#include "../CustomOutfit.h"
 #include "../silencer.h"
 #include "../scope.h"
 #include "../script_callback_ex.h"
 #include "../grenadelauncher.h"
 #include "../game_object_space.h"
-#include "../script_callback_ex.h"
-
+#include "../OPFuncs/utils.h"
+#include "../../defines.h"
 
 CUICellItem* CUIInventoryWnd::CurrentItem()
 {
@@ -41,90 +42,6 @@ void CUIInventoryWnd::SetItemSelected (CUICellItem* itm)
 		itm->m_selected=true;
 }
 
-void CUIInventoryWnd::ClearAllSuitables()
-{
-	std::for_each(inventoryLists.begin(),inventoryLists.end(),[](CUIDragDropListEx* list)
-	{
-		list->GetCellContainer()->clear_select_suitables();
-	});
-}
-
-void CUIInventoryWnd::ClearSuitablesInList(IWListTypes listType)
-{
-	auto listIt=std::find_if(inventoryLists.begin(),inventoryLists.end(),[listType](CUIDragDropListEx* list)
-	{
-		return list->GetUIListId()==listType;
-	});
-	if (listIt!=inventoryLists.end())
-	{
-		(*listIt)->GetCellContainer()->clear_select_suitables();
-	}
-}
-
-void CUIInventoryWnd::SetSuitableBySection(LPCSTR section)
-{
-	std::for_each(inventoryLists.begin(),inventoryLists.end(),[section](CUIDragDropListEx* list)
-	{
-		list->select_items_by_section(section);
-	});
-}
-
-xr_vector<LPCSTR> CUIInventoryWnd::getStringsFromLua(luabind::object const& table) const
-{
-	xr_vector<LPCSTR> luaStrings;
-	if (table!=nullptr && table.is_valid() && table.type()==LUA_TTABLE)
-		for(luabind::object::iterator iter=table.begin(); iter != table.end(); ++iter)
-		{
-			switch(iter->type())
-			{
-			case LUA_TSTRING:
-		   			luaStrings.push_back(luabind::object_cast<LPCSTR>(*iter));
-					break;
-			default: break;
-			}
-		}
-	return luaStrings;
-}
-
-void CUIInventoryWnd::SetSuitableBySection(luabind::object const& sections)
-{
-	xr_vector<LPCSTR> list=getStringsFromLua(sections);
-	if (list.size()>0)
-		std::for_each(list.begin(),list.end(),[&](LPCSTR section)
-		{
-			SetSuitableBySection(section);
-		});
-}
-
-void CUIInventoryWnd::SetSuitableBySectionInList(IWListTypes listType, luabind::object const& sections)
-{
-	auto listIt=std::find_if(inventoryLists.begin(),inventoryLists.end(),[listType](CUIDragDropListEx* list)
-	{
-		return list->GetUIListId()==listType;
-	});
-	if (listIt!=inventoryLists.end())
-	{
-		xr_vector<LPCSTR> listStrings=getStringsFromLua(sections);
-		if (listStrings.size()>0)
-			std::for_each(listStrings.begin(),listStrings.end(),[&](LPCSTR section)
-			{
-				(*listIt)->select_items_by_section(section);
-			});
-	};
-}
-
-void CUIInventoryWnd::SetSuitableBySectionInList(IWListTypes listType, LPCSTR section)
-{
-	auto listIt=std::find_if(inventoryLists.begin(),inventoryLists.end(),[listType](CUIDragDropListEx* list)
-	{
-		return list->GetUIListId()==listType;
-	});
-	if (listIt!=inventoryLists.end())
-	{
-		(*listIt)->select_items_by_section(section);
-	};
-}
-
 void CUIInventoryWnd::SetCurrentItem(CUICellItem* itm)
 {
 	if(m_pCurrentCellItem == itm) return;
@@ -135,7 +52,7 @@ void CUIInventoryWnd::SetCurrentItem(CUICellItem* itm)
 	ClearAllSuitables();
 
 	auto currentIItem=CurrentIItem();
-	std::for_each(inventoryLists.begin(),inventoryLists.end(),[&processed,currentIItem](CUIDragDropListEx* list)
+	std::for_each(sourceDragDropLists.begin(),sourceDragDropLists.end(),[&processed,currentIItem](CUIDragDropListEx* list)
 	{
 		bool ls=list->select_suitables_by_item(currentIItem);
 		processed=processed || ls;
@@ -176,8 +93,42 @@ void CUIInventoryWnd::InitInventory()
 	m_pMouseCapturer			= nullptr;
 	SetCurrentItem				(nullptr);
 
-	//Slots
-	PIItem _itm							= m_pInv->m_slots[KNIFE_SLOT].m_pIItem;
+#pragma region put items in slots
+	PIItem _itm							= m_pInv->m_slots[DETECTOR_ARTS_SLOT].m_pIItem;
+	if(_itm)
+	{
+		CUICellItem* itm				= create_cell_item(_itm);
+		m_pUIDetectorArtsList->SetItem		(itm);
+	}
+	_itm							= m_pInv->m_slots[DETECTOR_ANOM_SLOT].m_pIItem;
+	if(_itm)
+	{
+		CUICellItem* itm				= create_cell_item(_itm);
+		m_pUIDetectorAnomsList->SetItem		(itm);
+	}
+
+	_itm							= m_pInv->m_slots[APPARATUS_SLOT].m_pIItem;
+	if(_itm)
+	{
+		CUICellItem* itm				= create_cell_item(_itm);
+		m_pUIApparatusList->SetItem		(itm);
+	}
+
+	_itm							= m_pInv->m_slots[BIODEV_SLOT].m_pIItem;
+	if(_itm)
+	{
+		CUICellItem* itm				= create_cell_item(_itm);
+		m_pUIBiodevList->SetItem		(itm);
+	}
+
+	_itm							= m_pInv->m_slots[PNV_SLOT].m_pIItem;
+	if(_itm)
+	{
+		CUICellItem* itm				= create_cell_item(_itm);
+		m_pUIPNVList->SetItem		(itm);
+	}
+
+	_itm							= m_pInv->m_slots[KNIFE_SLOT].m_pIItem;
 	if(_itm)
 	{
 		CUICellItem* itm				= create_cell_item(_itm);
@@ -199,9 +150,17 @@ void CUIInventoryWnd::InitInventory()
 		m_pUIAutomaticList->SetItem		(itm);
 	}
 
+	_itm								= m_pInv->m_slots[SHOTGUN_SLOT].m_pIItem;
+	if(_itm)
+	{
+		CUICellItem* itm				= create_cell_item(_itm);
+		m_pUIShotgunList->SetItem		(itm);
+	}
+
 	PIItem _outfit						= m_pInv->m_slots[OUTFIT_SLOT].m_pIItem;
 	CUICellItem* outfit					= (_outfit)?create_cell_item(_outfit):NULL;
 	m_pUIOutfitList->SetItem			(outfit);
+#pragma endregion
 
 	TIItemContainer::iterator it, it_e;
 	for(it=m_pInv->m_belt.begin(),it_e=m_pInv->m_belt.end(); it!=it_e; ++it) 
@@ -308,7 +267,7 @@ bool CUIInventoryWnd::ToSlot(CUICellItem* itm, bool force_place)
 
 bool CUIInventoryWnd::ToBag(CUICellItem* itm, bool b_use_cursor_pos)
 {
-	PIItem	iitem						= (PIItem)itm->m_pData;
+	PIItem	iitem						= static_cast<PIItem>(itm->m_pData);
 
 	if(GetInventory()->CanPutInRuck(iitem))
 	{
@@ -339,12 +298,12 @@ bool CUIInventoryWnd::ToBag(CUICellItem* itm, bool b_use_cursor_pos)
 
 bool CUIInventoryWnd::ToBelt(CUICellItem* itm, bool b_use_cursor_pos)
 {
-	PIItem	iitem						= (PIItem)itm->m_pData;
+	PIItem	iitem						= static_cast<PIItem>(itm->m_pData);
 
 	if(GetInventory()->CanPutInBelt(iitem))
 	{
 		CUIDragDropListEx*	old_owner		= itm->OwnerList();
-		CUIDragDropListEx*	new_owner		= NULL;
+		CUIDragDropListEx*	new_owner		= nullptr;
 		if(b_use_cursor_pos){
 				new_owner					= CUIDragDropListEx::m_drag_item->BackList();
 				VERIFY						(new_owner==m_pUIBeltList);
@@ -416,7 +375,8 @@ bool CUIInventoryWnd::OnItemDrop(CUICellItem* itm)
 			} 
 			else if (pAmmo!=nullptr && weapon->CanLoadAmmo(pAmmo))
 			{
-				weapon->LoadAmmo(pAmmo);
+				if (g_uCommonFlags.test(invReloadWeapon))
+					weapon->LoadAmmo(pAmmo);
 				processed=true;
 			}
 		}
@@ -440,7 +400,8 @@ bool CUIInventoryWnd::OnItemDrop(CUICellItem* itm)
 					CWeaponAmmo*		pAmmo				= smart_cast<CWeaponAmmo*>		(draggedItem);
 					if (pAmmo!=nullptr && weapon->CanLoadAmmo(pAmmo))
 					{
-						weapon->LoadAmmo(pAmmo);
+						if (g_uCommonFlags.test(invReloadWeapon))
+							weapon->LoadAmmo(pAmmo);
 						processed=true;
 					}
 				}
@@ -559,6 +520,21 @@ CUIDragDropListEx* CUIInventoryWnd::GetSlotList(u32 slot_idx)
 	if(slot_idx == NO_ACTIVE_SLOT || GetInventory()->m_slots[slot_idx].m_bPersistent)	return nullptr;
 	switch (slot_idx)
 	{
+		case PNV_SLOT:
+			return m_pUIPNVList;
+			break;
+		case DETECTOR_ANOM_SLOT:
+			return m_pUIDetectorAnomsList;
+			break;
+		case DETECTOR_ARTS_SLOT:
+			return m_pUIDetectorArtsList;
+			break;
+		case APPARATUS_SLOT:
+			return m_pUIApparatusList;
+			break;
+		case BIODEV_SLOT:
+			return m_pUIBiodevList;
+			break;
 		case KNIFE_SLOT:
 			return m_pUIKnifeList;
 			break;
@@ -566,7 +542,9 @@ CUIDragDropListEx* CUIInventoryWnd::GetSlotList(u32 slot_idx)
 		case PISTOL_SLOT:
 			return m_pUIPistolList;
 			break;
-
+		case SHOTGUN_SLOT:
+			return m_pUIShotgunList;
+			break;
 		case RIFLE_SLOT:
 			return m_pUIAutomaticList;
 			break;
@@ -583,5 +561,5 @@ CUIDragDropListEx* CUIInventoryWnd::GetSlotList(u32 slot_idx)
 
 void CUIInventoryWnd::ClearAllLists()
 {
-	std::for_each(inventoryLists.begin(),inventoryLists.end(),[](CUIDragDropListEx* list){list->ClearAll(true);});
+	std::for_each(sourceDragDropLists.begin(),sourceDragDropLists.end(),[](CUIDragDropListEx* list){list->ClearAll(true);});
 }

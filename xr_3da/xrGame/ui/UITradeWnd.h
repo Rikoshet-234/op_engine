@@ -1,16 +1,24 @@
 #pragma once
 #include "UIWindow.h"
 #include "../inventory_space.h"
+#include "UIStatic.h"
+#include "UIMultiTextStatic.h"
+#include "UIDragDropListEx.h"
+#include "uicharacterinfo.h"
+#include "UI3tButton.h"
+#include "UIItemInfo.h"
+#include "../uigamecustom.h"
+#include "UIPropertiesBox.h"
+#include "../UIListsManipulations.h"
 
 class CInventoryOwner;
 class CEatableItem;
 class CTrade;
-struct CUITradeInternal;
 
 class CUIDragDropListEx;
 class CUICellItem;
 
-class CUITradeWnd: public CUIWindow
+class CUITradeWnd: public CUIWindow,public CUIListManipulations
 {
 private:
 	typedef CUIWindow inherited;
@@ -36,8 +44,43 @@ public:
 	void 				StartTrade					();
 	void 				StopTrade					();
 protected:
+	CUIStatic			UIStaticTop;
+	CUIStatic			UIStaticBottom;
 
-	CUITradeInternal*	m_uidata;
+	CUIStatic			UIOurBagWnd;
+	CUIStatic			UIOurMoneyStatic;
+	CUIStatic			UIOthersBagWnd;
+	CUIStatic			UIOtherMoneyStatic;
+	CUIDragDropListEx	UIOurBagList;
+	CUIDragDropListEx	UIOthersBagList;
+
+	CUIStatic			UIOurTradeWnd;
+	CUIStatic			UIOthersTradeWnd;
+	CUIMultiTextStatic	UIOurPriceCaption;
+	CUIMultiTextStatic	UIOthersPriceCaption;
+	CUIDragDropListEx	UIOurTradeList;
+	CUIDragDropListEx	UIOthersTradeList;
+
+	//кнопки
+	CUI3tButton			UIPerformTradeButton;
+	CUI3tButton			UIToTalkButton;
+
+	//информация о персонажах 
+	CUIStatic			UIOurIcon;
+	CUIStatic			UIOthersIcon;
+	CUICharacterInfo	UICharacterInfoLeft;
+	CUICharacterInfo	UICharacterInfoRight;
+
+	//информация о перетаскиваемом предмете
+	CUIStatic			UIDescWnd;
+	CUIItemInfo			UIItemInfo;
+
+	CUIPropertiesBox			UIPropertiesBox;
+	void						ProcessPropertiesBoxClicked	();
+	void						ActivatePropertiesBox		();
+	void						DetachAddon(const char* addon_name);
+
+	SDrawStaticStruct*	UIDealMsg;
 
 	bool				bStarted;
 	bool 				ToOurTrade					();
@@ -81,15 +124,39 @@ protected:
 
 
 	void				SetCurrentItem				(CUICellItem* itm);
+	void				SetItemSelected				(CUICellItem* itm);
 	CUICellItem*		CurrentItem					();
 	PIItem				CurrentIItem				();
+
 
 	bool		xr_stdcall		OnItemDrop			(CUICellItem* itm);
 	bool		xr_stdcall		OnItemStartDrag		(CUICellItem* itm);
 	bool		xr_stdcall		OnItemDbClick		(CUICellItem* itm);
 	bool		xr_stdcall		OnItemSelected		(CUICellItem* itm);
 	bool		xr_stdcall		OnItemRButtonClick	(CUICellItem* itm);
+	bool		xr_stdcall		OnItemFocusLost		(CUICellItem* itm);
+	bool		xr_stdcall		OnItemFocusReceive	(CUICellItem* itm);
 
-	void				BindDragDropListEnents		(CUIDragDropListEx* lst);
+	bool			OnMouse						(float x, float y, EUIMessages mouse_action) override;
+
+	void						SendEvent_Item_Drop			(PIItem	pItem);
+
+	void						BindDragDropListEnents		(CUIDragDropListEx* lst);
+	void						UpdateItemUICost(CUICellItem* cellItem);
+
+	enum eTradeSoundActions{	eInvSndOpen	=0,
+								eInvSndClose,
+								eInvProperties,
+								eInvDropItem,
+								//eInvAttachAddon,
+								eInvDetachAddon,
+								eInvItemUse,
+								eInvTradeDone,
+								eInvSndMax};
+	ref_sound					sounds					[eInvSndMax];
+	void PlaySnd(eTradeSoundActions a);
+
+public:
+	void						re_init();
 
 };

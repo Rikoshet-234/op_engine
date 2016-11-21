@@ -5,6 +5,13 @@
 #include "../HUDManager.h"
 #include "../level.h"
 #include "../object_broker.h"
+#include "UIDragDropListEx.h"
+#include "../Weapon.h"
+#include "../CustomOutfit.h"
+#include "../../defines.h"
+#include "../smart_cast.h"
+#include "UITradeWnd.h"
+#include "../OPFuncs/utils.h"
 
 CUICellItem::CUICellItem()
 {
@@ -18,16 +25,19 @@ CUICellItem::CUICellItem()
 	m_focused=false;
 	m_selected=false;
 	m_suitable=false;
+	p_ConditionProgressBar=xr_new<CUIProgressBar>();
+	p_ConditionProgressBar->SetAutoDelete(true);
+	CUIWindow::AttachChild(p_ConditionProgressBar);
 }
 
 CUICellItem::~CUICellItem()
 {
+
 	if(m_b_destroy_childs)
 		delete_data	(m_childs);
 
 	delete_data		(m_custom_draw);
 }
-
 
 void CUICellItem::Draw()
 {
@@ -86,6 +96,24 @@ CUIDragItem* CUICellItem::CreateDragItem()
 void CUICellItem::SetOwnerList(CUIDragDropListEx* p)	
 {
 	m_pParentList=p;
+	if (!m_pParentList)
+		return;
+	PIItem itm = static_cast<PIItem>(m_pData);
+	CWeapon* pWeapon = smart_cast<CWeapon*>(itm);
+	CCustomOutfit* pOutfit=smart_cast<CCustomOutfit*>(itm);
+	bool visible=false;
+	if ((pWeapon || pOutfit) && m_pParentList->GetShowConditionBar() && g_uCommonFlags.test(E_COMMON_FLAGS::uiShowConditions))
+	{
+		m_pParentList->PutConditionBarUIData(p_ConditionProgressBar);
+		Ivector2 itm_grid_size = GetGridSize();
+		Ivector2 cell_size = m_pParentList->CellSize();
+		float x = 1.f;
+		float y = itm_grid_size.y * cell_size.y - p_ConditionProgressBar->GetHeight();
+		p_ConditionProgressBar->SetWndPos(Fvector2().set(x,y));
+		p_ConditionProgressBar->SetProgressPos(itm->GetCondition()*100+1.0f-EPS);
+		visible=true;
+	}
+	p_ConditionProgressBar->Show(visible);
 }
 
 bool CUICellItem::EqualTo(CUICellItem* itm)
@@ -93,7 +121,7 @@ bool CUICellItem::EqualTo(CUICellItem* itm)
 	return (m_grid_size.x==itm->GetGridSize().x) && (m_grid_size.y==itm->GetGridSize().y);
 }
 
-u32 CUICellItem::ChildsCount()
+u32 CUICellItem::ChildsCount() const
 {
 	return m_childs.size();
 }
@@ -155,7 +183,7 @@ CUIDragItem::CUIDragItem(CUICellItem* parent)
 {
 	m_back_list						= nullptr;
 	m_pParent						= parent;
-	CUIWindow::AttachChild						(&m_static);
+	CUIWindow::AttachChild			(&m_static);
 	Device.seqRender.Add			(this, REG_PRIORITY_LOW-5000);
 	Device.seqFrame.Add				(this, REG_PRIORITY_LOW-5000);
 	VERIFY							(m_pParent->GetMessageTarget());

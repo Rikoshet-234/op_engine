@@ -553,7 +553,7 @@ void	CActor::Hit							(SHit* pHDS)
 		{
 			float hit_power	= HitArtefactsOnBelt(HDS.damage(), HDS.hit_type);
 
-			if (GodMode())//psActorFlags.test(AF_GODMODE))
+			if (GodMode() || psActorFlags.test(AF_GODMODE_PARTIAL))
 			{
 				HDS.power = 0.0f;
 //				inherited::Hit(0.f,dir,who,element,position_in_bone_space,impulse, hit_type);
