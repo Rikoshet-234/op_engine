@@ -20,9 +20,11 @@ private:
 private:
 	ICF void**			access			(void* P)	{ return (void**) ((void*)(P));	}
 	void				block_create	();
+	void				store_stat		(void* e);
+	void				remove_stat		(void* e);
 public:
 	void				_initialize		(u32 _element, u32 _sector, u32 _header);
-
+	void				_dump			(const void* corrupted_memory_item_ptr);
 #ifdef PROFILE_CRITICAL_SECTIONS
 	ICF					MEMPOOL			(): cs(MUTEX_PROFILE_ID(memory_pool)){}
 #endif // PROFILE_CRITICAL_SECTIONS
@@ -37,6 +39,7 @@ public:
 
 		void* E			= list;
 		list			= (u8*)*access(list);
+		store_stat(E);
 		cs.Leave		();
 		return			E;
 	}
@@ -45,6 +48,7 @@ public:
 		cs.Enter		();
 		*access(P)		= list;
 		list			= (u8*)P;
+		remove_stat(P);
 		cs.Leave		();
 	}
 };
