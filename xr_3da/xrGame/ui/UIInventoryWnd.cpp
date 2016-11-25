@@ -284,8 +284,9 @@ void CUIInventoryWnd::re_init()
 	DetachChild(UIExitButton);
 	UIStaticTime.DetachChild(&UIStaticTimeString);
 	DetachChild(&UIStaticTime);
+	UIPropertiesBox.RemoveAll();
+	UIPropertiesBox.DetachChild(static_cast<CUIWindow*>(&UIPropertiesBox.m_UIListWnd));
 	DetachChild(&UIPropertiesBox);
-	UIPropertiesBox.DetachAll();
 
 	DetachChild(m_pUIPNVList); 
 	DetachChild(m_pUIDetectorArtsList); 
@@ -301,6 +302,7 @@ void CUIInventoryWnd::re_init()
 
 	UIBagWnd.DetachChild(m_pUIBagList); 
 	sourceDragDropLists.clear();
+	UIOutfitInfo.DetachAll();
 	DetachChild(&UIOutfitInfo); 
 	UIPersonalWnd.DetachChild(&UIStaticPersonal);
 	UIProgressBack.DetachChild(&UIProgressBarHealth);
@@ -429,9 +431,6 @@ void CUIInventoryWnd::Update()
 
 		UIMoneyWnd.SetText				(sMoney);
 
-		// update outfit parameters
-		CCustomOutfit* outfit			= smart_cast<CCustomOutfit*>(pOurInvOwner->inventory().m_slots[OUTFIT_SLOT].m_pIItem);		
-		UIOutfitInfo.Update				(outfit);		
 	}
 
 	UIStaticTimeString.SetText(*InventoryUtilities::GetGameTimeAsString(InventoryUtilities::etpTimeToMinutes));

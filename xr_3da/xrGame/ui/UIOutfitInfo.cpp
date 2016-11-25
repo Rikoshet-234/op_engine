@@ -1,122 +1,150 @@
 #include "StdAfx.h"
 #include "UIOutfitInfo.h"
-#include "UIXmlInit.h"
 #include "UIStatic.h"
 #include "UIScrollView.h"
 #include "../actor.h"
 #include "../CustomOutfit.h"
 #include "../string_table.h"
+#include "UIListItemAdv.h"
+#include "UIListItemIconed.h"
+#include "UIXmlInit.h"
+#include "../InventoryOwner.h"
+#include "../entity_alive.h"
+#include "../inventory.h"
 
-CUIOutfitInfo::CUIOutfitInfo()
-{
-	Memory.mem_fill			(m_items, 0, sizeof(m_items));
-}
+CUIOutfitInfo::CUIOutfitInfo(): m_outfit(nullptr), m_list(nullptr) {}
 
-CUIOutfitInfo::~CUIOutfitInfo()
-{
-	for(u32 i=_item_start; i<_max_item_index; ++i)
-	{
-		CUIStatic* _s			= m_items[i];
-		xr_delete				(_s);
-	}
-}
-
-LPCSTR _imm_names []={
-	"burn_immunity",
-	"strike_immunity",
-	"shock_immunity",
-	"wound_immunity",		
-	"radiation_immunity",
-	"telepatic_immunity",
-	"chemical_burn_immunity",
-	"explosion_immunity",
-	"fire_wound_immunity",
-};
-
-LPCSTR _imm_st_names[]={
-	"ui_inv_outfit_burn_protection",
-	"ui_inv_outfit_shock_protection",
-	"ui_inv_outfit_strike_protection",
-	"ui_inv_outfit_wound_protection",
-	"ui_inv_outfit_radiation_protection",
-	"ui_inv_outfit_telepatic_protection",
-	"ui_inv_outfit_chemical_burn_protection",
-	"ui_inv_outfit_explosion_protection",
-	"ui_inv_outfit_fire_wound_protection",
-};
+CUIOutfitInfo::~CUIOutfitInfo() {}
 
 void CUIOutfitInfo::InitFromXml(CUIXml& xml_doc)
 {
 	LPCSTR _base				= "outfit_info";
-
 	string256					_buff;
 	CUIXmlInit::InitWindow		(xml_doc, _base, 0, this);
 
-	m_listWnd					= xr_new<CUIScrollView>(); m_listWnd->SetAutoDelete(true);
-	AttachChild					(m_listWnd);
-	strconcat					(sizeof(_buff),_buff, _base, ":scroll_view");
-	CUIXmlInit::InitScrollView	(xml_doc, _buff, 0, m_listWnd);
+	m_list=xr_new<CUIListWnd>();
+	m_list->SetAutoDelete(true);
+	strconcat(sizeof(_buff),_buff, _base, ":immunities_list");
+	xml_path=_buff;
+	CUIXmlInit::InitListWnd(xml_doc,_buff,0,m_list);
+	m_list->SetMessageTarget(this);
+	m_list->EnableScrollBar(true);
+	AttachChild(m_list);
 
-	for(u32 i=ALife::eHitTypeBurn; i<= ALife::eHitTypeFireWound; ++i)
+	strconcat(sizeof(_buff),_buff, _base, ":immunities_list:icons");
+	XML_NODE* iconsNode		= xml_doc.NavigateToNode(_buff,0);
+
+	if (iconsNode)
 	{
-		m_items[i]				= xr_new<CUIStatic>();
-		CUIStatic* _s			= m_items[i];
-		_s->SetAutoDelete		(false);
-		strconcat				(sizeof(_buff),_buff, _base, ":static_", _imm_names[i]);
-		CUIXmlInit::InitStatic	(xml_doc, _buff,	0, _s);
+		for (XML_NODE* node=iconsNode->FirstChild(); node; node=node->NextSibling())
+		{
+			if (node)
+			{	
+				LPCSTR id=node->Value();
+				LPCSTR value=nullptr;
+				XML_NODE *data=node->FirstChild();
+				if (data)
+				{
+					TiXmlText *text			= data->ToText();
+					if (text)				
+						value=text->Value();
+					iconIDs.insert(mk_pair(id,value));
+
+				}
+			}
+		}
 	}
-
 }
 
-void CUIOutfitInfo::Update(CCustomOutfit* outfit)
+void CUIOutfitInfo::Update(CCustomOutfit* outfitP)
 {
-	m_outfit				= outfit;
-
-	SetItem(ALife::eHitTypeBurn,		false);
-	SetItem(ALife::eHitTypeShock,		false);
-	SetItem(ALife::eHitTypeStrike,		false);
-	SetItem(ALife::eHitTypeWound,		false);
-	SetItem(ALife::eHitTypeRadiation,	false);
-	SetItem(ALife::eHitTypeTelepatic,	false);
-	SetItem(ALife::eHitTypeChemicalBurn,false);
-	SetItem(ALife::eHitTypeExplosion,	false);
-	SetItem(ALife::eHitTypeFireWound,	false);
+	m_outfit				= outfitP;
+	NewSetItem(ALife::eHitTypeBurn,			false);
+	NewSetItem(ALife::eHitTypeShock,		false);
+	NewSetItem(ALife::eHitTypeStrike,		false);
+	NewSetItem(ALife::eHitTypeWound,		false);
+	NewSetItem(ALife::eHitTypeRadiation,	false);
+	NewSetItem(ALife::eHitTypeTelepatic,	false);
+	NewSetItem(ALife::eHitTypeChemicalBurn,	false);
+	NewSetItem(ALife::eHitTypeExplosion,	false);
+	NewSetItem(ALife::eHitTypeFireWound,	false);
 }
 
-void CUIOutfitInfo::SetItem(u32 hitType, bool force_add)
+void CUIOutfitInfo::UpdateImmuneView()
 {
-	string128 _buff;
-	float _val_outfit	= 0.0f;
-	float _val_af		= 0.0f;
+	CEntityAlive *pEntityAlive = smart_cast<CEntityAlive*>(Level().CurrentEntity());
+	CInventoryOwner* pOurInvOwner = smart_cast<CInventoryOwner*>(pEntityAlive);
+	CCustomOutfit* pOutfit	= smart_cast<CCustomOutfit*>(pOurInvOwner->inventory().m_slots[OUTFIT_SLOT].m_pIItem);		
+	Update(pOutfit);		
+}
 
-	CUIStatic* _s		= m_items[hitType];
-
-	_val_outfit			= m_outfit ? m_outfit->GetDefHitTypeProtection(ALife::EHitType(hitType)) : 1.0f;
+void CUIOutfitInfo::NewSetItem(ALife::EHitType hitType, bool force_add)
+{
+	float _val_outfit			= m_outfit ? m_outfit->GetDefHitTypeProtection(ALife::EHitType(hitType)) : 1.0f;
 	_val_outfit			= 1.0f - _val_outfit;
-
-
-	_val_af				= Actor()->HitArtefactsOnBelt(1.0f,ALife::EHitType(hitType));
+	float _val_af				= Actor()->HitArtefactsOnBelt(1.0f,ALife::EHitType(hitType));
 	_val_af				= 1.0f - _val_af;
 
-	if(fsimilar(_val_outfit, 0.0f) && fsimilar(_val_af, 0.0f) && !force_add)
+	bool emptyParam=fsimilar(_val_outfit, 0.0f) && fsimilar(_val_af, 0.0f) && !force_add;
+
+	LPCSTR hitName= ALife::g_cafHitType2String(hitType);
+	int itemIndex=m_list->FindItem((void*)hitName);
+	CUIListItemIconed *item;
+	if (itemIndex==-1)
 	{
-		if(_s->GetParent()!=NULL)
-			m_listWnd->RemoveWindow(_s);
-		return;
+		if (emptyParam)
+			return;
+		CUIXml uiXml;
+		uiXml.Init(CONFIG_PATH, UI_PATH, "inventory_new.xml");
+		item=xr_new<CUIListItemIconed>();
+		item->InitXml(xml_path.c_str(),uiXml);
+		item->SetData((void*)hitName);
+		item->SetAutoDelete(true);
+		m_list->AddItem<CUIListItemIconed>(item);
+	}
+	else 
+	{
+		if (emptyParam)
+		{
+			m_list->RemoveItem(itemIndex);
+			return;
+		}
+		item=static_cast<CUIListItemIconed*>(m_list->GetItem(itemIndex));
 	}
 
-//	LPCSTR			_clr_outfit, _clr_af;
-	LPCSTR			_imm_name	= *CStringTable().translate(_imm_st_names[hitType]);
+	xr_map<shared_str ,shared_str>::iterator icon=iconIDs.find(hitName);
+	if (icon!=iconIDs.end())
+	{
+		if (icon->second.size()>0)
+			item->SetFieldIcon(0,icon->second.c_str());
+	}
+	
+	string64 buff;
+	sprintf_s(buff,"ui_inv_outfit_%s_protection",hitName);
+	item->SetFieldText(1,CStringTable().translate(buff).c_str());
+	bool outfit=false;
+	if (!fsimilar(_val_outfit, 0.0f))
+	{
+		string64 buff_outfit;
+		sprintf_s	(buff_outfit,"%s %+3.0f%%", (_val_outfit>0.0f)?"%c[green]":"%c[red]", _val_outfit*100.0f);
+		item->SetFieldText(2,buff_outfit);
+		outfit=true;
+	}
+	item->SetVisibility(2,outfit);
 
-	int _sz			= sprintf_s	(_buff,sizeof(_buff),"%s ", _imm_name);
-	_sz				+= sprintf_s	(_buff+_sz,sizeof(_buff)-_sz,"%s %+3.0f%%", (_val_outfit>0.0f)?"%c[green]":"%c[red]", _val_outfit*100.0f);
-
+	bool art=false;
 	if( !fsimilar(_val_af, 0.0f) )
 	{
-		_sz		+= sprintf_s	(_buff+_sz,sizeof(_buff)-_sz,"%s %+3.0f%%", (_val_af>0.0f)?"%c[green]":"%c[red]", _val_af*100.0f);
+		string64 buff_art;
+		sprintf_s	(buff_art,"%s %+3.0f%%", (_val_af>0.0f)?"%c[green]":"%c[red]", _val_af*100.0f);
+		item->SetFieldText(3,buff_art);
+		art=true;
 	}
-	_s->SetText			(_buff);
+	item->SetVisibility(3,art);
 
-	if(_s->GetParent()==NULL)
-		m_listWnd->AddWindow(_s, false);
+	string64 buff_total;
+	float total=_val_outfit+ _val_af;
+	sprintf_s	(buff_total,"%s %+3.0f%%", (total>0.0f)?"%c[green]":"%c[red]", total*100.0f);
+	item->SetVisibility(4,outfit && art);
+	item->SetFieldText(4,buff_total);
 }

@@ -22,7 +22,7 @@ void CUIFrameWindow::Init(float x, float y, float width, float height)
 {
 	CUIWindow::Init		(x,y,width,height);
 	m_UIWndFrame.Init	(x,y,width,height);
-	UITitleText->Init	(0,0, width, 50);
+ 	UITitleText->Init	(0,0, width, 50);
 }
 
 void CUIFrameWindow::Init(LPCSTR base_name, Frect* pRect)

@@ -2299,6 +2299,9 @@
     <Filter Include="AI\AScript\ScriptClasses\ScriptWriter">
       <UniqueIdentifier>{ff9932b1-559d-429e-ad4b-0426c90611ce}</UniqueIdentifier>
     </Filter>
+    <Filter Include="UI\UIWindows\ListBox\Iconed">
+      <UniqueIdentifier>{a1070554-506f-423b-bc1b-1403cb69af44}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mt_config.h">
@@ -6579,6 +6582,9 @@
     <ClInclude Include="UIListsManipulations.h">
       <Filter>UI\Common</Filter>
     </ClInclude>
+    <ClInclude Include="ui\UIListItemIconed.h">
+      <Filter>UI\UIWindows\ListBox\Iconed</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -9745,6 +9751,9 @@
     </ClCompile>
     <ClCompile Include="UIListsManipulations.cpp">
       <Filter>UI\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIListItemIconed.cpp">
+      <Filter>UI\UIWindows\ListBox\Iconed</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

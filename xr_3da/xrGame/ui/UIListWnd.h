@@ -105,6 +105,7 @@ public:
 
 	int				GetListPosition			() const						{ return m_iFirstShownIndex; }
 
+	LIST_ITEM_LIST	GetItemsList() const {return m_ItemList;}
 
 protected:
 	void			create_active_back		();

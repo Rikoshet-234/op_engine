@@ -93,7 +93,7 @@ void CUIInventoryWnd::InitInventory()
 	m_pMouseCapturer			= nullptr;
 	SetCurrentItem				(nullptr);
 
-#pragma region put items in slots
+#pragma region put items to slots
 	PIItem _itm							= m_pInv->m_slots[DETECTOR_ARTS_SLOT].m_pIItem;
 	if(_itm)
 	{
@@ -162,13 +162,17 @@ void CUIInventoryWnd::InitInventory()
 	m_pUIOutfitList->SetItem			(outfit);
 #pragma endregion
 
+#pragma region put items to belt
 	TIItemContainer::iterator it, it_e;
 	for(it=m_pInv->m_belt.begin(),it_e=m_pInv->m_belt.end(); it!=it_e; ++it) 
 	{
 		CUICellItem* itm			= create_cell_item(*it);
 		m_pUIBeltList->SetItem		(itm);
 	}
-	
+
+#pragma endregion
+
+#pragma region put items to ruck
 	ruck_list		= m_pInv->m_ruck;
 	std::sort		(ruck_list.begin(),ruck_list.end(),InventoryUtilities::GreaterRoomInRuck);
 
@@ -185,10 +189,11 @@ void CUIInventoryWnd::InitInventory()
 		CUICellItem* itm				= create_cell_item(_itm);
 		m_pUIBagList->SetItem			(itm);
 	}
+#pragma endregion
 
-	InventoryUtilities::UpdateWeight					(UIBagWnd, true);
-
-	m_b_need_reinit					= false;
+	UIOutfitInfo.UpdateImmuneView();
+	InventoryUtilities::UpdateWeight(UIBagWnd, true);
+	m_b_need_reinit = false;
 }  
 
 void CUIInventoryWnd::DropCurrentItem(bool b_all)
@@ -245,6 +250,7 @@ bool CUIInventoryWnd::ToSlot(CUICellItem* itm, bool force_place)
 		SendEvent_Item2Slot					(iitem);
 
 		SendEvent_ActivateSlot				(iitem);
+		UIOutfitInfo.UpdateImmuneView();
 		InventoryUtilities::UpdateWeight					(UIBagWnd, true);
 		return								true;
 	}else
@@ -260,6 +266,7 @@ bool CUIInventoryWnd::ToSlot(CUICellItem* itm, bool force_place)
 
 		bool result							= ToBag(slot_cell, false);
 		VERIFY								(result);
+		UIOutfitInfo.UpdateImmuneView();
 		InventoryUtilities::UpdateWeight					(UIBagWnd, true);
 		return ToSlot						(itm, false);
 	}
@@ -290,6 +297,7 @@ bool CUIInventoryWnd::ToBag(CUICellItem* itm, bool b_use_cursor_pos)
 			new_owner->SetItem				(i);
 
 		SendEvent_Item2Ruck					(iitem);
+		UIOutfitInfo.UpdateImmuneView();
 		InventoryUtilities::UpdateWeight					(UIBagWnd, true);
 		return true;
 	}
@@ -321,6 +329,7 @@ bool CUIInventoryWnd::ToBelt(CUICellItem* itm, bool b_use_cursor_pos)
 			new_owner->SetItem				(i);
 
 		SendEvent_Item2Belt					(iitem);
+		UIOutfitInfo.UpdateImmuneView();
 		return								true;
 	}
 	return									false;

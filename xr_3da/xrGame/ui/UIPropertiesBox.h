@@ -46,9 +46,9 @@ public:
 	CUIListBoxItem*		GetClickedItem						();
 
 	void				AutoUpdateSize						();
-
-protected:
 	CUIListBox			m_UIListWnd;
+protected:
+	
 
 	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
