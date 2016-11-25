@@ -13,6 +13,7 @@
 #include "game_base_space.h"
 #include "object_broker.h"
 #include "restriction_space.h"
+#include "../../xrCore/xrMemory.h"
 
 #ifndef AI_COMPILER
 #	include "character_info.h"
@@ -317,6 +318,7 @@ void CSE_ALifeObject::STATE_Write			(NET_Packet &tNetPacket)
 		{
 			if (m_ini_string[i] == 0)
 			{
+				Memory._dump(29, m_ini_string.c_str());
 				LogPacketError("Custom data broken [STATE_Write::before]! [%d != %d](%u, %X) Custom data: %s"
 					, m_ini_string.size(), i, m_ini_string._get()->dwReference, m_ini_string._get()->dwCRC, m_ini_string.c_str());
 				FATAL("ENGINE CRASH: See details in log");

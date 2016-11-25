@@ -275,4 +275,9 @@ void*	xrMemory::mem_realloc	(void* P, size_t size
 	return	_ptr;
 }
 
+void	xrMemory::_dump(u32 pool, const void* corrupted_memory_item_ptr)
+{
+	mem_pools[pool]._dump(corrupted_memory_item_ptr);
+}
+
 #endif // __BORLANDC__

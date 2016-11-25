@@ -23,9 +23,9 @@ CONDITIONAL COMPILATION :
                            File Scope Defines
 //////////////////////////////////////////////////////////////////////*/
 // The maximum symbol size handled in the module
-#define MAX_SYM_SIZE  256
-#define BUFF_SIZE 1024
-#define SYM_BUFF_SIZE 512
+#define MAX_SYM_SIZE  4*256
+#define BUFF_SIZE 8*1024
+#define SYM_BUFF_SIZE 4*512
 
 /*//////////////////////////////////////////////////////////////////////
                       File Scope Global Variables
