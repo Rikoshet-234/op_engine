@@ -314,9 +314,6 @@ void CSE_ALifeObject::STATE_Write			(NET_Packet &tNetPacket)
 	tNetPacket.w_u32			(m_flags.get());
 	if (m_ini_string.size() >= 450 && m_ini_string.size() < 466)
 	{
-		char* tmp = const_cast<char*>(m_ini_string.c_str()) + 391;
-		*tmp = 0;
-
 		for (u32 i = 0; i < m_ini_string.size(); ++i)
 		{
 			if (m_ini_string[i] == 0)
