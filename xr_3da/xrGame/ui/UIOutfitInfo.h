@@ -1,6 +1,11 @@
 #pragma once
 
 #include "UIWindow.h"
+#include "../alife_space.h"
+#include "UIListWnd.h"
+#include "UIMultiTextStatic.h"
+#include "UIXmlInit.h"
+#include "xrUIXmlParser.h"
 
 class CUIScrollView;
 class CCustomOutfit;
@@ -14,26 +19,14 @@ public:
 					CUIOutfitInfo			();
 	virtual			~CUIOutfitInfo			();
 
-			void 	Update					(CCustomOutfit* outfit);	
-			void 	InitFromXml				(CUIXml& xml_doc);
+	void Update					(CCustomOutfit* outfit);	
+	void UpdateImmuneView();
+	void InitFromXml				(CUIXml& xml_doc);
+	xr_map<shared_str ,shared_str> iconIDs;
+	shared_str xml_path;
+
 protected:
-	void			SetItem					(u32 hitType, bool force_add);
+	void NewSetItem(ALife::EHitType hitType, bool force_add);
+	CUIListWnd*		m_list;
 
-	CUIScrollView*	m_listWnd;
-
-	enum{
-		_item_start						= 0,
-		_item_burn_immunity				= _item_start,
-		_item_strike_immunity,
-		_item_shock_immunity,
-		_item_wound_immunity,		
-		_item_radiation_immunity,
-		_item_telepatic_immunity,
-		_item_chemical_burn_immunity,
-		_item_explosion_immunit,
-		_item_fire_wound_immunity,
-
-		_max_item_index,
-	};
-	CUIStatic*		m_items[_max_item_index];
 };
