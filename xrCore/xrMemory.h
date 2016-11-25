@@ -41,6 +41,7 @@ public:
 	xrMemory			();
 	void				_initialize		(BOOL _debug_mode=FALSE);
 	void				_destroy		();
+	void				_dump(u32 pool, const void* corrupted_memory_item_ptr);
 
 #ifdef DEBUG_MEMORY_MANAGER
 	BOOL				debug_mode;
