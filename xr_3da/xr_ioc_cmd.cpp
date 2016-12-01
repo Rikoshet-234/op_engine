@@ -14,6 +14,7 @@
 #include "ResourceManager.h"
 
 #include "xr_object.h"
+#include "../build_defines.h"
 
 xr_token							snd_freq_token							[ ]={
 	{ "22khz",						sf_22K										},
@@ -244,7 +245,9 @@ public:
 				for (it=Console->Commands.begin(); it!=Console->Commands.end(); it++)
 					it->second->Save(F);
 				FS.w_close			(F);
+#ifdef MORE_SPAM
 				Msg("Config-file [%s] saved successfully",cfg_full_name);
+#endif
 		}else
 			Msg("!Cannot store config file [%s]", cfg_full_name);
 	}

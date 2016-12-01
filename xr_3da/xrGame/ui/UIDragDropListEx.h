@@ -5,6 +5,7 @@
 #include "../inventory_space.h"
 #include "UIProgressBar.h"
 
+
 class CInventoryItem;
 class CUICellContainer;
 class CUIScrollBar;
@@ -55,6 +56,8 @@ typedef enum //inventory list types for export to scripts (identically to Invent
 	ltTradeOtherBag		= 23,
 	ltTradeOurTrade		= 24,
 	ltTradeOtherTrade	= 25,
+	ltCarbodyOurBag		= 26,
+	ltCarbodyOtherBag		= 27,
 	ltUnknown			= -1
 } IWListTypes;
 
@@ -62,6 +65,7 @@ class CUIDragDropListEx :public CUIWindow, public CUIWndCallback
 {
 private:
 	typedef CUIWindow inherited;
+
 
 	enum{	
 		flGroupSimilar		=	(1<<0),

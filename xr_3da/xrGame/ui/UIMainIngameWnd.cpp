@@ -515,7 +515,7 @@ void CUIMainIngameWnd::Update()
 	u32 year = 0, month = 0, day = 0, hours = 0, mins = 0, secs = 0, milisecs = 0;
 	split_time(Level().GetGameTime(), year, month, day, hours, mins, secs, milisecs);
 	string64 buffer;
-	sprintf_s(buffer,"%2i:%2i",hours,mins);
+	sprintf_s(buffer,"%02i:%02i",hours,mins);
 	UIStaticHudTime.SetText(buffer);
 
 	UIHealthBar.SetProgressPos		(m_pActor->GetfHealth()*100.0f);

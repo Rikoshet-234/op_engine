@@ -41,6 +41,7 @@ public:
 	virtual bool			OnKeyboard					(int dik, EUIMessages keyboard_action);
 
 	void					UpdateLists_delayed			();
+	void					re_init();
 
 protected:
 	CInventoryOwner*		m_pOurObject;
@@ -80,6 +81,7 @@ protected:
 	bool					ToOthersBag					();
 	
 	void					SetCurrentItem				(CUICellItem* itm);
+	void SetItemSelected(CUICellItem* itm);
 	CUICellItem*			CurrentItem					();
 	PIItem					CurrentIItem				();
 
@@ -92,8 +94,13 @@ protected:
 	bool		xr_stdcall	OnItemDbClick				(CUICellItem* itm);
 	bool		xr_stdcall	OnItemSelected				(CUICellItem* itm);
 	bool		xr_stdcall	OnItemRButtonClick			(CUICellItem* itm);
+	bool		xr_stdcall		OnItemFocusLost		(CUICellItem* itm) const;
+	bool		xr_stdcall		OnItemFocusReceive	(CUICellItem* itm) const;
 
+	void BindDragDropListEvents(CUIDragDropListEx* lst);
 	bool					TransferItem				(PIItem itm, CInventoryOwner* owner_from, CInventoryOwner* owner_to, bool b_check);
-	void					BindDragDropListEnents		(CUIDragDropListEx* lst);
-
+	bool			OnMouse						(float x, float y, EUIMessages mouse_action) override;
+	void						DetachAddon(const char* addon_name);
 };
+
+

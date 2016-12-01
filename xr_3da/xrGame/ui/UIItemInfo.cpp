@@ -90,7 +90,9 @@ void CUIItemInfo::Init(LPCSTR xml_name){
 
 	if(uiXml.NavigateToNode("condition_progress",0))
 	{
-		UICondProgresBar			= xr_new<CUIProgressBar>(); AttachChild(UICondProgresBar);UICondProgresBar->SetAutoDelete(true);
+		UICondProgresBar			= xr_new<CUIProgressBar>(); 
+		AttachChild(UICondProgresBar);
+		UICondProgresBar->SetAutoDelete(true);
 		xml_init.InitProgressBar	(uiXml, "condition_progress", 0, UICondProgresBar);
 	}
 
@@ -135,7 +137,12 @@ bool				IsGameTypeSingle();
 void CUIItemInfo::InitItem(CInventoryItem* pInvItem)
 {
 	m_pInvItem				= pInvItem;
-	if(!m_pInvItem)			return;
+	if(!m_pInvItem)
+	{
+		if(UICondProgresBar)
+			UICondProgresBar->Show(false);
+		return;
+	}
 
 	string256				str;
 	if(UIName)

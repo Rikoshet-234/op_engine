@@ -8,6 +8,10 @@
 #include "../inventory_item.h"
 #include "../../xrSound/Sound.h"
 #include "../ui/xrUIXmlParser.h"
+#include "../Level.h"
+#include "../Actor.h"
+#include "../../xrNetServer/NET_utils.h"
+#include "../Inventory.h"
 
 CTimerStat forCellCreation; 
 CTimerStat forFillActor; 
@@ -28,7 +32,7 @@ namespace OPFuncs
 		{
 			if (pSettings->line_exist(addonName.c_str(),"inv_name_short"))
 				name=pSettings->r_string(addonName.c_str(),"inv_name_short");
-			if ((name.size()==0) || (std::strcmp(name.c_str(),EMPTY_DESC)==0))
+			if ((name.size()==0) || (xr_strcmp(name.c_str(),EMPTY_DESC)==0))
 				name=pSettings->r_string(addonName.c_str(),"inv_name");
 		}
 		return name;
@@ -44,6 +48,40 @@ namespace OPFuncs
 			weaponWithGrenade->UnloadMagazine();
 			weaponWithGrenade->PerformSwitchGL();
 		}
+	}
+
+	void DetachAddon(CInventoryItem* item, const char* addon_name)
+	{
+		if (OnClient())
+		{
+			NET_Packet								P;
+			item->object().u_EventGen		(P, GE_ADDON_DETACH, item->object().ID());
+			P.w_stringZ								(addon_name);
+			item->object().u_EventSend	(P);
+		};
+		item->Detach						(addon_name, true);
+
+		CActor *pActor								= smart_cast<CActor*>(Level().CurrentEntity());
+		if(pActor && item == pActor->inventory().ActiveItem())
+		{
+			pActor->inventory().Activate		(NO_ACTIVE_SLOT);
+		}
+	}
+
+	void AttachAddon(CInventoryItem* item_to_upgrade,CInventoryItem* addon)
+	{
+		if (OnClient())
+		{
+			NET_Packet								P;
+			item_to_upgrade->object().u_EventGen	(P, GE_ADDON_ATTACH, item_to_upgrade->object().ID());
+			P.w_u32									(addon->object().ID());
+			item_to_upgrade->object().u_EventSend	(P);
+		};
+		item_to_upgrade->Attach						(addon, true);
+		//спрятать вещь из активного слота в инвентарь на время вызова менюшки
+		CActor *pActor								= smart_cast<CActor*>(Level().CurrentEntity());
+		if(pActor && item_to_upgrade == pActor->inventory().ActiveItem())
+				pActor->inventory().Activate		(NO_ACTIVE_SLOT);
 	}
 
 	std::string getComplexString(std::string untranslatedString,PIItem item,std::string untranslatedString2)

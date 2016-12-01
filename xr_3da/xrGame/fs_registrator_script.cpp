@@ -159,10 +159,23 @@ void r_close(CLocatorAPI* self,IReader* reader)
 	self->r_close(*&reader);
 }
 
+IReader* r_open(CLocatorAPI* self,LPCSTR fileName)
+{
+	string_path			S1;
+	FS.update_path		(S1,"$game_settings$",fileName);
+	return self->r_open(S1);
+}
 
 void w_close(CLocatorAPI* self,IWriter* writer)
 {
 	self->w_close(*&writer);
+}
+
+IWriter* w_open(CLocatorAPI* self,LPCSTR fileName)
+{
+	string_path			S1;
+	FS.update_path		(S1,"$game_settings$",fileName);
+	return self->w_open(S1);
 }
 
 #pragma optimize("s",on)
@@ -240,13 +253,14 @@ void fs_registrator::script_register(lua_State *L)
 
 			.def("get_file_age",						&CLocatorAPI::get_file_age)
 			.def("get_file_age_str",					&get_file_age_str)
-			.def("r_open",								static_cast<IReader* (CLocatorAPI::*)(LPCSTR, LPCSTR)>(&CLocatorAPI::r_open))
-			.def("r_open",								static_cast<IReader* (CLocatorAPI::*)(LPCSTR)>(&CLocatorAPI::r_open))
-			.def("r_close",								static_cast<void (*)(CLocatorAPI*,IReader *)>(&r_close))
+//			.def("r_open",								static_cast<IReader* (CLocatorAPI::*)(LPCSTR, LPCSTR)>(&CLocatorAPI::r_open))
+//			.def("r_open",								static_cast<IReader* (CLocatorAPI::*)(LPCSTR)>(&CLocatorAPI::r_open))
+			.def("r_open",								static_cast<IReader*	(*)		(CLocatorAPI*,LPCSTR)>		(&r_open))
+			.def("r_close",								static_cast<void		(*)		(CLocatorAPI*,IReader *)>	(&r_close))
 
-			.def("w_open",								static_cast<IWriter* (CLocatorAPI::*)(LPCSTR, LPCSTR)>(&CLocatorAPI::w_open))
-			.def("w_open",								static_cast<IWriter* (CLocatorAPI::*)(LPCSTR)>(&CLocatorAPI::w_open))
-			.def("w_close",								static_cast<void (*)(CLocatorAPI*,IWriter *)>(&w_close))
+//			.def("w_open",								static_cast<IWriter* (CLocatorAPI::*)(LPCSTR, LPCSTR)>(&CLocatorAPI::w_open))
+			.def("w_open",								static_cast<IWriter*	(*)		(CLocatorAPI*,LPCSTR)>		(&w_open))
+			.def("w_close",								static_cast<void		(*)		(CLocatorAPI*,IWriter *)>	(&w_close))
 
 			.def("file_list_open",						&file_list_open_script)
 			.def("file_list_open",						&file_list_open_script_2)

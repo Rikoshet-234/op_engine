@@ -57,6 +57,16 @@ CScriptIniFile *create_ini_file	(LPCSTR ini_string)
 		)
 	);
 }
+
+CScriptIniFile *open_ini_file(LPCSTR fileName,bool modeWrite)
+{
+	return xr_new<CScriptIniFile>(modeWrite,fileName);
+}
+
+void close_ini_file(CScriptIniFile *file)
+{
+	file->save_as();
+}
 #pragma warning(pop)
 
 #pragma optimize("s",on)
@@ -78,12 +88,26 @@ void CScriptIniFile::script_register(lua_State *L)
 			.def("r_s32",			&CScriptIniFile::r_s32)
 			.def("r_float",			&CScriptIniFile::r_float)
 			.def("r_vector",		&CScriptIniFile::r_fvector3)
-			.def("r_line",			&::r_line, out_value(_4) + out_value(_5)),
+			.def("r_line",			&::r_line, out_value(_4) + out_value(_5))
+
+			.def("w_string",		static_cast<void	(CScriptIniFile::*)		(LPCSTR, LPCSTR, LPCSTR, LPCSTR )>			(&CInifile::w_string))
+			.def("w_bool",			static_cast<void	(CScriptIniFile::*)		(LPCSTR, LPCSTR, bool, LPCSTR )>			(&CScriptIniFile::w_bool))
+			.def("w_u32",			static_cast<void	(CScriptIniFile::*)		(LPCSTR, LPCSTR, u32, LPCSTR )>				(&CScriptIniFile::w_u32))
+			.def("w_s32",			static_cast<void	(CScriptIniFile::*)		(LPCSTR, LPCSTR, s32, LPCSTR )>				(&CScriptIniFile::w_s32))
+			.def("w_float",			static_cast<void	(CScriptIniFile::*)		(LPCSTR, LPCSTR, float, LPCSTR )>			(&CScriptIniFile::w_float))
+			.def("w_fvector2",		static_cast<void	(CScriptIniFile::*)		(LPCSTR, LPCSTR, const Fvector2&, LPCSTR )>	(&CScriptIniFile::w_fvector2))
+			.def("w_fvector3",		static_cast<void	(CScriptIniFile::*)		(LPCSTR, LPCSTR, const Fvector3&, LPCSTR )>	(&CScriptIniFile::w_fvector3))
+			.def("w_fvector4",		static_cast<void	(CScriptIniFile::*)		(LPCSTR, LPCSTR, const Fvector4&, LPCSTR )>	(&CScriptIniFile::w_fvector4))
+			.def("remove_line",		static_cast<void	(CScriptIniFile::*)		(LPCSTR, LPCSTR )>							(&CScriptIniFile::remove_line))
+			.def("remove_section",	static_cast<void	(CScriptIniFile::*)		(LPCSTR )>									(&CScriptIniFile::remove_section)),
+
 
 		def("system_ini",			&get_system_ini),
 #ifdef XRGAME_EXPORTS
 		def("game_ini",				&get_game_ini),
 #endif // XRGAME_EXPORTS
-		def("create_ini_file",		&create_ini_file,	adopt(result))
+		def("create_ini_file",		&create_ini_file,	adopt(result)),
+		def("open_ini_file",		&open_ini_file,		adopt(result)),
+		def("close_ini_file",		&close_ini_file)
 	];
 }

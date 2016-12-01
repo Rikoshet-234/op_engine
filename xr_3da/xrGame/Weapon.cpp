@@ -122,8 +122,10 @@ void CWeapon::UpdateXForm	()
 		VERIFY			(V);
 
 		// Get matrices
-		int				boneL,boneR,boneR2;
+		int				boneL=-1,boneR=-1,boneR2=-1;
 		E->g_WeaponBones(boneL,boneR,boneR2);
+		if (boneR == -1)		return;
+
 		if ((HandDependence() == hd1Hand) || (GetState() == eReload) || (!E->g_Alive()))
 			boneL = boneR2;
 #pragma todo("TO ALL: serious performance problem")

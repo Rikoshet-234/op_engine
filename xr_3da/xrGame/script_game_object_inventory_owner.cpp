@@ -220,6 +220,18 @@ void CScriptGameObject::IterateRuckOnlyFunctor(luabind::functor<void> functor)
 		functor				((*I)->object().lua_game_object());
 }
 
+LPCSTR CScriptGameObject::GetVisualName(CScriptGameObject* self) const
+{
+	if (!g_pGameLevel)
+	{
+		Msg("Error! CScriptGameObject::GetVisualName : game level doesn't exist. wtf?????");
+		return "";
+	}
+
+	return *object().cNameVisual();
+
+}
+
 void CScriptGameObject::IterateBeltOnlyFunctor(luabind::functor<void> functor) 
 {
 	CInventoryOwner			*inventory_owner = smart_cast<CInventoryOwner*>(&this->object());

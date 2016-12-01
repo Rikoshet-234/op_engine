@@ -5,6 +5,11 @@
 using namespace luabind;
 
 #pragma optimize("s",on)
+void CUIEditBox_SetText(CUIEditBox* self,LPCSTR text)
+{
+	self->SetText(text);
+}
+
 void CUIEditBox::script_register(lua_State *L)
 {
 	module(L)
@@ -24,6 +29,7 @@ void CUIEditBox::script_register(lua_State *L)
 
 		class_<CUIEditBox, CUICustomEdit>("CUIEditBox")
 		.def(						constructor<>())
+		.def("SetText",				&CUIEditBox_SetText)
 		.def("InitTexture",			&CUIEditBox::InitTexture),
 
 		class_<CUIEditBoxEx, CUICustomEdit>("CUIEditBoxEx")

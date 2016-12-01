@@ -255,6 +255,7 @@ class_<CScriptGameObject> &script_register_game_object1(class_<CScriptGameObject
 		.def("iterate_ruck",				&CScriptGameObject::IterateRuckOnlyFunctor)
 		.def("is_crouch",					&CScriptGameObject::actor_is_crouch)
 		.def("set_crouch",					&CScriptGameObject::actor_set_crouch)
+		.def("get_visual_name",				&CScriptGameObject::GetVisualName)
 
 #ifdef DEBUG
 			     .def("debug_planner", &CScriptGameObject::debug_planner)

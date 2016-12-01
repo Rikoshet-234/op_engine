@@ -21,6 +21,7 @@
 #include "ai_object_location.h"
 #include "stalker_velocity_holder.h"
 #include "stalker_velocity_collection.h"
+#include "log.h"
 
 #ifdef DEBUG
 #	include "stalker_decision_space.h"
@@ -80,7 +81,7 @@ void CStalkerMovementManager::initialize()
 	set_body_state			(eBodyStateStand);
 	set_movement_type		(eMovementTypeStand);
 	set_mental_state		(eMentalStateDanger);
-	set_desired_direction	(0);
+	set_desired_direction	(nullptr);
 
 #ifdef DEBUG
 	restrictions().initialize();
@@ -94,7 +95,15 @@ void CStalkerMovementManager::set_desired_position(const Fvector *desired_positi
 {
 	if (desired_position) {
 		m_target.m_use_desired_position	= true;
-		VERIFY2							(object().movement().accessible(*desired_position) || show_restrictions(&restrictions()),*object().cName());
+#ifdef DEBUG
+		if (!object().movement().accessible(*desired_position))
+		{
+			show_restrictions(&restrictions());
+			Msg("~ WARNING CStalkerMovementManager: not accesible desired position [%f,%f,%f] for [%s]",VPUSH((*desired_position)),*object().cName());
+		}
+		//VERIFY2							(object().movement().accessible(*desired_position) || show_restrictions(&restrictions()),*object().cName());
+#endif
+
 		m_target.m_desired_position		= *desired_position;
 	}
 	else {

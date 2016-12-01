@@ -334,7 +334,7 @@ BOOL			CInifile::section_exist	( const shared_str& S	)					{ return	section_exis
 //--------------------------------------------------------------------------------------
 CInifile::Sect& CInifile::r_section( LPCSTR S )
 {
-	char	section[256]; strcpy_s(section,sizeof(section),S); strlwr(section);
+	char	section[256]; strcpy_s(section,sizeof(section),S); _strlwr(section);
 	RootIt I = std::lower_bound(DATA.begin(),DATA.end(),section,sect_pred);
 	if (!(I!=DATA.end() && xr_strcmp(*(*I)->Name,section)==0))
 		Debug.fatal(DEBUG_INFO,"Can't open section '%s'",S);
@@ -648,3 +648,12 @@ void	CInifile::remove_line	( LPCSTR S, LPCSTR L )
 	}
 }
 
+void CInifile::remove_section(LPCSTR S)
+{
+	if (!bReadOnly)
+	{
+		RootIt I = std::lower_bound(DATA.begin(),DATA.end(),S,sect_pred);
+		if (I!=DATA.end() && xr_strcmp(*(*I)->Name,S)==0)
+			DATA.erase(I);
+	}
+}

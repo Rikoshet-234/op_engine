@@ -22,6 +22,7 @@ class CUITradeWnd: public CUIWindow,public CUIListManipulations
 {
 private:
 	typedef CUIWindow inherited;
+
 public:
 						CUITradeWnd					();
 	virtual				~CUITradeWnd				();
@@ -87,7 +88,7 @@ protected:
 	bool 				ToOthersTrade				();
 	bool 				ToOurBag					();
 	bool 				ToOthersBag					();
-	void 				SendEvent_ItemDrop			(PIItem pItem);
+	//void 				SendEvent_ItemDrop			(PIItem pItem);
 	
 	u32					CalcItemsPrice				(CUIDragDropListEx* pList, CTrade* pTrade, bool bBuying);
 	float				CalcItemsWeight				(CUIDragDropListEx* pList);
@@ -128,7 +129,6 @@ protected:
 	CUICellItem*		CurrentItem					();
 	PIItem				CurrentIItem				();
 
-
 	bool		xr_stdcall		OnItemDrop			(CUICellItem* itm);
 	bool		xr_stdcall		OnItemStartDrag		(CUICellItem* itm);
 	bool		xr_stdcall		OnItemDbClick		(CUICellItem* itm);
@@ -141,7 +141,7 @@ protected:
 
 	void						SendEvent_Item_Drop			(PIItem	pItem);
 
-	void						BindDragDropListEnents		(CUIDragDropListEx* lst);
+	void						BindDragDropListEvents		(CUIDragDropListEx* lst);
 	void						UpdateItemUICost(CUICellItem* cellItem);
 
 	enum eTradeSoundActions{	eInvSndOpen	=0,
@@ -158,5 +158,4 @@ protected:
 
 public:
 	void						re_init();
-
 };

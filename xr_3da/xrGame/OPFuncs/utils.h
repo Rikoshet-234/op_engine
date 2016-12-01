@@ -24,6 +24,8 @@ namespace OPFuncs
 	std::string getComplexString(std::string untranslatedString,PIItem item,std::string untranslatedString2="");
 	std::string getAddonInvName(std::string addonName);
 	void UnloadWeapon(CWeaponMagazined* weapon);
+	void DetachAddon(CInventoryItem* item,const char* addon_name);
+	void AttachAddon(CInventoryItem* item_to_upgrade,CInventoryItem* addon);
 }
 
 #endif

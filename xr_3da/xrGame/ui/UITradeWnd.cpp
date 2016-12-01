@@ -123,7 +123,8 @@ void CUITradeWnd::Init()
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_list_other_trade", 0, &UIOthersTradeList);
 	UIOthersTradeList.SetUIListId(IWListTypes::ltTradeOtherTrade);
 	sourceDragDropLists.push_back(&UIOthersTradeList);
-	std::for_each(sourceDragDropLists.begin(),sourceDragDropLists.end(),[this](CUIDragDropListEx* list){BindDragDropListEnents(list);});
+
+	std::for_each(sourceDragDropLists.begin(),sourceDragDropLists.end(),[this](CUIDragDropListEx* list){BindDragDropListEvents(list);});
 
 	
 	AttachChild							(&UIDescWnd);
@@ -672,7 +673,7 @@ void CUITradeWnd::SwitchToTalk()
 	GetMessageTarget()->SendMessage		(this, TRADE_WND_CLOSED);
 }
 
-void CUITradeWnd::BindDragDropListEnents(CUIDragDropListEx* lst)
+void CUITradeWnd::BindDragDropListEvents(CUIDragDropListEx* lst)
 {
 	lst->m_f_item_drop				= CUIDragDropListEx::DRAG_DROP_EVENT(this,&CUITradeWnd::OnItemDrop);
 	lst->m_f_item_start_drag		= CUIDragDropListEx::DRAG_DROP_EVENT(this,&CUITradeWnd::OnItemStartDrag);
@@ -703,21 +704,7 @@ void CUITradeWnd::ColorizeItem(CUICellItem* itm, bool b)
 void CUITradeWnd::DetachAddon(const char* addon_name)
 {
 	PlaySnd										(eInvDetachAddon);
-	if (OnClient())
-	{
-		NET_Packet								P;
-		CurrentIItem()->object().u_EventGen		(P, GE_ADDON_DETACH, CurrentIItem()->object().ID());
-		P.w_stringZ								(addon_name);
-		CurrentIItem()->object().u_EventSend	(P);
-	};
-	CurrentIItem()->Detach						(addon_name, true);
-
-	CActor *pActor								= smart_cast<CActor*>(Level().CurrentEntity());
-	if(pActor && CurrentIItem() == pActor->inventory().ActiveItem())
-	{
-			//m_iCurrentActiveSlot				= pActor->inventory().GetActiveSlot();
-			pActor->inventory().Activate		(NO_ACTIVE_SLOT);
-	}
+	OPFuncs::DetachAddon(CurrentIItem(),addon_name);
 	SetCurrentItem(nullptr);
 }
 
@@ -806,6 +793,8 @@ void CUITradeWnd::ProcessPropertiesBoxClicked	()
 
 void CUITradeWnd::ActivatePropertiesBox()
 {
+	if (CurrentItem()->OwnerList()==&UIOthersTradeList || CurrentItem()->OwnerList()==&UIOthersBagList) //:))))
+		return;
 	UIPropertiesBox.RemoveAll();
 
 	bool b_show=false;
@@ -820,17 +809,17 @@ void CUITradeWnd::ActivatePropertiesBox()
 		if(pWeapon->GrenadeLauncherAttachable() && pWeapon->IsGrenadeLauncherAttached())
 		{
 			UIPropertiesBox.AddItem(OPFuncs::getComplexString("st_detach_gl",nullptr, OPFuncs::getAddonInvName(pWeapon->GetGrenadeLauncherName().c_str())).c_str(),  nullptr, INVENTORY_DETACH_GRENADE_LAUNCHER_ADDON);
-		b_show			= true;
+			b_show			= true;
 		}
 		if(pWeapon->ScopeAttachable() && pWeapon->IsScopeAttached())
 		{
 			UIPropertiesBox.AddItem(OPFuncs::getComplexString("st_detach_scope",nullptr, OPFuncs::getAddonInvName(pWeapon->GetScopeName().c_str())).c_str(),  nullptr, INVENTORY_DETACH_SCOPE_ADDON);
-		b_show			= true;
+			b_show			= true;
 		}
 		if(pWeapon->SilencerAttachable() && pWeapon->IsSilencerAttached())
 		{
 			UIPropertiesBox.AddItem(OPFuncs::getComplexString("st_detach_silencer",nullptr, OPFuncs::getAddonInvName(pWeapon->GetSilencerName().c_str())).c_str(),  nullptr, INVENTORY_DETACH_SILENCER_ADDON);
-		b_show			= true;
+			b_show			= true;
 		}
 		if(smart_cast<CWeaponMagazined*>(pWeapon) && IsGameTypeSingle())
 		{

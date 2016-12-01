@@ -22,14 +22,26 @@ CScriptIniFile::CScriptIniFile		(LPCSTR szFileName, BOOL ReadOnly, BOOL bLoadAtS
 {
 }
 
+CScriptIniFile::CScriptIniFile(bool writeMode, LPCSTR szFileName): inherited(updateSettings(szFileName), !writeMode, true, false)
+{
+}
+
 CScriptIniFile::~CScriptIniFile		()
 {
+	
 }
 
 LPCSTR	CScriptIniFile::update		(LPCSTR file_name)
 {
 	string_path			S1;
 	FS.update_path		(S1,"$game_config$",file_name);
+	return				(*shared_str(S1));
+}
+
+LPCSTR CScriptIniFile::updateSettings(LPCSTR file_name) const
+{
+	string_path			S1;
+	FS.update_path		(S1,"$game_settings$",file_name);
 	return				(*shared_str(S1));
 }
 
@@ -103,3 +115,11 @@ Fvector CScriptIniFile::r_fvector3		(LPCSTR S, LPCSTR L)
 	THROW3		(inherited::line_exist(S,L),"Cannot find line",L);
 	return		(inherited::r_fvector3(S,L));
 }
+
+void CScriptIniFile::w_bool(LPCSTR S, LPCSTR L, bool V, LPCSTR comment)
+{
+	inherited::w_bool(S,L,V,comment);
+}
+
+
+

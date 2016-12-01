@@ -128,7 +128,12 @@ CPhysicsShell*				P_build_Shell			(CGameObject* obj,bool not_active_state,LPCSTR
 			string64		fixed_bone;
 			_GetItem		(fixed_bones,i,fixed_bone);
 			f_bones.push_back(K->LL_BoneID(fixed_bone));
-			R_ASSERT2(BI_NONE!=f_bones.back(),"wrong fixed bone")			;
+			if (BI_NONE==f_bones.back())
+			{
+				Msg("! ERROR wrong fixed bone [%s] for object name [%s] with visual [%s]",fixed_bone,obj->cName().c_str(),obj->cNameVisual().c_str());
+				FATAL("ENGINE CRASH: See details in log");
+			}
+
 		}
 	}
 	return P_build_Shell	(obj,not_active_state,f_bones);

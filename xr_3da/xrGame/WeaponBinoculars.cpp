@@ -69,8 +69,8 @@ void CWeaponBinoculars::OnZoomOut		()
 		HUD_SOUND::StopSound(sndZoomIn);
 		bool b_hud_mode = (Level().CurrentEntity() == H_Parent());	
 		HUD_SOUND::PlaySound(sndZoomOut, H_Parent()->Position(), H_Parent(), b_hud_mode);
-		VERIFY			(m_binoc_vision);
-		xr_delete		(m_binoc_vision);
+		if(m_binoc_vision)
+			xr_delete		(m_binoc_vision);
 	
 		m_fRTZoomFactor = m_fZoomFactor;//store current
 	}

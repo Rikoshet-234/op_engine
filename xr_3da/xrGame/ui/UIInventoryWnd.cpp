@@ -15,6 +15,7 @@
 #include "../inventory.h"
 
 #include "UIInventoryUtilities.h"
+#include "../OPFuncs/utils.h"
 using namespace InventoryUtilities;
 
 
@@ -140,7 +141,6 @@ void CUIInventoryWnd::Init()
 	UIBagWnd.AttachChild(m_pUIBagList); 
 	m_pUIBagList->SetAutoDelete(true);
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_bag", 0, m_pUIBagList);
-	BindDragDropListEvents				(m_pUIBagList);
 	m_pUIBagList->SetUIListId(IWListTypes::ltBag);
 	sourceDragDropLists.push_back(m_pUIBagList);
 
@@ -148,7 +148,6 @@ void CUIInventoryWnd::Init()
 	AttachChild(m_pUIBeltList); 
 	m_pUIBeltList->SetAutoDelete(true);
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_belt", 0, m_pUIBeltList);
-	BindDragDropListEvents				(m_pUIBeltList);
 	m_pUIBeltList->SetUIListId(IWListTypes::ltBelt);
 	sourceDragDropLists.push_back(m_pUIBeltList);
 
@@ -156,7 +155,6 @@ void CUIInventoryWnd::Init()
 	AttachChild(m_pUIOutfitList); 
 	m_pUIOutfitList->SetAutoDelete(true);
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_outfit", 0, m_pUIOutfitList);
-	BindDragDropListEvents				(m_pUIOutfitList);
 	m_pUIOutfitList->SetUIListId(IWListTypes::ltSlotOutfit);
 	sourceDragDropLists.push_back(m_pUIOutfitList);
 	
@@ -164,7 +162,6 @@ void CUIInventoryWnd::Init()
 	AttachChild(m_pUIKnifeList); 
 	m_pUIKnifeList->SetAutoDelete(true);
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_knife", 0, m_pUIKnifeList);
-	BindDragDropListEvents				(m_pUIKnifeList);
 	m_pUIKnifeList->SetUIListId(IWListTypes::ltSlotKnife);
 	sourceDragDropLists.push_back(m_pUIKnifeList);
 
@@ -172,7 +169,6 @@ void CUIInventoryWnd::Init()
 	AttachChild(m_pUIPistolList); 
 	m_pUIPistolList->SetAutoDelete(true);
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_pistol", 0, m_pUIPistolList);
-	BindDragDropListEvents				(m_pUIPistolList);
 	m_pUIPistolList->SetUIListId(IWListTypes::ltSlotPistol);
 	sourceDragDropLists.push_back(m_pUIPistolList);
 
@@ -180,7 +176,6 @@ void CUIInventoryWnd::Init()
 	AttachChild(m_pUIAutomaticList); 
 	m_pUIAutomaticList->SetAutoDelete(true);
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_automatic", 0, m_pUIAutomaticList);
-	BindDragDropListEvents				(m_pUIAutomaticList);
 	m_pUIAutomaticList->SetUIListId(IWListTypes::ltSlotRifle);
 	sourceDragDropLists.push_back(m_pUIAutomaticList);
 
@@ -188,7 +183,6 @@ void CUIInventoryWnd::Init()
 	AttachChild(m_pUIShotgunList); 
 	m_pUIShotgunList->SetAutoDelete(true);
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_shotgun", 0, m_pUIShotgunList);
-	BindDragDropListEvents				(m_pUIShotgunList);
 	m_pUIShotgunList->SetUIListId(IWListTypes::ltSlotShotgun); 
 	sourceDragDropLists.push_back(m_pUIShotgunList);
 
@@ -196,7 +190,6 @@ void CUIInventoryWnd::Init()
 	AttachChild(m_pUIDetectorArtsList); 
 	m_pUIDetectorArtsList->SetAutoDelete(true);
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_detector_arts", 0, m_pUIDetectorArtsList);
-	BindDragDropListEvents				(m_pUIDetectorArtsList);
 	m_pUIDetectorArtsList->SetUIListId(IWListTypes::ltSlotDetectorArts);
 	sourceDragDropLists.push_back(m_pUIDetectorArtsList);
 
@@ -204,7 +197,6 @@ void CUIInventoryWnd::Init()
 	AttachChild(m_pUIDetectorAnomsList); 
 	m_pUIDetectorAnomsList->SetAutoDelete(true);
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_detector_anoms", 0, m_pUIDetectorAnomsList);
-	BindDragDropListEvents				(m_pUIDetectorAnomsList);
 	m_pUIDetectorAnomsList->SetUIListId(IWListTypes::ltSlotDetectorAnoms);
 	sourceDragDropLists.push_back(m_pUIDetectorAnomsList);
 
@@ -212,7 +204,6 @@ void CUIInventoryWnd::Init()
 	AttachChild(m_pUIPNVList); 
 	m_pUIPNVList->SetAutoDelete(true);
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_pnv", 0, m_pUIPNVList);
-	BindDragDropListEvents				(m_pUIPNVList);
 	m_pUIPNVList->SetUIListId(IWListTypes::ltSlotPNV);
 	sourceDragDropLists.push_back(m_pUIPNVList);
 
@@ -220,7 +211,6 @@ void CUIInventoryWnd::Init()
 	AttachChild(m_pUIApparatusList); 
 	m_pUIApparatusList->SetAutoDelete(true);
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_apparatus", 0, m_pUIApparatusList);
-	BindDragDropListEvents				(m_pUIApparatusList);
 	m_pUIApparatusList->SetUIListId(IWListTypes::ltSlotApparatus);
 	sourceDragDropLists.push_back(m_pUIApparatusList);
 
@@ -228,10 +218,10 @@ void CUIInventoryWnd::Init()
 	AttachChild(m_pUIBiodevList); 
 	m_pUIBiodevList->SetAutoDelete(true);
 	xml_init.InitDragDropListEx			(uiXml, "dragdrop_biodev", 0, m_pUIBiodevList);
-	BindDragDropListEvents				(m_pUIBiodevList);
 	m_pUIBiodevList->SetUIListId(IWListTypes::ltSlotBiodev);
 	sourceDragDropLists.push_back(m_pUIBiodevList);
 
+	std::for_each(sourceDragDropLists.begin(),sourceDragDropLists.end(),[this](CUIDragDropListEx* list){BindDragDropListEvents(list);});
 #pragma endregion
 
 #pragma region Common UI elements
@@ -503,46 +493,14 @@ void CUIInventoryWnd::AttachAddon(PIItem item_to_upgrade)
 {
 	PlaySnd										(eInvAttachAddon);
 	R_ASSERT									(item_to_upgrade);
-	if (OnClient())
-	{
-		NET_Packet								P;
-		item_to_upgrade->object().u_EventGen	(P, GE_ADDON_ATTACH, item_to_upgrade->object().ID());
-		P.w_u32									(CurrentIItem()->object().ID());
-		item_to_upgrade->object().u_EventSend	(P);
-	};
-
-	item_to_upgrade->Attach						(CurrentIItem(), true);
-
-
-	//спрятать вещь из активного слота в инвентарь на время вызова менюшки
-	CActor *pActor								= smart_cast<CActor*>(Level().CurrentEntity());
-	if(pActor && item_to_upgrade == pActor->inventory().ActiveItem())
-	{
-			m_iCurrentActiveSlot				= pActor->inventory().GetActiveSlot();
-			pActor->inventory().Activate		(NO_ACTIVE_SLOT);
-	}
-	SetCurrentItem								(NULL);
+	OPFuncs::AttachAddon(item_to_upgrade,CurrentIItem());
+	SetCurrentItem								(nullptr);
 }
 
 void CUIInventoryWnd::DetachAddon(const char* addon_name)
 {
 	PlaySnd										(eInvDetachAddon);
-	if (OnClient())
-	{
-		NET_Packet								P;
-		CurrentIItem()->object().u_EventGen		(P, GE_ADDON_DETACH, CurrentIItem()->object().ID());
-		P.w_stringZ								(addon_name);
-		CurrentIItem()->object().u_EventSend	(P);
-	};
-	CurrentIItem()->Detach						(addon_name, true);
-
-	//спрятать вещь из активного слота в инвентарь на время вызова менюшки
-	CActor *pActor								= smart_cast<CActor*>(Level().CurrentEntity());
-	if(pActor && CurrentIItem() == pActor->inventory().ActiveItem())
-	{
-			m_iCurrentActiveSlot				= pActor->inventory().GetActiveSlot();
-			pActor->inventory().Activate		(NO_ACTIVE_SLOT);
-	}
+	OPFuncs::DetachAddon(CurrentIItem(),addon_name);
 }
 
 void	CUIInventoryWnd::SendEvent_ActivateSlot	(PIItem	pItem)
