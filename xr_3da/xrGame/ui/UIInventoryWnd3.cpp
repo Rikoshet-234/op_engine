@@ -98,17 +98,17 @@ void CUIInventoryWnd::ActivatePropertiesBox()
 
 		if(pWeapon->GrenadeLauncherAttachable() && pWeapon->IsGrenadeLauncherAttached())
 		{
-			UIPropertiesBox.AddItem(OPFuncs::getComplexString("st_detach_gl",nullptr, OPFuncs::getAddonInvName(pWeapon->GetGrenadeLauncherName().c_str())).c_str(),  nullptr, INVENTORY_DETACH_GRENADE_LAUNCHER_ADDON);
+			UIPropertiesBox.AddItem(OPFuncs::getComplexString("st_detach_gl",nullptr, OPFuncs::getAddonInvName(pWeapon->GetGrenadeLauncherName().c_str()),"st_detach_gl_full").c_str(),  nullptr, INVENTORY_DETACH_GRENADE_LAUNCHER_ADDON);
 			b_show			= true;
 		}
 		if(pWeapon->ScopeAttachable() && pWeapon->IsScopeAttached())
 		{
-			UIPropertiesBox.AddItem(OPFuncs::getComplexString("st_detach_scope",nullptr, OPFuncs::getAddonInvName(pWeapon->GetScopeName().c_str())).c_str(),  nullptr, INVENTORY_DETACH_SCOPE_ADDON);
+			UIPropertiesBox.AddItem(OPFuncs::getComplexString("st_detach_scope",nullptr, OPFuncs::getAddonInvName(pWeapon->GetScopeName().c_str()),"st_detach_scope_full").c_str(),  nullptr, INVENTORY_DETACH_SCOPE_ADDON);
 			b_show			= true;
 		}
 		if(pWeapon->SilencerAttachable() && pWeapon->IsSilencerAttached())
 		{
-			UIPropertiesBox.AddItem(OPFuncs::getComplexString("st_detach_silencer",nullptr, OPFuncs::getAddonInvName(pWeapon->GetSilencerName().c_str())).c_str(),  nullptr, INVENTORY_DETACH_SILENCER_ADDON);
+			UIPropertiesBox.AddItem(OPFuncs::getComplexString("st_detach_silencer",nullptr, OPFuncs::getAddonInvName(pWeapon->GetSilencerName().c_str()),"st_detach_silencer_full").c_str(),  nullptr, INVENTORY_DETACH_SILENCER_ADDON);
 			b_show			= true;
 		}
 		if(smart_cast<CWeaponMagazined*>(pWeapon) && IsGameTypeSingle())

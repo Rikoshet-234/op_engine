@@ -21,7 +21,7 @@ namespace OPFuncs
 	double round(double number);
 
 	xr_vector<LPCSTR> getStringsFromLua(luabind::object const& table);
-	std::string getComplexString(std::string untranslatedString,PIItem item,std::string untranslatedString2="");
+	std::string getComplexString(std::string untranslatedString,PIItem item,std::string untranslatedString2="",std::string untranslatedString3="");
 	std::string getAddonInvName(std::string addonName);
 	void UnloadWeapon(CWeaponMagazined* weapon);
 	void DetachAddon(CInventoryItem* item,const char* addon_name);

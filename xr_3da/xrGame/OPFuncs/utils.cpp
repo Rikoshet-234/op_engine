@@ -84,7 +84,7 @@ namespace OPFuncs
 				pActor->inventory().Activate		(NO_ACTIVE_SLOT);
 	}
 
-	std::string getComplexString(std::string untranslatedString,PIItem item,std::string untranslatedString2)
+	std::string getComplexString(std::string untranslatedString,PIItem item,std::string untranslatedString2,std::string untranslatedString3)
 	{
 		std::string translateString=*CStringTable().translate(untranslatedString.c_str());
 		if (g_uCommonFlags.test(E_COMMON_FLAGS::uiShowExtDesc))
@@ -101,7 +101,10 @@ namespace OPFuncs
 			return translateString+" "+additionString;
 		}
 		else
-			return translateString;
+			if (untranslatedString3.size()>0)
+				return *CStringTable().translate(untranslatedString3.c_str());
+			else
+				return translateString;
 	}
 
 	xr_vector<LPCSTR> getStringsFromLua(luabind::object const& table) 
