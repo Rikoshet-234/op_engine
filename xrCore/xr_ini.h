@@ -114,6 +114,7 @@ public:
 	BOOL		r_line			( const shared_str& S, int L,	LPCSTR* N, LPCSTR* V );
 
     void		w_string		( LPCSTR S, LPCSTR L, LPCSTR			V, LPCSTR comment=0 );
+	void		w_stringWC		( LPCSTR S, LPCSTR L, LPCSTR			V);
 	void		w_u8			( LPCSTR S, LPCSTR L, u8				V, LPCSTR comment=0 );
 	void		w_u16			( LPCSTR S, LPCSTR L, u16				V, LPCSTR comment=0 );
 	void		w_u32			( LPCSTR S, LPCSTR L, u32				V, LPCSTR comment=0 );

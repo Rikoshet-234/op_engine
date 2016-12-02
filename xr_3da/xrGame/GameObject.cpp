@@ -794,8 +794,7 @@ CScriptGameObject *CGameObject::lua_game_object		() const
 #ifdef DEBUG
 	if (!m_spawned)
 	{
-		shared_str message=shared_str().sprintf("! you are trying to use a destroyed object class:%s name:%s",m_class_name.c_str(),Name());
-		Msg							(message.c_str());
+		Msg							("! you are trying to use a destroyed object class:%s name:%s",m_class_name.c_str(),Name());
 	}
 #endif
 	THROW							(m_spawned);

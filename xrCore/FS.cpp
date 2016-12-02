@@ -417,6 +417,13 @@ void	IReader::r_string	(char *dest, u32 tgt_sz)
 	strncpy		(dest,src,sz);
 	dest[sz]	= 0;
 }
+
+void 	IReader::r_string	(shared_str& dest)
+{
+	xr_string res;
+	r_string(res);
+	dest=res.c_str();
+}
 void	IReader::r_string	(xr_string& dest)
 {
 	char *src 	= (char *) data+Pos;

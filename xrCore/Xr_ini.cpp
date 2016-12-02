@@ -508,6 +508,10 @@ BOOL	CInifile::r_line( const shared_str& S, int L, const char** N, const char** 
 //--------------------------------------------------------------------------------------------------------
 // Write functions
 //--------------------------------------------------------------------------------------
+void	CInifile::w_stringWC	( LPCSTR S, LPCSTR L, LPCSTR			V)
+{
+	w_string(S,L,V,nullptr);
+}
 void	CInifile::w_string	( LPCSTR S, LPCSTR L, LPCSTR			V, LPCSTR comment)
 {
 	R_ASSERT	(!bReadOnly);

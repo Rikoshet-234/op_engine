@@ -91,6 +91,7 @@ void CScriptIniFile::script_register(lua_State *L)
 			.def("r_line",			&::r_line, out_value(_4) + out_value(_5))
 
 			.def("w_string",		static_cast<void	(CScriptIniFile::*)		(LPCSTR, LPCSTR, LPCSTR, LPCSTR )>			(&CInifile::w_string))
+			.def("w_string",		static_cast<void	(CScriptIniFile::*)		(LPCSTR, LPCSTR, LPCSTR)>					(&CInifile::w_stringWC))
 			.def("w_bool",			static_cast<void	(CScriptIniFile::*)		(LPCSTR, LPCSTR, bool, LPCSTR )>			(&CScriptIniFile::w_bool))
 			.def("w_u32",			static_cast<void	(CScriptIniFile::*)		(LPCSTR, LPCSTR, u32, LPCSTR )>				(&CScriptIniFile::w_u32))
 			.def("w_s32",			static_cast<void	(CScriptIniFile::*)		(LPCSTR, LPCSTR, s32, LPCSTR )>				(&CScriptIniFile::w_s32))

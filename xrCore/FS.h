@@ -365,6 +365,7 @@ public:
 
 	void			r_string	(char *dest, u32 tgt_sz);
 	void			r_string	(xr_string& dest);
+	void 			r_string	(shared_str& dest);
 
 	void			skip_stringZ();
 

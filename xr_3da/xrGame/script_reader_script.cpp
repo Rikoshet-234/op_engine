@@ -24,6 +24,17 @@ LPCSTR r_stringZ(IReader *self)
 	return			(*temp);
 }
 
+LPCSTR r_string(IReader *self)
+{
+	static const char empty = 0;
+	shared_str		temp;
+	self->r_string	(temp);
+	if (temp.size()>0)
+		return	(temp.c_str());
+	else
+		return &empty;
+}
+
 bool r_bool(IReader *self)
 {
 	return			(!!self->r_u8());
@@ -43,7 +54,6 @@ void CScriptReader::script_register(lua_State *L)
 			.def("r_seek",			&IReader::seek			)
 			.def("r_tell",			&IReader::tell			)
 			.def("r_vec3",			&::r_fvector3			)
-			.def("r_float",			(void (IReader::*)(float&))(&IReader::r_float		))
 			.def("r_u64",			(void (IReader::*)(u64&	))(&IReader::r_u64		))
 			.def("r_s64",			(void (IReader::*)(s64&	))(&IReader::r_s64		))
 			.def("r_u32",			(void (IReader::*)(u32&	))(&IReader::r_u32		))
@@ -54,14 +64,7 @@ void CScriptReader::script_register(lua_State *L)
 			.def("r_s8",			(void (IReader::*)(s8&)	)(&IReader::r_s8			))
 			.def("r_bool",			&::r_bool				)
 			.def("r_float",			(float	(IReader::*)()	)(&IReader::r_float		))
-			.def("r_u64",			(u64	(IReader::*)()	)(&IReader::r_u64		))
-			.def("r_s64",			(s64	(IReader::*)()	)(&IReader::r_s64		))
-			.def("r_u32",			(u32	(IReader::*)()	)(&IReader::r_u32		))
-			.def("r_s32",			(s32	(IReader::*)()	)(&IReader::r_s32		))
-			.def("r_u16",			(u16	(IReader::*)()	)(&IReader::r_u16		))
-			.def("r_s16",			(s16	(IReader::*)()	)(&IReader::r_s16		))
-			.def("r_u8",			(u8		(IReader::*)()	)(&IReader::r_u8			))
-			.def("r_s8",			(s8		(IReader::*)()	)(&IReader::r_s8			))
+			
 			.def("r_float_q16",		&IReader::r_float_q16	)
 			.def("r_float_q8",		&IReader::r_float_q8	)
 			.def("r_angle16",		&IReader::r_angle16		)
@@ -69,6 +72,7 @@ void CScriptReader::script_register(lua_State *L)
 			.def("r_dir",			&IReader::r_dir			)
 			.def("r_sdir",			&IReader::r_sdir		)
 			.def("r_stringZ",		&r_stringZ				)
+			.def("r_string",		&r_string				)
 			.def("r_elapsed",		&IReader::elapsed		)
 			.def("r_advance",		&IReader::advance		)
 			.def("r_eof",			&r_eof					)
