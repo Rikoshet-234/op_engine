@@ -8,7 +8,7 @@
 //! Keep this defines here so you don't have to rebuild cpps when you change version
 #define ENGINE_DESCRIPTION "OP 2.1 Engine"
 #define ENGINE_MINOR "0"
-#define ENGINE_MAJOR "55b"
+#define ENGINE_MAJOR "55c"
 
 #ifdef DEBUG
 	#define ENGINE_BUILD_TYPE "debug"
