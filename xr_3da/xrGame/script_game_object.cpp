@@ -597,6 +597,17 @@ float CScriptGameObject::Weight() const
 	return				(inventory_item->Weight());
 }
 
+float CScriptGameObject::GetSlot() const
+{
+	CInventoryItem		*inventory_item = smart_cast<CInventoryItem*>(&object());
+	if (!inventory_item) {
+		ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeError,"CSciptEntity : cannot access class member GetSlot!");
+		return			(false);
+	}
+	return				(inventory_item->GetSlot());
+}
+
+
 bool CScriptGameObject::ItemInBelt(LPCSTR itemSection) const
 {
 	if (itemSection==nullptr )

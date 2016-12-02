@@ -101,6 +101,19 @@ protected:
 	bool					TransferItem				(PIItem itm, CInventoryOwner* owner_from, CInventoryOwner* owner_to, bool b_check);
 	bool			OnMouse						(float x, float y, EUIMessages mouse_action) override;
 	void						DetachAddon(const char* addon_name);
+
+	enum eTradeSoundActions{	eInvSndOpen	=0,
+								eInvSndClose,
+								eInvProperties,
+								//eInvDropItem,
+								//eInvAttachAddon,
+								eInvDetachAddon,
+								eInvItemUse,
+								//eInvTradeDone,
+								eInvItemMove,
+								eInvSndMax};
+	ref_sound					sounds					[eInvSndMax];
+	void PlaySnd(eTradeSoundActions a);
 };
 
 

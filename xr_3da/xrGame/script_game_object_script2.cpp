@@ -245,6 +245,7 @@ class_<CScriptGameObject> &script_register_game_object1(class_<CScriptGameObject
 		.def("max_weight",					&CScriptGameObject::GetActorMaxWeight)
 		.def("total_weight",				&CScriptGameObject::GetTotalWeight)
 		.def("item_weight",					&CScriptGameObject::Weight)
+		.def("get_slot",					&CScriptGameObject::GetSlot)
 		.def("item_in_belt",				static_cast<bool (CScriptGameObject::*)(CScriptGameObject*) const>(&CScriptGameObject::ItemInBelt))
 		.def("item_in_belt",				static_cast<bool (CScriptGameObject::*)(LPCSTR) const>(&CScriptGameObject::ItemInBelt))
 		.def("item_in_slot",				&CScriptGameObject::item_in_slot)

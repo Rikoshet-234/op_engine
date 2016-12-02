@@ -415,13 +415,13 @@ void	CActor::initUsedSlots()
 	{
 		usedSlots.push_back(KNIFE_SLOT);
 		usedSlots.push_back(PISTOL_SLOT);
-		usedSlots.push_back(RIFLE_SLOT);
 		usedSlots.push_back(SHOTGUN_SLOT);
+		usedSlots.push_back(RIFLE_SLOT);
 		usedSlots.push_back(GRENADE_SLOT);
 		usedSlots.push_back(APPARATUS_SLOT);
 		usedSlots.push_back(BOLT_SLOT);
 	}
-} //maybe in config for future
+} //maybe from config in future
 
 void	CActor::OnNextWeaponSlot()
 {
@@ -440,6 +440,8 @@ void	CActor::OnNextWeaponSlot()
 	if (currPos==usedSlots.end())
 	{
 		currPos=usedSlots.begin();
+		while (currPos!=usedSlots.end() && !inventory().ItemFromSlot(*currPos))
+			++currPos;
 	}
 	inventory().ProcessSlotAction(true,*currPos);
 };
@@ -460,6 +462,8 @@ void	CActor::OnPrevWeaponSlot()
 	if (currPos==usedSlots.rend())
 	{
 		currPos=usedSlots.rbegin();
+		while (currPos!=usedSlots.rend() && !inventory().ItemFromSlot(*currPos))
+			++currPos;
 	}
 	inventory().ProcessSlotAction(true,*currPos);
 };

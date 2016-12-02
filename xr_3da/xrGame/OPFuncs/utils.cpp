@@ -144,7 +144,6 @@ namespace OPFuncs
 		}
 	}
 
-
 	std::vector<std::string> splitString(const std::string &s, char delim) 
 	{
 		std::vector<std::string> elems;

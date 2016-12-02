@@ -575,6 +575,7 @@ public:
 			float				GetActorMaxWeight					() const;
 			float				GetTotalWeight						() const;
 			float				Weight								() const;
+			float				GetSlot() const;
 
 			bool				ItemInBelt(CScriptGameObject* itemObj) const;
 			bool				ItemInBelt(LPCSTR itemSection) const;

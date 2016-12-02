@@ -38,6 +38,7 @@ void move_item (u16 from_id, u16 to_id, u16 what_id);
 CUICarBodyWnd::CUICarBodyWnd()
 {
 	m_pInventoryBox		= nullptr;
+	m_pCurrentCellItem=nullptr;
 	CUICarBodyWnd::Init				();
 	CUICarBodyWnd::Hide				();
 	m_b_need_update		= false;
@@ -93,20 +94,23 @@ void CUICarBodyWnd::Init()
 	AttachChild						(m_pUIOthersBagWnd);
 	xml_init.InitStatic				(uiXml, "others_bag_static", 0, m_pUIOthersBagWnd);
 
-	m_pUIOurBagList					= xr_new<CUIDragDropListEx>(); m_pUIOurBagList->SetAutoDelete(true);
+	m_pUIOurBagList					= xr_new<CUIDragDropListEx>(); 
+	m_pUIOurBagList->SetAutoDelete(true);
 	m_pUIOurBagWnd->AttachChild		(m_pUIOurBagList);	
 	xml_init.InitDragDropListEx		(uiXml, "dragdrop_list_our", 0, m_pUIOurBagList);
 	m_pUIOurBagList->SetUIListId(IWListTypes::ltCarbodyOurBag);
 	sourceDragDropLists.push_back(m_pUIOurBagList);
 
 
-	m_pUIOthersBagList				= xr_new<CUIDragDropListEx>(); m_pUIOthersBagList->SetAutoDelete(true);
+	m_pUIOthersBagList				= xr_new<CUIDragDropListEx>(); 
+	m_pUIOthersBagList->SetAutoDelete(true);
 	m_pUIOthersBagWnd->AttachChild	(m_pUIOthersBagList);	
 	xml_init.InitDragDropListEx		(uiXml, "dragdrop_list_other", 0, m_pUIOthersBagList);
 	m_pUIOthersBagList->SetUIListId(IWListTypes::ltCarbodyOtherBag);
 	sourceDragDropLists.push_back(m_pUIOthersBagList);
 
 	std::for_each(sourceDragDropLists.begin(),sourceDragDropLists.end(),[this](CUIDragDropListEx* list){BindDragDropListEvents(list);});
+
 	//информация о предмете
 	m_pUIDescWnd					= xr_new<CUIFrameWindow>(); m_pUIDescWnd->SetAutoDelete(true);
 	AttachChild						(m_pUIDescWnd);
@@ -135,10 +139,19 @@ void CUICarBodyWnd::Init()
 	AttachChild						(m_pUITakeAll);
 	xml_init.Init3tButton				(uiXml, "take_all_btn", 0, m_pUITakeAll);
 
-	BindDragDropListEvents(m_pUIOurBagList);
-	BindDragDropListEvents(m_pUIOthersBagList);
-
-
+	uiXml.SetLocalRoot					(uiXml.NavigateToNode		("action_sounds",0));
+	if (LPCSTR data=uiXml.Read("snd_open",		0,	nullptr))
+		::Sound->create						(sounds[eInvSndOpen],data,st_Effect,sg_SourceType);
+	if (LPCSTR data=uiXml.Read("snd_close",		0,	nullptr))
+		::Sound->create						(sounds[eInvSndClose],data,st_Effect,sg_SourceType);
+	if (LPCSTR data=uiXml.Read("snd_properties",		0,	nullptr))
+		::Sound->create						(sounds[eInvProperties],data,st_Effect,sg_SourceType);
+	if (LPCSTR data=uiXml.Read("snd_detach_addon",		0,	nullptr))
+		::Sound->create						(sounds[eInvDetachAddon],data,st_Effect,sg_SourceType);
+	if (LPCSTR data=uiXml.Read("snd_item_use",		0,	nullptr))
+		::Sound->create						(sounds[eInvItemUse],data,st_Effect,sg_SourceType);
+	if (LPCSTR data=uiXml.Read("snd_item_move",		0,	nullptr))
+		::Sound->create						(sounds[eInvItemMove],data,st_Effect,sg_SourceType);
 }
 
 void CUICarBodyWnd::InitCarBody(CInventoryOwner* pOur, CInventoryBox* pInvBox)
@@ -226,6 +239,7 @@ void CUICarBodyWnd::re_init()
 
 void CUICarBodyWnd::Hide()
 {
+	PlaySnd								(eInvSndClose);
 	InventoryUtilities::SendInfoToActor			("ui_car_body_hide");
 	std::for_each(sourceDragDropLists.begin(),sourceDragDropLists.end(),[](CUIDragDropListEx* list){list->ClearAll(true);});
 	inherited::Hide								();
@@ -297,12 +311,20 @@ void CUICarBodyWnd::SendMessage(CUIWindow *pWnd, s16 msg, void *pData)
 			case INVENTORY_UNLOAD_MAGAZINE:
 				{
 					CUICellItem * itm = CurrentItem();
-					(smart_cast<CWeaponMagazined*>(static_cast<CWeapon*>(itm->m_pData)))->UnloadMagazine();
-					for(u32 i=0; i<itm->ChildsCount(); ++i)
+					CWeapon* weapon=static_cast<CWeapon*>(itm->m_pData);
+					if (!weapon)
+						break;
+					CWeaponMagazined* wg = smart_cast<CWeaponMagazined*>(weapon);
+					if (!wg)
+						break;
+					wg->PlayEmptySnd();
+					OPFuncs::UnloadWeapon(wg);
+					for(size_t i=0; i<itm->ChildsCount(); ++i)
 					{
 						CUICellItem * child_itm			= itm->Child(i);
-						(smart_cast<CWeaponMagazined*>(static_cast<CWeapon*>(child_itm->m_pData)))->UnloadMagazine();
+						OPFuncs::UnloadWeapon(smart_cast<CWeaponMagazined*>(static_cast<CWeapon*>(child_itm->m_pData)));
 					}
+					SetCurrentItem(nullptr);
 				}break;
 				case INVENTORY_CB_MOVE_ALL:
 				case INVENTORY_CB_MOVE_SINGLE:
@@ -321,7 +343,7 @@ void CUICarBodyWnd::SendMessage(CUIWindow *pWnd, s16 msg, void *pData)
 						from_id=owner_list==m_pUIOthersBagList ? bag_id:actor_id;
 						to_id=owner_list==m_pUIOthersBagList ? actor_id: bag_id;
 						CUICellItem* currItem=CurrentItem();
-						CInventoryItem * currInvItem=CurrentIItem();
+						PlaySnd	(eInvItemMove);
 						if (itemTag==INVENTORY_CB_MOVE_ALL)
 						{
 							for(u32 i=0; i<currItem->ChildsCount(); ++i)
@@ -375,6 +397,7 @@ void CUICarBodyWnd::Update()
 
 void CUICarBodyWnd::Show() 
 { 
+	PlaySnd								(eInvSndOpen);
 	InventoryUtilities::SendInfoToActor		("ui_car_body");
 	inherited::Show							();
 	SetCurrentItem							(nullptr);
@@ -399,13 +422,13 @@ CUICellItem* CUICarBodyWnd::CurrentItem()
 
 PIItem CUICarBodyWnd::CurrentIItem()
 {
-	return	(m_pCurrentCellItem)?(PIItem)m_pCurrentCellItem->m_pData : NULL;
+	return	(m_pCurrentCellItem)?static_cast<PIItem>(m_pCurrentCellItem->m_pData) : nullptr;
 }
 
 void CUICarBodyWnd::SetItemSelected(CUICellItem* itm)
 {
 	CUICellItem* curr=CurrentItem();
-	if (curr!=nullptr  && curr->m_selected)
+	if (curr  && curr->m_selected)
 		curr->m_selected=false;
 	if (itm!=nullptr && !itm->m_selected)	
 		itm->m_selected=true;
@@ -563,6 +586,7 @@ void CUICarBodyWnd::ActivatePropertiesBox()
 			
 
 	if(b_show){
+		PlaySnd							(eInvProperties);
 		m_pUIPropertiesBox->AutoUpdateSize	();
 		m_pUIPropertiesBox->BringAllToTop	();
 		Fvector2						cursor_pos;
@@ -576,6 +600,7 @@ void CUICarBodyWnd::ActivatePropertiesBox()
 
 void CUICarBodyWnd::EatItem()
 {
+	PlaySnd									(eInvItemUse);
 	CActor *pActor				= smart_cast<CActor*>(Level().CurrentEntity());
 	if(!pActor)					return;
 
@@ -756,9 +781,15 @@ bool CUICarBodyWnd::OnMouse(float x, float y, EUIMessages mouse_action)
 
 void CUICarBodyWnd::DetachAddon(const char* addon_name)
 {
-	//PlaySnd										(eInvDetachAddon);
+	PlaySnd										(eInvDetachAddon);
 	OPFuncs::DetachAddon(CurrentIItem(),addon_name);
 	SetCurrentItem(nullptr);
+}
+
+void CUICarBodyWnd::PlaySnd(eTradeSoundActions a)
+{
+	if (sounds[a]._handle())
+		sounds[a].play(nullptr, sm_2D);
 }
 
 void CUICarBodyWnd::BindDragDropListEvents(CUIDragDropListEx* lst)
