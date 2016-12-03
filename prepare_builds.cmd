@@ -1,9 +1,9 @@
 rem %comspec% /k 
 @call "c:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\vcvars32.bat"
-@call ball_debug.cmd
-@set BUILD_STATUS=%ERRORLEVEL% 
-@if not %BUILD_STATUS%==0 goto fail
-@timeout /T 5 /NOBREAK 
+REM @call ball_debug.cmd
+REM @set BUILD_STATUS=%ERRORLEVEL% 
+REM @if not %BUILD_STATUS%==0 goto fail
+REM @timeout /T 5 /NOBREAK 
 @call ball_release.cmd
 @set BUILD_STATUS=%ERRORLEVEL% 
 @if not %BUILD_STATUS%==0 goto fail

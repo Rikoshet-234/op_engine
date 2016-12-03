@@ -418,7 +418,7 @@ void	IReader::r_string	(char *dest, u32 tgt_sz)
 	dest[sz]	= 0;
 }
 
-void 	IReader::r_string	(shared_str& dest)
+void 	IReader::r_stringSS	(shared_str& dest)
 {
 	xr_string res;
 	r_string(res);

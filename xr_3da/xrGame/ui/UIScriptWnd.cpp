@@ -46,6 +46,7 @@ void CUIDialogWndEx::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 	if(it==m_callbacks.end())
 		return inherited::SendMessage(pWnd, msg, pData);
 
+	Msg((*it)->m_controlName.c_str());
 	((*it)->m_callback)();
 
 //	if ( (*it)->m_cpp_callback )	
