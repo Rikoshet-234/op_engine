@@ -2302,6 +2302,9 @@
     <Filter Include="UI\UIWindows\ListBox\Iconed">
       <UniqueIdentifier>{a1070554-506f-423b-bc1b-1403cb69af44}</UniqueIdentifier>
     </Filter>
+    <Filter Include="AI\ALife\simulator_base\registries\keyval_registry">
+      <UniqueIdentifier>{aea9068d-7f5f-47c2-ab84-9bb38c84f957}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mt_config.h">
@@ -6585,6 +6588,9 @@
     <ClInclude Include="ui\UIListItemIconed.h">
       <Filter>UI\UIWindows\ListBox\Iconed</Filter>
     </ClInclude>
+    <ClInclude Include="C:\Projects\stalker\op_engine\xr_3da\xrGame\alife_keyval_registry.h">
+      <Filter>AI\ALife\simulator_base\registries\keyval_registry</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -9754,6 +9760,12 @@
     </ClCompile>
     <ClCompile Include="ui\UIListItemIconed.cpp">
       <Filter>UI\UIWindows\ListBox\Iconed</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Projects\stalker\op_engine\xr_3da\xrGame\alife_keyval_registry.cpp">
+      <Filter>AI\ALife\simulator_base\registries\keyval_registry</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Projects\stalker\op_engine\xr_3da\xrGame\alife_keyval_registry_script.cpp">
+      <Filter>AI\ALife\simulator_base\registries\keyval_registry</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

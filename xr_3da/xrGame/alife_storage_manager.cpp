@@ -15,6 +15,7 @@
 #include "alife_graph_registry.h"
 #include "alife_group_registry.h"
 #include "alife_registry_container.h"
+#include "alife_keyval_registry.h"
 #include "xrserver.h"
 #include "level.h"
 #include "../x_ray.h"
@@ -60,6 +61,7 @@ void CALifeStorageManager::save	(LPCSTR save_name, bool update_name)
 		spawns().save			(stream);
 		objects().save			(stream);
 		registry().save			(stream);
+		keyvals().save			(stream);
 
 		source_count			= stream.tell();
 		void					*source_data = stream.pointer();
@@ -131,6 +133,8 @@ void CALifeStorageManager::load	(void *buffer, const u32 &buffer_size, LPCSTR fi
 		register_object			((*I).second,false);
 	} 
 	registry().load				(source);
+
+	keyvals().load				(source);
 
 	can_register_objects		(true);
 	

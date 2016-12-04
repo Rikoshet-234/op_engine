@@ -18,6 +18,7 @@
 #include "alife_smart_terrain_registry.h"
 #include "alife_group_registry.h"
 #include "alife_registry_container.h"
+#include "alife_keyval_registry.h"
 #include "xrserver.h"
 #include "level_graph.h"
 
@@ -42,6 +43,7 @@ CALifeSimulatorBase::CALifeSimulatorBase	(xrServer *server, LPCSTR section)
 	m_smart_terrains			= 0;
 	m_groups					= 0;
 	m_registry_container		= 0;
+	m_keyval_registry			= 0;
 	random().seed				(u32(CPU::QPC() & 0xffffffff));
 	m_can_register_objects		= true;
 }
@@ -68,6 +70,7 @@ void CALifeSimulatorBase::unload			()
 	xr_delete					(m_smart_terrains);
 	xr_delete					(m_groups);
 	xr_delete					(m_registry_container);
+	xr_delete					(m_keyval_registry);
 	m_initialized				= false;
 }
 
@@ -83,6 +86,7 @@ void CALifeSimulatorBase::reload			(LPCSTR section)
 	m_smart_terrains			= xr_new<CALifeSmartTerrainRegistry>();
 	m_groups					= xr_new<CALifeGroupRegistry>		();
 	m_registry_container		= xr_new<CALifeRegistryContainer>	();
+	m_keyval_registry			= xr_new<CALifeKeyvalRegistry>		();
 	m_initialized				= true;
 }
 

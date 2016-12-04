@@ -11,8 +11,6 @@ class CExtraContentFilter
 	};
 
 	xr_vector<PackData*>		aDataPacks;
-
-	bool	CheckPackKey(LPCSTR KeyName);
 public:
 				CExtraContentFilter				();
 	virtual		~CExtraContentFilter			();
