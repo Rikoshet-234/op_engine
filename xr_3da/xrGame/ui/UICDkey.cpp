@@ -160,5 +160,5 @@ void CUICDkey::CreateCDKeyEntry(){
 }
 
 void GetCDKey(char* CDKeyStr){
-	ReadRegistry_StrValue(REGISTRY_VALUE_GSCDKEY, CDKeyStr);
+	CDKeyStr = "";
 }

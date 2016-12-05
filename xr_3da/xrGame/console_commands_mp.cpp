@@ -232,20 +232,6 @@ public:
 };
 #endif // DEBUG
 
-class CCC_GSCDKey: public CCC_String{
-public:
-						CCC_GSCDKey		(LPCSTR N, LPSTR V, int _size) : CCC_String(N, V, _size)  { bEmptyArgsHandled = false; };
-	virtual void		Execute			(LPCSTR arguments)
-	{
-		CCC_String::Execute(arguments);	
-
-		WriteRegistry_StrValue(REGISTRY_VALUE_GSCDKEY, value);
-
-		if (g_pGamePersistent && MainMenu()) MainMenu()->ValidateCDKey();
-	}
-	virtual void		Save			(IWriter *F)	{};
-};
-
 class CCC_KickPlayerByName : public IConsole_Command {
 public:
 					CCC_KickPlayerByName(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = false; };
@@ -1266,7 +1252,6 @@ void register_mp_console_commands()
 	CMD3(CCC_Mask,		"net_dump_size",		&psNET_Flags,		NETFLAG_DBG_DUMPSIZE	);
 	CMD1(CCC_Dbg_NumObjects,"net_dbg_objects"				);
 #endif // DEBUG
-	CMD3(CCC_GSCDKey,	"cdkey",				gsCDKey,			sizeof(gsCDKey)			);
 	CMD4(CCC_Integer,	"g_eventdelay",			&g_dwEventDelay,	0,	1000);
 	CMD4(CCC_Integer,	"g_corpsenum",			(int*)&g_dwMaxCorpses,		0,	100);
 

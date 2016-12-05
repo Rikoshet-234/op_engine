@@ -5,16 +5,6 @@
 
 #define EXTRA_CONTENT_SECTION	"extracontent_packs"	
 
-bool CExtraContentFilter::CheckPackKey(LPCSTR KeyName)
-{
-	if (!KeyName) return false;
-
-	DWORD KeyValue = 0;
-	ReadRegistry_DWValue(KeyName, KeyValue);
-
-	return KeyValue == 1;
-}
-
 CExtraContentFilter::CExtraContentFilter()
 {
 	if (pSettings->section_exist(EXTRA_CONTENT_SECTION))
@@ -26,7 +16,7 @@ CExtraContentFilter::CExtraContentFilter()
 			LPCSTR PackName, KeyName;
 			pSettings->r_line(EXTRA_CONTENT_SECTION, i, &PackName, &KeyName);
 			pNewPack->sPackName = PackName;
-			pNewPack->bEnabled = CheckPackKey(KeyName);
+			pNewPack->bEnabled = true;//! jarni: always enabled
 
 			if (pSettings->section_exist(pNewPack->sPackName))
 			{

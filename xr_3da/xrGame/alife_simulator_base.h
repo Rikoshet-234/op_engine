@@ -24,6 +24,7 @@ class CALifeStoryRegistry;
 class CALifeSmartTerrainRegistry;
 class CALifeGroupRegistry;
 class CALifeRegistryContainer;
+class CALifeKeyvalRegistry;
 
 class CSE_Abstract;
 class CSE_ALifeObject;
@@ -44,6 +45,7 @@ protected:
 	CALifeSmartTerrainRegistry					*m_smart_terrains;
 	CALifeGroupRegistry							*m_groups;
 	CALifeRegistryContainer						*m_registry_container;
+	CALifeKeyvalRegistry						*m_keyval_registry;
 	CRandom32									m_random;
 	bool										m_initialized;
 	shared_str									*m_server_command_line;
@@ -59,6 +61,7 @@ protected:
 	IC		CALifeStoryRegistry					&story_objects				();
 	IC		CALifeSmartTerrainRegistry			&smart_terrains				();
 	IC		CALifeGroupRegistry					&groups						();
+	IC		CALifeKeyvalRegistry				&keyvals					();
 	IC		void								can_register_objects		(const bool &value);
 	IC		const bool							&can_register_objects		() const;
 
@@ -82,6 +85,7 @@ public:
 	IC		const CALifeStoryRegistry			&story_objects				() const;
 	IC		const CALifeSmartTerrainRegistry	&smart_terrains				() const;
 	IC		const CALifeGroupRegistry			&groups						() const;
+	IC		const CALifeKeyvalRegistry			&keyvals					() const;
 	IC		CRandom32							&random						();
 	IC		xrServer							&server						() const;
 	IC		const CALifeTimeManager				&time_manager				() const;

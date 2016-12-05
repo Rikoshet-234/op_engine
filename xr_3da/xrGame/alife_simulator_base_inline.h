@@ -76,6 +76,13 @@ IC	const CALifeGroupRegistry			&CALifeSimulatorBase::groups				() const
 	return						(*m_groups);
 }
 
+IC	const CALifeKeyvalRegistry	&CALifeSimulatorBase::keyvals						() const
+{
+	VERIFY						(initialized());
+	VERIFY						(m_keyval_registry);
+	return						(*m_keyval_registry);
+}
+
 IC	CALifeSimulatorHeader				&CALifeSimulatorBase::header				()
 {
 	VERIFY						(initialized());
@@ -144,6 +151,13 @@ IC	CALifeRegistryContainer		&CALifeSimulatorBase::registry						() const
 	VERIFY						(initialized());
 	VERIFY						(m_registry_container);
 	return						(*m_registry_container);
+}
+
+IC	CALifeKeyvalRegistry		&CALifeSimulatorBase::keyvals						()
+{
+	VERIFY						(initialized());
+	VERIFY						(m_keyval_registry);
+	return						(*m_keyval_registry);
 }
 
 IC	CRandom32							&CALifeSimulatorBase::random				()

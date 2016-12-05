@@ -157,8 +157,8 @@ void CUICustomEdit::LoadSettings(LPCSTR path)
 {
 	m_path = path;
 	std::replace(m_path.begin(), m_path.end(), ':', '_');
-
-	IReader* fr = FS.r_open("$game_settings$","ceb.settings");
+	
+	IReader* fr = (FS.exist("$game_settings$","ceb.settings") == NULL) ? NULL : FS.r_open("$game_settings$","ceb.settings");
 	if (fr)
 	{
 		CInifile cebSettings(fr);

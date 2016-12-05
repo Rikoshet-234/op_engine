@@ -275,14 +275,6 @@ CUIProgressBar* CScriptXmlInit::InitProgressBar(LPCSTR path, CUIWindow* parent)
 	return							pWnd;	
 }
 
-CUIEditBox* CScriptXmlInit::InitCDkey(LPCSTR path, CUIWindow* parent){
-	CUICDkey* pWnd					= xr_new<CUICDkey>();
-	CUIXmlInit::InitEditBox			(m_xml, path, 0, pWnd);
-	pWnd->SetAutoDelete				(true);
-	_attach_child					(pWnd, parent);
-	return							pWnd;	
-}
-
 #pragma optimize("s",on)
 void CScriptXmlInit::script_register(lua_State *L){
 	module(L)
@@ -311,7 +303,6 @@ void CScriptXmlInit::script_register(lua_State *L){
 		.def("InitMapList",				&CScriptXmlInit::InitMapList)
 		.def("InitMapInfo",				&CScriptXmlInit::InitMapInfo)
 		.def("InitTrackBar",			&CScriptXmlInit::InitTrackBar)
-		.def("InitCDkey",				&CScriptXmlInit::InitCDkey)
 		.def("InitKeyBinding",			&CScriptXmlInit::InitKeyBinding)
 		.def("InitMMShniaga",			&CScriptXmlInit::InitMMShniaga)
 		.def("InitScrollView",			&CScriptXmlInit::InitScrollView)
