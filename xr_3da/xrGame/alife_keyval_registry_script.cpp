@@ -1,9 +1,9 @@
 ////////////////////////////////////////////////////////////////////////////
-//	Module 		: saved_game_wrapper_script.cpp
-//	Created 	: 21.02.2006
-//  Modified 	: 21.02.2006
-//	Author		: Dmitriy Iassenev
-//	Description : saved game wrapper class script export
+//	Module 		: alife_keyval_registry_script.cpp
+//	Created 	: 03.12.2016
+//  Modified 	: 03.12.2016
+//	Author		: jarni
+//	Description : ALife key-value pairs registry
 ////////////////////////////////////////////////////////////////////////////
 
 #include "pch_script.h"

@@ -6588,7 +6588,7 @@
     <ClInclude Include="ui\UIListItemIconed.h">
       <Filter>UI\UIWindows\ListBox\Iconed</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Projects\stalker\op_engine\xr_3da\xrGame\alife_keyval_registry.h">
+    <ClInclude Include="alife_keyval_registry.h">
       <Filter>AI\ALife\simulator_base\registries\keyval_registry</Filter>
     </ClInclude>
   </ItemGroup>
@@ -9761,10 +9761,10 @@
     <ClCompile Include="ui\UIListItemIconed.cpp">
       <Filter>UI\UIWindows\ListBox\Iconed</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Projects\stalker\op_engine\xr_3da\xrGame\alife_keyval_registry.cpp">
+    <ClCompile Include="alife_keyval_registry.cpp">
       <Filter>AI\ALife\simulator_base\registries\keyval_registry</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Projects\stalker\op_engine\xr_3da\xrGame\alife_keyval_registry_script.cpp">
+    <ClCompile Include="alife_keyval_registry_script.cpp">
       <Filter>AI\ALife\simulator_base\registries\keyval_registry</Filter>
     </ClCompile>
   </ItemGroup>
