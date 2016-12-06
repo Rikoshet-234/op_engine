@@ -59,7 +59,8 @@ ENGINE_API enum E_COMMON_FLAGS
 	uiShowExtDesc				= 1<<5,
 	uiShowTradeSB				= 1<<6,
 	uiShowFocused				= 1<<7,
-	invReloadWeapon				= 1<<8
+	invReloadWeapon				= 1<<8,
+	uiAllowOpTradeSB			= 1<<9
 };
 
 

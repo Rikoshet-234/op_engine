@@ -71,6 +71,8 @@ protected:
 	CUI3tButton*			m_pUITakeAll;
 
 	CUICellItem*			m_pCurrentCellItem;
+	
+	void					AddSingleItemToList			(CUICellItem* itm,CUIDragDropListEx* to);
 
 	void					UpdateLists					();
 

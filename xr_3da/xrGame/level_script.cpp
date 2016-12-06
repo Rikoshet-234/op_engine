@@ -29,6 +29,7 @@
 #include "map_location.h"
 #include "phworld.h"
 #include <OPFuncs/utils.h>
+#include "../../xrCore/OPFuncs/utils.h"
 
 using namespace luabind;
 
@@ -217,8 +218,8 @@ void map_remove_object_spot(u16 id, LPCSTR spot_type)
 	Level().MapManager().RemoveMapLocation(spot_type, id);
 }
 
-template<typename T> 
-XRCORE_API OPFuncs::STR2INT_ERROR str2int(T &, char const *);
+//template<typename T> 
+//XRCORE_API OPFuncs::STR2INT_ERROR str2int(T &, char const *);
 
 void map_remove_object_spot(LPCSTR id, LPCSTR spot_type)
 {

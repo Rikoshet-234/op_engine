@@ -84,6 +84,29 @@ namespace OPFuncs
 				pActor->inventory().Activate		(NO_ACTIVE_SLOT);
 	}
 
+	bool IsUsedInInventory(CInventoryOwner* owner, CInventoryItem* pItem)
+	{
+		TIItemContainer belt=owner->inventory().m_belt;
+		TIItemContainer::iterator it	= belt.begin();
+		TIItemContainer::iterator it_e	= belt.end();
+		bool found = false;
+		for(; it != it_e; ++it) 
+		{
+			if ((*it)->object().ID()==pItem->object().ID())
+			{
+				found = true;
+				break;
+			}
+		}
+		if (found)
+			return true;
+		if (owner->inventory().ItemFromSlot(OUTFIT_SLOT)==pItem)
+			return true;
+		if (pItem->GetSlot()!=NO_ACTIVE_SLOT && owner->inventory().ItemFromSlot(pItem->GetSlot())==pItem)
+			return true;
+		return false;
+	}
+
 	std::string getComplexString(std::string untranslatedString,PIItem item,std::string untranslatedString2,std::string untranslatedString3)
 	{
 		std::string translateString=*CStringTable().translate(untranslatedString.c_str());

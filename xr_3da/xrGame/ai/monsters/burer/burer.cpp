@@ -90,7 +90,15 @@ void CBurer::Load(LPCSTR section)
 	m_gravi_impulse_to_objects		= pSettings->r_float(section,"Gravi_Impulse_To_Objects");
 	m_gravi_impulse_to_enemy		= pSettings->r_float(section,"Gravi_Impulse_To_Enemy");
 	m_gravi_hit_power				= pSettings->r_float(section,"Gravi_Hit_Power");
-	
+	if (pSettings->line_exist(section,"Gravi_Hit_Type"))
+	{
+		shared_str hitStr=pSettings->r_string(section, "Gravi_Hit_Type");
+		m_gravi_hit_type						= ALife::g_tfString2HitType(hitStr.c_str());
+	}
+	else
+		m_gravi_hit_type=ALife::eHitTypeWound;
+
+
 	m_tele_max_handled_objects		= pSettings->r_u32(section,"Tele_Max_Handled_Objects");
 	m_tele_time_to_hold				= pSettings->r_u32(section,"Tele_Time_To_Hold");
 	m_tele_object_min_mass			= pSettings->r_float(section,"Tele_Object_Min_Mass");
@@ -107,7 +115,7 @@ void CBurer::Load(LPCSTR section)
 	SVelocityParam &velocity_run_dmg	= move().get_velocity(MonsterMovement::eVelocityParameterRunDamaged);
 	SVelocityParam &velocity_steal		= move().get_velocity(MonsterMovement::eVelocityParameterSteal);
 //		SVelocityParam &velocity_drag		= move().get_velocity(MonsterMovement::eVelocityParameterDrag);
-
+#pragma region anims loads
 	anim().AddAnim(eAnimStandIdle,		"stand_idle_",			-1, &velocity_none,				PS_STAND, 	"fx_stand_f", "fx_stand_b", "fx_stand_l", "fx_stand_r");
 	anim().AddAnim(eAnimStandTurnLeft,	"stand_turn_ls_",		-1, &velocity_turn,			PS_STAND, 	"fx_stand_f", "fx_stand_b", "fx_stand_l", "fx_stand_r");
 	anim().AddAnim(eAnimStandTurnRight,	"stand_turn_rs_",		-1, &velocity_turn,			PS_STAND, 	"fx_stand_f", "fx_stand_b", "fx_stand_l", "fx_stand_r");
@@ -147,7 +155,7 @@ void CBurer::Load(LPCSTR section)
 	anim().LinkAction(ACT_ATTACK,		eAnimAttack);
 	anim().LinkAction(ACT_STEAL,		eAnimSteal);
 	anim().LinkAction(ACT_LOOK_AROUND,	eAnimScared);
-
+#pragma endregion 
 #ifdef DEBUG	
 	anim().accel_chain_test		();
 #endif
@@ -203,7 +211,7 @@ void CBurer::UpdateGraviObject()
 	float trace_dist = float(m_gravi_step);
 
 	collide::rq_result	l_rq;
-	if (Level().ObjectSpace.RayPick(new_pos, dir, trace_dist, collide::rqtBoth, l_rq, NULL)) {
+	if (Level().ObjectSpace.RayPick(new_pos, dir, trace_dist, collide::rqtBoth, l_rq, nullptr)) {
 		const CObject *enemy = smart_cast<const CObject *>(m_gravi_object.enemy);
 		if ((l_rq.O == enemy) && (l_rq.range < trace_dist)) {
 			
@@ -226,7 +234,8 @@ void CBurer::UpdateGraviObject()
 				impulse_dir.set(0.0f,0.0f,1.0f);
 				impulse_dir.normalize();
 
-				HitEntity(m_gravi_object.enemy, m_gravi_hit_power, m_gravi_impulse_to_enemy, impulse_dir);
+				HitEntity(m_gravi_object.enemy, m_gravi_hit_power, m_gravi_impulse_to_enemy, impulse_dir,m_gravi_hit_type);
+				
 				m_gravi_object.deactivate();
 				return;
 			}
@@ -318,24 +327,18 @@ void CBurer::StopTeleObjectParticle(CGameObject *pO)
 	PP->StopParticles(particle_tele_object, BI_NONE, true);
 }
 
-//void CBurer::Hit(float P,Fvector &dir,CObject*who,s16 element,Fvector p_in_object_space,float impulse, ALife::EHitType hit_type)
 void	CBurer::Hit								(SHit* pHDS)
 {
 	if (m_shield_active && (pHDS->hit_type == ALife::eHitTypeFireWound) && (Device.dwFrame != last_hit_frame)) {
-
 		// вычислить позицию и направленность партикла
 		Fmatrix pos; 
-		//CParticlesPlayer::MakeXFORM(this,element,Fvector().set(0.f,0.f,1.f),p_in_object_space,pos);
 		CParticlesPlayer::MakeXFORM(this,pHDS->bone(),pHDS->dir,pHDS->p_in_bone_space,pos);
-
 		// установить particles
 		CParticlesObject* ps = CParticlesObject::Create(particle_fire_shield,TRUE);
-		
 		ps->UpdateParent(pos,Fvector().set(0.f,0.f,0.f));
 		GamePersistent().ps_needtoplay.push_back(ps);
 
 	} else if (!m_shield_active)
-//				inherited::Hit(P,dir,who,element,p_in_object_space,impulse,hit_type);
 				inherited::Hit(pHDS);
 
 	last_hit_frame = Device.dwFrame;

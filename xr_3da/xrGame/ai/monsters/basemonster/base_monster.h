@@ -133,6 +133,7 @@ public:
 	virtual bool			IsTalkEnabled					() {return false;}
 
 	virtual void			HitEntity						(const CEntity *pEntity, float fDamage, float impulse, Fvector &dir);
+	virtual void			HitEntity						(const CEntity *pEntity, float fDamage, float impulse, Fvector &dir,ALife::EHitType hitType);
 	virtual	void			HitEntityInJump					(const CEntity *pEntity) {}
 
 	virtual	void			on_before_sell					(CInventoryItem *item);

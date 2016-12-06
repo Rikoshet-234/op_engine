@@ -295,9 +295,9 @@ void CUITradeWnd::StopTrade()
 }
 
 #include "../trade_parameters.h"
+
 bool CUITradeWnd::CanMoveToOther(PIItem pItem)
 {
-
 	float r1				= CalcItemsWeight(&UIOurTradeList);	// our
 	float r2				= CalcItemsWeight(&UIOthersTradeList);	// other
 
@@ -317,15 +317,33 @@ bool CUITradeWnd::CanMoveToOther(PIItem pItem)
 	return true;
 }
 
-void move_item(CUICellItem* itm, CUIDragDropListEx* from, CUIDragDropListEx* to)
+void CUITradeWnd::move_item(CUICellItem* itm, CUIDragDropListEx* from, CUIDragDropListEx* to) 
 {
 	CUICellItem* _itm		= from->RemoveItem	(itm, false);
-	to->SetItem				(_itm);
+	AddSingleItemToList(_itm,to);
+}
+
+
+void CUITradeWnd::AddSingleItemToList(CUICellItem* itm,CUIDragDropListEx* to)
+{
+		CInventoryItem* iitem=static_cast<CInventoryItem*>(itm->m_pData);
+		if (g_uCommonFlags.is(E_COMMON_FLAGS::uiShowTradeSB) && OPFuncs::IsUsedInInventory(m_pInvOwner,iitem))
+		{
+			itm->SetColor				(color_rgba(255,100,100,255));
+			itm->SetMoveableToOther(!!g_uCommonFlags.is(E_COMMON_FLAGS::uiAllowOpTradeSB));
+			itm->SetAllowedGrouping(false);
+			to->SetItem(itm);
+		}
+		else
+		{
+			itm->SetAllowedGrouping(true);
+			to->SetItem(itm);
+		}
 }
 
 bool CUITradeWnd::ToOurTrade()
 {
-	if (!CanMoveToOther(CurrentIItem()))	return false;
+	if (!CurrentItem()->GetMoveableToOther() || !CanMoveToOther(CurrentIItem()))	return false;
 
 	move_item				(CurrentItem(), &UIOurBagList, &UIOurTradeList);
 	UpdatePrices			();
@@ -488,7 +506,7 @@ void CUITradeWnd::UpdateLists(EListType mode)
 
 	if(mode==eBoth||mode==e1st){
 		ruck_list.clear					();
-		bool useAdds=!!g_uCommonFlags.test(E_COMMON_FLAGS::uiShowTradeSB);
+		bool useAdds=!!g_uCommonFlags.is(E_COMMON_FLAGS::uiShowTradeSB);
 		m_pInv->AddAvailableItems		(ruck_list, true,useAdds,useAdds);
 		std::sort						(ruck_list.begin(),ruck_list.end(),InventoryUtilities::GreaterRoomInRuck);
 		FillList						(ruck_list, UIOurBagList, true);
@@ -510,7 +528,7 @@ void CUITradeWnd::FillList	(TIItemContainer& cont, CUIDragDropListEx& dragDropLi
 	{
 		CUICellItem* itm			= create_cell_item	(*it);
 		if(do_colorize)				ColorizeItem		(itm, CanMoveToOther(*it));
-		dragDropList.SetItem		(itm);
+		AddSingleItemToList(itm,&dragDropList);
 	}
 
 }

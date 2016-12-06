@@ -1481,6 +1481,7 @@ void CCC_RegisterCommands()
 	g_uCommonFlags.set(uiShowSelected, TRUE);
 	g_uCommonFlags.set(uiShowFocused, TRUE);
 	g_uCommonFlags.set(uiShowTradeSB, FALSE);
+	g_uCommonFlags.set(uiAllowOpTradeSB, FALSE);
 	g_uCommonFlags.set(invReloadWeapon, FALSE);
 
 	CMD3(CCC_Mask,				"ai_use_torch_dynamic_lights",	&g_uCommonFlags,flAiUseTorchDynamicLights);
@@ -1491,6 +1492,7 @@ void CCC_RegisterCommands()
 	CMD3(CCC_Mask,				"ui_show_selected",				&g_uCommonFlags,uiShowSelected);
 	CMD3(CCC_Mask,				"ui_show_focused",				&g_uCommonFlags,uiShowFocused);
 	CMD3(CCC_Mask,				"ui_show_trade_sb",				&g_uCommonFlags,uiShowTradeSB);
+	CMD3(CCC_Mask,				"ui_allow_operations_tsb",		&g_uCommonFlags,uiAllowOpTradeSB);
 	CMD3(CCC_Mask,				"winv_reload_enable",			&g_uCommonFlags,invReloadWeapon);
 
 	CMD1(CCC_GSCheckForUpdates, "check_for_updates"		);

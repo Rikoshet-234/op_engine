@@ -15,7 +15,7 @@
 #else
 	// "release"
 	#if defined(_CPPUNWIND)
-		#error Please disable exceptions...
+		//#error Please disable exceptions...
 	#endif
 	//#define _HAS_EXCEPTIONS		0	// STL
 	#define XRAY_EXCEPTIONS		0	// XRAY

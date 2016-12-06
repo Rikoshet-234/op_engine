@@ -45,9 +45,9 @@ void CUIDialogWndEx::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 	CALLBACK_IT it = std::find_if(m_callbacks.begin(),m_callbacks.end(),ec);
 	if(it==m_callbacks.end())
 		return inherited::SendMessage(pWnd, msg, pData);
-
-	Msg((*it)->m_controlName.c_str());
+	
 	((*it)->m_callback)();
+
 
 //	if ( (*it)->m_cpp_callback )	
 //		(*it)->m_cpp_callback(pData);
