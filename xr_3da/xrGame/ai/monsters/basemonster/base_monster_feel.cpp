@@ -73,7 +73,13 @@ void CBaseMonster::feel_sound_new(CObject* who, int eType, CSound_UserDataPtr us
 }
 #define MAX_LOCK_TIME 2.f
 
+
 void CBaseMonster::HitEntity(const CEntity *pEntity, float fDamage, float impulse, Fvector &dir)
+{
+	HitEntity(pEntity,fDamage,impulse,dir,m_eHitType);
+}
+
+void CBaseMonster::HitEntity(const CEntity *pEntity, float fDamage, float impulse, Fvector &dir,ALife::EHitType hitType)
 {
 	if (!g_Alive()) return;
 	if (!pEntity || pEntity->getDestroy()) return;
@@ -94,16 +100,16 @@ void CBaseMonster::HitEntity(const CEntity *pEntity, float fDamage, float impuls
 		
 		NET_Packet	l_P;
 		SHit		HS;
-		HS.GenHeader(GE_HIT, pEntityNC->ID());													//		u_EventGen	(l_P,GE_HIT, pEntityNC->ID());
-		HS.whoID			= (ID());															//		l_P.w_u16	(ID());
-		HS.weaponID			= (ID());															//		l_P.w_u16	(ID());
-		HS.dir				= (hit_dir);														//		l_P.w_dir	(hit_dir);
-		HS.power			= (fDamage);														//		l_P.w_float	(fDamage);
-		HS.boneID			= (smart_cast<CKinematics*>(pEntityNC->Visual())->LL_GetBoneRoot());//		l_P.w_s16	(smart_cast<CKinematics*>(pEntityNC->Visual())->LL_GetBoneRoot());
-		HS.p_in_bone_space	= (position_in_bone_space);											//		l_P.w_vec3	(position_in_bone_space);
-		HS.impulse			= (impulse);														//		l_P.w_float	(impulse);
-		//HS.hit_type			= (ALife::eHitTypeWound);											//		l_P.w_u16	( u16(ALife::eHitTypeWound) );
-		HS.hit_type			= m_eHitType;											//		l_P.w_u16	( u16(ALife::eHitTypeWound) );
+		HS.GenHeader(GE_HIT, pEntityNC->ID());													
+		HS.whoID			= (ID());															
+		HS.weaponID			= (ID());															
+		HS.dir				= (hit_dir);														
+		HS.power			= (fDamage);														
+		HS.boneID			= (smart_cast<CKinematics*>(pEntityNC->Visual())->LL_GetBoneRoot());
+		HS.p_in_bone_space	= (position_in_bone_space);											
+		HS.impulse			= (impulse);														
+		//HS.hit_type			= (ALife::eHitTypeWound);										
+		HS.hit_type			= hitType;											
 		HS.Write_Packet(l_P);
 		u_EventSend	(l_P);
 		

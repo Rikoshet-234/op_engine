@@ -3,7 +3,7 @@
 #include "associative_vector.h"
 
 #define MIN_LEGS_COUNT	1
-#define MAX_LEGS_COUNT	4 
+#define MAX_LEGS_COUNT	6 
 
 struct MotionID;
 

@@ -105,9 +105,9 @@ protected:
 	void				FillList					(TIItemContainer& cont, CUIDragDropListEx& list, bool do_colorize);
 
 	bool				m_bDealControlsVisible;
-
+	void				move_item(CUICellItem* itm, CUIDragDropListEx* from, CUIDragDropListEx* to) ;
 	bool				CanMoveToOther				(PIItem pItem);
-
+	void				AddSingleItemToList(CUICellItem* itm,CUIDragDropListEx* to);
 	//указатели игрока и того с кем торгуем
 	CInventory*			m_pInv;
 	CInventory*			m_pOthersInv;

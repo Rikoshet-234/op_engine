@@ -19,11 +19,13 @@ CUICellItem::CUICellItem()
 	m_pData				= nullptr;
 	m_custom_draw		= nullptr;
 	m_b_already_drawn	= false;
+	m_moveableToOther=true;
 	m_drawn_frame=0;
 	SetAccelerator		(0);
 	m_b_destroy_childs	= true;
 	m_focused=false;
 	m_selected=false;
+	m_allowedGrouping=true;
 	m_suitable=false;
 	p_ConditionProgressBar=xr_new<CUIProgressBar>();
 	p_ConditionProgressBar->SetAutoDelete(true);

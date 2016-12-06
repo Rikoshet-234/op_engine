@@ -248,6 +248,23 @@ void CUICarBodyWnd::Hide()
 }
 
 
+void CUICarBodyWnd::AddSingleItemToList(CUICellItem* itm,CUIDragDropListEx* to)
+{
+		CInventoryItem* iitem=static_cast<CInventoryItem*>(itm->m_pData);
+		if (g_uCommonFlags.is(E_COMMON_FLAGS::uiShowTradeSB) && OPFuncs::IsUsedInInventory(m_pOurObject,iitem))
+		{
+			itm->SetColor				(color_rgba(255,100,100,255));
+			itm->SetMoveableToOther(!!g_uCommonFlags.is(E_COMMON_FLAGS::uiAllowOpTradeSB));
+			itm->SetAllowedGrouping(false);
+			to->SetItem(itm);
+		}
+		else
+		{
+			itm->SetAllowedGrouping(true);
+			to->SetItem(itm);
+		}
+}
+
 void CUICarBodyWnd::UpdateLists()
 {
 	TIItemContainer								ruck_list;
@@ -265,7 +282,7 @@ void CUICarBodyWnd::UpdateLists()
 	for(it =  ruck_list.begin(); ruck_list.end() != it; ++it) 
 	{
 		CUICellItem* itm				= create_cell_item(*it);
-		m_pUIOurBagList->SetItem		(itm);
+		AddSingleItemToList(itm,m_pUIOurBagList);
 	}
 
 
@@ -577,12 +594,13 @@ void CUICarBodyWnd::ActivatePropertiesBox()
 		m_pUIPropertiesBox->AddItem(_action, nullptr, INVENTORY_EAT_ACTION);
 
 	if (!CurrentIItem()->IsQuestItem())
-	{
-		m_pUIPropertiesBox->AddItem("ui_carbody_move_single", nullptr, INVENTORY_CB_MOVE_SINGLE);
-		if (CurrentItem()->ChildsCount())
-			m_pUIPropertiesBox->AddItem("ui_carbody_move_all", nullptr, INVENTORY_CB_MOVE_ALL);
-		b_show						= true;
-	}
+		if (CurrentItem()->GetMoveableToOther())
+		{
+			m_pUIPropertiesBox->AddItem("ui_carbody_move_single", nullptr, INVENTORY_CB_MOVE_SINGLE);
+			if (CurrentItem()->ChildsCount())
+				m_pUIPropertiesBox->AddItem("ui_carbody_move_all", nullptr, INVENTORY_CB_MOVE_ALL);
+			b_show						= true;
+		}
 			
 
 	if(b_show){
@@ -666,6 +684,8 @@ bool CUICarBodyWnd::OnItemDrop(CUICellItem* itm)
 
 bool CUICarBodyWnd::OnItemStartDrag(CUICellItem* itm)
 {
+	if (!CurrentItem()->GetMoveableToOther()) 
+		return true;
 	return				false; //default behaviour
 }
 
@@ -673,6 +693,9 @@ bool CUICarBodyWnd::OnItemDbClick(CUICellItem* itm)
 {
 	CUIDragDropListEx*	old_owner		= itm->OwnerList();
 	CUIDragDropListEx*	new_owner		= (old_owner==m_pUIOthersBagList)?m_pUIOurBagList:m_pUIOthersBagList;
+
+	if (!CurrentItem()->GetMoveableToOther()) 
+		return true;
 
 	if(m_pOthersObject)
 	{
@@ -688,7 +711,7 @@ bool CUICarBodyWnd::OnItemDbClick(CUICellItem* itm)
 		}
 	}else
 	{
-		if(false && old_owner==m_pUIOurBagList) return true;
+		//if(false && old_owner==m_pUIOurBagList) return true;
 		bool bMoveDirection		= (old_owner==m_pUIOthersBagList);
 
 		u16 tmp_id				= (smart_cast<CGameObject*>(m_pOurObject))->ID();

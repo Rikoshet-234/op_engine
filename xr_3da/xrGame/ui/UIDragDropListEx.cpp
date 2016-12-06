@@ -602,9 +602,7 @@ void CUIDragDropListEx::SetScrollPos(int iPos)
 
 void CUIDragDropListEx::SetItem(CUICellItem* itm) //auto
 {
-	if(m_container->AddSimilar(itm)){
-		return;
-	}
+	if(m_container->AddSimilar(itm)) return;
 
 	Ivector2 dest_cell_pos =	m_container->FindFreeCell(itm->GetGridSize());
 	SetItem						(itm,dest_cell_pos);
@@ -742,16 +740,12 @@ CUICellItem* CUICellContainer::FindSimilar(CUICellItem* itm)
 {
 	for(WINDOW_LIST_it it = m_ChildWndList.begin(); m_ChildWndList.end()!=it; ++it)
 	{
-#ifdef DEBUG
-		CUICellItem* i = smart_cast<CUICellItem*>(*it);
-#else
-		CUICellItem* i = (CUICellItem*)(*it);
-#endif
+		CUICellItem* i = static_cast<CUICellItem*>(*it);
 		R_ASSERT		(i!=itm);
-		if(i->EqualTo(itm))
+		if(i->EqualTo(itm) && i->GetAllowedGrouping() && itm->GetAllowedGrouping()) //grouping by single attribute, maybe grouping groups by ID?
 			return i;
 	}
-	return NULL;
+	return nullptr;
 }
 
 CUICellItem* CUICellContainer::GetFocusedCellItem()

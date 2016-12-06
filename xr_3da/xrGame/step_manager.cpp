@@ -30,7 +30,12 @@ void CStepManager::reload(LPCSTR section)
 	LPCSTR anim_section = pSettings->r_string	(section, "step_params");
 
 	if (!pSettings->section_exist(anim_section)) return;
-	VERIFY((m_legs_count>=MIN_LEGS_COUNT) && (m_legs_count<=MAX_LEGS_COUNT));
+	if (m_legs_count<MIN_LEGS_COUNT || m_legs_count>MAX_LEGS_COUNT)
+	{
+		Msg("~ ERROR Invalid legs count for [%s] defval [%i]. How much you brains, spiderman?",section,MAX_LEGS_COUNT);
+		FATAL("ENGINE Crush. See log for details.");
+	}
+	//VERIFY((m_legs_count>=MIN_LEGS_COUNT) && (m_legs_count<=MAX_LEGS_COUNT));
 
 	SStepParam			param; 
 	param.step[0].time = 0.1f;	// avoid warning

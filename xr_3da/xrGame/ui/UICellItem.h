@@ -24,6 +24,8 @@ private:
 protected:
 	xr_vector<CUICellItem*> m_childs;
 
+	bool					m_moveableToOther; //Enable(false) not receive any input from mouse 
+	bool					m_allowedGrouping;
 	CUIDragDropListEx*		m_pParentList;
 	Ivector2				m_grid_size;
 	Ivector2				m_grid_size_start;
@@ -59,6 +61,10 @@ public:
 	IC			int			GetAccelerator			()		const			{return m_accelerator;};
 	
 	virtual		CUIDragItem* CreateDragItem			();
+				bool		GetAllowedGrouping	() const		{return m_allowedGrouping;}
+				void		SetAllowedGrouping	(bool value)	{m_allowedGrouping=value;}
+				bool		GetMoveableToOther	() const		{return m_moveableToOther;}
+				void		SetMoveableToOther	(bool value)	{m_moveableToOther=value;}
 
 	CUIDragDropListEx*		OwnerList				()						{return m_pParentList;}
 				void		SetOwnerList			(CUIDragDropListEx* p);
