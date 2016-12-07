@@ -585,7 +585,7 @@ public:
 			bool				ItemInSlot(LPCSTR itemSection,u32 slotId) const;
 			void				IterateBeltOnlyFunctor(luabind::functor<void> functor);
 			void				IterateRuckOnlyFunctor(luabind::functor<void> functor);
-			LPCSTR				GetVisualName(CScriptGameObject* self) const;
+			LPCSTR				GetVisualName() const;
 
 	DECLARE_SCRIPT_REGISTER_FUNCTION
 };

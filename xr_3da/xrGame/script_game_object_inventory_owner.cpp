@@ -220,15 +220,14 @@ void CScriptGameObject::IterateRuckOnlyFunctor(luabind::functor<void> functor)
 		functor				((*I)->object().lua_game_object());
 }
 
-LPCSTR CScriptGameObject::GetVisualName(CScriptGameObject* self) const
+LPCSTR CScriptGameObject::GetVisualName() const
 {
 	if (!g_pGameLevel)
 	{
 		Msg("Error! CScriptGameObject::GetVisualName : game level doesn't exist. wtf?????");
 		return "";
 	}
-
-	return *object().cNameVisual();
+	return	*(object().cNameVisual());
 
 }
 
