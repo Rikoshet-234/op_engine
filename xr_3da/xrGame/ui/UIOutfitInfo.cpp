@@ -142,9 +142,10 @@ void CUIOutfitInfo::NewSetItem(ALife::EHitType hitType, bool force_add)
 	}
 	item->SetVisibility(3,art);
 
-	string64 buff_total;
+	//incorrect sum values...
+	/*string64 buff_total;
 	float total=_val_outfit+ _val_af;
 	sprintf_s	(buff_total,"%s %+3.0f%%", (total>0.0f)?"%c[green]":"%c[red]", total*100.0f);
 	item->SetVisibility(4,outfit && art);
-	item->SetFieldText(4,buff_total);
+	item->SetFieldText(4,buff_total);*/
 }

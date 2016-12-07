@@ -299,15 +299,18 @@ void CALifeKeyvalRegistry::load(IReader &memory_stream)
 	if (memory_stream.find_chunk(KEYVAL_CHUNK_DATA))
 	{
 		u32 count = memory_stream.r_u32();
-		countPairs += m_generic.load(memory_stream);
-		for (--count; count > 0; --count) 
+		if (count>0)
 		{
-			shared_str key;
-			memory_stream.r_stringZ(key);
+			countPairs += m_generic.load(memory_stream);
+			for (--count; count > 0; --count) 
+			{
+				shared_str key;
+				memory_stream.r_stringZ(key);
 			
-			CALifeKeyvalContainer* container = xr_new<CALifeKeyvalContainer>();
-			countPairs += container->load(memory_stream);
-			m_specific.insert(TKeyValContainers::value_type(key._get()->dwCRC, SKeyContItem(key, container)));
+				CALifeKeyvalContainer* container = xr_new<CALifeKeyvalContainer>();
+				countPairs += container->load(memory_stream);
+				m_specific.insert(TKeyValContainers::value_type(key._get()->dwCRC, SKeyContItem(key, container)));
+			}
 		}
 	}
 

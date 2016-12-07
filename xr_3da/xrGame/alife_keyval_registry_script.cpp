@@ -10,6 +10,8 @@
 #include "alife_keyval_registry.h"
 #include "alife_simulator.h"
 #include "ai_space.h"
+#include "luabind/luabind.hpp"
+#include "luabind/iterator_policy.hpp"
 
 using namespace luabind;
 
@@ -33,6 +35,15 @@ void keyvals_remove(LPCSTR name)
 	return (const_cast<CALifeKeyvalRegistry*>(&ai().get_alife()->keyvals())->remove(name));
 }
 
+xr_vector<LPCSTR> keyvals_test()
+{
+	xr_vector<LPCSTR> result;
+	result.push_back("test1");
+	result.push_back("test2");
+	result.push_back("test3");
+	return result;
+}
+
 #pragma optimize("s",on)
 void CALifeKeyvalContainer::script_register(lua_State *L)
 {
@@ -50,5 +61,6 @@ void CALifeKeyvalContainer::script_register(lua_State *L)
 		,def("keyvals", static_cast<CALifeKeyvalContainer* (*)(LPCSTR)>(&keyvals))
 		,def("keyvals_list", &keyvals_list)
 		,def("keyvals_remove", &keyvals_remove)
+		,def("keyvals_test", &keyvals_test)
 	];
 }
