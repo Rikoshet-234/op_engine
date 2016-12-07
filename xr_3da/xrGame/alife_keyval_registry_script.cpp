@@ -13,21 +13,42 @@
 
 using namespace luabind;
 
-static CALifeKeyvalRegistry *keyvals()
+static CALifeKeyvalContainer *keyvals()
 {
-	return			(const_cast<CALifeKeyvalRegistry*>(&ai().get_alife()->keyvals()));
+	return (const_cast<CALifeKeyvalRegistry*>(&ai().get_alife()->keyvals())->keyvals(nullptr));
 }
 
-//#pragma optimize("s",on)
-void CALifeKeyvalRegistry::script_register(lua_State *L)
+static CALifeKeyvalContainer *keyvals(LPCSTR name)
+{
+	return (const_cast<CALifeKeyvalRegistry*>(&ai().get_alife()->keyvals())->keyvals(name));
+}
+
+static luabind::object keyvals_list()
+{
+	return (const_cast<CALifeKeyvalRegistry*>(&ai().get_alife()->keyvals())->list());
+}
+
+void keyvals_remove(LPCSTR name)
+{
+	return (const_cast<CALifeKeyvalRegistry*>(&ai().get_alife()->keyvals())->remove(name));
+}
+
+#pragma optimize("s",on)
+void CALifeKeyvalContainer::script_register(lua_State *L)
 {
 	module(L)
 	[
-		class_<CALifeKeyvalRegistry>("CALifeKeyvalRegistry")
-			//.def(constructor<>())
-			.def("get", &CALifeKeyvalRegistry::get)
-			.def("set", &CALifeKeyvalRegistry::set)
+		class_<CALifeKeyvalContainer>("CALifeKeyvalContainer")
+			.def("get", &CALifeKeyvalContainer::get)
+			.def("set", &CALifeKeyvalContainer::set)
+			.def("exist", &CALifeKeyvalContainer::exist)
+			.def("remove", &CALifeKeyvalContainer::remove)
+			.def("clear", &CALifeKeyvalContainer::clear)
+			.def("list", &CALifeKeyvalContainer::list)
 		
-		,def("keyvals", &keyvals)
+		,def("keyvals", static_cast<CALifeKeyvalContainer* (*)()>(&keyvals))
+		,def("keyvals", static_cast<CALifeKeyvalContainer* (*)(LPCSTR)>(&keyvals))
+		,def("keyvals_list", &keyvals_list)
+		,def("keyvals_remove", &keyvals_remove)
 	];
 }
