@@ -17,12 +17,12 @@ using namespace luabind;
 
 static CALifeKeyvalContainer *keyvals()
 {
-	return (const_cast<CALifeKeyvalRegistry*>(&ai().get_alife()->keyvals())->keyvals(nullptr));
+	return (const_cast<CALifeKeyvalRegistry*>(&ai().get_alife()->keyvals())->container(nullptr));
 }
 
 static CALifeKeyvalContainer *keyvals(LPCSTR name)
 {
-	return (const_cast<CALifeKeyvalRegistry*>(&ai().get_alife()->keyvals())->keyvals(name));
+	return (const_cast<CALifeKeyvalRegistry*>(&ai().get_alife()->keyvals())->container(name));
 }
 
 static luabind::object keyvals_list()
