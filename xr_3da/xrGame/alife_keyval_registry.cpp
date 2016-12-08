@@ -10,7 +10,10 @@
 #include "alife_keyval_registry.h"
 #include "alife_space.h"
 #include "script_engine.h"
+#include "script_thread.h"
+#include "script_process.h"
 #include "ai_space.h"
+#include "../../xrLua/lua_tools.h"
 
 static void serialize(IWriter &memory_stream, const luabind::object& object)
 {
@@ -113,8 +116,20 @@ static void deserialize(IReader &memory_stream, luabind::object& container)
 	}
 }
 
+lua_State* getCurrentLuaState()
+{
+	CScriptThread *luaThread=ai().script_engine().current_thread();
+	lua_State* lua;
+	if (luaThread)
+		lua=luaThread->lua();
+	else
+		lua=ai().script_engine().lua();
+	return lua;
+}
+
 CALifeKeyvalContainer::CALifeKeyvalContainer()
 {
+
 }
 
 CALifeKeyvalContainer::~CALifeKeyvalContainer	()
@@ -218,7 +233,8 @@ void CALifeKeyvalContainer::clear()
 
 luabind::object CALifeKeyvalContainer::list()
 {
-	luabind::object array = luabind::newtable(ai().script_engine().lua());
+	//luabind::object array = luabind::newtable(ai().script_engine().lua()lua());
+	luabind::object array = luabind::newtable(getCurrentLuaState());
 
 	int ai = 1;
 	for(auto i = m_keyvals.begin(); i != m_keyvals.end(); ++i)
@@ -246,7 +262,8 @@ u32 CALifeKeyvalContainer::load(IReader &memory_stream)
 { 
 	m_keyvals.clear();
 	u32 count = memory_stream.r_u32();
-	lua_State* L = ai().script_engine().lua();
+	//lua_State* L = ai().script_engine().lua();
+	lua_State* L = getCurrentLuaState();
 	for (u32 i = 0; i < count; ++i) 
 	{
 		shared_str key;
@@ -366,7 +383,8 @@ void CALifeKeyvalRegistry::remove(LPCSTR key)
 
 luabind::object CALifeKeyvalRegistry::list()
 {
-	luabind::object array = luabind::newtable(ai().script_engine().lua());
+	//luabind::object array = luabind::newtable(ai().script_engine().lua());
+	luabind::object array = luabind::newtable(getCurrentLuaState());
 
 	int ai = 1;
 	for(auto i = m_specific.begin(); i != m_specific.end(); ++i)
