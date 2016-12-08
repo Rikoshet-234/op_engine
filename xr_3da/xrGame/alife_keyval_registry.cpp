@@ -13,7 +13,7 @@
 #include "script_thread.h"
 #include "script_process.h"
 #include "ai_space.h"
-#include "../../xrLua/lua_tools.h"
+
 
 static void serialize(IWriter &memory_stream, const luabind::object& object)
 {

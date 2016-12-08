@@ -30,7 +30,7 @@ public:
 
 protected:
 	TKeyVals m_keyvals;
-	lua_State *lua;  
+	
 public:
 	CALifeKeyvalContainer();
 	virtual ~CALifeKeyvalContainer();
