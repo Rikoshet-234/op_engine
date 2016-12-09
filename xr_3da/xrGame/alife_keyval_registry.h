@@ -70,7 +70,7 @@ public:
 	void save(IWriter &memory_stream);
 	void load(IReader &memory_stream);
 
-	CALifeKeyvalContainer* keyvals(LPCSTR name);
+	CALifeKeyvalContainer* container(LPCSTR name);
 	void remove(LPCSTR key);
 	luabind::object list();
 
