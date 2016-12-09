@@ -233,7 +233,6 @@ void CALifeKeyvalContainer::clear()
 
 luabind::object CALifeKeyvalContainer::list()
 {
-	//luabind::object array = luabind::newtable(ai().script_engine().lua()lua());
 	luabind::object array = luabind::newtable(getCurrentLuaState());
 
 	int ai = 1;
@@ -262,7 +261,6 @@ u32 CALifeKeyvalContainer::load(IReader &memory_stream)
 { 
 	m_keyvals.clear();
 	u32 count = memory_stream.r_u32();
-	//lua_State* L = ai().script_engine().lua();
 	lua_State* L = getCurrentLuaState();
 	for (u32 i = 0; i < count; ++i) 
 	{
@@ -383,7 +381,6 @@ void CALifeKeyvalRegistry::remove(LPCSTR key)
 
 luabind::object CALifeKeyvalRegistry::list()
 {
-	//luabind::object array = luabind::newtable(ai().script_engine().lua());
 	luabind::object array = luabind::newtable(getCurrentLuaState());
 
 	int ai = 1;
@@ -403,3 +400,4 @@ void CALifeKeyvalRegistry::removeall()
 	}
 	m_specific.clear();
 }
+
