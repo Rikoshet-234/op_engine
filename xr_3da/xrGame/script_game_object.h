@@ -197,6 +197,7 @@ public:
 			_DECLARE_FUNCTION10	(IsCar					,			bool);
 			_DECLARE_FUNCTION10	(IsHeli					,			bool);
 			_DECLARE_FUNCTION10	(IsEntityAlive			,			bool);
+			_DECLARE_FUNCTION10	(IsArtefact				,			bool);
 
 			CScriptEntityAction	*GetCurrentAction	() const;
 			void				AddAction			(const CScriptEntityAction *tpEntityAction, bool bHighPriority = false);

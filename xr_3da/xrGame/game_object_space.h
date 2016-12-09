@@ -61,6 +61,7 @@ namespace GameObject {
 		eOnCellItemDrop,
 		eOnCellItemAfterSelect,
 
+		OnInventoryItemPlaceChange,
 		eDummy = u32(-1),
 	};
 };

@@ -269,6 +269,7 @@ class_<CScriptGameObject> &script_register_game_object2(class_<CScriptGameObject
 		.def("is_car",						&CScriptGameObject::IsCar)
 		.def("is_helicopter",				&CScriptGameObject::IsHeli)
 		.def("is_entity_alive",				&CScriptGameObject::IsEntityAlive)
+		.def("is_artefact",					&CScriptGameObject::IsArtefact)
 
 
 		

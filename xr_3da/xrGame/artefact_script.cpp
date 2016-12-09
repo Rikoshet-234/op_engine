@@ -21,6 +21,9 @@ void CArtefact::script_register(lua_State *L)
 {
 	module(L)
 	[
+		class_<CArtefact, CGameObject>("CArtefact")
+		.def("get_immunities",		&CArtefact::GetImmunitiesTable),
+
 		class_<CMercuryBall			,CGameObject>("CMercuryBall").def		(constructor<>()),
 		class_<CBlackDrops			,CGameObject>("CBlackDrops").def		(constructor<>()),
 		class_<CBlackGraviArtefact	,CGameObject>("CBlackGraviArtefact").def(constructor<>()),

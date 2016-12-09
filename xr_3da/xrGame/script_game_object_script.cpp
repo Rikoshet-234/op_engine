@@ -13,6 +13,7 @@
 #include "sight_manager_space.h"
 #include "ui/UICellItem.h"
 #include "GameObject.h"
+#include "Inventory.h"
 
 using namespace luabind;
 
@@ -77,7 +78,7 @@ void CScriptGameObject::script_register(lua_State *L)
 		class_<CInventoryItem>("CInventoryItem")
 		.def("Name",				&CInventoryItem::Name)
 		.def("GetGameObject",		&CInventoryItem::GetGameObject),
-
+	
 		class_<enum_exporter<InventorySlots> >("inventory_slots")
 		.enum_("inventory_slots")
 			[
@@ -99,6 +100,16 @@ void CScriptGameObject::script_register(lua_State *L)
 				value("BIODEV",			int(InventorySlots::BIODEV))
 			],
 
+		class_<enum_exporter<CInventory::InventoryItemPlaceChange>>("item_place_change")
+			.enum_("item_place_change")
+				[
+					value("REMOVE_FROM_RUCK",				int(CInventory::removeFromRuck)),
+					value("REMOVE_FROM_SLOT",				int(CInventory::removeFromSlot)),
+					value("REMOVE_FROM_BELT",				int(CInventory::removeFromBelt)),
+					value("PUT_TO_SLOT",					int(CInventory::putToSlot)),
+					value("PUT_TO_BELT",					int(CInventory::putToBelt)),
+					value("PUT_TO_RUCK",					int(CInventory::putToRuck))
+				],
 		class_<enum_exporter<GameObject::ECallbackType> >("callback")
 			.enum_("callback_types")
 			[
@@ -140,7 +151,8 @@ void CScriptGameObject::script_register(lua_State *L)
 				value("on_actor_weapon_fire",		int(GameObject::eOnActorWeaponFire)),
 				value("on_object_hit",				int(GameObject::eOnObjectHit)),
 				value("on_cell_after_select",		int(GameObject::eOnCellItemAfterSelect)),
-				value("on_cell_item_drop",			int(GameObject::eOnCellItemDrop))
+				value("on_cell_item_drop",			int(GameObject::eOnCellItemDrop)),
+				value("on_item_place_change",		int(GameObject::OnInventoryItemPlaceChange))
 				//value("on_inv_prop_show",		int(GameObject::eOnInventoryShowPropBox))
 
 			],

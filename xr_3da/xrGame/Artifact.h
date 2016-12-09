@@ -75,6 +75,7 @@ public:
 	float							m_art_additional_weight;
 	CHitImmunity 					m_ArtefactHitImmunities;
 
+	luabind::object					GetImmunitiesTable();
 protected:
 	MotionSVec						m_anim_idle;
 	MotionSVec						m_anim_idle_sprint;

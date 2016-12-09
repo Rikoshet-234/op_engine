@@ -19,6 +19,7 @@
 #include "sight_control_action.h"
 #include "sight_manager.h"
 #include "inventoryBox.h"
+#include "Artifact.h"
 class CWeapon;
 
 //////////////////////////////////////////////////////////////////////////
@@ -240,6 +241,7 @@ TEST_OBJECT_CLASS(CScriptGameObject::IsGameObject,			CGameObject)
 TEST_OBJECT_CLASS(CScriptGameObject::IsCar,					CCar)
 TEST_OBJECT_CLASS(CScriptGameObject::IsHeli,				CHelicopter)
 TEST_OBJECT_CLASS(CScriptGameObject::IsEntityAlive,			CEntityAlive)
+TEST_OBJECT_CLASS(CScriptGameObject::IsArtefact,			CArtefact)
 
 		
 		

@@ -173,4 +173,15 @@ protected:
 	bool				m_drop_last_frame;
 
 	void				SendActionEvent		(s32 cmd, u32 flags);
+
+public:
+	enum InventoryItemPlaceChange
+	{
+		removeFromRuck,
+		removeFromSlot,
+		removeFromBelt,
+		putToSlot,
+		putToBelt,
+		putToRuck
+	};
 };
