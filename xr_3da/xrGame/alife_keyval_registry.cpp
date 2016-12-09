@@ -10,10 +10,10 @@
 #include "alife_keyval_registry.h"
 #include "alife_space.h"
 #include "script_engine.h"
-#include "script_thread.h"
-#include "script_process.h"
 #include "ai_space.h"
 
+#define KEYVALS_V0 ((u8)0)
+#define CURRENT_KEYVALS_VERSION KEYVALS_V0
 
 static void serialize(IWriter &memory_stream, const luabind::object& object)
 {
@@ -127,9 +127,9 @@ lua_State* getCurrentLuaState()
 	return lua;
 }
 
+
 CALifeKeyvalContainer::CALifeKeyvalContainer()
 {
-
 }
 
 CALifeKeyvalContainer::~CALifeKeyvalContainer	()
@@ -289,7 +289,7 @@ void CALifeKeyvalRegistry::save(IWriter &memory_stream)
 	u32 count = 0;
 
 	memory_stream.open_chunk(KEYVAL_CHUNK_DATA);
-	
+	memory_stream.w_u8(CURRENT_KEYVALS_VERSION);
 	memory_stream.w_u32(u32(m_specific.size() + 1));//! Reserve space for # of containers
 	count += m_generic.save(memory_stream);
 	for (auto i = m_specific.begin(); i != m_specific.end(); ++i)
@@ -313,26 +313,39 @@ void CALifeKeyvalRegistry::load(IReader &memory_stream)
 	u32 countPairs = 0;
 	if (memory_stream.find_chunk(KEYVAL_CHUNK_DATA))
 	{
-		u32 count = memory_stream.r_u32();
-		if (count>0)
+		u8 version = memory_stream.r_u8();
+		R_ASSERT2(version <= CURRENT_KEYVALS_VERSION, "[keyvals] Can't load save with newer version of keyvals registry");
+		
+		if (version == KEYVALS_V0)
 		{
-			countPairs += m_generic.load(memory_stream);
-			for (--count; count > 0; --count) 
+			u32 count = memory_stream.r_u32();
+			if (count > 0)
 			{
-				shared_str key;
-				memory_stream.r_stringZ(key);
+				countPairs += m_generic.load(memory_stream);
+				for (--count; count > 0; --count) 
+				{
+					shared_str key;
+					memory_stream.r_stringZ(key);
 			
-				CALifeKeyvalContainer* container = xr_new<CALifeKeyvalContainer>();
-				countPairs += container->load(memory_stream);
-				m_specific.insert(TKeyValContainers::value_type(key._get()->dwCRC, SKeyContItem(key, container)));
+					CALifeKeyvalContainer* container = xr_new<CALifeKeyvalContainer>();
+					countPairs += container->load(memory_stream);
+					m_specific.insert(TKeyValContainers::value_type(key._get()->dwCRC, SKeyContItem(key, container)));
+				}
 			}
+			else
+			{
+				//! Chunk is empty
+			}
+		}
+		else //! Loaders for older versions
+		{
 		}
 	}
 
 	Msg("* %u key-value pairs were successfully loaded (%2.3fs)", countPairs, t.GetElapsed_sec());
 }
 
-CALifeKeyvalContainer* CALifeKeyvalRegistry::keyvals(LPCSTR name)
+CALifeKeyvalContainer* CALifeKeyvalRegistry::container(LPCSTR name)
 { 
 	CALifeKeyvalContainer* container = nullptr;
 	if (name == nullptr)
@@ -400,4 +413,3 @@ void CALifeKeyvalRegistry::removeall()
 	}
 	m_specific.clear();
 }
-
