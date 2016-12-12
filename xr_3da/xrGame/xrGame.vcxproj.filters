@@ -2305,6 +2305,9 @@
     <Filter Include="AI\ALife\simulator_base\registries\keyval_registry">
       <UniqueIdentifier>{aea9068d-7f5f-47c2-ab84-9bb38c84f957}</UniqueIdentifier>
     </Filter>
+    <Filter Include="AI\AScript\ScriptClasses\ScriptGameObject\enums">
+      <UniqueIdentifier>{13f790bb-3d5f-4986-8e7f-1deb8e967ffa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mt_config.h">
@@ -6591,6 +6594,12 @@
     <ClInclude Include="alife_keyval_registry.h">
       <Filter>AI\ALife\simulator_base\registries\keyval_registry</Filter>
     </ClInclude>
+    <ClInclude Include="item_place_change_enum.h">
+      <Filter>AI\AScript\ScriptClasses\ScriptGameObject\enums</Filter>
+    </ClInclude>
+    <ClInclude Include="inventory_slots_script_enum.h">
+      <Filter>AI\AScript\ScriptClasses\ScriptGameObject\enums</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -9766,6 +9775,15 @@
     </ClCompile>
     <ClCompile Include="alife_keyval_registry_script.cpp">
       <Filter>AI\ALife\simulator_base\registries\keyval_registry</Filter>
+    </ClCompile>
+    <ClCompile Include="script_game_object_script4.cpp">
+      <Filter>AI\AScript\ScriptClasses\ScriptGameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="item_place_change_enum_script.cpp">
+      <Filter>AI\AScript\ScriptClasses\ScriptGameObject\enums</Filter>
+    </ClCompile>
+    <ClCompile Include="inventory_slots_script_enum_script.cpp">
+      <Filter>AI\AScript\ScriptClasses\ScriptGameObject\enums</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

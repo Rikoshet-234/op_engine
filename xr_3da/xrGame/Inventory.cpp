@@ -18,6 +18,7 @@
 #include "clsid_game.h"
 #include "game_object_space.h"
 #include "script_callback_ex.h"
+#include "item_place_change_enum.h"
 
 using namespace InventoryUtilities;
 
@@ -262,7 +263,7 @@ bool CInventory::DropItem(CGameObject *pObj)
 	return							true;
 }
 
-void callMovingCallback(CInventoryItem* item,CInventory::InventoryItemPlaceChange placeChangeId)
+void callMovingCallback(CInventoryItem* item,InventoryPlaceChange::EnumItemPlaceChange placeChangeId)
 {
 	CObject* parent=item->object().H_Parent();
 	if (parent)
@@ -305,13 +306,13 @@ bool CInventory::Slot(PIItem pIItem, bool bNotActivate)
 	if(m_ruck.end() != it) 
 	{
 			m_ruck.erase(it);
-			callMovingCallback(pIItem,InventoryItemPlaceChange::removeFromRuck);
+			callMovingCallback(pIItem,InventoryPlaceChange::removeFromRuck);
 	}
 	it = std::find(m_belt.begin(), m_belt.end(), pIItem);
 	if(m_belt.end() != it) 
 	{
 			m_belt.erase(it);
-			callMovingCallback(pIItem,InventoryItemPlaceChange::removeFromBelt);
+			callMovingCallback(pIItem,InventoryPlaceChange::removeFromBelt);
 	}
 
 
@@ -326,7 +327,7 @@ bool CInventory::Slot(PIItem pIItem, bool bNotActivate)
 	
 	pIItem->object().processing_activate();
 
-	callMovingCallback(pIItem,InventoryItemPlaceChange::putToSlot);
+	callMovingCallback(pIItem,InventoryPlaceChange::putToSlot);
 	return						true;
 }
 
@@ -349,7 +350,7 @@ bool CInventory::Belt(PIItem pIItem)
 	{
 		if(m_iActiveSlot == pIItem->GetSlot()) Activate(NO_ACTIVE_SLOT);
 		m_slots[pIItem->GetSlot()].m_pIItem = nullptr;
-		callMovingCallback(pIItem,InventoryItemPlaceChange::removeFromSlot);
+		callMovingCallback(pIItem,InventoryPlaceChange::removeFromSlot);
 	}
 	
 	m_belt.insert(m_belt.end(), pIItem); 
@@ -360,7 +361,7 @@ bool CInventory::Belt(PIItem pIItem)
 		if(m_ruck.end() != it) 
 		{
 				m_ruck.erase(it);
-				callMovingCallback(pIItem,InventoryItemPlaceChange::removeFromRuck);
+				callMovingCallback(pIItem,InventoryPlaceChange::removeFromRuck);
 		}
 	}
 
@@ -375,7 +376,7 @@ bool CInventory::Belt(PIItem pIItem)
 	if(in_slot)
 		pIItem->object().processing_deactivate();
 	pIItem->object().processing_activate();
-	callMovingCallback(pIItem,InventoryItemPlaceChange::putToBelt);
+	callMovingCallback(pIItem,InventoryPlaceChange::putToBelt);
 	return true;
 }
 
@@ -389,7 +390,7 @@ bool CInventory::Ruck(PIItem pIItem)
 	{
 		if(m_iActiveSlot == pIItem->GetSlot()) Activate(NO_ACTIVE_SLOT);
 		m_slots[pIItem->GetSlot()].m_pIItem = nullptr;
-		callMovingCallback(pIItem,InventoryItemPlaceChange::removeFromSlot);
+		callMovingCallback(pIItem,InventoryPlaceChange::removeFromSlot);
 	}
 	else
 	{
@@ -398,7 +399,7 @@ bool CInventory::Ruck(PIItem pIItem)
 		if(m_belt.end() != it) 
 		{
 			m_belt.erase(it);
-			callMovingCallback(pIItem,InventoryItemPlaceChange::removeFromBelt);
+			callMovingCallback(pIItem,InventoryPlaceChange::removeFromBelt);
 		}
 	}
 	
@@ -417,7 +418,7 @@ bool CInventory::Ruck(PIItem pIItem)
 
 	if(in_slot)
 		pIItem->object().processing_deactivate();
-	callMovingCallback(pIItem,InventoryItemPlaceChange::putToRuck);
+	callMovingCallback(pIItem,InventoryPlaceChange::putToRuck);
 	return true;
 }
 
@@ -1017,7 +1018,9 @@ bool CInventory::Eat(PIItem pIItem)
 
 		CGameObject::u_EventGen		(P,GE_DESTROY,pIItem->object().ID());
 		CGameObject::u_EventSend	(P);
-
+		
+		callMovingCallback(pIItem,InventoryPlaceChange::removeFromRuck);
+		
 		return		false;
 	}
 	return			true;

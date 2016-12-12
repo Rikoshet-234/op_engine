@@ -281,7 +281,7 @@ public:
 			void				IterateInventoryOnlyFunctor	(luabind::functor<void> functor);
 			void				IterateInventorySimple	(luabind::functor<void> functor);
 			bool				actor_is_crouch() const;
-			void				actor_set_crouch();
+			void				actor_set_crouch() const;
 
 			void				MarkItemDropped		(CScriptGameObject *item);
 			bool				MarkedDropped		(CScriptGameObject *item);
@@ -576,7 +576,7 @@ public:
 			float				GetActorMaxWeight					() const;
 			float				GetTotalWeight						() const;
 			float				Weight								() const;
-			float				GetSlot() const;
+			u32					GetSlot() const;
 
 			bool				ItemInBelt(CScriptGameObject* itemObj) const;
 			bool				ItemInBelt(LPCSTR itemSection) const;
@@ -587,6 +587,8 @@ public:
 			void				IterateBeltOnlyFunctor(luabind::functor<void> functor);
 			void				IterateRuckOnlyFunctor(luabind::functor<void> functor);
 			LPCSTR				GetVisualName() const;
+			luabind::object		GetImmunitiesTable() const;
+			luabind::object		GetImmunitiesFromBeltTable() const;
 
 	DECLARE_SCRIPT_REGISTER_FUNCTION
 };

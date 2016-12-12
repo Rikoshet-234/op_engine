@@ -174,14 +174,4 @@ protected:
 
 	void				SendActionEvent		(s32 cmd, u32 flags);
 
-public:
-	enum InventoryItemPlaceChange
-	{
-		removeFromRuck,
-		removeFromSlot,
-		removeFromBelt,
-		putToSlot,
-		putToBelt,
-		putToRuck
-	};
 };

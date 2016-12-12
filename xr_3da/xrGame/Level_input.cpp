@@ -16,13 +16,14 @@
 #include "WeaponHUD.h"
 #include "xrServer.h"
 #include "autosave_manager.h"
-
+#include "game_object_space.h"
 #include "actor.h"
 #include "huditem.h"
 #include "ui/UIDialogWnd.h"
 #include "clsid_game.h"
 #include "../xr_input.h"
 #include "saved_game_wrapper.h"
+#include "script_callback_ex.h"
 
 #ifdef DEBUG
 #	include "ai/monsters/BaseMonster/base_monster.h"
@@ -97,6 +98,10 @@ extern bool g_block_pause;
 void CLevel::IR_OnKeyboardPress	(int key)
 {
 	bool b_ui_exist = (pHUD && pHUD->GetUI());
+
+	if (!g_bDisableAllInput)
+		if (Actor())
+			Actor()->callback(GameObject::ECallbackType::OnKeyboardPress)(key,get_binded_action(key));
 
 //.	if (DIK_F10 == key)		vtune.enable();
 //.	if (DIK_F11 == key)		vtune.disable();

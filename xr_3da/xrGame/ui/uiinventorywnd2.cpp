@@ -382,7 +382,7 @@ bool CUIInventoryWnd::OnItemDrop(CUICellItem* itm)
 				AttachAddon(weapon);
 				processed=true;
 			} 
-			else if (pAmmo!=nullptr && weapon->CanLoadAmmo(pAmmo))
+			else if (pAmmo!=nullptr && weapon->CanLoadAmmo(pAmmo,true))
 			{
 				if (g_uCommonFlags.test(invReloadWeapon))
 					weapon->LoadAmmo(pAmmo);
@@ -407,7 +407,7 @@ bool CUIInventoryWnd::OnItemDrop(CUICellItem* itm)
 				if (weapon)
 				{
 					CWeaponAmmo*		pAmmo				= smart_cast<CWeaponAmmo*>		(draggedItem);
-					if (pAmmo!=nullptr && weapon->CanLoadAmmo(pAmmo))
+					if (pAmmo!=nullptr && weapon->CanLoadAmmo(pAmmo,true))
 					{
 						if (g_uCommonFlags.test(invReloadWeapon))
 							weapon->LoadAmmo(pAmmo);
@@ -456,15 +456,22 @@ bool CUIInventoryWnd::OnItemDbClick(CUICellItem* itm)
 			CWeaponAmmo* ammo=smart_cast<CWeaponAmmo*>(invItem);
 			CInventoryItem *pistol=m_pInv->m_slots[PISTOL_SLOT].m_pIItem;
 			CInventoryItem *rifle=m_pInv->m_slots[RIFLE_SLOT].m_pIItem;
+			CInventoryItem *shotgun=m_pInv->m_slots[SHOTGUN_SLOT].m_pIItem;
 			if (ammo)
 			{				
-				if (pistol != nullptr && pistol->CanLoadAmmo(ammo))
+				if (pistol != nullptr && pistol->CanLoadAmmo(ammo,true))
 				{
 					CWeaponMagazined* weapon=smart_cast<CWeaponMagazined*>(pistol);
 					weapon->LoadAmmo(ammo);
 					break;
 				}
-				if (rifle != nullptr && rifle->CanLoadAmmo(ammo))
+				if (shotgun != nullptr && shotgun->CanLoadAmmo(ammo,true))
+				{
+					CWeaponMagazined* weapon=smart_cast<CWeaponMagazined*>(shotgun);
+					weapon->LoadAmmo(ammo);
+					break;
+				}				
+				if (rifle != nullptr && rifle->CanLoadAmmo(ammo,true))
 				{
 					CWeaponMagazined* weapon=smart_cast<CWeaponMagazined*>(rifle);
 					weapon->LoadAmmo(ammo);
@@ -479,10 +486,17 @@ bool CUIInventoryWnd::OnItemDbClick(CUICellItem* itm)
 			{
 				pistol=smart_cast<CWeaponMagazined*>(pistol);
 				rifle=smart_cast<CWeaponMagazined*>(rifle);
+				shotgun=smart_cast<CWeaponMagazined*>(shotgun);
 				if (pistol!=nullptr && (pistol->CanAttach(pScope) || pistol->CanAttach(pSilencer) || pistol->CanAttach(pGrenadeLauncher)))
 				{
 					SetCurrentItem(itm);
 					AttachAddon(pistol);
+					break;
+				}
+				if (shotgun!=nullptr && (shotgun->CanAttach(pScope) || shotgun->CanAttach(pSilencer) || shotgun->CanAttach(pGrenadeLauncher)))
+				{
+					SetCurrentItem(itm);
+					AttachAddon(shotgun);
 					break;
 				}
 				if (rifle!=nullptr && (rifle->CanAttach(pScope) || rifle->CanAttach(pSilencer) || rifle->CanAttach(pGrenadeLauncher)))

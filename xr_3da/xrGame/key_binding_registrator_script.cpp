@@ -50,7 +50,7 @@ void key_binding_registrator::script_register(lua_State *L)
 				value("kWPN_7",						int(kWPN_7)),
 				value("kWPN_8",						int(kWPN_8)),
 				value("kWPN_NEXT",					int(kWPN_NEXT)),
-//.				value("kWPN_PREV",					int(kWPN_PREV)),
+//				value("kWPN_PREV",					int(kWPN_PREV)),
 				value("kWPN_FIRE",					int(kWPN_FIRE)),
 				value("kWPN_RELOAD",				int(kWPN_RELOAD)),
 				value("kWPN_ZOOM",					int(kWPN_ZOOM)),
@@ -65,7 +65,8 @@ void key_binding_registrator::script_register(lua_State *L)
 				value("kINVENTORY",					int(kINVENTORY)),
 				value("kBUY",						int(kBUY)),
 				value("kSKIN",						int(kSKIN)),
-				value("kTEAM",						int(kTEAM))
+				value("kTEAM",						int(kTEAM)),
+				value("kNOTBINDED",					int(kNOTBINDED))
 			],
 		class_<key_binding_registrator >("DIK_keys")
 			.enum_("dik_keys")

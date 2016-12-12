@@ -36,6 +36,7 @@
 #include "ai/stalker/ai_stalker.h"
 #include "ui/UIMainIngameWnd.h"
 #include "UI.h"
+#include "Artifact.h"
 
 bool CScriptGameObject::GiveInfoPortion(LPCSTR info_id)
 {
@@ -220,17 +221,6 @@ void CScriptGameObject::IterateRuckOnlyFunctor(luabind::functor<void> functor)
 		functor				((*I)->object().lua_game_object());
 }
 
-LPCSTR CScriptGameObject::GetVisualName() const
-{
-	if (!g_pGameLevel)
-	{
-		Msg("Error! CScriptGameObject::GetVisualName : game level doesn't exist. wtf?????");
-		return "";
-	}
-	return	*(object().cNameVisual());
-
-}
-
 void CScriptGameObject::IterateBeltOnlyFunctor(luabind::functor<void> functor) 
 {
 	CInventoryOwner			*inventory_owner = smart_cast<CInventoryOwner*>(&this->object());
@@ -244,33 +234,7 @@ void CScriptGameObject::IterateBeltOnlyFunctor(luabind::functor<void> functor)
 		functor				((*I)->object().lua_game_object());
 }
 
-void CScriptGameObject::actor_set_crouch()
-{
-	CActor* actor= smart_cast<CActor*>(&this->object());
-	if (!actor)
-	{
-		ai().script_engine().script_log		(ScriptStorage::eLuaMessageTypeError,"CActor::set_crouch non-Actor object !!!");
-		return;
-	}
-	extern bool g_bAutoClearCrouch;
-	g_bAutoClearCrouch=false;
-	actor->character_physics_support()->movement()->EnableCharacter();
-	actor->character_physics_support()->movement()->ActivateBoxDynamic(1);
-	actor->set_state(actor->get_state() | mcCrouch);
-	actor->set_state_wishful(actor->get_state_wishful() | mcCrouch);
-	HUD().GetUI()->UIMainIngameWnd->MotionIcon().ShowState(CUIMotionIcon::stCrouch);
-}
 
-bool CScriptGameObject::actor_is_crouch() const
-{
-	CActor* actor= smart_cast<CActor*>(&this->object());
-	if (!actor)
-	{
-		ai().script_engine().script_log		(ScriptStorage::eLuaMessageTypeError,"CActor::is_crouch non-Actor object !!!");
-		return false;
-	}
-	return !!(actor->get_state()&mcCrouch);
-}
 
 void CScriptGameObject::IterateInventorySimple	(luabind::functor<void> functor)
 {

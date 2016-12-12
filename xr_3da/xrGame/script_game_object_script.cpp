@@ -11,6 +11,7 @@
 #include "game_object_space.h"
 #include "script_ini_file.h"
 #include "sight_manager_space.h"
+#include "inventory_space.h"
 #include "ui/UICellItem.h"
 #include "GameObject.h"
 #include "Inventory.h"
@@ -19,27 +20,9 @@ using namespace luabind;
 
 extern class_<CScriptGameObject> &script_register_game_object1(class_<CScriptGameObject> &);
 extern class_<CScriptGameObject> &script_register_game_object2(class_<CScriptGameObject> &);
+extern class_<CScriptGameObject> &script_register_game_object3(class_<CScriptGameObject> &);
 extern class_<CScriptGameObject> &script_register_game_object_trader(class_<CScriptGameObject> &);
 
-enum InventorySlots //for export to scripts
-{
-	KNIFE			=	KNIFE_SLOT,		
-	PISTOL			=	PISTOL_SLOT,
-	RIFLE			=	RIFLE_SLOT,
-	GRENADE			=	GRENADE_SLOT,
-	APPARATUS		=	APPARATUS_SLOT,
-	BOLT			=	BOLT_SLOT,
-	OUTFIT			=	OUTFIT_SLOT,
-	PDA				=	PDA_SLOT,
-	DETECTOR_ARTS	=	DETECTOR_ARTS_SLOT,
-	DETECTOR_ANOMS	=	DETECTOR_ANOM_SLOT,
-	TORCH			=	TORCH_SLOT,
-	ARTEFACT		=	ARTEFACT_SLOT,
-	PNV				=	PNV_SLOT,
-	SHOTGUN			=	SHOTGUN_SLOT,
-	BIODEV			=	BIODEV_SLOT,
-	NO_ACT_SLOT		=	NO_ACTIVE_SLOT
-};
 
 #pragma optimize("s",on)
 void CScriptGameObject::script_register(lua_State *L)
@@ -68,48 +51,15 @@ void CScriptGameObject::script_register(lua_State *L)
 			.def_readonly("m_object",		&CSightParams::m_object)
 			.def_readonly("m_vector",		&CSightParams::m_vector)
 			.def_readonly("m_sight_type",	&CSightParams::m_sight_type),
-		
-		script_register_game_object2(
-			script_register_game_object1(
-				script_register_game_object_trader(instance)
+
+		script_register_game_object3(
+			script_register_game_object2(
+				script_register_game_object1(
+					script_register_game_object_trader(instance)
+				)
 			)
 		),
 
-		class_<CInventoryItem>("CInventoryItem")
-		.def("Name",				&CInventoryItem::Name)
-		.def("GetGameObject",		&CInventoryItem::GetGameObject),
-	
-		class_<enum_exporter<InventorySlots> >("inventory_slots")
-		.enum_("inventory_slots")
-			[
-				value("NO_ACT_SLOT",	int(InventorySlots::NO_ACT_SLOT)),
-				value("KNIFE",			int(InventorySlots::KNIFE)),
-				value("PISTOL",			int(InventorySlots::PISTOL)),
-				value("RIFLE",			int(InventorySlots::RIFLE)),
-				value("GRENADE",		int(InventorySlots::GRENADE)),
-				value("APPARATUS",		int(InventorySlots::APPARATUS)),
-				value("BOLT",			int(InventorySlots::BOLT)),
-				value("OUTFIT",			int(InventorySlots::OUTFIT)),
-				value("PDA",			int(InventorySlots::PDA)),
-				value("DETECTOR_ARTS",	int(InventorySlots::DETECTOR_ARTS)),
-				value("DETECTOR_ANOMS",	int(InventorySlots::DETECTOR_ANOMS)),
-				value("TORCH",			int(InventorySlots::TORCH)),
-				value("ARTEFACT",		int(InventorySlots::ARTEFACT)),
-				value("PNV",			int(InventorySlots::PNV)),
-				value("SHOTGUN",		int(InventorySlots::SHOTGUN)),
-				value("BIODEV",			int(InventorySlots::BIODEV))
-			],
-
-		class_<enum_exporter<CInventory::InventoryItemPlaceChange>>("item_place_change")
-			.enum_("item_place_change")
-				[
-					value("REMOVE_FROM_RUCK",				int(CInventory::removeFromRuck)),
-					value("REMOVE_FROM_SLOT",				int(CInventory::removeFromSlot)),
-					value("REMOVE_FROM_BELT",				int(CInventory::removeFromBelt)),
-					value("PUT_TO_SLOT",					int(CInventory::putToSlot)),
-					value("PUT_TO_BELT",					int(CInventory::putToBelt)),
-					value("PUT_TO_RUCK",					int(CInventory::putToRuck))
-				],
 		class_<enum_exporter<GameObject::ECallbackType> >("callback")
 			.enum_("callback_types")
 			[
@@ -152,7 +102,8 @@ void CScriptGameObject::script_register(lua_State *L)
 				value("on_object_hit",				int(GameObject::eOnObjectHit)),
 				value("on_cell_after_select",		int(GameObject::eOnCellItemAfterSelect)),
 				value("on_cell_item_drop",			int(GameObject::eOnCellItemDrop)),
-				value("on_item_place_change",		int(GameObject::OnInventoryItemPlaceChange))
+				value("on_item_place_change",		int(GameObject::OnInventoryItemPlaceChange)),
+				value("on_keyboard_press",			int(GameObject::OnKeyboardPress))
 				//value("on_inv_prop_show",		int(GameObject::eOnInventoryShowPropBox))
 
 			],

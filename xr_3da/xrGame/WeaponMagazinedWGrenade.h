@@ -35,7 +35,7 @@ public:
 	virtual bool	UseScopeTexture();
 	virtual	float	CurrentZoomFactor	();
 	void			LoadAmmo			(CWeaponAmmo *pAmmo) override;
-	bool			CanLoadAmmo			(CWeaponAmmo *pAmmo) override;
+	bool			CanLoadAmmo			(CWeaponAmmo *pAmmo,bool checkFullMagazine=false) override;
 
 	virtual void	OnStateSwitch	(u32 S);
 	

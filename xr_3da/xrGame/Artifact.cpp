@@ -406,15 +406,6 @@ void CArtefact::OnStateSwitch		(u32 S)
 	};
 }
 
-luabind::object CArtefact::GetImmunitiesTable()
-{
-	luabind::object immunities = luabind::newtable(ai().script_engine().lua());
-	HitImmunity::HitTypeSVec hitVector=this->m_ArtefactHitImmunities.GetHitTypeVec();
-	for (HitImmunity::HitTypeSVec::iterator it=hitVector.begin();it!=hitVector.end();++it)
-		if (*it!=1.0f)
-			immunities[std::distance(hitVector.begin(),it)]=*it;
-	return immunities;
-}
 
 void CArtefact::PlayAnimIdle()
 {

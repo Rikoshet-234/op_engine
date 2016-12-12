@@ -10,6 +10,7 @@
 #include "alife_keyval_registry.h"
 #include "alife_space.h"
 #include "script_engine.h"
+#include "script_thread.h"
 #include "ai_space.h"
 
 #define KEYVALS_V0 ((u8)0)

@@ -40,6 +40,7 @@ enum EItemPlace
 	eItemPlaceRuck
 };
 
+
 extern u32	INV_STATE_LADDER;
 extern u32	INV_STATE_CAR;
 extern u32	INV_STATE_BLOCK_ALL;

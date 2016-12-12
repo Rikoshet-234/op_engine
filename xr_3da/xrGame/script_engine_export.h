@@ -162,4 +162,6 @@
 #	include "ai/trader/ai_trader.h"
 #	include "space_restrictor.h"
 #	include "physicobject.h"
+#	include "item_place_change_enum.h"
+#	include "inventory_slots_script_enum.h"
 #endif

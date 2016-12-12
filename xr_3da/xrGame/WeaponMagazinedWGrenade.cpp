@@ -649,7 +649,7 @@ void CWeaponMagazinedWGrenade::LoadAmmo(CWeaponAmmo* pAmmo)
 		PlayEmptySnd();
 		return;
 	}
-	else // подствольник выключен
+	else // подствольник включен
 	{
 		if (!ammo1 && ammo2) // б/п найдены в списке патронов
 		{
@@ -683,12 +683,21 @@ void CWeaponMagazinedWGrenade::LoadAmmo(CWeaponAmmo* pAmmo)
 }
 
 
-bool CWeaponMagazinedWGrenade::CanLoadAmmo(CWeaponAmmo* pAmmo)
+bool CWeaponMagazinedWGrenade::CanLoadAmmo(CWeaponAmmo* pAmmo,bool checkFullMagazine)
 {
 	bool grAllowed=false;
 	if (!pAmmo) return grAllowed;
-	bool ammo1=std::find(m_ammoTypes.begin(),m_ammoTypes.end(),pAmmo->cNameSect())!=m_ammoTypes.end();
+	bool switchBack=false;
+	if (m_bGrenadeMode)
+	{
+		switchBack=true;
+		PerformSwitchGL();
+	}
+	bool ammo1=inherited::CanLoadAmmo(pAmmo,checkFullMagazine);
+	//bool ammo1=std::find(m_ammoTypes.begin(),m_ammoTypes.end(),pAmmo->cNameSect())!=m_ammoTypes.end();
 	bool ammo2=std::find(m_ammoTypes2.begin(),m_ammoTypes2.end(),pAmmo->cNameSect())!=m_ammoTypes2.end();
+	if (switchBack)
+		PerformSwitchGL();
 	return ammo1 || (ammo2 && GrenadeLauncherAttachable());
 }
 

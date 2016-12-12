@@ -40,6 +40,7 @@ enum	EGameActions
 	kWPN_8,
 	kARTEFACT,
 	kWPN_NEXT,
+//	kWPN_PREV,
 	kWPN_FIRE,
 	kWPN_ZOOM,
 	kWPN_ZOOM_INC,

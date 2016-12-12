@@ -36,6 +36,32 @@ void CUIInventoryWnd::EatItem(PIItem itm)
 #include "../Medkit.h"
 #include "../Antirad.h"
 
+void CUIInventoryWnd::AddWeaponAttachInfo(u32 slot,CInventoryItem* addon,std::string titleId,bool& needShow)
+{
+	if(m_pInv->m_slots[slot].m_pIItem != NULL && m_pInv->m_slots[slot].m_pIItem->CanAttach(addon))
+	{
+		PIItem target = m_pInv->m_slots[slot].m_pIItem;
+		std::string title=OPFuncs::getComplexString(titleId,addon);
+		string512 buf;
+		sprintf_s(buf,"%s %s %s",OPFuncs::getComplexString(titleId,addon).c_str(),CStringTable().translate("st_attach_between").c_str(),target->Name());
+		UIPropertiesBox.AddItem(buf,  static_cast<void*>(target), INVENTORY_ATTACH_ADDON);
+		if (!needShow)
+			needShow = true;
+	}
+}
+
+void CUIInventoryWnd::AddLoadAmmoWeaponInfo(u32 slot,CWeaponAmmo* ammo,bool& needShow)
+{
+	auto slotWeapon=m_pInv->m_slots[slot].m_pIItem;
+	if (slotWeapon != NULL && slotWeapon->CanLoadAmmo(ammo,true))
+	{
+		CWeaponMagazined* weapon=smart_cast<CWeaponMagazined*>(slotWeapon);
+		UIPropertiesBox.AddItem(OPFuncs::getComplexString("st_load_ammo",weapon).c_str(),  weapon, INVENTORY_LOAD_MAGAZINE);
+		if (!needShow)
+			needShow=true;
+	}
+}
+
 void CUIInventoryWnd::ActivatePropertiesBox()
 {
 	// Флаг-признак для невлючения пункта контекстного меню: Dreess Outfit, если костюм уже надет
@@ -136,67 +162,31 @@ void CUIInventoryWnd::ActivatePropertiesBox()
 		}
 	}
 	
-	//присоединение аддонов к активному слоту (2 или 3)
+	//присоединение аддонов к активному слоту 
 	if(pScope)
 	{
-		if(m_pInv->m_slots[PISTOL_SLOT].m_pIItem != NULL &&
-		   m_pInv->m_slots[PISTOL_SLOT].m_pIItem->CanAttach(pScope))
-		 {
-			PIItem tgt = m_pInv->m_slots[PISTOL_SLOT].m_pIItem;
-			UIPropertiesBox.AddItem(OPFuncs::getComplexString("st_attach_scope_to_pistol",pScope).c_str(),  static_cast<void*>(tgt), INVENTORY_ATTACH_ADDON);
-			b_show			= true;
-		 }
-		 if(m_pInv->m_slots[RIFLE_SLOT].m_pIItem != NULL &&
-			m_pInv->m_slots[RIFLE_SLOT].m_pIItem->CanAttach(pScope))
-		 {
-			PIItem tgt = m_pInv->m_slots[RIFLE_SLOT].m_pIItem;
-			UIPropertiesBox.AddItem(OPFuncs::getComplexString("st_attach_scope_to_rifle",pScope).c_str(),  static_cast<void*>(tgt), INVENTORY_ATTACH_ADDON);
-			b_show			= true;
-		 }
+		AddWeaponAttachInfo(PISTOL_SLOT,pScope,"st_attach_scope_to_pistol",b_show);
+		AddWeaponAttachInfo(SHOTGUN_SLOT,pScope,"st_attach_scope_to_shotgun",b_show);
+		AddWeaponAttachInfo(RIFLE_SLOT,pScope,"st_attach_scope_to_rifle",b_show);
 	}
 	else if(pSilencer)
 	{
-		 if(m_pInv->m_slots[PISTOL_SLOT].m_pIItem != NULL &&
-		   m_pInv->m_slots[PISTOL_SLOT].m_pIItem->CanAttach(pSilencer))
-		 {
-			PIItem tgt = m_pInv->m_slots[PISTOL_SLOT].m_pIItem;
-			UIPropertiesBox.AddItem(OPFuncs::getComplexString("st_attach_silencer_to_pistol",pSilencer).c_str(),  static_cast<void*>(tgt), INVENTORY_ATTACH_ADDON);
-			b_show			= true;
-		 }
-		 if(m_pInv->m_slots[RIFLE_SLOT].m_pIItem != NULL &&
-			m_pInv->m_slots[RIFLE_SLOT].m_pIItem->CanAttach(pSilencer))
-		 {
-			PIItem tgt = m_pInv->m_slots[RIFLE_SLOT].m_pIItem;
-			UIPropertiesBox.AddItem(OPFuncs::getComplexString("st_attach_silencer_to_rifle",pSilencer).c_str(),  static_cast<void*>(tgt), INVENTORY_ATTACH_ADDON);
-			b_show			= true;
-		 }
+		AddWeaponAttachInfo(PISTOL_SLOT,pSilencer,"st_attach_silencer_to_pistol",b_show);
+		AddWeaponAttachInfo(SHOTGUN_SLOT,pSilencer,"st_attach_silencer_to_shotgun",b_show);
+		AddWeaponAttachInfo(RIFLE_SLOT,pSilencer,"st_attach_silencer_to_rifle",b_show);
 	}
 	else if(pGrenadeLauncher)
 	{
-		 if(m_pInv->m_slots[RIFLE_SLOT].m_pIItem != NULL &&
-			m_pInv->m_slots[RIFLE_SLOT].m_pIItem->CanAttach(pGrenadeLauncher))
-		 {
-			PIItem tgt = m_pInv->m_slots[RIFLE_SLOT].m_pIItem;
-			UIPropertiesBox.AddItem(OPFuncs::getComplexString("st_attach_gl_to_rifle",pGrenadeLauncher).c_str(),  static_cast<void*>(tgt), INVENTORY_ATTACH_ADDON);
-			b_show			= true;
-		 }
-
+		AddWeaponAttachInfo(PISTOL_SLOT,pGrenadeLauncher,"st_attach_gl_to_rifle",b_show);
+		AddWeaponAttachInfo(SHOTGUN_SLOT,pGrenadeLauncher,"st_attach_gl_to_shotgun",b_show);
+		AddWeaponAttachInfo(RIFLE_SLOT,pGrenadeLauncher,"st_attach_gl_to_rifle",b_show);
 	}
 
 	if (pAmmoItem)
 	{
-		auto pistol=m_pInv->m_slots[PISTOL_SLOT].m_pIItem;
-		auto rifle=m_pInv->m_slots[RIFLE_SLOT].m_pIItem;
-		if (pistol != NULL && pistol->CanLoadAmmo(pAmmoItem))
-		{
-			CWeaponMagazined* weapon=smart_cast<CWeaponMagazined*>(pistol);
-			UIPropertiesBox.AddItem(OPFuncs::getComplexString("st_load_ammo",weapon).c_str(),  weapon, INVENTORY_LOAD_MAGAZINE);
-		}
-		if (rifle != NULL && rifle->CanLoadAmmo(pAmmoItem))
-		{
-			CWeaponMagazined* weapon=smart_cast<CWeaponMagazined*>(rifle);
-			UIPropertiesBox.AddItem(OPFuncs::getComplexString("st_load_ammo",weapon).c_str(),  weapon, INVENTORY_LOAD_MAGAZINE);
-		}
+		AddLoadAmmoWeaponInfo(PISTOL_SLOT,pAmmoItem,b_show);
+		AddLoadAmmoWeaponInfo(SHOTGUN_SLOT,pAmmoItem,b_show);
+		AddLoadAmmoWeaponInfo(RIFLE_SLOT,pAmmoItem,b_show);
 	}
 
 	LPCSTR _action = nullptr;

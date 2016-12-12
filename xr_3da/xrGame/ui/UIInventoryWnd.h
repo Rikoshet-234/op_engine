@@ -16,6 +16,7 @@ class CInventory;
 #include "UIOutfitInfo.h"
 #include "UIItemInfo.h"
 #include "../inventory_space.h"
+#include "inventory_item_object.h"
 
 
 
@@ -149,7 +150,8 @@ protected:
 
 	void						ProcessPropertiesBoxClicked	();
 	void						ActivatePropertiesBox		();
-
+	void						AddWeaponAttachInfo(u32 slot,CInventoryItem* addon,std::string titleId,bool& needShow);
+	void						AddLoadAmmoWeaponInfo(u32 slot,CWeaponAmmo* ammo,bool& needShow);
 	void						DropCurrentItem				(bool b_all);
 	void						EatItem						(PIItem itm);
 	

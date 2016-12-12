@@ -93,7 +93,7 @@ public:
 	virtual bool				Detach				(const char* item_section_name, bool b_spawn_item);
 	virtual bool				CanAttach			(PIItem pIItem) {return false;}
 	virtual bool				CanDetach			(LPCSTR item_section_name) {return false;}
-	virtual bool				CanLoadAmmo			(CWeaponAmmo *pAmmo) {return false;}
+	virtual bool				CanLoadAmmo			(CWeaponAmmo *pAmmo,bool checkFullMagazine=false) {return false;}
 
 	virtual EHandDependence		HandDependence		()	const	{return hd1Hand;};
 	virtual bool				IsSingleHanded		()	const	{return true;};	
@@ -260,6 +260,11 @@ public:
 	virtual CHudItem			*cast_hud_item				()	{return 0;}
 	virtual CWeaponAmmo			*cast_weapon_ammo			()	{return 0;}
 	virtual CGameObject			*cast_game_object			()  {return 0;};
+
+	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
 
+add_to_type_list(CInventoryItem)
+#undef script_type_list
+#define script_type_list save_type_list(CInventoryItem)
 #include "inventory_item_inline.h"
