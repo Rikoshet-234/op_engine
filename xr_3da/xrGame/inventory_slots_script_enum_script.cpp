@@ -25,7 +25,9 @@ void CInventorySlots::script_register(lua_State *L)
 				value("ARTEFACT",		int(ARTEFACT_SLOT)),
 				value("PNV",			int(PNV_SLOT)),
 				value("SHOTGUN",		int(SHOTGUN_SLOT)),
-				value("BIODEV",			int(BIODEV_SLOT))
+				value("BIODEV",			int(BIODEV_SLOT)),
+				value("RUCK",			int(InventorySlots::RUCK)),
+				value("BELT",			int(InventorySlots::BELT))
 			]
 	];
 };

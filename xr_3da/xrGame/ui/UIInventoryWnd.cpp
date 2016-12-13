@@ -430,6 +430,7 @@ void CUIInventoryWnd::Update()
 
 void CUIInventoryWnd::Show() 
 { 
+	
 	InitInventory			();
 	inherited::Show			();
 

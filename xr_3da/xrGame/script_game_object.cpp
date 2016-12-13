@@ -518,6 +518,22 @@ u32	CScriptGameObject::vertex_in_direction(u32 level_vertex_id, Fvector directio
 	return			(ai().level_graph().valid_vertex_id(result) ? result : level_vertex_id);
 }
 
+bool CScriptGameObject::ItemInBelt(int itemID) const
+{
+	CInventoryOwner	*inventory_owner = smart_cast<CInventoryOwner*>(&object());
+	if (!inventory_owner) {
+		return		false;
+	}
+	const TIItemContainer &list =  inventory_owner->inventory().m_belt;
+	for(TIItemContainer::const_iterator it = list.begin(); list.end() != it; ++it) 
+	{
+		PIItem pIItem = *it;
+		if ((*it)->object().ID()==itemID)
+			return true;
+	}
+	return false;
+}
+
 bool CScriptGameObject::ItemInBelt(LPCSTR itemSection) const
 {
 	if (itemSection==nullptr )

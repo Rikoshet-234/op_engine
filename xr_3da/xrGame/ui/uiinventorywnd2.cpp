@@ -384,8 +384,7 @@ bool CUIInventoryWnd::OnItemDrop(CUICellItem* itm)
 			} 
 			else if (pAmmo!=nullptr && weapon->CanLoadAmmo(pAmmo,true))
 			{
-				if (g_uCommonFlags.test(invReloadWeapon))
-					weapon->LoadAmmo(pAmmo);
+				weapon->LoadAmmo(pAmmo);
 				processed=true;
 			}
 		}
@@ -409,7 +408,7 @@ bool CUIInventoryWnd::OnItemDrop(CUICellItem* itm)
 					CWeaponAmmo*		pAmmo				= smart_cast<CWeaponAmmo*>		(draggedItem);
 					if (pAmmo!=nullptr && weapon->CanLoadAmmo(pAmmo,true))
 					{
-						if (g_uCommonFlags.test(invReloadWeapon))
+//						if (g_uCommonFlags.test(invReloadWeapon))
 							weapon->LoadAmmo(pAmmo);
 						processed=true;
 					}

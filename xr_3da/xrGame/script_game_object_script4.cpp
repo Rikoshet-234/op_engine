@@ -21,6 +21,8 @@
 #include "Inventory.h"
 #include "inventory_item.h"
 #include "car.h"
+#include "inventory_slots_script_enum.h"
+#include "item_place_change_enum.h"
 
 using namespace luabind;
 
@@ -55,6 +57,86 @@ LPCSTR CScriptGameObject::GetVisualName() const
 	}
 	return	*(object().cNameVisual());
 
+}
+
+bool CScriptGameObject::InventoryMoveItem(CScriptGameObject* item,u32 to,bool force) const
+{
+	if (to==NO_ACTIVE_SLOT || !item)
+		return false;
+	CInventoryOwner* pInventoryOwner = smart_cast<CInventoryOwner*>(&object());
+	if (!pInventoryOwner)
+	{
+		Msg("! ERROR CScriptGameObject::InventoryMoveItem cannot acces to CInventoryOwner members!");
+		return false;
+	}
+	CInventoryItem* itemFrom=smart_cast<CInventoryItem*>(&(item->object()));
+	if (!itemFrom)
+	{
+		Msg("! ERROR CScriptGameObject::InventoryMoveItem cannot cast to CInventoryItem itemFrom!");
+		return false;
+	}
+	if (to<SLOTS_TOTAL)
+	{
+		CInventoryItem* itemTo=pInventoryOwner->inventory().ItemFromSlot(to);
+		if (itemTo)
+		{
+			if (itemTo->object().lua_game_object()==item)
+			{
+				Msg("~ WARNING CScriptGameObject::InventoryMoveItem cannot move himself");
+				return false;
+			}
+			if (!force)
+			{
+				Msg("~ WARNING CScriptGameObject::InventoryMoveItem destination slot is busy!");
+				return false;
+			}
+			if (!pInventoryOwner->inventory().CanPutInRuck(itemTo))
+			{
+				Msg("~ ERROR CScriptGameObject::InventoryMoveItem cant put item from slot to ruck!");
+				return false;
+			}
+			pInventoryOwner->inventory().Ruck(itemTo);
+		}
+		if (pInventoryOwner->inventory().CanPutInSlot(itemFrom))
+			pInventoryOwner->inventory().Slot(itemFrom,false);
+		else
+		{
+			Msg("~ WARNING CScriptGameObject::InventoryMoveItem cannot put item to slot!");
+			return false;
+		}
+	}
+	else if (to==InventorySlots::RUCK || to==InventorySlots::BELT)
+	{
+		switch (to)
+		{
+			case InventorySlots::RUCK:
+				{
+					if (!pInventoryOwner->inventory().Ruck(itemFrom))
+					{
+						Msg("~ WARNING CScriptGameObject::InventoryMoveItem cannot put item [%s] to ruck!",itemFrom->object().cName().c_str());
+						return false;
+					}
+				}
+				break;
+			case InventorySlots::BELT:
+				{
+					if (!pInventoryOwner->inventory().Belt(itemFrom))
+					{
+						Msg("~ WARNING CScriptGameObject::InventoryMoveItem cannot put item [%s] to belt!",itemFrom->object().cName().c_str());
+						return false;
+					}
+				}
+				break;
+			default:
+				break;
+		}
+	}
+	else
+	{
+		Msg("! ERROR CScriptGameObject::InventoryMoveItem invalid destination!");
+		return false;
+	}
+	return true;
 }
 
 #pragma region invulnerabilities from scripts
@@ -243,7 +325,8 @@ class_<CScriptGameObject> &script_register_game_object3(class_<CScriptGameObject
 		.def("set_crouch",					&CScriptGameObject::actor_set_crouch)
 		.def("get_visual_name",				&CScriptGameObject::GetVisualName)
 		.def("get_immunities_from_belt",	&CScriptGameObject::GetImmunitiesFromBeltTable)
-		.def("get_immunities",				&CScriptGameObject::GetImmunitiesTable);
+		.def("get_immunities",				&CScriptGameObject::GetImmunitiesTable)
+		.def("inventory_move_item",			&CScriptGameObject::InventoryMoveItem);
 
 	return	(instance);
 }

@@ -580,6 +580,7 @@ public:
 
 			bool				ItemInBelt(CScriptGameObject* itemObj) const;
 			bool				ItemInBelt(LPCSTR itemSection) const;
+			bool				ItemInBelt(int itemID) const;
 			bool				ItemInSlot(CScriptGameObject* itemObj,u32 slotId) const;
 			bool				ItemInSlot(CScriptGameObject* itemObj) const;
 			bool				ItemInSlot(LPCSTR itemSection) const;
@@ -589,6 +590,7 @@ public:
 			LPCSTR				GetVisualName() const;
 			luabind::object		GetImmunitiesTable() const;
 			luabind::object		GetImmunitiesFromBeltTable() const;
+			bool				InventoryMoveItem(CScriptGameObject* item,u32 to,bool force) const;
 
 	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
