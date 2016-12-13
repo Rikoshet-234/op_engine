@@ -181,16 +181,17 @@ protected:
 	virtual bool	AllowFireWhileWorking() {return false;}
 
 	//виртуальные функции для проигрывания анимации HUD
+
+	virtual void	StartIdleAnim		();
+	virtual	int		ShotsFired			() { return m_iShotNum; }
+	virtual float	GetWeaponDeterioration	();
+public:
 	virtual void	PlayAnimShow();
 	virtual void	PlayAnimHide();
 	virtual void	PlayAnimReload();
 	virtual void	PlayAnimIdle();
 	virtual void	PlayAnimShoot();
 	virtual void	PlayReloadSound		();
-
-	virtual void	StartIdleAnim		();
-	virtual	int		ShotsFired			() { return m_iShotNum; }
-	virtual float	GetWeaponDeterioration	();
 
 };
 

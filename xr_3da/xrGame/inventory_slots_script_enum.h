@@ -23,6 +23,8 @@ namespace InventorySlots
 		PNV				=	PNV_SLOT,
 		SHOTGUN			=	SHOTGUN_SLOT,
 		BIODEV			=	BIODEV_SLOT,
+		RUCK			=	SLOTS_TOTAL+1,
+		BELT			=	RUCK+1,
 		NO_ACT_SLOT		=	NO_ACTIVE_SLOT
 	};
 }

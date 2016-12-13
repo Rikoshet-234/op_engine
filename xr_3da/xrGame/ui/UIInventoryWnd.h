@@ -16,7 +16,8 @@ class CInventory;
 #include "UIOutfitInfo.h"
 #include "UIItemInfo.h"
 #include "../inventory_space.h"
-#include "inventory_item_object.h"
+#include "../WeaponAmmo.h"
+
 
 
 

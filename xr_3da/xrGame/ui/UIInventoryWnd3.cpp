@@ -14,6 +14,7 @@
 #include "../game_cl_base.h"
 #include "../xr_level_controller.h"
 #include "UICellItem.h"
+#include "../UIGameSP.h"
 #include "UIListBoxItem.h"
 #include "../CustomOutfit.h"
 #include "../string_table.h"
@@ -22,6 +23,8 @@
 #include "../script_callback_ex.h"
 #include "../script_game_object.h"
 #include "../OPFuncs/utils.h"
+#include "weaponShotgun.h"
+
 
 void CUIInventoryWnd::EatItem(PIItem itm)
 {
@@ -287,7 +290,22 @@ void CUIInventoryWnd::ProcessPropertiesBoxClicked	()
 				CWeaponMagazined*	weapon	=static_cast<CWeaponMagazined*>(UIPropertiesBox.GetClickedItem()->GetData());
 				CWeaponAmmo*		ammo	=static_cast<CWeaponAmmo*>(CurrentItem()->m_pData);
 				if (weapon && ammo)
-						weapon->LoadAmmo(ammo);
+				{
+					weapon->LoadAmmo(ammo);
+					//CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
+					//pGameSP->InventoryMenu->GetHolder()->StartStopMenu(pGameSP->InventoryMenu,true);
+					//m_pInv->ProcessSlotAction(true,weapon->GetSlot());
+					//m_pInv->Items_SetCurrentEntityHud(true);
+					//weapon->Action(kWPN_RELOAD, CMD_START);
+
+					/*CHudItem* pHudItem = smart_cast<CHudItem*>(m_pInv->ActiveItem());
+					if (pHudItem) 
+					{
+						pHudItem->OnStateSwitch(CWeapon::eReload);
+					}*/
+					//weapon->OnStateSwitch(CWeapon::eReload); 
+					//weapon->SetState(CWeapon::eReload);
+				}
 			}
 			break;
 		case INVENTORY_UNLOAD_MAGAZINE:

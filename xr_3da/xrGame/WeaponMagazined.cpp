@@ -834,6 +834,8 @@ bool CWeaponMagazined::CanLoadAmmo(CWeaponAmmo* pAmmo,bool checkFullMagazine)
 
 void CWeaponMagazined::LoadAmmo(CWeaponAmmo* pAmmo)
 {
+	return;
+
 	if (!pAmmo)
 	{
 		Msg("! WARNING not possible to load null ammo in magazine for [%s]",Name());
@@ -853,8 +855,11 @@ void CWeaponMagazined::LoadAmmo(CWeaponAmmo* pAmmo)
 		m_set_next_ammoType_on_reload=std::distance(m_ammoTypes.begin(),am_it);
 		if (m_set_next_ammoType_on_reload!=u32(-1))
 		{
+			SetState(eReload);
+			TryReload();
+			/*m_pHUD->animPlay(random_anim(mhud.mhud_reload),TRUE,this,eReload);
 			PlayReloadSound();
-			ReloadMagazine();
+			ReloadMagazine();*/
 		}
 	}
 }

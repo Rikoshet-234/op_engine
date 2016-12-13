@@ -245,6 +245,7 @@ class_<CScriptGameObject> &script_register_game_object1(class_<CScriptGameObject
 		
 		.def("item_in_belt",				static_cast<bool (CScriptGameObject::*)(CScriptGameObject*) const>(&CScriptGameObject::ItemInBelt))
 		.def("item_in_belt",				static_cast<bool (CScriptGameObject::*)(LPCSTR) const>(&CScriptGameObject::ItemInBelt))
+		.def("item_in_belt",				static_cast<bool (CScriptGameObject::*)(int) const>(&CScriptGameObject::ItemInBelt))
 		.def("item_in_slot",				&CScriptGameObject::item_in_slot)
 		.def("item_in_slot",				static_cast<bool (CScriptGameObject::*)(CScriptGameObject*) const>(&CScriptGameObject::ItemInSlot))
 		.def("item_in_slot",				static_cast<bool (CScriptGameObject::*)(CScriptGameObject*, u32) const>(&CScriptGameObject::ItemInSlot))

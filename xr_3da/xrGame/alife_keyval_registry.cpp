@@ -14,7 +14,9 @@
 #include "ai_space.h"
 
 #define KEYVALS_V0 ((u8)0)
-#define CURRENT_KEYVALS_VERSION KEYVALS_V0
+#define KEYVALS_V1 ((u8)1) //small hack for skipped versions before begin versioning :)
+#define KEYVALS_V2 ((u8)2) //actual version
+#define CURRENT_KEYVALS_VERSION KEYVALS_V2
 
 static void serialize(IWriter &memory_stream, const luabind::object& object)
 {
@@ -317,7 +319,7 @@ void CALifeKeyvalRegistry::load(IReader &memory_stream)
 		u8 version = memory_stream.r_u8();
 		R_ASSERT2(version <= CURRENT_KEYVALS_VERSION, "[keyvals] Can't load save with newer version of keyvals registry");
 		
-		if (version == KEYVALS_V0)
+		if (version == KEYVALS_V2)
 		{
 			u32 count = memory_stream.r_u32();
 			if (count > 0)
@@ -335,11 +337,11 @@ void CALifeKeyvalRegistry::load(IReader &memory_stream)
 			}
 			else
 			{
-				//! Chunk is empty
+				//! Loaders for older versions
 			}
 		}
-		else //! Loaders for older versions
-		{
+		else 
+		{//! Chunk is empty
 		}
 	}
 
