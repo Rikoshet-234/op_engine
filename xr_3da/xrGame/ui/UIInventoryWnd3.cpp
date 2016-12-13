@@ -23,7 +23,7 @@
 #include "../script_callback_ex.h"
 #include "../script_game_object.h"
 #include "../OPFuncs/utils.h"
-#include "weaponShotgun.h"
+
 
 
 void CUIInventoryWnd::EatItem(PIItem itm)
