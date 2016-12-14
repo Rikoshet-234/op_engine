@@ -186,36 +186,13 @@ class cl_hemi_color	: public R_constant_setup {
 	}
 };	static cl_hemi_color		binder_hemi_color;
 
-// KD
-class cl_resolution	: public R_constant_setup {
-	u32			marker;
-	Fvector4	result;
-
-	void setup	(R_constant* C) override
+static class cl_screen_res : public R_constant_setup		
+{	
+	virtual void setup	(R_constant* C)
 	{
-		if (marker!=Device.dwFrame)	{
-			float _w = float(Device.dwWidth);
-			float _h = float(Device.dwHeight);
-			result.set (_w, _h, static_cast<float>(1.0)/_w, static_cast<float>(1.0)/_h);
-		}
-		RCache.set_c	(C,result);
+		RCache.set_c	(C, static_cast<float>(Device.dwWidth), static_cast<float>(Device.dwHeight), 1.0f/static_cast<float>(Device.dwWidth), 1.0f/static_cast<float>(Device.dwHeight));
 	}
-};	static cl_resolution		binder_resolution;
-
-class cl_screen_params	: public R_constant_setup {
-	u32			marker;
-	Fvector4	result;
-
-	void setup	(R_constant* C) override
-	{
-		if (marker!=Device.dwFrame)	{
-			float _ffov = float(Device.fFOV);
-			float _faspect = float(Device.fASPECT);
-			result.set (_ffov, _faspect, 0.f, 0.f);
-		}
-		RCache.set_c	(C,result);
-	}
-};	static cl_screen_params		binder_screen_params;
+}	binder_screen_res;
 
 // Standart constant-binding
 void	CBlender_Compile::SetMapping	()
@@ -249,9 +226,8 @@ void	CBlender_Compile::SetMapping	()
 	r_Constant				("L_hemi_color",	&binder_hemi_color);
 	r_Constant				("L_ambient",		&binder_amb_color);
 
-	//KD
-	r_Constant				("c_screen",		&binder_screen_params);
-	r_Constant				("c_resolution",		&binder_resolution);
+
+	r_Constant				("screen_res",		&binder_screen_res);
 
 
 	// detail
