@@ -23,6 +23,8 @@
 #include "car.h"
 #include "inventory_slots_script_enum.h"
 #include "item_place_change_enum.h"
+#include "ui/UIInventoryWnd.h"
+#include "UIGameSP.h"
 
 using namespace luabind;
 
@@ -75,6 +77,7 @@ bool CScriptGameObject::InventoryMoveItem(CScriptGameObject* item,u32 to,bool fo
 		Msg("! ERROR CScriptGameObject::InventoryMoveItem cannot cast to CInventoryItem itemFrom!");
 		return false;
 	}
+	bool moved=false;
 	if (to<SLOTS_TOTAL)
 	{
 		CInventoryItem* itemTo=pInventoryOwner->inventory().ItemFromSlot(to);
@@ -90,16 +93,15 @@ bool CScriptGameObject::InventoryMoveItem(CScriptGameObject* item,u32 to,bool fo
 				Msg("~ WARNING CScriptGameObject::InventoryMoveItem destination slot is busy!");
 				return false;
 			}
-			if (!pInventoryOwner->inventory().CanPutInRuck(itemTo))
+			moved=pInventoryOwner->inventory().Ruck(itemTo);
+			if (!moved)
 			{
 				Msg("~ ERROR CScriptGameObject::InventoryMoveItem cant put item from slot to ruck!");
 				return false;
 			}
-			pInventoryOwner->inventory().Ruck(itemTo);
 		}
-		if (pInventoryOwner->inventory().CanPutInSlot(itemFrom))
-			pInventoryOwner->inventory().Slot(itemFrom,false);
-		else
+		moved=pInventoryOwner->inventory().Slot(itemFrom,false);
+		if (!moved)
 		{
 			Msg("~ WARNING CScriptGameObject::InventoryMoveItem cannot put item to slot!");
 			return false;
@@ -111,7 +113,8 @@ bool CScriptGameObject::InventoryMoveItem(CScriptGameObject* item,u32 to,bool fo
 		{
 			case InventorySlots::RUCK:
 				{
-					if (!pInventoryOwner->inventory().Ruck(itemFrom))
+					moved=pInventoryOwner->inventory().Ruck(itemFrom);
+					if (!moved)
 					{
 						Msg("~ WARNING CScriptGameObject::InventoryMoveItem cannot put item [%s] to ruck!",itemFrom->object().cName().c_str());
 						return false;
@@ -120,7 +123,8 @@ bool CScriptGameObject::InventoryMoveItem(CScriptGameObject* item,u32 to,bool fo
 				break;
 			case InventorySlots::BELT:
 				{
-					if (!pInventoryOwner->inventory().Belt(itemFrom))
+					moved=pInventoryOwner->inventory().Belt(itemFrom);
+					if (!moved)
 					{
 						Msg("~ WARNING CScriptGameObject::InventoryMoveItem cannot put item [%s] to belt!",itemFrom->object().cName().c_str());
 						return false;
@@ -135,6 +139,11 @@ bool CScriptGameObject::InventoryMoveItem(CScriptGameObject* item,u32 to,bool fo
 	{
 		Msg("! ERROR CScriptGameObject::InventoryMoveItem invalid destination!");
 		return false;
+	}
+	if (moved)
+	{
+		CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
+		pGameSP->ReInitShownUI();
 	}
 	return true;
 }
