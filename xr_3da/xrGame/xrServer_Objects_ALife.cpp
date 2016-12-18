@@ -318,7 +318,7 @@ void CSE_ALifeObject::STATE_Write			(NET_Packet &tNetPacket)
 		{
 			if (m_ini_string[i] == 0)
 			{
-				Memory._dump(29, m_ini_string.c_str());
+				Memory._dump((m_ini_string.size() + 14) / 16, m_ini_string.c_str());
 				LogPacketError("Custom data broken [STATE_Write::before]! [%d != %d](%u, %X) Custom data: %s"
 					, m_ini_string.size(), i, m_ini_string._get()->dwReference, m_ini_string._get()->dwCRC, m_ini_string.c_str());
 				FATAL("ENGINE CRASH: See details in log");
