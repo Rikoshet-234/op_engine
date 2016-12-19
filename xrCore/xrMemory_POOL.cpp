@@ -1,6 +1,10 @@
 #include "stdafx.h"
 #pragma hdrstop
 
+#include <set>
+#include <vector>
+#include <hash_map>
+
 #include "xrMemory_POOL.h"
 #include "xrMemory_align.h"
 
@@ -13,11 +17,143 @@ extern int	g_stackTraceCount;
 size_t g_stackTraceLengths[100];
 
 std::hash_map<size_t, char*> g_stackTraces;
-#else
-std::set<size_t> g_used;
 #endif
 
-std::vector<size_t> g_blocks;
+extern const u32 mem_pools_count;
+extern const u32 mem_pools_ebase;
+
+class nonXRCriticalSection
+{
+public:
+	nonXRCriticalSection()
+	{
+		InitializeCriticalSection(&m_cs);
+	}
+
+	~nonXRCriticalSection()
+	{
+		DeleteCriticalSection(&m_cs);
+	}
+
+	void Enter() { EnterCriticalSection(&m_cs); }
+	void Leave() { LeaveCriticalSection(&m_cs); }
+
+private:
+	CRITICAL_SECTION m_cs;
+};
+
+template <class T>
+class my_allocator
+{
+public:
+  typedef size_t    size_type;
+  typedef ptrdiff_t difference_type;
+  typedef T*        pointer;
+  typedef const T*  const_pointer;
+  typedef T&        reference;
+  typedef const T&  const_reference;
+  typedef T         value_type;
+
+  my_allocator() {}
+  my_allocator(const my_allocator&) {}
+
+
+
+  pointer allocate(size_type n, const void * = 0)
+  {
+    T* t = (T*)::malloc(n * sizeof(T));
+    return t;
+  }
+  
+  void deallocate(void* p, size_type)
+  {
+    if (p)
+    {
+      ::free(p);
+    }
+  }
+
+  pointer           address(reference x) const { return &x; }
+  const_pointer     address(const_reference x) const { return &x; }
+  my_allocator<T>&  operator=(const my_allocator&) { return *this; }
+  void              construct(pointer p, const T& val) 
+                    { new ((T*) p) T(val); }
+  void              destroy(pointer p) { p->~T(); }
+
+  size_type         max_size() const { return size_t(-1); }
+
+  template <class U>
+  struct rebind { typedef my_allocator<U> other; };
+
+  template <class U>
+  my_allocator(const my_allocator<U>&) {}
+
+  template <class U>
+  my_allocator& operator=(const my_allocator<U>&) { return *this; }
+};
+
+class CMemLogger
+{
+public:
+	typedef ::std::set<size_t, std::less<size_t>, my_allocator<size_t> > TUsed;
+	typedef ::std::vector<size_t, my_allocator<size_t> > TBlocks;
+
+private:
+	struct TMemLoggerItem
+	{
+		TUsed used;
+		TBlocks blocks;
+	};
+
+public:
+	CMemLogger() {}
+	~CMemLogger()
+	{
+		for (u32 i = 0; i < mem_pools_count; ++i)
+		{
+			TMemLoggerItem& item = m_blocks[i];
+			for (size_t j = 0; j < item.blocks.size(); ++j)
+			{
+				xr_aligned_free(reinterpret_cast<void*>(item.blocks[j]));
+			}
+		}
+	}
+
+	void block(u32 element_size, u8* list)
+	{
+		size_t index = element_size / mem_pools_ebase - 1;
+		m_blocks[index].blocks.push_back(reinterpret_cast<size_t>(list));
+	}
+
+	void itemAdd(u32 element_size, void* item)
+	{
+		size_t index = element_size / mem_pools_ebase - 1;
+		m_blocks[index].used.insert(reinterpret_cast<size_t>(item));
+	}
+
+	void itemRemove(u32 element_size, void* item)
+	{
+		size_t index = element_size / mem_pools_ebase - 1;
+		m_blocks[index].used.erase(reinterpret_cast<size_t>(item));
+	}
+
+	const TUsed& used(u32 element_size)
+	{
+		size_t index = element_size / mem_pools_ebase - 1;
+		return m_blocks[index].used;
+	}
+
+	const TBlocks& blocks(u32 element_size)
+	{
+		size_t index = element_size / mem_pools_ebase - 1;
+		return m_blocks[index].blocks;
+	}
+private:
+	TMemLoggerItem m_blocks[mem_pools_count];	
+};
+
+static CMemLogger* s_memlogger;
+static nonXRCriticalSection s_blocks_cs;
 
 void	MEMPOOL::block_create	()
 {
@@ -34,10 +170,14 @@ void	MEMPOOL::block_create	()
 	*access	(list+(s_count-1)*s_element)	= NULL;
 	block_count				++;
 
-	if (s_element == 480)
+	s_blocks_cs.Enter();
+	if (nullptr == s_memlogger)
 	{
-		g_blocks.push_back((size_t)list);
+		s_memlogger = (CMemLogger*)::malloc(sizeof(CMemLogger));
+		::new (s_memlogger) CMemLogger();
 	}
+	s_memlogger->block(s_element, list);
+	s_blocks_cs.Leave();
 }
 
 void	MEMPOOL::_initialize	(u32 _element, u32 _sector, u32 _header)
@@ -53,7 +193,6 @@ void	MEMPOOL::_initialize	(u32 _element, u32 _sector, u32 _header)
 
 void MEMPOOL::store_stat(void* e)
 {
-	if (s_element != 480) return;
 #ifdef STORE_CSTACKS
 	BuildStackTrace();
 	size_t stackTraceLen = 0;
@@ -77,7 +216,9 @@ void MEMPOOL::store_stat(void* e)
 	g_stackTraces[(size_t)e] = stackTrace;
 	//g_stackTraces[(size_t)e] = "";
 #else
-	g_used.insert((size_t)e);
+	s_blocks_cs.Enter();
+	s_memlogger->itemAdd(s_element, e);
+	s_blocks_cs.Leave();
 #endif
 }
 
@@ -89,8 +230,9 @@ void MEMPOOL::remove_stat(void* e)
 	free(i->second);
 	g_stackTraces.erase(i);
 #else
-	auto i = g_used.find((size_t)e);
-	g_used.erase(i);
+	s_blocks_cs.Enter();
+	s_memlogger->itemAdd(s_element, e);
+	s_blocks_cs.Leave();
 #endif
 }
 
@@ -112,6 +254,9 @@ void MEMPOOL::_dump(const void* corrupted_memory_item_ptr)
 #else
 	std::vector<std::vector<bool>> table;
 #endif
+	const CMemLogger::TBlocks& g_blocks = s_memlogger->blocks(s_element);
+	const CMemLogger::TUsed& g_used = s_memlogger->used(s_element);
+
 	table.resize(g_blocks.size());
 	for (size_t i = 0; i < table.size(); ++i)
 	{
