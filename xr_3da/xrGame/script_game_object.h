@@ -193,12 +193,32 @@ public:
 	_DECLARE_FUNCTION10	(GetEnemyStrength, int);
 	_DECLARE_FUNCTION10	(can_script_capture, bool);
 	
-			_DECLARE_FUNCTION10	(IsGameObject			,			bool);
-			_DECLARE_FUNCTION10	(IsCar					,			bool);
-			_DECLARE_FUNCTION10	(IsHeli					,			bool);
-			_DECLARE_FUNCTION10	(IsEntityAlive			,			bool);
-			_DECLARE_FUNCTION10	(IsArtefact				,			bool);
-
+			_DECLARE_FUNCTION10(IsGameObject			,			bool);
+			_DECLARE_FUNCTION10(IsCar					,			bool);
+			_DECLARE_FUNCTION10(IsHeli					,			bool);
+			_DECLARE_FUNCTION10(IsEntityAlive			,			bool);
+			_DECLARE_FUNCTION10(IsArtefact				,			bool);
+			_DECLARE_FUNCTION10(IsActor					,			bool);
+			_DECLARE_FUNCTION10(IsWeapon				,			bool);
+			_DECLARE_FUNCTION10(IsMedkit				,			bool);
+			_DECLARE_FUNCTION10(IsEatableItem			,			bool);
+			_DECLARE_FUNCTION10(IsAntirad				,			bool);
+			_DECLARE_FUNCTION10(IsCustomOutfit			,			bool);
+			_DECLARE_FUNCTION10(IsScope					,			bool);
+			_DECLARE_FUNCTION10(IsSilencer				,			bool);
+			_DECLARE_FUNCTION10(IsGrenadeLauncher		,			bool);
+			_DECLARE_FUNCTION10(IsWeaponMagazined		,			bool);
+			_DECLARE_FUNCTION10(IsStalker				,			bool);
+			_DECLARE_FUNCTION10(IsMonster				,			bool);
+			_DECLARE_FUNCTION10(IsTrader				,			bool);
+			_DECLARE_FUNCTION10(IsAmmo					,			bool);
+			_DECLARE_FUNCTION10(IsMissile				,			bool);
+			_DECLARE_FUNCTION10(IsGrenade				,			bool);
+			_DECLARE_FUNCTION10(IsBottleItem			,			bool);
+			_DECLARE_FUNCTION10(IsTorch					,			bool);
+			_DECLARE_FUNCTION10(IsWeaponGL				,			bool);
+			_DECLARE_FUNCTION10(IsInventoryBox			,			bool);
+														
 			CScriptEntityAction	*GetCurrentAction	() const;
 			void				AddAction			(const CScriptEntityAction *tpEntityAction, bool bHighPriority = false);
 			void				ResetActionQueue	();
@@ -341,6 +361,10 @@ public:
 			void				SetCallback			(GameObject::ECallbackType type, const luabind::functor<void> &functor);
 			void				SetCallback			(GameObject::ECallbackType type, const luabind::functor<void> &functor, const luabind::object &object);
 			void				SetCallback			(GameObject::ECallbackType type);
+
+			void				SetCallbackEx			(GameObject::ECallbackType type, const luabind::functor<bool> &functor);
+			void				SetCallbackEx			(GameObject::ECallbackType type, const luabind::functor<bool> &functor, const luabind::object &object);
+			void				SetCallbackEx			(GameObject::ECallbackType type);
 
 			void				set_patrol_extrapolate_callback(const luabind::functor<bool> &functor);
 			void				set_patrol_extrapolate_callback(const luabind::functor<bool> &functor, const luabind::object &object);
@@ -587,11 +611,13 @@ public:
 			bool				ItemInSlot(LPCSTR itemSection,u32 slotId) const;
 			void				IterateBeltOnlyFunctor(luabind::functor<void> functor);
 			void				IterateRuckOnlyFunctor(luabind::functor<void> functor);
+			void				IterateInventoryBoxObject(luabind::functor<void> functor,bool showError=false) const;
+			void				IterateInventoryBoxId(luabind::functor<void> functor) const;
 			LPCSTR				GetVisualName() const;
 			luabind::object		GetImmunitiesTable() const;
 			luabind::object		GetImmunitiesFromBeltTable() const;
 			bool				InventoryMoveItem(CScriptGameObject* item,u32 to,bool force) const;
-
+			
 	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
 add_to_type_list(CScriptGameObject)

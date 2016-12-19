@@ -1,26 +1,28 @@
 #include "pch_script.h"
 #include "ScriptXmlInit.h"
-#include "ui\UIXmlInit.h"
-#include "ui\UITextureMaster.h"
-#include "ui\UICheckButton.h" //#include "ui\UI3tButton.h"
-#include "ui\UISpinNum.h"
-#include "ui\UISpinText.h"
-#include "ui\UIComboBox.h"
-#include "ui\UIListWnd.h"
-#include "ui\UITabControl.h"
-#include "ui\UIFrameWindow.h"
-#include "ui\UILabel.h"
-#include "ui\ServerList.h"
-#include "ui\UIMapList.h"
-#include "ui\UIKeyBinding.h"
-#include "ui\UIEditBox.h"
-#include "ui\UIAnimatedStatic.h"
-#include "ui\UITrackBar.h"
-#include "ui\UICDkey.h"
-#include "ui\UIMapInfo.h"
-#include "ui\UIMMShniaga.h"
-#include "ui\UIScrollView.h"
-#include "ui\UIProgressBar.h"
+#include "ui/UIXmlInit.h"
+#include "ui/UITextureMaster.h"
+#include "ui/UICheckButton.h" //#include "ui\UI3tButton.h"
+#include "ui/UISpinNum.h"
+#include "ui/UISpinText.h"
+#include "ui/UIComboBox.h"
+#include "ui/UIListWnd.h"
+#include "ui/UITabControl.h"
+#include "ui/UIFrameWindow.h"
+#include "ui/UILabel.h"
+#include "ui/ServerList.h"
+#include "ui/UIMapList.h"
+#include "ui/UIKeyBinding.h"
+#include "ui/UIEditBox.h"
+#include "ui/UIAnimatedStatic.h"
+#include "ui/UITrackBar.h"
+#include "ui/UIListItemIconed.h"
+#include "ui/UIMapInfo.h"
+#include "ui/UIMMShniaga.h"
+#include "ui/UIScrollView.h"
+#include "ui/UIProgressBar.h"
+#include "ai_space.h"
+#include "script_engine.h"
 
 using namespace luabind;
 
@@ -275,12 +277,51 @@ CUIProgressBar* CScriptXmlInit::InitProgressBar(LPCSTR path, CUIWindow* parent)
 	return							pWnd;	
 }
 
+CUIListItemIconed*	CScriptXmlInit::InitIconedColumns(LPCSTR path, CUIWindow* parent)
+{
+	CUIListItemIconed * pWnd=xr_new<CUIListItemIconed>();
+	CUIXmlInit::InitIconedColumns(m_xml, path, 0, pWnd);
+	pWnd->SetAutoDelete				(true);
+	_attach_child					(pWnd, parent);
+	return							pWnd;	
+}
+
+luabind::object CScriptXmlInit::TryReadTable(LPCSTR tablePath) 
+{
+	luabind::object resultTable=luabind::newtable(ai().script_engine().lua());
+	XML_NODE* nodes		= m_xml.NavigateToNode(tablePath,0);
+
+	if (nodes)
+	{
+		for (XML_NODE* node=nodes->FirstChild(); node; node=node->NextSibling())
+		{
+			if (node)
+			{	
+				LPCSTR id=node->Value();
+				LPCSTR value=nullptr;
+				XML_NODE *data=node->FirstChild();
+				if (data)
+				{
+					TiXmlText *text			= data->ToText();
+					if (text)				
+						value=text->Value();
+					resultTable[id]=value;
+					//iconIDs.insert(mk_pair(id,value));
+
+				}
+			}
+		}
+	}
+	return resultTable;
+}
 #pragma optimize("s",on)
 void CScriptXmlInit::script_register(lua_State *L){
 	module(L)
 	[
 		class_<CScriptXmlInit>			("CScriptXmlInit")
 		.def(							constructor<>())
+		.def("TryReadTable",			&CScriptXmlInit::TryReadTable)
+		.def("InitIconedColumns",		&CScriptXmlInit::InitIconedColumns)
 		.def("ParseFile",				&CScriptXmlInit::ParseFile)
 		.def("ParseShTexInfo",			&CScriptXmlInit::ParseShTexInfo)
 		.def("InitWindow",				&CScriptXmlInit::InitWindow)

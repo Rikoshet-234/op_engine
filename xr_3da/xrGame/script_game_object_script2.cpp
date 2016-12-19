@@ -118,13 +118,15 @@ class_<CScriptGameObject> &script_register_game_object1(class_<CScriptGameObject
 		.def("object",						(CScriptGameObject *(CScriptGameObject::*)(int))(&CScriptGameObject::GetObjectByIndex))
 		.def("active_item",					&CScriptGameObject::GetActiveItem)
 		
-		.def("set_callback",				(void (CScriptGameObject::*)(GameObject::ECallbackType, const luabind::functor<void> &))(&CScriptGameObject::SetCallback))
-		.def("set_callback",				(void (CScriptGameObject::*)(GameObject::ECallbackType, const luabind::functor<void> &, const luabind::object &))(&CScriptGameObject::SetCallback))
-		.def("set_callback",				(void (CScriptGameObject::*)(GameObject::ECallbackType))(&CScriptGameObject::SetCallback))
+		.def("set_callback",				static_cast<void (CScriptGameObject::*)(GameObject::ECallbackType, const luabind::functor<void>&)>(&CScriptGameObject::SetCallback))
+		.def("set_callback",				static_cast<void (CScriptGameObject::*)(GameObject::ECallbackType, const luabind::functor<void>&, const luabind::object&)>(&CScriptGameObject::SetCallback))
+		.def("set_callback",				static_cast<void (CScriptGameObject::*)(GameObject::ECallbackType)>(&CScriptGameObject::SetCallback))
 
-		.def("set_patrol_extrapolate_callback",	(void (CScriptGameObject::*)())(&CScriptGameObject::set_patrol_extrapolate_callback))
-		.def("set_patrol_extrapolate_callback",	(void (CScriptGameObject::*)(const luabind::functor<bool> &))(&CScriptGameObject::set_patrol_extrapolate_callback))
-		.def("set_patrol_extrapolate_callback",	(void (CScriptGameObject::*)(const luabind::functor<bool> &, const luabind::object &))(&CScriptGameObject::set_patrol_extrapolate_callback))
+
+
+		.def("set_patrol_extrapolate_callback",	static_cast<void (CScriptGameObject::*)()>(&CScriptGameObject::set_patrol_extrapolate_callback))
+		.def("set_patrol_extrapolate_callback",	static_cast<void (CScriptGameObject::*)(const luabind::functor<bool>&)>(&CScriptGameObject::set_patrol_extrapolate_callback))
+		.def("set_patrol_extrapolate_callback",	static_cast<void (CScriptGameObject::*)(const luabind::functor<bool>&, const luabind::object&)>(&CScriptGameObject::set_patrol_extrapolate_callback))
 
 		.def("set_enemy_callback",			(void (CScriptGameObject::*)())(&CScriptGameObject::set_enemy_callback))
 		.def("set_enemy_callback",			(void (CScriptGameObject::*)(const luabind::functor<bool> &))(&CScriptGameObject::set_enemy_callback))

@@ -53,6 +53,7 @@ CGameObject::CGameObject		()
 	m_server_flags.one			();
 
 	m_callbacks					= xr_new<CALLBACK_MAP>();
+	m_callbacks_bool			=xr_new<CALLBACK_MAP_BOOL>();
 	m_anim_mov_ctrl				= 0;
 	m_class_name = typeid((*this)).name();
 	if ("" == m_class_name)
@@ -67,6 +68,7 @@ CGameObject::~CGameObject		()
 	VERIFY						(!m_spawned);
 	xr_delete					(m_ai_location);
 	xr_delete					(m_callbacks);
+	xr_delete					(m_callbacks_bool);
 }
 
 void CGameObject::init			()
@@ -96,6 +98,7 @@ void CGameObject::reinit	()
 
 	// clear callbacks	
 	for (CALLBACK_MAP_IT it = m_callbacks->begin(); it != m_callbacks->end(); ++it) it->second.clear();
+	for (CALLBACK_MAP_BOOL_IT it = m_callbacks_bool->begin(); it != m_callbacks_bool->end(); ++it) it->second.clear();
 }
 
 void CGameObject::reload	(LPCSTR section)
@@ -907,6 +910,11 @@ void CGameObject::net_Relcase			(CObject* O)
 CGameObject::CScriptCallbackExVoid &CGameObject::callback(GameObject::ECallbackType type) const
 {
 	return ((*m_callbacks)[type]);
+}
+
+CGameObject::CScriptCallbackExBool &CGameObject::callback_ex(GameObject::ECallbackType type) const
+{
+	return ((*m_callbacks_bool)[type]);
 }
 
 LPCSTR CGameObject::visual_name			(CSE_Abstract *server_entity)

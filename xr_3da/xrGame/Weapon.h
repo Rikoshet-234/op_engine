@@ -124,6 +124,30 @@ public:
 		eMagEmpty,
 		eSwitch,
 	};
+	xr_string getStateString(EWeaponStates state) const
+	{
+		switch (state)
+		{
+			case eIdle: return "eIdle";
+			case eFire: return "eFire";
+			case eFire2: return "eFire2";
+			case eReload: return "eReload";
+			case eShowing: return "eShowing";
+			case eHiding: return "eHidding";
+			case eHidden: return "eHidden";
+			case eMisfire: return "eMisfire";
+			case eMagEmpty: return "eMagEmpty";
+			case eSwitch: return "eSwitch";
+			default: return "unknown";;
+		}
+	}
+
+#ifdef DEBUG
+	//#define SHOW_WEAPON_STATE(state) Msg("[%s] weapon [%s] state [%s]",__FUNCTION__ ,cName().c_str(),getStateString(static_cast<EWeaponStates>(state)).c_str());
+	#define SHOW_WEAPON_STATE(state) 
+#else
+	#define SHOW_WEAPON_STATE(state) {}	
+#endif
 	enum EWeaponSubStates{
 		eSubstateReloadBegin		=0,
 		eSubstateReloadInProcess,

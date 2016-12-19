@@ -3,12 +3,13 @@
 #include "alife_space.h"
 #include "script_entity_space.h"
 #include "movement_manager_space.h"
-#include "pda_space.h"
+#include "script_callback_ex.h"
 #include "memory_space.h"
 #include "cover_point.h"
 #include "script_hit.h"
 #include "script_binder_object.h"
 #include "InventoryOwner.h"
+#include "InventoryBox.h"
 #include "Artifact.h"
 #include "HUDManager.h"
 #include "ui/UIMainIngameWnd.h"
@@ -319,12 +320,72 @@ luabind::object	CScriptGameObject::GetImmunitiesFromBeltTable() const
 
 #pragma endregion
 
+CUIInventoryWnd* get_inventory_wnd()
+{
+	CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
+	return pGameSP->InventoryMenu;
+}
+
+#pragma region add functionality for callback,returning bool value
+
+void CScriptGameObject::SetCallbackEx(GameObject::ECallbackType type, const luabind::functor<bool> &functor)
+{
+	object().callback_ex(type).set(functor);
+}
+
+void CScriptGameObject::SetCallbackEx(GameObject::ECallbackType type, const luabind::functor<bool> &functor, const luabind::object &object)
+{
+	this->object().callback_ex(type).set(functor, object);
+}
+
+void CScriptGameObject::SetCallbackEx(GameObject::ECallbackType type)
+{
+	object().callback_ex(type).clear();
+}
+
+#pragma endregion
+
+void CScriptGameObject::IterateInventoryBoxObject(luabind::functor<void> functor,bool showError) const
+{
+	CInventoryBox			*inventoryBox = smart_cast<CInventoryBox*>(&this->object());
+	if (!inventoryBox) {
+		ai().script_engine().script_log		(ScriptStorage::eLuaMessageTypeError,"CScriptGameObject::IterateInventoryBoxOnlyFunctor non-CInventoryBox object !!!");
+		return;
+	}
+
+	xr_vector<u16>::iterator	I_id = inventoryBox->GetItemsVector()->begin();
+	xr_vector<u16>::iterator	E = inventoryBox->GetItemsVector()->end();
+	for ( ; I_id != E; ++I_id)
+	{
+		CInventoryItem* item=smart_cast<PIItem>(Level().Objects.net_Find(*I_id));
+		if (item)
+			functor				(item->object().lua_game_object());
+		else
+			if (showError)
+				Msg("! ERROR invalid id [%i] in inventoryBox. Not found in object registry!",*I_id);
+	}
+}
+
+void CScriptGameObject::IterateInventoryBoxId(luabind::functor<void> functor) const
+{
+	CInventoryBox			*inventoryBox = smart_cast<CInventoryBox*>(&this->object());
+	if (!inventoryBox) {
+		ai().script_engine().script_log		(ScriptStorage::eLuaMessageTypeError,"CScriptGameObject::IterateInventoryBoxOnlyFunctor non-CInventoryBox object !!!");
+		return;
+	}
+	xr_vector<u16>::iterator	I_id = inventoryBox->GetItemsVector()->begin();
+	xr_vector<u16>::iterator	E = inventoryBox->GetItemsVector()->end();
+	for ( ; I_id != E; ++I_id)
+		functor				(*I_id);
+}
+
 #pragma endregion
 
 class_<CScriptGameObject> &script_register_game_object3(class_<CScriptGameObject> &instance)
 {
 	instance
 		.def("get_slot",					&CScriptGameObject::GetSlot)
+		.def("get_inventory_wnd",			&get_inventory_wnd)
 		.def("invulnerable",				static_cast<bool (CScriptGameObject::*)		() const>	(&CScriptGameObject::invulnerable))
 		.def("invulnerable",				static_cast<void (CScriptGameObject::*)		(bool)>		(&CScriptGameObject::invulnerable))
 		.def("max_weight",					&CScriptGameObject::GetActorMaxWeight)
@@ -335,7 +396,42 @@ class_<CScriptGameObject> &script_register_game_object3(class_<CScriptGameObject
 		.def("get_visual_name",				&CScriptGameObject::GetVisualName)
 		.def("get_immunities_from_belt",	&CScriptGameObject::GetImmunitiesFromBeltTable)
 		.def("get_immunities",				&CScriptGameObject::GetImmunitiesTable)
-		.def("inventory_move_item",			&CScriptGameObject::InventoryMoveItem);
+
+		.def("set_callback_ex",				static_cast<void (CScriptGameObject::*)		(GameObject::ECallbackType, const luabind::functor<bool>&)>								(&CScriptGameObject::SetCallbackEx))
+		.def("set_callback_ex",				static_cast<void (CScriptGameObject::*)		(GameObject::ECallbackType, const luabind::functor<bool>&, const luabind::object&)>		(&CScriptGameObject::SetCallbackEx))
+		.def("set_callback_ex",				static_cast<void (CScriptGameObject::*)		(GameObject::ECallbackType)>															(&CScriptGameObject::SetCallbackEx))
+	
+		.def("inventory_move_item",			&CScriptGameObject::InventoryMoveItem)
+	
+		.def("is_game_object",				&CScriptGameObject::IsGameObject)
+		.def("is_car",						&CScriptGameObject::IsCar)
+		.def("is_helicopter",				&CScriptGameObject::IsHeli)
+		.def("is_entity_alive",				&CScriptGameObject::IsEntityAlive)
+		.def("is_artefact",					&CScriptGameObject::IsArtefact)
+		.def("is_actor",					&CScriptGameObject::IsActor)
+		.def("is_weapon",					&CScriptGameObject::IsWeapon)
+		.def("is_medkit",					&CScriptGameObject::IsMedkit)
+		.def("is_eatable",					&CScriptGameObject::IsEatableItem)
+		.def("is_antirad",					&CScriptGameObject::IsAntirad)
+		.def("is_outfit",					&CScriptGameObject::IsCustomOutfit)
+		.def("is_scope",					&CScriptGameObject::IsScope)
+		.def("is_silencer",					&CScriptGameObject::IsSilencer)
+		.def("is_grenade_launcher",			&CScriptGameObject::IsGrenadeLauncher)
+		.def("is_weapon_magazined",			&CScriptGameObject::IsWeaponMagazined)
+		.def("is_stalker",					&CScriptGameObject::IsStalker)
+		.def("is_monster",					&CScriptGameObject::IsMonster)
+		.def("is_trader",					&CScriptGameObject::IsTrader)
+		.def("is_ammo",						&CScriptGameObject::IsAmmo)
+		.def("is_missile",					&CScriptGameObject::IsMissile)
+		.def("is_grenade",					&CScriptGameObject::IsGrenade)
+		.def("is_bottle",					&CScriptGameObject::IsBottleItem)
+		.def("is_torch",					&CScriptGameObject::IsTorch)
+		.def("is_weaponGL",					&CScriptGameObject::IsWeaponGL)
+		.def("is_inventory_box",			&CScriptGameObject::IsInventoryBox)
+		.def("iterate_box_obj",				&CScriptGameObject::IterateInventoryBoxObject)
+		.def("iterate_box_obj",				&CScriptGameObject::IterateInventoryBoxId)
+		
+	;
 
 	return	(instance);
 }

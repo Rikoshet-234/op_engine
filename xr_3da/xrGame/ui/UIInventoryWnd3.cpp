@@ -185,13 +185,14 @@ void CUIInventoryWnd::ActivatePropertiesBox()
 		AddWeaponAttachInfo(RIFLE_SLOT,pGrenadeLauncher,"st_attach_gl_to_rifle",b_show);
 	}
 
-	if (pAmmoItem)
+#pragma region disable due to hard learning async state machine and plaing animation
+	/*if (pAmmoItem)
 	{
 		AddLoadAmmoWeaponInfo(PISTOL_SLOT,pAmmoItem,b_show);
 		AddLoadAmmoWeaponInfo(SHOTGUN_SLOT,pAmmoItem,b_show);
 		AddLoadAmmoWeaponInfo(RIFLE_SLOT,pAmmoItem,b_show);
-	}
-
+	}*/
+#pragma endregion
 	LPCSTR _action = nullptr;
 
 	if(pMedkit || pAntirad)
@@ -291,20 +292,11 @@ void CUIInventoryWnd::ProcessPropertiesBoxClicked	()
 				CWeaponAmmo*		ammo	=static_cast<CWeaponAmmo*>(CurrentItem()->m_pData);
 				if (weapon && ammo)
 				{
+					CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
+					pGameSP->InventoryMenu->GetHolder()->StartStopMenu(pGameSP->InventoryMenu,true);
+					if (m_pInv->ActiveItem()!=weapon)
+						m_pInv->ProcessSlotAction(true,weapon->GetSlot());
 					weapon->LoadAmmo(ammo);
-					//CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-					//pGameSP->InventoryMenu->GetHolder()->StartStopMenu(pGameSP->InventoryMenu,true);
-					//m_pInv->ProcessSlotAction(true,weapon->GetSlot());
-					//m_pInv->Items_SetCurrentEntityHud(true);
-					//weapon->Action(kWPN_RELOAD, CMD_START);
-
-					/*CHudItem* pHudItem = smart_cast<CHudItem*>(m_pInv->ActiveItem());
-					if (pHudItem) 
-					{
-						pHudItem->OnStateSwitch(CWeapon::eReload);
-					}*/
-					//weapon->OnStateSwitch(CWeapon::eReload); 
-					//weapon->SetState(CWeapon::eReload);
 				}
 			}
 			break;

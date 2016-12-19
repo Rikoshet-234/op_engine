@@ -263,17 +263,5 @@ class_<CScriptGameObject> &script_register_game_object2(class_<CScriptGameObject
 		.def("movement_enabled",			&CScriptGameObject::movement_enabled)
 
 		.def("critically_wounded",			&CScriptGameObject::critically_wounded)
-		
-		//functions for object testing
-		.def("is_game_object",				&CScriptGameObject::IsGameObject)
-		.def("is_car",						&CScriptGameObject::IsCar)
-		.def("is_helicopter",				&CScriptGameObject::IsHeli)
-		.def("is_entity_alive",				&CScriptGameObject::IsEntityAlive)
-		.def("is_artefact",					&CScriptGameObject::IsArtefact)
-
-
-		
-
-
 	;return	(instance);
 }

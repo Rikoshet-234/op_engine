@@ -135,6 +135,9 @@ public:
 	virtual bool	StopedAfterQueueFired	()			{return m_bStopedAfterQueueFired; }
 	virtual void	StopedAfterQueueFired	(bool value){m_bStopedAfterQueueFired = value; }
 	
+	bool m_bforceReloadAfterIdle;
+	bool GetForeceReloadFlag() const {return m_bforceReloadAfterIdle;}
+	void SetForeceReloadFlag(bool flag) {m_bforceReloadAfterIdle=flag;}
 protected:
 	//максимальный размер очереди, которой можно стрельнуть
 	int				m_iQueueSize;

@@ -496,19 +496,19 @@ bool CUIDragDropListEx::select_weapons_by_addon(CInventoryItem* addonItem)
 		CWeapon* weapon = smart_cast<CWeapon*>(item);
 		if (!weapon)
 			continue;
-		if ( pScope && weapon->CanAttach(pScope) )
+		if ( pScope && xr_strcmp(weapon->GetScopeName(),pScope->cNameSect())==0)
 		{
 			ci->m_suitable = true;
 			selected=true;
 			continue;
 		}
-		if ( pSilencer && weapon->CanAttach(pSilencer) )
+		if ( pSilencer && xr_strcmp(weapon->GetSilencerName(),pSilencer->cNameSect())==0)
 		{
 			ci->m_suitable = true;
 			selected=true;
 			continue;
 		}
-		if ( pGrenadeLauncher && weapon->CanAttach(pGrenadeLauncher) )
+		if ( pGrenadeLauncher && xr_strcmp(weapon->GetGrenadeLauncherName(),pGrenadeLauncher->cNameSect())==0)
 		{
 			ci->m_suitable = true;
 			selected=true;

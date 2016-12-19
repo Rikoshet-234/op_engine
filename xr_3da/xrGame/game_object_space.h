@@ -34,7 +34,7 @@ namespace GameObject {
 		eActionTypeParticle,
 		eActionTypeObject,
 
-			eActorSleep,
+		eActorSleep,
 
 		eHelicopterOnPoint,
 		eHelicopterOnHit,
@@ -63,6 +63,7 @@ namespace GameObject {
 
 		OnInventoryItemPlaceChange,
 		OnKeyboardPress,
+		OnPrepareItemInfo,
 		eDummy = u32(-1),
 	};
 };

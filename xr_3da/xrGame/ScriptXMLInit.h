@@ -30,6 +30,7 @@ class CUIMapInfo;
 class CUIMMShniaga;
 class CUIScrollView;
 class CUIProgressBar;
+class CUIListItemIconed;
 
 class CScriptXmlInit {
 public:
@@ -68,6 +69,9 @@ public:
 	CUIScrollView*		InitScrollView(LPCSTR path, CUIWindow* parent);
 	CUIProgressBar*		InitProgressBar(LPCSTR path, CUIWindow* parent);
 	void				InitAutoStaticGroup(LPCSTR path, CUIWindow* pWnd);
+
+	luabind::object		TryReadTable(LPCSTR tablePath);
+	CUIListItemIconed*	InitIconedColumns(LPCSTR path, CUIWindow* pWnd);
 protected:
 	CUIXml	m_xml;
 };

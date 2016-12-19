@@ -21,6 +21,7 @@
 #include "../game_object_space.h"
 #include "../OPFuncs/utils.h"
 #include "../../defines.h"
+#include "UIGameSP.h"
 
 CUICellItem* CUIInventoryWnd::CurrentItem()
 {
@@ -382,11 +383,13 @@ bool CUIInventoryWnd::OnItemDrop(CUICellItem* itm)
 				AttachAddon(weapon);
 				processed=true;
 			} 
-			else if (pAmmo!=nullptr && weapon->CanLoadAmmo(pAmmo,true))
+#pragma region disabled due i do not wont move active item to slot
+			/*else if (pAmmo!=nullptr && weapon->CanLoadAmmo(pAmmo,true)) 
 			{
 				weapon->LoadAmmo(pAmmo);
 				processed=true;
-			}
+			}*/
+#pragma endregion
 		}
 		if (Actor())
 			Actor()->callback(GameObject::ECallbackType::eOnCellItemDrop)(this,old_owner,new_owner,itm,focusedCellItem,processed);
@@ -400,7 +403,8 @@ bool CUIInventoryWnd::OnItemDrop(CUICellItem* itm)
 			CUIDragDropListEx *slotForitem=GetSlotList(CurrentIItem()->GetSlot());
 			if(slotForitem==new_owner)
 					processed=ToSlot	(itm, true);
-			else
+#pragma region disabled due i do not wont move active item to slot
+			/*else
 			{
 				CWeapon*			weapon				= smart_cast<CWeapon*>			(focusedItem); 
 				if (weapon)
@@ -408,12 +412,12 @@ bool CUIInventoryWnd::OnItemDrop(CUICellItem* itm)
 					CWeaponAmmo*		pAmmo				= smart_cast<CWeaponAmmo*>		(draggedItem);
 					if (pAmmo!=nullptr && weapon->CanLoadAmmo(pAmmo,true))
 					{
-//						if (g_uCommonFlags.test(invReloadWeapon))
-							weapon->LoadAmmo(pAmmo);
+						weapon->LoadAmmo(pAmmo);
 						processed=true;
 					}
 				}
-			}
+			}*/
+#pragma endregion
 		}break;
 		case iwBag:{
 			processed=ToBag	(itm, true);
@@ -429,7 +433,13 @@ bool CUIInventoryWnd::OnItemDrop(CUICellItem* itm)
 			Actor()->callback(GameObject::ECallbackType::eOnCellItemDrop)(this,old_owner,new_owner,itm,focusedCellItem,processed);
 	return true;
 }
-
+void CUIInventoryWnd::hideInventoryWnd(CInventoryItem* weapon) const
+{
+	CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
+	pGameSP->InventoryMenu->GetHolder()->StartStopMenu(pGameSP->InventoryMenu,true);
+	if (m_pInv->ActiveItem()!=weapon)
+		m_pInv->ProcessSlotAction(true,weapon->GetSlot());
+}
 bool CUIInventoryWnd::OnItemDbClick(CUICellItem* itm)
 {
 	CInventoryItem *invItem=static_cast<PIItem>(itm->m_pData);
@@ -456,28 +466,32 @@ bool CUIInventoryWnd::OnItemDbClick(CUICellItem* itm)
 			CInventoryItem *pistol=m_pInv->m_slots[PISTOL_SLOT].m_pIItem;
 			CInventoryItem *rifle=m_pInv->m_slots[RIFLE_SLOT].m_pIItem;
 			CInventoryItem *shotgun=m_pInv->m_slots[SHOTGUN_SLOT].m_pIItem;
-			if (ammo)
+#pragma region disable due to hard learning async state machine and plaing animation
+			/*if (ammo)
 			{				
 				if (pistol != nullptr && pistol->CanLoadAmmo(ammo,true))
 				{
 					CWeaponMagazined* weapon=smart_cast<CWeaponMagazined*>(pistol);
+					hideInventoryWnd(weapon);
 					weapon->LoadAmmo(ammo);
 					break;
 				}
 				if (shotgun != nullptr && shotgun->CanLoadAmmo(ammo,true))
 				{
 					CWeaponMagazined* weapon=smart_cast<CWeaponMagazined*>(shotgun);
+					hideInventoryWnd(weapon);
 					weapon->LoadAmmo(ammo);
 					break;
 				}				
 				if (rifle != nullptr && rifle->CanLoadAmmo(ammo,true))
 				{
 					CWeaponMagazined* weapon=smart_cast<CWeaponMagazined*>(rifle);
+					hideInventoryWnd(weapon);
 					weapon->LoadAmmo(ammo);
 					break;
 				}
-			}
-
+			}*/
+#pragma endregion
 			CScope*				pScope				= smart_cast<CScope*>			(invItem);
 			CSilencer*			pSilencer			= smart_cast<CSilencer*>		(invItem);
 			CGrenadeLauncher*	pGrenadeLauncher	= smart_cast<CGrenadeLauncher*> (invItem);

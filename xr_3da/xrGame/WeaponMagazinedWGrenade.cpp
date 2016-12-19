@@ -23,6 +23,7 @@ CWeaponMagazinedWGrenade::CWeaponMagazinedWGrenade(LPCSTR name,ESoundTypes eSoun
 {
 	m_ammoType2 = 0;
 	m_bGrenadeMode = false;
+	m_bforceReloadAfterIdle=false;
 }
 
 CWeaponMagazinedWGrenade::~CWeaponMagazinedWGrenade(void)
@@ -157,6 +158,7 @@ BOOL CWeaponMagazinedWGrenade::net_Spawn(CSE_Abstract* DC)
 
 void CWeaponMagazinedWGrenade::switch2_Idle() 
 {
+	SHOW_WEAPON_STATE(eIdle);
 	inherited::switch2_Idle();
 }
 
@@ -192,6 +194,7 @@ void CWeaponMagazinedWGrenade::OnShot		()
 //на одиночные, а уже потом на подствольник
 bool CWeaponMagazinedWGrenade::SwitchMode() 
 {
+	SHOW_WEAPON_STATE(GetState());
 	bool bUsefulStateToSwitch = ((eIdle==GetState())||(eHidden==GetState())||(eMisfire==GetState())||(eMagEmpty==GetState())) && (!IsPending());
 
 	if(!bUsefulStateToSwitch)
@@ -215,6 +218,7 @@ bool CWeaponMagazinedWGrenade::SwitchMode()
 
 void  CWeaponMagazinedWGrenade::PerformSwitchGL()
 {
+	SHOW_WEAPON_STATE(GetState());
 	m_bGrenadeMode		= !m_bGrenadeMode;
 
 	iMagazineSize		= m_bGrenadeMode?1:iMagazineSize2;
@@ -252,7 +256,8 @@ void  CWeaponMagazinedWGrenade::PerformSwitchGL()
 
 bool CWeaponMagazinedWGrenade::Action(s32 cmd, u32 flags) 
 {
-	if(inherited::Action(cmd, flags)) return true;
+	SHOW_WEAPON_STATE(GetState());
+	if(inherited::Action(cmd, flags)) return  true;
 	
 	switch(cmd) 
 	{
@@ -327,6 +332,7 @@ void CWeaponMagazinedWGrenade::state_Fire(float dt)
 
 void CWeaponMagazinedWGrenade::SwitchState(u32 S) 
 {
+	SHOW_WEAPON_STATE(S);
 	inherited::SwitchState(S);
 	
 	//стрельнуть из подствольника
@@ -454,7 +460,7 @@ void CWeaponMagazinedWGrenade::ReloadMagazine()
 
 void CWeaponMagazinedWGrenade::OnStateSwitch(u32 S) 
 {
-
+	SHOW_WEAPON_STATE(S);
 	switch (S)
 	{
 	case eSwitch:
@@ -473,6 +479,7 @@ void CWeaponMagazinedWGrenade::OnStateSwitch(u32 S)
 
 void CWeaponMagazinedWGrenade::OnAnimationEnd(u32 state)
 {
+	SHOW_WEAPON_STATE(state);
 	switch (state)
 	{
 	case eSwitch:
@@ -621,7 +628,7 @@ void CWeaponMagazinedWGrenade::LoadAmmo(CWeaponAmmo* pAmmo)
 	bool ammo1=ammo1_it!=m_ammoTypes.end();
 	bool ammo2=ammo2_it!=m_ammoTypes2.end();
 
-	if (!m_bGrenadeMode) // подствольник не выключен
+	if (!m_bGrenadeMode) // подствольник не включен
 	{
 		if (ammo1 && !ammo2) // б/п найдены в списке патронов
 		{
@@ -632,17 +639,18 @@ void CWeaponMagazinedWGrenade::LoadAmmo(CWeaponAmmo* pAmmo)
 		{
 			if (IsGrenadeLauncherAttached()) 
 			{
-				u32 index2=std::distance(m_ammoTypes2.begin(), ammo2_it);
-				if (index2==m_ammoType2 && !m_magazine2.empty())
+				/*m_set_next_ammoType_on_reload=std::distance(m_ammoTypes2.begin(), ammo2_it);
+				if (m_set_next_ammoType_on_reload==m_ammoType2 && !m_magazine2.empty())
 				{
 					PlayEmptySnd();
+					m_set_next_ammoType_on_reload=u32(-1);
 					return;
-				}
-				m_ammoType2=index2;
-				PerformSwitchGL();
-				PlaySound(sndReloadG,get_LastFP2());
-				UnloadMagazine();
-				ReloadMagazine();
+				}*/
+				SHOW_WEAPON_STATE(GetState());
+				SwitchState(eSwitch);
+				m_bforceReloadAfterIdle=false;
+				//m_bForceSwitchAfterIdle=true; 				
+				/*UnloadMagazine();*/
 				return;
 			}
 		}
@@ -685,8 +693,7 @@ void CWeaponMagazinedWGrenade::LoadAmmo(CWeaponAmmo* pAmmo)
 
 bool CWeaponMagazinedWGrenade::CanLoadAmmo(CWeaponAmmo* pAmmo,bool checkFullMagazine)
 {
-	bool grAllowed=false;
-	if (!pAmmo) return grAllowed;
+	if (!pAmmo) return false;
 	bool switchBack=false;
 	if (m_bGrenadeMode)
 	{
@@ -694,11 +701,22 @@ bool CWeaponMagazinedWGrenade::CanLoadAmmo(CWeaponAmmo* pAmmo,bool checkFullMaga
 		PerformSwitchGL();
 	}
 	bool ammo1=inherited::CanLoadAmmo(pAmmo,checkFullMagazine);
-	//bool ammo1=std::find(m_ammoTypes.begin(),m_ammoTypes.end(),pAmmo->cNameSect())!=m_ammoTypes.end();
+	if (checkFullMagazine)
+	{
+		xr_string currentAmmoType;
+		if (GetAmmoElapsed()==0 || m_magazine2.empty())
+			currentAmmoType=*m_ammoTypes2[m_ammoType2];
+		else
+			currentAmmoType = *m_ammoTypes2[m_magazine2.back().m_LocalAmmoType];
+		if ((xr_strcmp(currentAmmoType.c_str(),pAmmo->cNameSect().c_str())==0) && m_magazine2.size()==1)
+			return false;
+	}
 	bool ammo2=std::find(m_ammoTypes2.begin(),m_ammoTypes2.end(),pAmmo->cNameSect())!=m_ammoTypes2.end();
 	if (switchBack)
 		PerformSwitchGL();
-	return ammo1 || (ammo2 && GrenadeLauncherAttachable());
+	if (ammo1 || (ammo2 && GrenadeLauncherAttachable() && !checkFullMagazine))
+		return true;
+	return ammo1 || (ammo2 && IsGrenadeLauncherAttached());
 }
 
 //виртуальные функции для проигрывания анимации HUD

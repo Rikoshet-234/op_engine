@@ -39,36 +39,36 @@ void CUIListItemIconed::SetFieldIcon(u32 fieldIndex, LPCSTR textureName)
 }
 
 
-void CUIListItemIconed::InitXml(const char* path, CUIXml& uiXml)
-{
-
-	CUIStatic	*pStatic;
-	string256 buf;
-	strconcat(sizeof(buf),buf, path, ":static");
-
-	int tabsCount = uiXml.GetNodesNum(path, 0, "static");
-
-	XML_NODE* _stored_root = uiXml.GetLocalRoot();
-	uiXml.SetLocalRoot(uiXml.NavigateToNode(path,0));
-	string64 sname;
-
-	for (int i = 0; i < tabsCount; ++i)
-	{
-		pStatic = xr_new<CUIStatic>();
-		pStatic->SetAutoDelete(true);
-		CUIXmlInit::InitStatic(uiXml, "static", i, pStatic);
-		pStatic->SetTextAlignment(CGameFont::alLeft);
-		pStatic->m_pLines->SetColoringMode(true);
-		sprintf_s(sname,"column_%d", i);
-		pStatic->SetWindowName(sname);
-		AttachChild(pStatic);
-		fields.push_back(pStatic);
-	}
-
-	//fields[0]->SetElipsis(CUIStatic::eepEnd, 0);
-	uiXml.SetLocalRoot(_stored_root);
-
-}
+//void CUIListItemIconed::InitXml(const char* path, CUIXml& uiXml)
+//{
+//
+//	CUIStatic	*pStatic;
+//	string256 buf;
+//	strconcat(sizeof(buf),buf, path, ":static");
+//
+//	int tabsCount = uiXml.GetNodesNum(path, 0, "static");
+//
+//	XML_NODE* _stored_root = uiXml.GetLocalRoot();
+//	uiXml.SetLocalRoot(uiXml.NavigateToNode(path,0));
+//	string64 sname;
+//
+//	for (int i = 0; i < tabsCount; ++i)
+//	{
+//		pStatic = xr_new<CUIStatic>();
+//		pStatic->SetAutoDelete(true);
+//		CUIXmlInit::InitStatic(uiXml, "static", i, pStatic);
+//		pStatic->SetTextAlignment(CGameFont::alLeft);
+//		pStatic->m_pLines->SetColoringMode(true);
+//		sprintf_s(sname,"column_%d", i);
+//		pStatic->SetWindowName(sname);
+//		AttachChild(pStatic);
+//		fields.push_back(pStatic);
+//	}
+//
+//	//fields[0]->SetElipsis(CUIStatic::eepEnd, 0);
+//	uiXml.SetLocalRoot(_stored_root);
+//
+//}
 
 void CUIListItemIconed::ClearField(u32 fieldIndex)
 {
@@ -80,4 +80,11 @@ void CUIListItemIconed::SetVisibility(u32 fieldIndex, bool visibility)
 {
 	if (auto pStatic=GetFieldStatic(fieldIndex))
 		pStatic->Show(visibility);
+}
+
+bool CUIListItemIconed::GetVisibility(u32 fieldIndex)
+{
+	if (auto pStatic=GetFieldStatic(fieldIndex))
+		return pStatic->IsShown();
+	return false;
 }

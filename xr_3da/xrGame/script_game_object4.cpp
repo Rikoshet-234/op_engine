@@ -19,7 +19,8 @@
 #include "sight_control_action.h"
 #include "sight_manager.h"
 #include "inventoryBox.h"
-#include "Artifact.h"
+
+
 class CWeapon;
 
 //////////////////////////////////////////////////////////////////////////
@@ -226,7 +227,24 @@ bool CScriptGameObject::IsInvBoxEmpty()
 //KD
 #include "car.h"
 #include "helicopter.h"
-#include "actor.h"
+#include "Artifact.h"
+#include "Actor.h"
+#include "Weapon.h"
+#include "medkit.h"
+#include "antirad.h"
+#include "CustomOutfit.h"
+#include "Scope.h"
+#include "GrenadeLauncher.h"
+#include "Silencer.h"
+#include "WeaponMagazined.h"
+#include "WeaponMagazinedWGrenade.h"
+#include "Missile.h"
+#include "Grenade.h"
+#include "BottleItem.h"
+#include "Torch.h"
+#include "InventoryBox.h"
+#include "ai/monsters/basemonster/base_monster.h"
+
 #define TEST_OBJECT_CLASS(A,B)\
 bool A () const\
 {\
@@ -242,7 +260,26 @@ TEST_OBJECT_CLASS(CScriptGameObject::IsCar,					CCar)
 TEST_OBJECT_CLASS(CScriptGameObject::IsHeli,				CHelicopter)
 TEST_OBJECT_CLASS(CScriptGameObject::IsEntityAlive,			CEntityAlive)
 TEST_OBJECT_CLASS(CScriptGameObject::IsArtefact,			CArtefact)
-
+TEST_OBJECT_CLASS(CScriptGameObject::IsActor,				CActor)
+TEST_OBJECT_CLASS(CScriptGameObject::IsWeapon,				CWeapon)
+TEST_OBJECT_CLASS(CScriptGameObject::IsMedkit,				CMedkit)
+TEST_OBJECT_CLASS(CScriptGameObject::IsEatableItem,			CEatableItem)
+TEST_OBJECT_CLASS(CScriptGameObject::IsAntirad,				CAntirad)
+TEST_OBJECT_CLASS(CScriptGameObject::IsCustomOutfit,		CCustomOutfit)
+TEST_OBJECT_CLASS(CScriptGameObject::IsScope,				CScope)
+TEST_OBJECT_CLASS(CScriptGameObject::IsSilencer,			CSilencer)
+TEST_OBJECT_CLASS(CScriptGameObject::IsGrenadeLauncher,		CGrenadeLauncher)
+TEST_OBJECT_CLASS(CScriptGameObject::IsWeaponMagazined,		CWeaponMagazined)
+TEST_OBJECT_CLASS(CScriptGameObject::IsStalker,				CAI_Stalker)
+TEST_OBJECT_CLASS(CScriptGameObject::IsMonster,				CBaseMonster)
+TEST_OBJECT_CLASS(CScriptGameObject::IsTrader,				CAI_Trader)
+TEST_OBJECT_CLASS(CScriptGameObject::IsAmmo,				CWeaponAmmo)
+TEST_OBJECT_CLASS(CScriptGameObject::IsMissile,				CMissile)
+TEST_OBJECT_CLASS(CScriptGameObject::IsGrenade,				CGrenade)
+TEST_OBJECT_CLASS(CScriptGameObject::IsBottleItem,			CBottleItem)
+TEST_OBJECT_CLASS(CScriptGameObject::IsTorch,				CTorch)
+TEST_OBJECT_CLASS(CScriptGameObject::IsWeaponGL,			CWeaponMagazinedWGrenade)
+TEST_OBJECT_CLASS(CScriptGameObject::IsInventoryBox,		CInventoryBox)
 		
 		
 		

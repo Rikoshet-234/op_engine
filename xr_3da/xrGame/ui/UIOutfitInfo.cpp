@@ -97,7 +97,7 @@ void CUIOutfitInfo::NewSetItem(ALife::EHitType hitType, bool force_add)
 		CUIXml uiXml;
 		uiXml.Init(CONFIG_PATH, UI_PATH, "inventory_new.xml");
 		item=xr_new<CUIListItemIconed>();
-		item->InitXml(xml_path.c_str(),uiXml);
+		CUIXmlInit::InitIconedColumns(uiXml,xml_path.c_str(),0,item);
 		item->SetData((void*)hitName);
 		item->SetAutoDelete(true);
 		m_list->AddItem<CUIListItemIconed>(item);

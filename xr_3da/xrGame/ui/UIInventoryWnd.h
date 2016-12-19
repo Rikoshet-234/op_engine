@@ -137,6 +137,8 @@ protected:
 
 	CUICellItem*				m_pCurrentCellItem;
 
+	void hideInventoryWnd(CInventoryItem* weapon) const;
+
 	bool						DropItem					(PIItem itm, CUIDragDropListEx* lst);
 	bool						TryUseItem					(PIItem itm);
 	//----------------------	-----------------------------------------------

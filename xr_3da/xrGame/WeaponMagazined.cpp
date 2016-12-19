@@ -37,6 +37,7 @@ CWeaponMagazined::CWeaponMagazined(LPCSTR name, ESoundTypes eSoundType) : CWeapo
 	m_iQueueSize = WEAPON_ININITE_QUEUE;
 	m_bLockType = false;
 	m_iCurFireMode=0;
+	m_bforceReloadAfterIdle=false;
 }
 
 CWeaponMagazined::~CWeaponMagazined()
@@ -297,6 +298,7 @@ void CWeaponMagazined::UnloadMagazine(bool spawn_ammo)
 
 void CWeaponMagazined::ReloadMagazine() 
 {
+	m_bforceReloadAfterIdle=false;
 	m_dwAmmoCurrentCalcFrame = 0;	
 
 	//устранить осечку при перезарядке
@@ -631,6 +633,11 @@ void CWeaponMagazined::switch2_Idle	()
 {
 	m_bPending = false;
 	PlayAnimIdle();
+	if (GetForeceReloadFlag())
+	{
+		SetForeceReloadFlag(false);
+		SwitchState(eReload);
+	}
 }
 
 #ifdef DEBUG
@@ -834,8 +841,6 @@ bool CWeaponMagazined::CanLoadAmmo(CWeaponAmmo* pAmmo,bool checkFullMagazine)
 
 void CWeaponMagazined::LoadAmmo(CWeaponAmmo* pAmmo)
 {
-	return;
-
 	if (!pAmmo)
 	{
 		Msg("! WARNING not possible to load null ammo in magazine for [%s]",Name());
@@ -855,11 +860,8 @@ void CWeaponMagazined::LoadAmmo(CWeaponAmmo* pAmmo)
 		m_set_next_ammoType_on_reload=std::distance(m_ammoTypes.begin(),am_it);
 		if (m_set_next_ammoType_on_reload!=u32(-1))
 		{
-			SetState(eReload);
-			TryReload();
-			/*m_pHUD->animPlay(random_anim(mhud.mhud_reload),TRUE,this,eReload);
-			PlayReloadSound();
-			ReloadMagazine();*/
+			m_bforceReloadAfterIdle=true;
+			UnloadMagazine();
 		}
 	}
 }

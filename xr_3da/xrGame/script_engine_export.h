@@ -164,4 +164,5 @@
 #	include "physicobject.h"
 #	include "item_place_change_enum.h"
 #	include "inventory_slots_script_enum.h"
+#	include	"ui/UIListItemIconed.h"
 #endif

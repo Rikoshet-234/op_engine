@@ -9785,6 +9785,9 @@
     <ClCompile Include="inventory_slots_script_enum_script.cpp">
       <Filter>AI\AScript\ScriptClasses\ScriptGameObject\enums</Filter>
     </ClCompile>
+    <ClCompile Include="ui\UIListItemIconed_script.cpp">
+      <Filter>UI\UIWindows\ListBox\Iconed</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="graph_abstract.h">

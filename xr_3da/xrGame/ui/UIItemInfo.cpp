@@ -13,7 +13,10 @@
 #include "UIInventoryUtilities.h"
 #include "../PhysicsShellHolder.h"
 #include "UIWpnParams.h"
+#include "game_object_space.h"
 #include "ui_af_params.h"
+#include "actor.h"
+#include "../script_callback_ex.h"
 
 CUIItemInfo::CUIItemInfo()
 {
@@ -71,7 +74,6 @@ void CUIItemInfo::Init(LPCSTR xml_name){
 		UIWeight->SetAutoDelete(true);
 		xml_init.InitStatic		(uiXml, "static_weight", 0,			UIWeight);
 	}
-
 	if(uiXml.NavigateToNode("static_cost",0))
 	{
 		UICost					= xr_new<CUIStatic>();	 
@@ -79,7 +81,6 @@ void CUIItemInfo::Init(LPCSTR xml_name){
 		UICost->SetAutoDelete	(true);
 		xml_init.InitStatic		(uiXml, "static_cost", 0,			UICost);
 	}
-
 	if(uiXml.NavigateToNode("static_condition",0))
 	{
 		UICondition					= xr_new<CUIStatic>();	 
@@ -87,7 +88,6 @@ void CUIItemInfo::Init(LPCSTR xml_name){
 		UICondition->SetAutoDelete	(true);
 		xml_init.InitStatic			(uiXml, "static_condition", 0,		UICondition);
 	}
-
 	if(uiXml.NavigateToNode("condition_progress",0))
 	{
 		UICondProgresBar			= xr_new<CUIProgressBar>(); 
@@ -159,7 +159,6 @@ void CUIItemInfo::InitItem(CInventoryItem* pInvItem)
 		sprintf_s				(str, "%d %s", pInvItem->Cost(),*CStringTable().translate("ui_st_money_regional"));		// will be owerwritten in multiplayer
 		UICost->SetText		(str);
 	}
-
 	if(UICondProgresBar)
 	{
 		float cond							= pInvItem->GetConditionToShow();
@@ -173,6 +172,10 @@ void CUIItemInfo::InitItem(CInventoryItem* pInvItem)
 		VERIFY								(0==UIDesc->GetSize());
 		TryAddWpnInfo						(pInvItem->object().cNameSect());
 		TryAddArtefactInfo					(pInvItem->object().cNameSect());
+
+		if (Actor())
+			Actor()->callback(GameObject::ECallbackType::OnPrepareItemInfo)(UIDesc);
+		
 		if(m_desc_info.bShowDescrText)
 		{
 			CUIStatic* pItem					= xr_new<CUIStatic>();

@@ -283,14 +283,19 @@ public:
 public:
 	
 	typedef CScriptCallbackEx<void> CScriptCallbackExVoid;
+	typedef CScriptCallbackEx<bool> CScriptCallbackExBool;
 
 private:
 	
 	DEFINE_MAP				(GameObject::ECallbackType, CScriptCallbackExVoid, CALLBACK_MAP, CALLBACK_MAP_IT);
 	CALLBACK_MAP			*m_callbacks;
 
+	DEFINE_MAP				(GameObject::ECallbackType, CScriptCallbackExBool, CALLBACK_MAP_BOOL, CALLBACK_MAP_BOOL_IT);
+	CALLBACK_MAP_BOOL		*m_callbacks_bool;
+
 public:
 	CScriptCallbackExVoid	&callback			(GameObject::ECallbackType type) const;
+	CScriptCallbackExBool	&callback_ex		(GameObject::ECallbackType type) const;
 	virtual	LPCSTR			visual_name			(CSE_Abstract *server_entity);
 
 	virtual	void			On_B_NotCurrentEntity () {};

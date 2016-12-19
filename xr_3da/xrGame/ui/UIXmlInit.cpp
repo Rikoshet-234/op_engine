@@ -26,7 +26,7 @@
 #include "UIComboBox.h"
 #include "UITrackBar.h"
 #include "../game_base_space.h"
-
+#include "UIListItemIconed.h"
 #include "UITextureMaster.h"
 #include "UIDragDropListEx.h"
 #include "UItabButtonMP.h"
@@ -1391,4 +1391,34 @@ u32	CUIXmlInit::GetColor(CUIXml& xml_doc, const char* path, int index, u32 def_c
 		return color_argb(a,r,g,b);
 	}
 
+}
+
+bool	CUIXmlInit::InitIconedColumns		(CUIXml& xml_doc, const char* path, int index, CUIListItemIconed* pWnd)
+{
+	CUIStatic	*pStatic;
+	string256 buf;
+	strconcat(sizeof(buf),buf, path, ":static");
+
+	int tabsCount = xml_doc.GetNodesNum(path, 0, "static");
+
+	XML_NODE* _stored_root = xml_doc.GetLocalRoot();
+	xml_doc.SetLocalRoot(xml_doc.NavigateToNode(path,0));
+	string64 sname;
+
+	for (int i = 0; i < tabsCount; ++i)
+	{
+		pStatic = xr_new<CUIStatic>();
+		pStatic->SetAutoDelete(true);
+		CUIXmlInit::InitStatic(xml_doc, "static", i, pStatic);
+		pStatic->SetTextAlignment(CGameFont::alLeft);
+		pStatic->m_pLines->SetColoringMode(true);
+		sprintf_s(sname,"column_%d", i);
+		pStatic->SetWindowName(sname);
+		pWnd->AttachChild(pStatic);
+		pWnd->GetFields()->push_back(pStatic);
+	}
+
+	//fields[0]->SetElipsis(CUIStatic::eepEnd, 0);
+	xml_doc.SetLocalRoot(_stored_root);
+	return true;
 }

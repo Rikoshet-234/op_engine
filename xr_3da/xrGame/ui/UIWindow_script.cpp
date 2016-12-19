@@ -75,12 +75,6 @@ TEX_INFO	get_texture_info(LPCSTR name, LPCSTR def_name)
 	return CUITextureMaster::FindItem(name, def_name);
 }
 
-CUIInventoryWnd* get_inv_wnd()
-{
-	CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-	return pGameSP->InventoryMenu;
-}
-
 using namespace luabind;
 
 #pragma optimize("s",on)
@@ -227,8 +221,6 @@ void CUIWindow::script_register(lua_State *L)
 		class_<CUIDragDropListEx, CUIWindow,CUIWndCallback>("CUIDragDropListEx")
 		.def("GetUIListId",				&CUIDragDropListEx::GetUIListId),
 
-		def("get_inv_wnd",&get_inv_wnd),		
-		
 		class_<CUIScrollView, CUIWindow>("CUIScrollView")
 		.def(							constructor<>())
 		.def("AddWindow",				&CUIScrollView::AddWindow)
