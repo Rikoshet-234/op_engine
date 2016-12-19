@@ -66,6 +66,7 @@ void key_binding_registrator::script_register(lua_State *L)
 				value("kBUY",						int(kBUY)),
 				value("kSKIN",						int(kSKIN)),
 				value("kTEAM",						int(kTEAM)),
+				value("kCREEP",						int(kCREEP)),
 				value("kNOTBINDED",					int(kNOTBINDED))
 			],
 		class_<key_binding_registrator >("DIK_keys")
@@ -183,7 +184,7 @@ void key_binding_registrator::script_register(lua_State *L)
 				value("DIK_COLON",						int(DIK_COLON		)),
 				value("DIK_KANJI",						int(DIK_KANJI		)),
 				value("DIK_AX",							int(DIK_AX			)),
-				value("DIK_NUMPADENTER",				int(DIK_NUMPADENTER	)),
+				//value("DIK_NUMPADENTER",				int(DIK_NUMPADENTER	)),
 				value("DIK_NUMPADCOMMA",				int(DIK_NUMPADCOMMA	)),
 				value("DIK_SYSRQ",						int(DIK_SYSRQ		)),
 				value("DIK_HOME",						int(DIK_HOME		)),

@@ -99,7 +99,7 @@ _action  actions[]		= {
 	{ "use_medkit",			kUSE_MEDKIT				,_sp},		
 	{ "quick_save",			kQUICK_SAVE				,_sp},		
 	{ "quick_load",			kQUICK_LOAD				,_sp},		
-																
+	{ "creep",				kCREEP					,_sp},												
 	{ NULL, 				kLASTACTION				,_both}		
 };															
 

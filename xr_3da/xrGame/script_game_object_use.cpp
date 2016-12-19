@@ -179,7 +179,10 @@ void CScriptGameObject::set_enemy_callback	()
 
 void CScriptGameObject::SetCallback(GameObject::ECallbackType type, const luabind::functor<void> &functor)
 {
-	object().callback(type).set(functor);
+	if (functor.is_valid())
+		object().callback(type).set(functor);
+	else
+		object().callback(type).clear();
 }
 
 void CScriptGameObject::SetCallback(GameObject::ECallbackType type, const luabind::functor<void> &functor, const luabind::object &object)
@@ -194,9 +197,6 @@ void CScriptGameObject::SetCallback(GameObject::ECallbackType type)
 
 void CScriptGameObject::set_fastcall(const luabind::functor<bool> &functor, const luabind::object &object)
 {
-	
-
-	
 	CPHScriptGameObjectCondition* c=xr_new<CPHScriptGameObjectCondition>(object,functor,m_game_object);
 	CPHDummiAction*				  a=xr_new<CPHDummiAction>();
 	CPHSriptReqGObjComparer cmpr(m_game_object);

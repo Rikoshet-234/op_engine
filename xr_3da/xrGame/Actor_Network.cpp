@@ -1318,6 +1318,10 @@ void CActor::save(NET_Packet &output_packet)
 	inherited::save(output_packet);
 	CInventoryOwner::save(output_packet);
 	output_packet.w_u8(u8(m_bOutBorder));
+	bool crouch=(get_state()&mcCrouch)!=0;
+	output_packet.w_u8(crouch?1:0);
+	output_packet.w_u8(g_bForceCreep?1:0);//reserved
+	output_packet.w_u8(u8(psActorFlags.test(AF_GODMODE_PARTIAL)));
 }
 
 void CActor::load(IReader &input_packet)
@@ -1325,6 +1329,15 @@ void CActor::load(IReader &input_packet)
 	inherited::load(input_packet);
 	CInventoryOwner::load(input_packet);
 	m_bOutBorder=!!(input_packet.r_u8());
+	bool crouch=!!input_packet.r_u8();
+	if (crouch)
+	{
+		g_bAutoClearCrouch=false;
+		g_bForceCrouch=true;
+	}
+	g_bForceCreep=!!input_packet.r_u8();
+	psActorFlags.set(AF_GODMODE_PARTIAL,!!input_packet.r_u8());
+
 }
 
 #ifdef DEBUG

@@ -527,7 +527,6 @@ bool CScriptGameObject::ItemInBelt(int itemID) const
 	const TIItemContainer &list =  inventory_owner->inventory().m_belt;
 	for(TIItemContainer::const_iterator it = list.begin(); list.end() != it; ++it) 
 	{
-		PIItem pIItem = *it;
 		if ((*it)->object().ID()==itemID)
 			return true;
 	}

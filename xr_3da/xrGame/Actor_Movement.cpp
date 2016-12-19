@@ -219,13 +219,21 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector &vControlAccel, float &Ju
 			if (!isActorAccelerated(mstate_real, IsZoomAimingMode()) && isActorAccelerated(mstate_wf, IsZoomAimingMode()))
 			{
 				character_physics_support()->movement()->EnableCharacter();
-				if(!character_physics_support()->movement()->ActivateBoxDynamic(1))move	&=~mcAccel;
+				if(!character_physics_support()->movement()->ActivateBoxDynamic(1))
+				{
+//					if (!g_bForceCreep)
+						move	&=~mcAccel;
+				}
 			}
 
 			if (isActorAccelerated(mstate_real, IsZoomAimingMode()) && !isActorAccelerated(mstate_wf, IsZoomAimingMode()))
 			{
 				character_physics_support()->movement()->EnableCharacter();
-				if(character_physics_support()->movement()->ActivateBoxDynamic(2))mstate_real	&=~mcAccel;
+				if(character_physics_support()->movement()->ActivateBoxDynamic(2))
+				{
+	//				if (!g_bForceCreep)
+						mstate_real	&=~mcAccel;
+				}
 			}
 		}
 
