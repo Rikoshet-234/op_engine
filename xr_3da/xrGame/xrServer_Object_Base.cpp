@@ -113,7 +113,7 @@ CSE_Abstract::CSE_Abstract					(LPCSTR caSection)
 		string_path				file_name;
 		FS.update_path			(file_name,"$game_config$",pSettings->r_string(caSection,"custom_data"));
 		if (!FS.exist(file_name)) {
-			Msg					("! cannot open config file %s",file_name);
+			Msg					("~ WARNING cannot open config file [%s] for [%s]",file_name,caSection);
 		}
 		else {
 			IReader				*reader = FS.r_open(file_name);
@@ -310,7 +310,7 @@ BOOL CSE_Abstract::Spawn_Read				(NET_Packet	&tNetPacket)
 	if (0==m_wVersion) {
 		tNetPacket.r_pos		-= sizeof(u16);
 		m_wVersion				= 0;
-        return					FALSE;
+		return					FALSE;
 	}
 
 	if (m_wVersion > 69)
@@ -378,7 +378,7 @@ void	CSE_Abstract::load			(NET_Packet	&tNetPacket)
 		if (!client_data.empty())
 			Msg					("CSE_Abstract::load: client_data is cleared for [%d][%s]",ID,name_replace());
 #endif // DEBUG
-        client_data.clear		();
+		client_data.clear		();
 	}
 }
 
@@ -439,7 +439,7 @@ void CSE_Abstract::FillProps				(LPCSTR pref, PropItemVec& items)
 #ifdef XRGAME_EXPORTS
 #	ifdef DEBUG
 	PHelper().CreateToken8		(items,	PrepareKey(pref,"Game Type"),			&s_gameid,		game_types);
-    PHelper().CreateU16			(items,	PrepareKey(pref, "Respawn Time (s)"),	&RespawnTime,	0,43200);
+	PHelper().CreateU16			(items,	PrepareKey(pref, "Respawn Time (s)"),	&RespawnTime,	0,43200);
 
 //	LPCSTR						gcs = pSettings->r_string(s_name,"GroupControlSection");
 //	PHelper().CreateChoose		(items,PrepareKey(pref,*s_name,"Spawn\\group control"),				&m_spawn_control,		smSpawnItem,	0,	(void*)gcs,	16);
