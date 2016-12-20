@@ -34,8 +34,7 @@ CSE_ALifeTraderAbstract* ch_info_get_from_id (u16 id)
 	}
 }
 
-CUICharacterInfo::CUICharacterInfo()
-:m_ownerID(u16(-1)),pUIBio(NULL)
+CUICharacterInfo::CUICharacterInfo():pUIBio(nullptr),m_ownerID(u16(-1))
 {
 	ZeroMemory			(m_icons,sizeof(m_icons));
 	m_bForceUpdate		= false;
@@ -49,7 +48,7 @@ void CUICharacterInfo::Init(float x, float y, float width, float height, CUIXml*
 	inherited::Init(x, y, width, height);
 
 	CUIXmlInit xml_init;
-	CUIStatic*	pItem = NULL;
+	CUIStatic*	pItem = nullptr;
 
 	if(xml_doc->NavigateToNode("icon_static",0))	
 	{

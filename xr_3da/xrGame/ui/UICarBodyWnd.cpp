@@ -29,6 +29,7 @@
 #include "../BottleItem.h"
 #include "UITradeWnd.h"
 #include "../OPFuncs/utils.h"
+#include "string_table.h"
 
 #define				CAR_BODY_XML		"carbody_new.xml"
 #define				CARBODY_ITEM_XML	"carbody_item.xml"
@@ -195,6 +196,12 @@ void CUICarBodyWnd::InitCarBody(CInventoryOwner* pOur, CInventoryOwner* pOthers)
 				shared_str monster_tex_name = pSettings->r_string(monster->cNameSect(),"icon");
 				m_pUICharacterInfoRight->UIIcon().InitTexture(monster_tex_name.c_str());
 				m_pUICharacterInfoRight->UIIcon().SetStretchTexture(true);
+				if (monster->cNameSect().size()>0)
+				{
+					shared_str translatedName=CStringTable().translate(monster->cNameSect());
+					m_pUICharacterInfoRight->UIName().SetText(translatedName.c_str());
+					m_pUICharacterInfoRight->UIName().Show(true);
+				}
 			}
 		}else 
 		{

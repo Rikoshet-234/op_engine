@@ -34,13 +34,9 @@ void CWeaponBinoculars::Load	(LPCSTR section)
 
 bool CWeaponBinoculars::Action(s32 cmd, u32 flags) 
 {
-	/*switch(cmd) 
-	{
-	case kWPN_FIRE : 
+	if (cmd==kWPN_FIRE && iMagazineSize==0) //only for binoculars, must set in config file ammo_mag_size=0
 		return inherited::Action(kWPN_ZOOM, flags);
-	}*/
-
-	return inherited::Action(cmd, flags);
+	return inherited::Action(cmd, flags); //for other weapons, based on WP_BINOC
 }
 
 void CWeaponBinoculars::OnZoomIn		()
