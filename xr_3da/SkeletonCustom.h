@@ -67,13 +67,13 @@ public:
 	Fobb				obb;			
 
 	Fmatrix				bind_transform;
-    Fmatrix				m2b_transform;	// model to bone conversion transform
-    SBoneShape			shape;
-    shared_str			game_mtl_name;
+	Fmatrix				m2b_transform;	// model to bone conversion transform
+	SBoneShape			shape;
+	shared_str			game_mtl_name;
 	u16					game_mtl_idx;
-    SJointIKData		IK_data;
-    float				mass;
-    Fvector				center_of_mass;
+	SJointIKData		IK_data;
+	float				mass;
+	Fvector				center_of_mass;
 
 	DEFINE_VECTOR		(u16,FacesVec,FacesVecIt);
 	DEFINE_VECTOR		(FacesVec,ChildFacesVec,ChildFacesVecIt);
@@ -192,7 +192,7 @@ protected:
 	xr_vector<IRender_Visual*>	children_invisible	;
 
 	// Globals
-    CInifile*					pUserData;
+	CInifile*					pUserData;
 	CBoneInstance*				bone_instances;	// bone instances
 	vecBones*					bones;			// all bones	(shared)
 	u16							iRoot;			// Root bone index
@@ -205,8 +205,8 @@ protected:
 	u32							UCalc_Time				;
 	s32							UCalc_Visibox			;
 
-    Flags64						visimask;
-    
+	Flags64						visimask;
+	
 	CSkeletonX*					LL_GetChild				(u32 idx);
 
 	// internal functions
@@ -216,7 +216,7 @@ protected:
 	void						Visibility_Invalidate	()	{ Update_Visibility=TRUE; };
 	void						Visibility_Update		()	;
 
-    void						LL_Validate				();
+	void						LL_Validate				();
 public:
 	UpdateCallback				Update_Callback;
 	void*						Update_Callback_Param;
@@ -239,22 +239,33 @@ public:
 	u16							LL_BoneID		(const shared_str& B);
 	LPCSTR						LL_BoneName_dbg	(u16 ID);
 
-    CInifile*					LL_UserData			(){return pUserData;}
+	CInifile*					LL_UserData			(){return pUserData;}
 	accel*						LL_Bones			(){return bone_map_N;}
 	ICF CBoneInstance&			LL_GetBoneInstance	(u16 bone_id)		{	VERIFY(bone_id<LL_BoneCount()); VERIFY(bone_instances); return bone_instances[bone_id];	}
 	CBoneData&					LL_GetData			(u16 bone_id)		{	VERIFY(bone_id<LL_BoneCount()); VERIFY(bones);			return *((*bones)[bone_id]);	}
-	u16							LL_BoneCount		()					{	return u16(bones->size());										}
+	u16							LL_BoneCount		()
+	{
+		if (!bones)
+		{
+			xr_string meshName="sorry, visual path is unknown";
+			if (m_lod->dbg_name.size()>0)
+				meshName=m_lod->dbg_name.c_str();
+			Msg("! ERROR invalid bones structure for [%s]",meshName.c_str());
+			FATAL("ENGINE crash! See log for detail!");
+		}
+		return u16(bones->size());
+	}
 	u16							LL_VisibleBoneCount	()					{	u64 F=visimask.flags&((u64(1)<<u64(LL_BoneCount()))-1); return (u16)btwCount1(F); }
 	ICF Fmatrix&				LL_GetTransform		(u16 bone_id)		{	return LL_GetBoneInstance(bone_id).mTransform;					}
 	ICF Fmatrix&				LL_GetTransform_R	(u16 bone_id)		{	return LL_GetBoneInstance(bone_id).mRenderTransform;			}	// rendering only
 	Fobb&						LL_GetBox			(u16 bone_id)		{	VERIFY(bone_id<LL_BoneCount());	return (*bones)[bone_id]->obb;	}
 	void						LL_GetBindTransform (xr_vector<Fmatrix>& matrices);
-    int 						LL_GetBoneGroups 	(xr_vector<xr_vector<u16> >& groups);
+	int 						LL_GetBoneGroups 	(xr_vector<xr_vector<u16> >& groups);
 
 	u16							LL_GetBoneRoot		()					{	return iRoot;													}
 	void						LL_SetBoneRoot		(u16 bone_id)		{	VERIFY(bone_id<LL_BoneCount());	iRoot=bone_id;					}
 
-    BOOL						LL_GetBoneVisible	(u16 bone_id)		{	VERIFY(bone_id<LL_BoneCount()); return visimask.is(u64(1)<<bone_id);	}
+	BOOL						LL_GetBoneVisible	(u16 bone_id)		{	VERIFY(bone_id<LL_BoneCount()); return visimask.is(u64(1)<<bone_id);	}
 	void						LL_SetBoneVisible	(u16 bone_id, BOOL val, BOOL bRecursive);
 	u64							LL_GetBonesVisible	()					{	return visimask.get();	}
 	void						LL_SetBonesVisible	(u64 mask);
@@ -270,11 +281,11 @@ public:
 #endif
 
 	// General "Visual" stuff
-    virtual void				Copy				(IRender_Visual *pFrom);
+	virtual void				Copy				(IRender_Visual *pFrom);
 	virtual void				Load				(const char* N, IReader *data, u32 dwFlags);
 	virtual void 				Spawn				();
 	virtual void				Depart				();
-    virtual void 				Release				();
+	virtual void 				Release				();
 
 	virtual	CKinematics*		dcast_PKinematics	()				{ return this;	}
 

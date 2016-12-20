@@ -21,7 +21,7 @@
 #include "../game_object_space.h"
 #include "../OPFuncs/utils.h"
 #include "../../defines.h"
-#include "UIGameSP.h"
+#include "../UIGameSP.h"
 
 CUICellItem* CUIInventoryWnd::CurrentItem()
 {

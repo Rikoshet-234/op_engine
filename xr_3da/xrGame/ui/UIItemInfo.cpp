@@ -13,9 +13,9 @@
 #include "UIInventoryUtilities.h"
 #include "../PhysicsShellHolder.h"
 #include "UIWpnParams.h"
-#include "game_object_space.h"
+#include "../game_object_space.h"
 #include "ui_af_params.h"
-#include "actor.h"
+#include "../actor.h"
 #include "../script_callback_ex.h"
 
 CUIItemInfo::CUIItemInfo()

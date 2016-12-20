@@ -2,7 +2,7 @@
 #define UIListItemIconedH
 
 #include "UIItemInfo.h"
-#include "script_export_space.h"
+#include "../script_export_space.h"
 
 class CUIListItemIconed : public CUIListItem
 {

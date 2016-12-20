@@ -174,7 +174,7 @@ void CGameObject::OnEvent		(NET_Packet& P, u16 type)
 
 			shared_str boneName="";
 			CKinematics* kin=smart_cast<CKinematics*>(Visual());
-			if (kin->LL_BoneCount()>HDS.boneID)			
+			if (kin && (kin->LL_BoneCount()>HDS.boneID))			
 				boneName=kin->LL_GetData(HDS.boneID).name.c_str();
 			if (g_uCommonFlags.test(E_COMMON_FLAGS::enShowObjectHit))
 				Msg("Hit received: %s [%s] ammo: [%s] on [%s] bone [%s : %i] power [%f] hit_type [%s]", 
