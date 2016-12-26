@@ -361,7 +361,6 @@ bool CUIInventoryWnd::OnMouse(float x, float y, EUIMessages mouse_action)
 {
 	if(m_b_need_reinit)
 		return true;
-
 	//вызов дополнительного меню по правой кнопке
 	if(mouse_action == WINDOW_RBUTTON_DOWN)
 	{
@@ -370,6 +369,7 @@ bool CUIInventoryWnd::OnMouse(float x, float y, EUIMessages mouse_action)
 			UIPropertiesBox.Hide		();
 			return						true;
 		}
+		
 	}
 
 	CUIWindow::OnMouse					(x, y, mouse_action);

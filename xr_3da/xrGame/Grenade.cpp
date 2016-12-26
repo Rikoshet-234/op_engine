@@ -227,22 +227,44 @@ bool CGrenade::Action(s32 cmd, u32 flags)
 	//переключение типа гранаты
 	case kWPN_NEXT:
 		{
-            if(flags&CMD_START) 
+			if(flags&CMD_START) 
 			{
 				if(m_pCurrentInventory)
 				{
-					TIItemContainer::iterator it = m_pCurrentInventory->m_ruck.begin();
-					TIItemContainer::iterator it_e = m_pCurrentInventory->m_ruck.end();
-					for(;it!=it_e;++it) 
+					TIItemContainer::iterator m_ruck_begin = m_pCurrentInventory->m_ruck.begin();
+					TIItemContainer::iterator m_ruck_end = m_pCurrentInventory->m_ruck.end();
+					xr_vector<shared_str> grenadeSections;
+					xr_vector<CInventoryItem* > grenades;
+					std::for_each(m_ruck_begin,m_ruck_end,[&](CInventoryItem* iItemitem) //collect all section of grenades
 					{
-						CGrenade *pGrenade = smart_cast<CGrenade*>(*it);
-						if(pGrenade && xr_strcmp(pGrenade->cNameSect(), cNameSect())) 
+						CGrenade *pGrenade = smart_cast<CGrenade*>(iItemitem);
+						if (pGrenade && std::find(grenadeSections.begin(),grenadeSections.end(),pGrenade->cNameSect().c_str())==grenadeSections.end())
 						{
-							m_pCurrentInventory->Ruck(this);
-							m_pCurrentInventory->SetActiveSlot(NO_ACTIVE_SLOT);
-							m_pCurrentInventory->Slot(pGrenade);
-							return true;
+							grenades.push_back(iItemitem); //decreases iterations over inventory
+							grenadeSections.push_back(pGrenade->cNameSect()); 
 						}
+					});
+					if (grenadeSections.size()<=1) //if only more 1 grenades
+						return true;
+					std::sort(grenadeSections.begin(),grenadeSections.end()); //sort for unici access
+					xr_vector<shared_str>::iterator currItem=std::find(grenadeSections.begin(),grenadeSections.end(),cNameSect());
+					if (currItem!=grenadeSections.end())
+						++currItem;
+					if (currItem==grenadeSections.end())
+						currItem=grenadeSections.begin();//select new section
+					TIItemContainer::iterator f_it=grenades.begin();
+					for(;f_it!=m_ruck_end;++f_it)  //searh inventory item for new section only on grenades
+					{
+						CGrenade *pGrenade = smart_cast<CGrenade*>(*f_it);
+						if (pGrenade)
+							if (xr_strcmp(pGrenade->cNameSect(),*currItem)==0)
+								break;
+					};
+					if (f_it!=m_ruck_end)
+					{
+						m_pCurrentInventory->Ruck(this);
+						m_pCurrentInventory->SetActiveSlot(NO_ACTIVE_SLOT);
+						m_pCurrentInventory->Slot(*f_it);
 					}
 					return true;
 				}

@@ -568,6 +568,7 @@ bool CWeaponMagazinedWGrenade::Detach(const char* item_section_name, bool b_spaw
 		}
 
 		UpdateAddonsVisibility();
+		InitAddons();
 		return CInventoryItemObject::Detach(item_section_name, b_spawn_item);
 	}
 	else

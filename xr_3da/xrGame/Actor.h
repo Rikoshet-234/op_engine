@@ -792,3 +792,6 @@ IC	CActorCondition	&CActor::conditions	() const{ VERIFY(m_entity_condition); ret
 extern CActor*		g_actor;
 CActor*				Actor		();
 extern const float	s_fFallTime;
+extern bool g_bAutoClearCrouch;
+extern bool g_bForceCrouch;
+extern bool g_bForceCreep;

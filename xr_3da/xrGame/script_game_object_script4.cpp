@@ -242,7 +242,6 @@ void CScriptGameObject::actor_set_crouch() const
 		ai().script_engine().script_log		(ScriptStorage::eLuaMessageTypeError,"CActor::set_crouch non-Actor object !!!");
 		return;
 	}
-	extern bool g_bAutoClearCrouch;
 	g_bAutoClearCrouch=false;
 	actor->character_physics_support()->movement()->EnableCharacter();
 	actor->character_physics_support()->movement()->ActivateBoxDynamic(1);

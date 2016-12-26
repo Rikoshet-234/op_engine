@@ -248,36 +248,62 @@ void ui_core::RenderFont()
 	Font()->Render();
 }
 
+//display aspect ratio to screen weight&height ratio 
+//16:9 - 1,7(7)
+//16:10 - 1,6
+//21:9 - 2
+//check value 1,34(3)
+
 bool ui_core::is_16_9_mode()
 {
 	return (Device.dwWidth)/float(Device.dwHeight) > (UI_BASE_WIDTH/UI_BASE_HEIGHT +0.01f);
 }
 
+
+bool ui_core::is_21_9_mode()
+{
+	return (Device.dwWidth)/float(Device.dwHeight) > 1.8f;
+}
+
+std::string createFileName(std::string oldFileName,std::string postfix)
+{
+	size_t dot = oldFileName.find_last_of(".");
+	std::string newName;
+	std::string ext;
+	if (dot != std::string::npos)
+	{
+		newName = oldFileName.substr(0, dot);
+		ext  = oldFileName.substr(dot, oldFileName.size() - dot);
+	}
+	else
+	{
+		newName = oldFileName;
+		ext  = ".xml";
+	}
+	newName.append(postfix).append(ext);
+	return newName;
+}
+
 shared_str	ui_core::get_xml_name(LPCSTR fn)
 {
-	string_path				str;
-	if(!is_16_9_mode()){
-		sprintf_s(str, "%s", fn);
-		if ( NULL==strext(fn) ) strcat(str, ".xml");
-	}else{
-
-		string_path			str_;
-		if ( strext(fn) )
-		{
-			strcpy	(str, fn);
-			*strext(str)	= 0;
-			strcat	(str, "_16.xml");
-		}else
-			sprintf_s				(str, "%s_16", fn);
-
-		if(NULL==FS.exist(str_, "$game_config$", "ui\\" , str) )
-		{
-			sprintf_s(str, "%s", fn);
-			if ( NULL==strext(fn) ) strcat(str, ".xml");
-		}
-#ifdef MORE_SPAM
-		Msg("[16-9] get_xml_name for[%s] returns [%s]", fn, str);
-#endif
+	
+	std::string file;
+	if (is_16_9_mode())
+	{
+		file=createFileName(fn,"_16");
 	}
-	return str;
+	else if (is_21_9_mode())
+	{
+		file=createFileName(fn,"_21");
+	}
+	else
+	{
+		file=createFileName(fn,"");
+	}
+	string_path path;
+	if (!FS.exist(path,"$game_config$", "ui\\" ,file.c_str()))
+		file=createFileName(fn,"");
+	return file.c_str();
 }
+
+

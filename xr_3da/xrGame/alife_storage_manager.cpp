@@ -138,6 +138,7 @@ void CALifeStorageManager::load	(void *buffer, const u32 &buffer_size, LPCSTR fi
 
 	can_register_objects		(true);
 	
+	Msg("* Start objects on_register'ed...");
 	//g_measure = true;
 	CTimer t;
 	t.Start();

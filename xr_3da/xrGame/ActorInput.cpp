@@ -26,6 +26,8 @@
 #include "InventoryBox.h"
 
 bool g_bAutoClearCrouch = true;
+bool g_bForceCrouch = false;
+bool g_bForceCreep=false;
 
 void CActor::IR_OnKeyboardPress(int cmd)
 {
@@ -65,6 +67,26 @@ void CActor::IR_OnKeyboardPress(int cmd)
 		if(inventory().Action(cmd, CMD_START))					return;
 
 	switch(cmd){
+	case kCREEP:
+		{
+			if (g_bForceCreep)
+			{
+				mstate_wishful &= ~mcCrouch; 
+				mstate_wishful &= ~mcAccel; 
+				g_bForceCreep=false;
+				if (g_bForceCrouch)
+					g_bForceCrouch=false;
+				if (!g_bAutoClearCrouch)
+					g_bAutoClearCrouch=true;
+			}
+			else
+			{
+				mstate_wishful |= mcCrouch;
+				mstate_wishful |= mcAccel;
+				g_bForceCreep=true;
+			}
+		}
+		break;
 	case kJUMP:		
 		{
 			mstate_wishful |= mcJump;
@@ -76,6 +98,10 @@ void CActor::IR_OnKeyboardPress(int cmd)
 		}break;
 	case kCROUCH_TOGGLE:
 		{
+			if (g_bForceCreep)
+				g_bForceCreep=false;
+			if (g_bForceCrouch)
+				g_bForceCrouch=false;
 			g_bAutoClearCrouch = !g_bAutoClearCrouch;
 			if (!g_bAutoClearCrouch)
 				mstate_wishful |= mcCrouch;
@@ -199,7 +225,7 @@ void CActor::IR_OnKeyboardRelease(int cmd)
 		{
 		case kJUMP:		mstate_wishful &=~mcJump;		break;
 		case kDROP:		if(GAME_PHASE_INPROGRESS == Game().Phase()) g_PerformDrop();				break;
-		case kCROUCH:	g_bAutoClearCrouch = true;
+		case kCROUCH:	g_bAutoClearCrouch = true;g_bForceCrouch=false; break;
 		}
 	}
 }
