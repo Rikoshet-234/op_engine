@@ -274,7 +274,7 @@ void CWeaponShotgun::OnStateSwitch	(u32 S)
 		{
 			if (fullMagazine && requiredChangeAmmoType)
 				UnloadMagazine();
-			else if ((m_magazine.size()>0 && requiredChangeAmmoType) && g_uCommonFlags.is(E_COMMON_FLAGS::gpFullReload))
+			else if ((m_magazine.size()>0 && requiredChangeAmmoType) && g_uCommonFlags.is(E_COMMON_FLAGS::gpFixedReload))
 				UnloadMagazine();
 			switch2_StartReload	();
 		}
@@ -328,15 +328,18 @@ void CWeaponShotgun::PlayAnimCloseWeapon()
 
 bool CWeaponShotgun::HaveCartridgeInInventory		(u8 cnt)
 {
+
 	if (unlimited_ammo()) return true;
+	u32 checkedType=m_ammoType;
+	if(m_set_next_ammoType_on_reload != u32(-1))
+		checkedType						= m_set_next_ammoType_on_reload;
 	m_pAmmo = nullptr;
 	if(m_pCurrentInventory) 
 	{
 		//попытатьс€ найти в инвентаре патроны текущего типа 
-		m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAny(*m_ammoTypes[m_ammoType]));
+		m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAny(*m_ammoTypes[checkedType]));
 		
-		if(!m_pAmmo )
-		{
+		if(!m_pAmmo && !g_uCommonFlags.is(E_COMMON_FLAGS::gpFixedReload))
 			for(u32 i = 0; i < m_ammoTypes.size(); ++i) 
 			{
 				//проверить патроны всех подход€щих типов
@@ -344,10 +347,10 @@ bool CWeaponShotgun::HaveCartridgeInInventory		(u8 cnt)
 				if(m_pAmmo) 
 				{ 
 					m_ammoType = i; 
+					m_iPropousedAmmoType=i;
 					break; 
 				}
 			}
-		}
 	}
 	return (m_pAmmo!= nullptr)&&(m_pAmmo->m_boxCurr>=cnt) ;
 }

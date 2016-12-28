@@ -116,7 +116,7 @@ CCustomRocket*	CRocketLauncher::getCurrentRocket()
 	if( m_rockets.size() )
 		return m_rockets.back();
 	else
-		return (CCustomRocket*)0;
+		return nullptr;
 }
 
 void			CRocketLauncher::dropCurrentRocket()

@@ -62,7 +62,7 @@ ENGINE_API enum E_COMMON_FLAGS
 	invReloadWeapon				= 1<<8,
 	uiAllowOpTradeSB			= 1<<9,
 	gpDeferredReload			= 1<<10,
-	gpFullReload				= 1<< 11
+	gpFixedReload				= 1<< 11
 };
 
 

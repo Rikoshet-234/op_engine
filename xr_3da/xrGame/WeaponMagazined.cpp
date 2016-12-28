@@ -206,17 +206,20 @@ bool CWeaponMagazined::TryReload()
 			SwitchState(eReload); 
 			return true;
 		} 
-		else for(u32 i = 0; i < m_ammoTypes.size(); ++i) 
-		{
-			m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAny( *m_ammoTypes[i] ));
-			if(m_pAmmo) 
-			{ 
-				m_ammoType = i; 
-				m_bPending = true;
-				SwitchState(eReload);
-				return true; 
-			}
-		}
+		else 
+			if(!m_pAmmo && !g_uCommonFlags.is(E_COMMON_FLAGS::gpFixedReload))
+				for(u32 i = 0; i < m_ammoTypes.size(); ++i) 
+				{
+					m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAny( *m_ammoTypes[i] ));
+					if(m_pAmmo) 
+					{ 
+						m_ammoType = i; 
+						m_iPropousedAmmoType=i;
+						m_bPending = true;
+						SwitchState(eReload);
+						return true; 
+					}
+				}
 	}
 	
 	SwitchState(eIdle);
@@ -644,7 +647,7 @@ void CWeaponMagazined::switch2_Idle	()
 }
 
 #ifdef DEBUG
-#include "ai\stalker\ai_stalker.h"
+#include "ai/stalker/ai_stalker.h"
 #include "object_handler_planner.h"
 #endif
 void CWeaponMagazined::switch2_Fire	()
