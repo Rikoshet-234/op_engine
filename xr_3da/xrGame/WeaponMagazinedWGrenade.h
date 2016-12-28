@@ -53,8 +53,8 @@ public:
 	virtual void	StopHUDSounds	();
 
 	//переключение в режим подствольника
-	virtual bool	SwitchMode		();
-	void			PerformSwitchGL	();
+	virtual bool	SwitchMode		(bool switchOnLoad=false);
+	void			PerformSwitchGL	(bool switchOnLoad=false);
 	void			OnAnimationEnd	(u32 state);
 
 	virtual bool	IsNecessaryItem	    (const shared_str& item_sect);

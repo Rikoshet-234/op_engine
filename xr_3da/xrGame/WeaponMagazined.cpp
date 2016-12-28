@@ -206,17 +206,20 @@ bool CWeaponMagazined::TryReload()
 			SwitchState(eReload); 
 			return true;
 		} 
-		else for(u32 i = 0; i < m_ammoTypes.size(); ++i) 
-		{
-			m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAny( *m_ammoTypes[i] ));
-			if(m_pAmmo) 
-			{ 
-				m_ammoType = i; 
-				m_bPending = true;
-				SwitchState(eReload);
-				return true; 
-			}
-		}
+		else 
+			if(!m_pAmmo && !g_uCommonFlags.is(E_COMMON_FLAGS::gpFixedReload))
+				for(u32 i = 0; i < m_ammoTypes.size(); ++i) 
+				{
+					m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAny( *m_ammoTypes[i] ));
+					if(m_pAmmo) 
+					{ 
+						m_ammoType = i; 
+						m_iPropousedAmmoType=i;
+						m_bPending = true;
+						SwitchState(eReload);
+						return true; 
+					}
+				}
 	}
 	
 	SwitchState(eIdle);
@@ -294,6 +297,8 @@ void CWeaponMagazined::UnloadMagazine(bool spawn_ammo)
 		}
 		if(l_it->second && !unlimited_ammo()) SpawnAmmo(l_it->second, l_it->first);
 	}
+	if (m_pCurrentInventory)
+		m_pCurrentInventory->m_bForceRecalcAmmos=true;
 }
 
 void CWeaponMagazined::ReloadMagazine() 
@@ -379,7 +384,8 @@ void CWeaponMagazined::ReloadMagazine()
 		ReloadMagazine(); 
 		m_bLockType = false; 
 	}
-
+	if (m_pCurrentInventory)
+		m_pCurrentInventory->m_bForceRecalcAmmos=true;
 	VERIFY((u32)iAmmoElapsed == m_magazine.size());
 }
 
@@ -641,7 +647,7 @@ void CWeaponMagazined::switch2_Idle	()
 }
 
 #ifdef DEBUG
-#include "ai\stalker\ai_stalker.h"
+#include "ai/stalker/ai_stalker.h"
 #include "object_handler_planner.h"
 #endif
 void CWeaponMagazined::switch2_Fire	()
@@ -756,7 +762,7 @@ bool CWeaponMagazined::Action(s32 cmd, u32 flags)
 	case kWPN_RELOAD:
 		{
 			if(flags&CMD_START) 
-				if(iAmmoElapsed < iMagazineSize || IsMisfire()) 
+				if(iAmmoElapsed < iMagazineSize || IsMisfire() || m_ammoType!=static_cast<u32>(m_iPropousedAmmoType)) 
 					Reload();
 		} 
 		return true;
@@ -1295,13 +1301,17 @@ void CWeaponMagazined::net_Import	(NET_Packet& P)
 void CWeaponMagazined::GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count)
 {
 	int	AE					= GetAmmoElapsed();
-	int	AC					= GetAmmoCurrent();
 	
-	if(AE==0 || 0==m_magazine.size() )
-		icon_sect_name	= *m_ammoTypes[m_ammoType];
-	else
-		icon_sect_name	= *m_ammoTypes[m_magazine.back().m_LocalAmmoType];
+	if (m_iPropousedAmmoType==-1)
+		if(AE==0 || 0==m_magazine.size() )
+			m_iPropousedAmmoType	= m_ammoType;
+		else
+			m_iPropousedAmmoType	= m_magazine.back().m_LocalAmmoType;
+	
+		icon_sect_name	= *m_ammoTypes[m_iPropousedAmmoType];
 
+	int sectionCount=0;
+	int	AC					= GetAmmoCurrentEx(sectionCount);
 
 	string256		sItemName;
 	strcpy_s			(sItemName, *CStringTable().translate(pSettings->r_string(icon_sect_name.c_str(), "inv_name_short")));
@@ -1315,13 +1325,11 @@ void CWeaponMagazined::GetBriefInfo(xr_string& str_name, xr_string& icon_sect_na
 	str_name		= sItemName;
 
 
-	{
 	if (GetAmmoMagSize()!=0)
 		if (!unlimited_ammo())
-			sprintf_s			(sItemName, "%d/%d",AE,AC - AE);
+			sprintf_s			(sItemName, "%d/%d/%d",AE,sectionCount,AC - AE);
 		else
-			sprintf_s			(sItemName, "%d/--",AE);
+			sprintf_s			(sItemName, "%d/--/--",AE);
 
-		str_count				= sItemName;
-	}
+	str_count				= sItemName;
 }

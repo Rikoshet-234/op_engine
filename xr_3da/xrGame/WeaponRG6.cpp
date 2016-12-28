@@ -52,7 +52,7 @@ void CWeaponRG6::Load(LPCSTR section)
 void CWeaponRG6::FireStart ()
 {
 
-	if(GetState() == eIdle	&& getRocketCount() ) 
+	if(GetState() == eIdle	&& getRocketCount() && m_magazine.size()>0) 
 	{
 		inheritedSG::FireStart ();
 	
@@ -165,6 +165,8 @@ void CWeaponRG6::OnEvent(NET_Packet& P, u16 type)
 			bool bLaunch = (type==GE_LAUNCH_ROCKET);
 			P.r_u16						(id);
 			inheritedRL::DetachRocket	(id, bLaunch);
+			if(m_pCurrentInventory)
+				m_pCurrentInventory->m_bForceRecalcAmmos=true;
 		} break;
 	}
 }

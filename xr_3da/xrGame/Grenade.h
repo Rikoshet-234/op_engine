@@ -48,7 +48,7 @@ public:
 			void			PutNextToSlot						();
 
 	virtual void			Deactivate							();
-	virtual void			GetBriefInfo						(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count);
+	void			GetBriefInfo						(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count) override;
 protected:
 	ALife::_TIME_ID			m_dwGrenadeRemoveTime;
 	ALife::_TIME_ID			m_dwGrenadeIndependencyTime;

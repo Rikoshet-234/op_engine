@@ -1483,6 +1483,8 @@ void CCC_RegisterCommands()
 	g_uCommonFlags.set(uiShowTradeSB, FALSE);
 	g_uCommonFlags.set(uiAllowOpTradeSB, FALSE);
 	g_uCommonFlags.set(invReloadWeapon, FALSE);
+	g_uCommonFlags.set(gpDeferredReload, true);
+	g_uCommonFlags.set(gpFixedReload, true);
 
 	CMD3(CCC_Mask,				"ai_use_torch_dynamic_lights",	&g_uCommonFlags,flAiUseTorchDynamicLights);
 	CMD3(CCC_Mask,				"engine_show_object_hit",		&g_uCommonFlags,enShowObjectHit);
@@ -1494,6 +1496,8 @@ void CCC_RegisterCommands()
 	CMD3(CCC_Mask,				"ui_show_trade_sb",				&g_uCommonFlags,uiShowTradeSB);
 	CMD3(CCC_Mask,				"ui_allow_operations_tsb",		&g_uCommonFlags,uiAllowOpTradeSB);
 	CMD3(CCC_Mask,				"winv_reload_enable",			&g_uCommonFlags,invReloadWeapon);
+	CMD3(CCC_Mask,				"gp_deffered_reload",			&g_uCommonFlags,gpDeferredReload);
+	CMD3(CCC_Mask,				"gp_fixed_reload",				&g_uCommonFlags,gpFixedReload);
 
 	CMD1(CCC_GSCheckForUpdates, "check_for_updates"		);
 	CMD1(CCC_DumpInfos,			"dump_infos"			);
