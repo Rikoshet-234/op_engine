@@ -60,7 +60,9 @@ ENGINE_API enum E_COMMON_FLAGS
 	uiShowTradeSB				= 1<<6,
 	uiShowFocused				= 1<<7,
 	invReloadWeapon				= 1<<8,
-	uiAllowOpTradeSB			= 1<<9
+	uiAllowOpTradeSB			= 1<<9,
+	gpDeferredReload			= 1<<10,
+	gpFullReload				= 1<< 11
 };
 
 

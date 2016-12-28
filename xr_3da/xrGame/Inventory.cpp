@@ -65,7 +65,7 @@ CInventory::CInventory()
 	m_iLoadActiveSlot							= NO_ACTIVE_SLOT;
 	m_ActivationSlotReason						= eGeneral;
 	m_pTarget									= nullptr;
-
+	m_bForceRecalcAmmos=true;
 	string256 temp;
 	for(u32 i=0; i<m_slots.size(); ++i ) 
 	{

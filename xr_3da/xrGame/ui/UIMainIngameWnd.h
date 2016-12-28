@@ -174,6 +174,7 @@ protected:
 	void				UpdatePickUpItem();
 public:
 	void				SetPickUpItem	(CInventoryItem* PickUpItem);
+	void				SetActiveItemAmmoInfo(xr_string str_name, xr_string icon_sect_name, xr_string str_count);
 #ifdef DEBUG
 	void				draw_adjust_mode					();
 #endif

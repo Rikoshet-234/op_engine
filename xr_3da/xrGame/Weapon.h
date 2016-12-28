@@ -437,6 +437,7 @@ public:
 	IC int					GetAmmoElapsed		()	const		{	return /*int(m_magazine.size())*/iAmmoElapsed;}
 	IC int					GetAmmoMagSize		()	const		{	return iMagazineSize;						}
 	int						GetAmmoCurrent		(bool use_item_to_spawn = false)  const;
+	int						GetAmmoCurrentEx	(int &sectionCount,bool use_item_to_spawn = false) ;
 
 	void					SetAmmoElapsed		(int ammo_count);
 
@@ -456,6 +457,7 @@ protected:
 
 	//для подсчета в GetAmmoCurrent
 	mutable int				iAmmoCurrent;
+	mutable int				iAmmoSectionCurrent;
 	mutable u32				m_dwAmmoCurrentCalcFrame;	//кадр на котором просчитали кол-во патронов
 	//  [10/5/2005]
 	bool					m_bAmmoWasSpawned;
@@ -464,6 +466,7 @@ protected:
 	virtual bool			IsNecessaryItem	    (const shared_str& item_sect);
 
 public:
+	int						m_iPropousedAmmoType;
 	xr_vector<shared_str>	m_ammoTypes;
 
 	CWeaponAmmo*			m_pAmmo;

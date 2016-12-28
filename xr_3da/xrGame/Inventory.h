@@ -136,6 +136,7 @@ public:
 	bool				ProcessSlotAction			(bool flag,u32 slotId);
 
 	u32 getLoadActiveSlot() const {return m_iLoadActiveSlot;}
+	bool m_bForceRecalcAmmos;
 protected:
 	void					UpdateDropTasks		();
 	void					UpdateDropItem		(PIItem pIItem);

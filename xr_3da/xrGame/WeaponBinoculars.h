@@ -36,7 +36,7 @@ public:
 	virtual void	UpdateCL			();
 	virtual void	OnDrawUI			();
 	virtual bool	use_crosshair		()	const {return false;}
-	virtual void	GetBriefInfo		(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count);
+	void	GetBriefInfo		(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count) override;
 	virtual void	net_Relcase			(CObject *object);
 	int				GetCurrentFireMode	() override;	
 

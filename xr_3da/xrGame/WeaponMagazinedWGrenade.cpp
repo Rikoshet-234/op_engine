@@ -192,7 +192,7 @@ void CWeaponMagazinedWGrenade::OnShot		()
 //переход в режим подствольника или выход из него
 //если мы в режиме стрельбы очередями, переключиться
 //на одиночные, а уже потом на подствольник
-bool CWeaponMagazinedWGrenade::SwitchMode() 
+bool CWeaponMagazinedWGrenade::SwitchMode(bool switchOnLoad) 
 {
 	SHOW_WEAPON_STATE(GetState());
 	bool bUsefulStateToSwitch = ((eIdle==GetState())||(eHidden==GetState())||(eMisfire==GetState())||(eMagEmpty==GetState())) && (!IsPending());
@@ -205,7 +205,7 @@ bool CWeaponMagazinedWGrenade::SwitchMode()
 
 	m_bPending				= true;
 
-	PerformSwitchGL			();
+	PerformSwitchGL			(switchOnLoad);
 	
 	PlaySound				(sndSwitch,get_LastFP());
 
@@ -216,16 +216,14 @@ bool CWeaponMagazinedWGrenade::SwitchMode()
 	return					true;
 }
 
-void  CWeaponMagazinedWGrenade::PerformSwitchGL()
+void  CWeaponMagazinedWGrenade::PerformSwitchGL(bool switchOnLoad)
 {
 	SHOW_WEAPON_STATE(GetState());
 	m_bGrenadeMode		= !m_bGrenadeMode;
-
 	iMagazineSize		= m_bGrenadeMode?1:iMagazineSize2;
-
 	m_ammoTypes.swap	(m_ammoTypes2);
-
-	swap				(m_ammoType,m_ammoType2);
+	if (!switchOnLoad)
+		swap(m_ammoType,m_ammoType2);
 	swap				(m_ammoName,m_ammoName2);
 	
 	swap				(m_DefaultCartridge, m_DefaultCartridge2);
@@ -252,6 +250,7 @@ void  CWeaponMagazinedWGrenade::PerformSwitchGL()
 		SetQueueSize(1);
 	else
 		SetQueueSize(GetCurrentFireMode());
+	m_iPropousedAmmoType=m_ammoType;
 }
 
 bool CWeaponMagazinedWGrenade::Action(s32 cmd, u32 flags) 
@@ -561,12 +560,10 @@ bool CWeaponMagazinedWGrenade::Detach(const char* item_section_name, bool b_spaw
 	   !xr_strcmp(*m_sGrenadeLauncherName, item_section_name))
 	{
 		m_flagsAddOnState &= ~CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher;
-		if(m_bGrenadeMode)
-		{
-			UnloadMagazine();
+		if(!m_bGrenadeMode)
 			PerformSwitchGL();
-		}
-
+		UnloadMagazine();
+		PerformSwitchGL();
 		UpdateAddonsVisibility();
 		InitAddons();
 		return CInventoryItemObject::Detach(item_section_name, b_spawn_item);
@@ -844,19 +841,21 @@ void CWeaponMagazinedWGrenade::UpdateGrenadeVisibility(bool visibility)
 
 void CWeaponMagazinedWGrenade::save(NET_Packet &output_packet)
 {
-	inherited::save								(output_packet);
-	save_data									(m_bGrenadeMode, output_packet);
-	save_data									(m_magazine2.size(), output_packet);
+	inherited::save(output_packet);
+	save_data(m_ammoType2,		output_packet);
+	save_data(m_bGrenadeMode, output_packet);
+	save_data(m_magazine2.size(), output_packet);
 
 }
 
 void CWeaponMagazinedWGrenade::load(IReader &input_packet)
 {
 	inherited::load				(input_packet);
+	load_data(m_ammoType2,		input_packet);
 	bool b;
 	load_data					(b, input_packet);
 	if(b!=m_bGrenadeMode)		
-		SwitchMode				();
+		SwitchMode				(true);
 
 	u32 sz;
 	load_data					(sz, input_packet);
@@ -866,6 +865,7 @@ void CWeaponMagazinedWGrenade::load(IReader &input_packet)
 
 	while (sz > m_magazine2.size())
 		m_magazine2.push_back(l_cartridge);
+	
 }
 
 void CWeaponMagazinedWGrenade::net_Export	(NET_Packet& P)

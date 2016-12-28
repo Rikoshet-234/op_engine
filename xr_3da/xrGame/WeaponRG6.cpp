@@ -165,6 +165,8 @@ void CWeaponRG6::OnEvent(NET_Packet& P, u16 type)
 			bool bLaunch = (type==GE_LAUNCH_ROCKET);
 			P.r_u16						(id);
 			inheritedRL::DetachRocket	(id, bLaunch);
+			if(m_pCurrentInventory)
+				m_pCurrentInventory->m_bForceRecalcAmmos=true;
 		} break;
 	}
 }

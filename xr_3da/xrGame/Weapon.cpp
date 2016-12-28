@@ -1,4 +1,5 @@
 // Weapon.cpp: implementation of the CWeapon class.
+// Weapon.cpp: implementation of the CWeapon class.
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -29,6 +30,8 @@
 #include "ai_space.h"
 #include "script_engine.h"
 #include "../ai_script_lua_space.h"
+#include "ui/UIMainIngameWnd.h"
+#include "../defines.h"
 
 #define WEAPON_REMOVE_TIME		60000
 #define ROTATION_TIME			0.25f
@@ -43,11 +46,12 @@ CWeapon::CWeapon(LPCSTR name)
 	SetNextState			(eHidden);
 	m_sub_state				= eSubstateReloadBegin;
 	m_bTriStateReload		= false;
-	SetDefaults				();
+	CWeapon::SetDefaults				();
 	m_Offset.identity		();
 	m_StrapOffset.identity	();
 
 	iAmmoCurrent			= -1;
+	iAmmoSectionCurrent =-1;
 	m_dwAmmoCurrentCalcFrame= 0;
 
 	iAmmoElapsed			= -1;
@@ -78,6 +82,8 @@ CWeapon::CWeapon(LPCSTR name)
 	m_ef_weapon_type		= u32(-1);
 	m_UIScope				= nullptr;
 	m_set_next_ammoType_on_reload = u32(-1);
+	m_iPropousedAmmoType=-1;
+	
 }
 
 CWeapon::~CWeapon		()
@@ -89,8 +95,6 @@ void CWeapon::Hit					(SHit* pHDS)
 {
 	inherited::Hit(pHDS);
 }
-
-
 
 void CWeapon::UpdateXForm	()
 {
@@ -450,12 +454,6 @@ void CWeapon::LoadZoomOffset (LPCSTR section, LPCSTR prefix)
 	m_pHUD->SetZoomOffset(pSettings->r_fvector3	(hud_sect, zoName));
 	m_pHUD->SetZoomRotateX(pSettings->r_float	(hud_sect, zxName));
 	m_pHUD->SetZoomRotateY(pSettings->r_float	(hud_sect, zyName));
-
-
-	//m_pHUD->SetZoomOffset(pSettings->r_fvector3	(hud_sect, strconcat(sizeof(full_name),full_name, prefix, "zoom_offset")));
-	//m_pHUD->SetZoomRotateX(pSettings->r_float	(hud_sect, strconcat(sizeof(full_name),full_name, prefix, "zoom_rotate_x")));
-	//m_pHUD->SetZoomRotateY(pSettings->r_float	(hud_sect, strconcat(sizeof(full_name),full_name, prefix, "zoom_rotate_y")));
-
 	if(pSettings->line_exist(hud_sect, "zoom_rotate_time"))
 		m_fZoomRotateTime = pSettings->r_float(hud_sect,"zoom_rotate_time");
 }
@@ -631,6 +629,7 @@ void CWeapon::load(IReader &input_packet)
 	load_data		(m_flagsAddOnState, input_packet);
 	UpdateAddonsVisibility	();
 	load_data		(m_ammoType,		input_packet);
+	m_iPropousedAmmoType=m_ammoType;
 	load_data		(m_bZoomMode,		input_packet);
 
 	if (m_bZoomMode)	OnZoomIn();
@@ -830,38 +829,40 @@ bool CWeapon::Action(s32 cmd, u32 flags)
 	}
 		return true;
 	case kWPN_NEXT:
-	{
-		if (IsPending() || OnClient()) 
 		{
-			return false;
-		}
-		if(flags&CMD_START) 
-		{
-			u32 l_newType = m_ammoType;
-			bool b1, b2;
-			do
+			if (IsPending() || OnClient()) 
 			{
-				l_newType = (l_newType+1)%m_ammoTypes.size();
-				b1 = l_newType != m_ammoType;
-				b2 = unlimited_ammo() ? false : (!m_pCurrentInventory->GetAny(*m_ammoTypes[l_newType]));						
-			} while( b1 && b2);
-
-					if(l_newType != m_ammoType) 
+				return false;
+			}
+			if(flags&CMD_START) 
+			{
+				if (Actor() && Actor()->inventory().ActiveItem())
+				{
+					u32 l_newType = m_iPropousedAmmoType;
+					bool b1, b2;
+					do
 					{
-						m_set_next_ammoType_on_reload = l_newType;						
-/*						m_ammoType = l_newType;
-						m_pAmmo = NULL;
-						if (unlimited_ammo())
-						{
-							m_DefaultCartridge.Load(*m_ammoTypes[m_ammoType], u8(m_ammoType));
-						};							
-*/
+						l_newType++;
+						if (l_newType>=m_ammoTypes.size())
+							l_newType=0;
+						b1 = l_newType != m_ammoType;
+						b2 = unlimited_ammo() ? false : (!m_pCurrentInventory->GetAny(*m_ammoTypes[l_newType]));						
+					} while( b1 && b2);
+					xr_string str_name;
+					xr_string icon_sect_name;
+					xr_string str_count;
+					m_iPropousedAmmoType=l_newType;
+					GetBriefInfo(str_name, icon_sect_name, str_count);
+					HUD().GetUI()->UIMainIngameWnd->SetActiveItemAmmoInfo(str_name,icon_sect_name,str_count);
+					m_set_next_ammoType_on_reload = m_iPropousedAmmoType;						
+					if (static_cast<u32>(m_iPropousedAmmoType)!=m_ammoType && !g_uCommonFlags.is(E_COMMON_FLAGS::gpDeferredReload))
 						if(OnServer()) Reload();
-					}
+					if(m_pCurrentInventory)
+						m_pCurrentInventory->m_bForceRecalcAmmos=true;
 				}
-			} 
+			}
 			return true;
-
+		}
 	case kWPN_ZOOM:
 		if(IsZoomEnabled())
 			{
@@ -953,6 +954,44 @@ void CWeapon::LoadAmmo(CWeaponAmmo* pAmmo)
 {
 }
 
+int CWeapon::GetAmmoCurrentEx(int &sectionCount,bool use_item_to_spawn) //слишком не во всех местах это надо... 
+{
+	int l_count = iAmmoElapsed;
+	sectionCount=iAmmoSectionCurrent;
+	if(!m_pCurrentInventory) return l_count;
+
+	//чтоб не делать лишних пересчетов
+	if(!m_pCurrentInventory->m_bForceRecalcAmmos)
+		return l_count + iAmmoCurrent;
+	m_pCurrentInventory->m_bForceRecalcAmmos=false;
+	iAmmoCurrent = 0;
+	iAmmoSectionCurrent=0;
+	if (m_iPropousedAmmoType==-1)
+		m_iPropousedAmmoType=m_ammoType;
+	for(TIItemContainer::iterator l_it = m_pCurrentInventory->m_belt.begin(); m_pCurrentInventory->m_belt.end() != l_it; ++l_it) 
+	{
+		CWeaponAmmo *l_pAmmo = smart_cast<CWeaponAmmo*>(*l_it);
+		if(l_pAmmo && std::find(m_ammoTypes.begin(),m_ammoTypes.end(),l_pAmmo->cNameSect())!=m_ammoTypes.end()) 
+		{
+			iAmmoCurrent = iAmmoCurrent + l_pAmmo->m_boxCurr;
+			if (xr_strcmp(l_pAmmo->cNameSect(),m_ammoTypes[m_iPropousedAmmoType])==0)
+				iAmmoSectionCurrent+=l_pAmmo->m_boxCurr;
+		}
+	}
+	for(TIItemContainer::iterator l_it = m_pCurrentInventory->m_ruck.begin(); m_pCurrentInventory->m_ruck.end() != l_it; ++l_it) 
+	{
+		CWeaponAmmo *l_pAmmo = smart_cast<CWeaponAmmo*>(*l_it);
+		if(l_pAmmo && std::find(m_ammoTypes.begin(),m_ammoTypes.end(),l_pAmmo->cNameSect())!=m_ammoTypes.end()) 
+		{
+			iAmmoCurrent = iAmmoCurrent + l_pAmmo->m_boxCurr;
+			if (xr_strcmp(l_pAmmo->cNameSect(),m_ammoTypes[m_iPropousedAmmoType])==0)
+				iAmmoSectionCurrent+=l_pAmmo->m_boxCurr;
+		}
+	}
+	sectionCount=iAmmoSectionCurrent;
+	return l_count + iAmmoCurrent;
+}
+
 int CWeapon::GetAmmoCurrent(bool use_item_to_spawn) const
 {
 	int l_count = iAmmoElapsed;
@@ -964,28 +1003,21 @@ int CWeapon::GetAmmoCurrent(bool use_item_to_spawn) const
 
 	m_dwAmmoCurrentCalcFrame = Device.dwFrame;
 	iAmmoCurrent = 0;
-
-	for(int i = 0; i < (int)m_ammoTypes.size(); ++i) 
+	for(int i = 0; i < static_cast<int>(m_ammoTypes.size()); ++i) 
 	{
 		LPCSTR l_ammoType = *m_ammoTypes[i];
-
 		for(TIItemContainer::iterator l_it = m_pCurrentInventory->m_belt.begin(); m_pCurrentInventory->m_belt.end() != l_it; ++l_it) 
 		{
 			CWeaponAmmo *l_pAmmo = smart_cast<CWeaponAmmo*>(*l_it);
-
 			if(l_pAmmo && !xr_strcmp(l_pAmmo->cNameSect(), l_ammoType)) 
-			{
 				iAmmoCurrent = iAmmoCurrent + l_pAmmo->m_boxCurr;
-			}
 		}
 
 		for(TIItemContainer::iterator l_it = m_pCurrentInventory->m_ruck.begin(); m_pCurrentInventory->m_ruck.end() != l_it; ++l_it) 
 		{
 			CWeaponAmmo *l_pAmmo = smart_cast<CWeaponAmmo*>(*l_it);
 			if(l_pAmmo && !xr_strcmp(l_pAmmo->cNameSect(), l_ammoType)) 
-			{
 				iAmmoCurrent = iAmmoCurrent + l_pAmmo->m_boxCurr;
-			}
 		}
 
 		if (!use_item_to_spawn)
@@ -999,6 +1031,7 @@ int CWeapon::GetAmmoCurrent(bool use_item_to_spawn) const
 	return l_count + iAmmoCurrent;
 }
 
+#pragma region misfire verify funcs
 float CWeapon::GetConditionMisfireProbability() const
 {
 	if( GetCondition()>0.95f ) return 0.0f;
@@ -1033,12 +1066,14 @@ BOOL CWeapon::IsMisfire() const
 {	
 	return bMisfire;
 }
+#pragma endregion
+
 void CWeapon::Reload()
 {
 	OnZoomOut();
 }
 
-
+#pragma region addons verify funcs
 bool CWeapon::IsGrenadeLauncherAttached() const
 {
 	return (CSE_ALifeItemWeapon::eAddonAttachable == m_eGrenadeLauncherStatus &&
@@ -1073,6 +1108,7 @@ bool CWeapon::SilencerAttachable()
 {
 	return (CSE_ALifeItemWeapon::eAddonAttachable == m_eSilencerStatus);
 }
+#pragma endregion
 
 LPCSTR wpn_scope				= "wpn_scope";
 LPCSTR wpn_silencer				= "wpn_silencer";

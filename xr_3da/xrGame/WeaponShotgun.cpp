@@ -189,9 +189,7 @@ bool CWeaponShotgun::Action			(s32 cmd, u32 flags)
 {
 	if(inherited::Action(cmd, flags)) return true;
 
-	if(	m_bTriStateReload && GetState()==eReload &&
-		cmd==kWPN_FIRE && flags&CMD_START &&
-		m_sub_state==eSubstateReloadInProcess		)//остановить перезагрузку
+	if(	m_bTriStateReload && GetState()==eReload && cmd==kWPN_FIRE && flags&CMD_START && m_sub_state==eSubstateReloadInProcess		)//остановить перезагрузку
 	{
 		AddCartridge(1);
 		m_sub_state = eSubstateReloadEnd;
@@ -260,9 +258,11 @@ void CWeaponShotgun::OnStateSwitch	(u32 S)
 		return;
 	}
 
+	bool requiredChangeAmmoType=m_DefaultCartridge.m_LocalAmmoType!=static_cast<u8>(m_iPropousedAmmoType);
+	bool fullMagazine=m_magazine.size() == static_cast<u32>(iMagazineSize) ;
 	CWeapon::OnStateSwitch(S);
 
-	if( m_magazine.size() == (u32)iMagazineSize || !HaveCartridgeInInventory(1) ){
+	if( (fullMagazine || !HaveCartridgeInInventory(1)) && !requiredChangeAmmoType){
 			switch2_EndReload		();
 			m_sub_state = eSubstateReloadEnd;
 	};
@@ -271,7 +271,13 @@ void CWeaponShotgun::OnStateSwitch	(u32 S)
 	{
 	case eSubstateReloadBegin:
 		if( HaveCartridgeInInventory(1) )
+		{
+			if (fullMagazine && requiredChangeAmmoType)
+				UnloadMagazine();
+			else if ((m_magazine.size()>0 && requiredChangeAmmoType) && g_uCommonFlags.is(E_COMMON_FLAGS::gpFullReload))
+				UnloadMagazine();
 			switch2_StartReload	();
+		}
 		break;
 	case eSubstateReloadInProcess:
 			if( HaveCartridgeInInventory(1) )
@@ -323,7 +329,7 @@ void CWeaponShotgun::PlayAnimCloseWeapon()
 bool CWeaponShotgun::HaveCartridgeInInventory		(u8 cnt)
 {
 	if (unlimited_ammo()) return true;
-	m_pAmmo = NULL;
+	m_pAmmo = nullptr;
 	if(m_pCurrentInventory) 
 	{
 		//попытаться найти в инвентаре патроны текущего типа 
@@ -343,7 +349,7 @@ bool CWeaponShotgun::HaveCartridgeInInventory		(u8 cnt)
 			}
 		}
 	}
-	return (m_pAmmo!=NULL)&&(m_pAmmo->m_boxCurr>=cnt) ;
+	return (m_pAmmo!= nullptr)&&(m_pAmmo->m_boxCurr>=cnt) ;
 }
 
 u8 CWeaponShotgun::AddCartridge		(u8 cnt)
@@ -384,7 +390,8 @@ u8 CWeaponShotgun::AddCartridge		(u8 cnt)
 	//выкинуть коробку патронов, если она пустая
 	if(m_pAmmo && !m_pAmmo->m_boxCurr && OnServer()) 
 		m_pAmmo->SetDropManual(TRUE);
-
+	if (m_pCurrentInventory)
+		m_pCurrentInventory->m_bForceRecalcAmmos=true;
 	return cnt;
 }
 

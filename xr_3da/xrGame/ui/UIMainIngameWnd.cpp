@@ -1120,6 +1120,14 @@ if (m_pPickUpItem != PickUpItem)
 		UIPickUpItemIcon.Show(false);
 		UIPickUpItemIcon.DetachAll();
 	}
+}
+
+void CUIMainIngameWnd::SetActiveItemAmmoInfo(xr_string str_name, xr_string icon_sect_name, xr_string str_count)
+{
+		UIWeaponSignAmmo.Show		(true						);
+		UIWeaponBack.SetText		(str_name.c_str			()	);
+		UIWeaponSignAmmo.SetText	(str_count.c_str		()	);
+		SetAmmoIcon					(icon_sect_name.c_str	()	);
 };
 
 typedef CUIWeaponCellItem::eAddonType eAddonType;
@@ -1215,12 +1223,9 @@ void CUIMainIngameWnd::UpdateActiveItemInfo()
 		xr_string					str_name;
 		xr_string					icon_sect_name;
 		xr_string					str_count;
+		m_pActor->inventory().m_bForceRecalcAmmos=true;
 		item->GetBriefInfo			(str_name, icon_sect_name, str_count);
-
-		UIWeaponSignAmmo.Show		(true						);
-		UIWeaponBack.SetText		(str_name.c_str			()	);
-		UIWeaponSignAmmo.SetText	(str_count.c_str		()	);
-		SetAmmoIcon					(icon_sect_name.c_str	()	);
+		SetActiveItemAmmoInfo		(str_name, icon_sect_name, str_count);
 
 		//-------------------
 		m_pWeapon = smart_cast<CWeapon*> (item);		

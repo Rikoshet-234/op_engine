@@ -120,7 +120,7 @@ public:
 	bool			IsAmmoAvailable	();
 	virtual void	UnloadMagazine	(bool spawn_ammo = true);
 
-	virtual void	GetBriefInfo				(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count);
+	void	GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count) override;
 
 	void			PlayEmptySnd()	{PlaySound	(sndEmptyClick,get_LastFP());};
 	void			PlayHideSnd()	{PlaySound	(sndHide,get_LastFP());};
