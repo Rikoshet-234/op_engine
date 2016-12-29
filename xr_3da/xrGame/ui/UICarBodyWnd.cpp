@@ -29,7 +29,7 @@
 #include "../BottleItem.h"
 #include "UITradeWnd.h"
 #include "../OPFuncs/utils.h"
-#include "string_table.h"
+#include "../string_table.h"
 
 #define				CAR_BODY_XML		"carbody_new.xml"
 #define				CARBODY_ITEM_XML	"carbody_item.xml"
