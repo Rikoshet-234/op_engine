@@ -100,7 +100,7 @@ void CLevel::IR_OnKeyboardPress	(int key)
 	bool b_ui_exist = (pHUD && pHUD->GetUI());
 
 	if (!g_bDisableAllInput)
-		if (Actor())
+		if (g_actor)
 			Actor()->callback(GameObject::ECallbackType::OnKeyboardPress)(key,get_binded_action(key));
 
 //.	if (DIK_F10 == key)		vtune.enable();

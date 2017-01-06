@@ -26,6 +26,7 @@
 #include "item_place_change_enum.h"
 #include "ui/UIInventoryWnd.h"
 #include "UIGameSP.h"
+#include <Windows.h>
 
 using namespace luabind;
 
@@ -344,6 +345,7 @@ void CScriptGameObject::SetCallbackEx(GameObject::ECallbackType type)
 
 #pragma endregion
 
+#pragma region iterate items in boxes
 void CScriptGameObject::IterateInventoryBoxObject(luabind::functor<void> functor,bool showError) const
 {
 	CInventoryBox			*inventoryBox = smart_cast<CInventoryBox*>(&this->object());
@@ -379,6 +381,7 @@ void CScriptGameObject::IterateInventoryBoxId(luabind::functor<void> functor) co
 }
 
 #pragma endregion
+
 
 class_<CScriptGameObject> &script_register_game_object3(class_<CScriptGameObject> &instance)
 {
