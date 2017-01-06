@@ -113,6 +113,8 @@ void CUICellItem::SetOwnerList(CUIDragDropListEx* p)
 		float y = itm_grid_size.y * cell_size.y - p_ConditionProgressBar->GetHeight();
 		p_ConditionProgressBar->SetWndPos(Fvector2().set(x,y));
 		p_ConditionProgressBar->SetProgressPos(itm->GetCondition()*100+1.0f-EPS);
+		p_ConditionProgressBar->SetWidth(GetWidth());
+		Msg("[%s] [%f|%f] [%d] [%f|%f]",itm->Name(), GetWidth(),GetHeight(),itm_grid_size.y * cell_size.y,p_ConditionProgressBar->GetWidth(),p_ConditionProgressBar->GetHeight());
 		visible=true;
 	}
 	p_ConditionProgressBar->Show(visible);

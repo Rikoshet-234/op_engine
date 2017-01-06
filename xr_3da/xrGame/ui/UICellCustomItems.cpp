@@ -58,7 +58,7 @@ void CUIAmmoCellItem::UpdateItemText()
 		
 		u16 total				= object()->m_boxCurr;
 		for(;it!=it_e;++it)
-			total				= total + ((CUIAmmoCellItem*)(*it))->object()->m_boxCurr;
+			total				= total + static_cast<CUIAmmoCellItem*>(*it)->object()->m_boxCurr;
 
 		string32				str;
 		sprintf_s					(str,"%d",total);
@@ -71,12 +71,11 @@ void CUIAmmoCellItem::UpdateItemText()
 }
 
 
-CUIWeaponCellItem::CUIWeaponCellItem(CWeapon* itm)
-:inherited(itm)
+CUIWeaponCellItem::CUIWeaponCellItem(CWeapon* itm):inherited(itm)
 {
-	m_addons[eSilencer]		= NULL;
-	m_addons[eScope]		= NULL;
-	m_addons[eLauncher]		= NULL;
+	m_addons[eSilencer]		= nullptr;
+	m_addons[eScope]		= nullptr;
+	m_addons[eLauncher]		= nullptr;
 
 	if(itm->SilencerAttachable())
 		m_addon_offset[eSilencer].set(object()->GetSilencerX(), object()->GetSilencerY());
@@ -120,7 +119,7 @@ void CUIWeaponCellItem::CreateIcon(eAddonType t)
 void CUIWeaponCellItem::DestroyIcon(eAddonType t)
 {
 	DetachChild		(m_addons[t]);
-	m_addons[t]		= NULL;
+	m_addons[t]		= nullptr;
 }
 
 CUIStatic* CUIWeaponCellItem::GetIcon(eAddonType t)
@@ -207,12 +206,7 @@ void CUIWeaponCellItem::InitAddon(CUIStatic* s, LPCSTR section, Fvector2 addon_o
 		cell_size.set(rect.width(),rect.height());
 		tex_rect.x1=rect.x1;
 		tex_rect.y1=rect.y1;
-		//cell_size.x				= pSettings->r_u32(section, "inv_grid_width")*INV_GRID_WIDTHF;
-		//cell_size.y				= pSettings->r_u32(section, "inv_grid_height")*INV_GRID_HEIGHTF;
-
-		//tex_rect.x1				= pSettings->r_u32(section, "inv_grid_x")*INV_GRID_WIDTHF;
-		//tex_rect.y1				= pSettings->r_u32(section, "inv_grid_y")*INV_GRID_HEIGHTF;
-
+		
 		tex_rect.rb.add			(tex_rect.lt,cell_size);
 
 		cell_size.mul			(base_scale);
@@ -227,7 +221,7 @@ void CUIWeaponCellItem::InitAddon(CUIStatic* s, LPCSTR section, Fvector2 addon_o
 CUIDragItem* CUIWeaponCellItem::CreateDragItem()
 {
 	CUIDragItem* i		= inherited::CreateDragItem();
-	CUIStatic* s		= NULL;
+	CUIStatic* s		= nullptr;
 
 	if(GetIcon(eSilencer))
 	{
