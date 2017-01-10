@@ -190,7 +190,10 @@ bool CWeaponMagazined::TryReload()
 {
 	if(m_pCurrentInventory) 
 	{
-		m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAny(*m_ammoTypes[m_ammoType] ));
+		int ammoIndex=m_ammoType;
+		if (static_cast<int>(m_ammoType)!=m_iPropousedAmmoType)
+			ammoIndex=m_iPropousedAmmoType;
+		m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAny(*m_ammoTypes[ammoIndex] ));
 
 		
 		if(IsMisfire() && iAmmoElapsed)
@@ -237,6 +240,16 @@ bool CWeaponMagazined::IsAmmoAvailable()
 				return	(true);
 	return		(false);
 }
+
+void CWeaponMagazined::ZoomInc()
+{
+	Msg("CWeaponMagazined::ZoomInc request");
+}
+void CWeaponMagazined::ZoomDec()
+{
+	Msg("CWeaponMagazined::ZoomDec request");
+}
+
 
 void CWeaponMagazined::OnMagazineEmpty() 
 {
@@ -1298,36 +1311,59 @@ void CWeaponMagazined::net_Import	(NET_Packet& P)
 		SetQueueSize(1);
 }
 #include "string_table.h"
+u32 CWeaponMagazined::getCurrentAmmoType()
+{
+	u32 result;
+	if(GetAmmoElapsed()==0 || m_magazine.size()==0)
+		result	= m_ammoType;
+	else
+		result	= m_magazine.back().m_LocalAmmoType;
+	return result;
+}
 void CWeaponMagazined::GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count)
 {
 	int	AE					= GetAmmoElapsed();
-	
 	if (m_iPropousedAmmoType==-1)
-		if(AE==0 || 0==m_magazine.size() )
-			m_iPropousedAmmoType	= m_ammoType;
-		else
-			m_iPropousedAmmoType	= m_magazine.back().m_LocalAmmoType;
-	
-		icon_sect_name	= *m_ammoTypes[m_iPropousedAmmoType];
-
+		m_iPropousedAmmoType	= getCurrentAmmoType();
+	icon_sect_name	= *m_ammoTypes[m_iPropousedAmmoType];
 	int sectionCount=0;
 	int	AC					= GetAmmoCurrentEx(sectionCount);
-
 	string256		sItemName;
 	strcpy_s			(sItemName, *CStringTable().translate(pSettings->r_string(icon_sect_name.c_str(), "inv_name_short")));
-
 	if ( HasFireModes() )
 		strcat_s(sItemName, GetCurrentFireModeStr());
 	else if (GetAmmoMagSize()!=0)
 		strcat_s(sItemName, " (1)");
-
-
 	str_name		= sItemName;
-
-
+	bool multiAmmo=false;
+	CWeaponAmmo *lastFounded=nullptr;
+	std::for_each(m_ammoTypes.begin(),m_ammoTypes.end(),[&](shared_str section)
+	{
+		auto founded=std::find_if(m_pCurrentInventory->m_ruck.begin(),m_pCurrentInventory->m_ruck.end(),
+			[&](CInventoryItem* item)
+			{
+				CWeaponAmmo *l_pAmmo = smart_cast<CWeaponAmmo*>(item);
+				if (!l_pAmmo)
+					return false;
+				return xr_strcmp(l_pAmmo->cNameSect().c_str(),section.c_str())==0;
+			});
+		if (founded!=m_pCurrentInventory->m_ruck.end())
+		{
+			CWeaponAmmo *ammo = smart_cast<CWeaponAmmo*>(*founded);
+			lastFounded=ammo;
+			if (xr_strcmp(icon_sect_name.c_str(),ammo->cNameSect().c_str())!=0)
+				multiAmmo=true;
+		}
+	});
+	if (!multiAmmo)
+		if (lastFounded && xr_strcmp(*m_ammoTypes[getCurrentAmmoType()],lastFounded->cNameSect())!=0)
+			multiAmmo=true;
 	if (GetAmmoMagSize()!=0)
 		if (!unlimited_ammo())
-			sprintf_s			(sItemName, "%d/%d/%d",AE,sectionCount,AC - AE);
+			if (multiAmmo)
+				sprintf_s			(sItemName, "%d/%d/%d",AE,sectionCount,AC - AE);
+			else
+				sprintf_s			(sItemName, "%d/%d",AE,AC - AE);
 		else
 			sprintf_s			(sItemName, "%d/--/--",AE);
 

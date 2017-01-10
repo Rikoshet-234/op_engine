@@ -437,6 +437,7 @@ void CUIInventoryWnd::hideInventoryWnd(CInventoryItem* weapon) const
 {
 	CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
 	pGameSP->InventoryMenu->GetHolder()->StartStopMenu(pGameSP->InventoryMenu,true);
+	m_pInv->m_bForceRecalcAmmos=true;
 	if (m_pInv->ActiveItem()!=weapon)
 		m_pInv->ProcessSlotAction(true,weapon->GetSlot());
 }
@@ -466,7 +467,7 @@ bool CUIInventoryWnd::OnItemDbClick(CUICellItem* itm)
 			CInventoryItem *pistol=m_pInv->m_slots[PISTOL_SLOT].m_pIItem;
 			CInventoryItem *rifle=m_pInv->m_slots[RIFLE_SLOT].m_pIItem;
 			CInventoryItem *shotgun=m_pInv->m_slots[SHOTGUN_SLOT].m_pIItem;
-#pragma region disable due to hard learning async state machine and plaing animation
+#pragma region disabled due to hard learning async state machine and playng animation
 			/*if (ammo)
 			{				
 				if (pistol != nullptr && pistol->CanLoadAmmo(ammo,true))

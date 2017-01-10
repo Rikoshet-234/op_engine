@@ -845,20 +845,20 @@ bool CWeapon::Action(s32 cmd, u32 flags)
 						l_newType++;
 						if (l_newType>=m_ammoTypes.size())
 							l_newType=0;
-						b1 = l_newType != m_ammoType;
-						b2 = unlimited_ammo() ? false : (!m_pCurrentInventory->GetAny(*m_ammoTypes[l_newType]));						
+						b1 = static_cast<int>(l_newType) != m_iPropousedAmmoType;
+						bool found=m_pCurrentInventory->GetAny(*m_ammoTypes[l_newType])!=nullptr;
+						b2 = unlimited_ammo() ? false : !found;						
 					} while( b1 && b2);
 					xr_string str_name;
 					xr_string icon_sect_name;
 					xr_string str_count;
 					m_iPropousedAmmoType=l_newType;
+					m_pCurrentInventory->m_bForceRecalcAmmos=true;
 					GetBriefInfo(str_name, icon_sect_name, str_count);
 					HUD().GetUI()->UIMainIngameWnd->SetActiveItemAmmoInfo(str_name,icon_sect_name,str_count);
 					m_set_next_ammoType_on_reload = m_iPropousedAmmoType;						
 					if (static_cast<u32>(m_iPropousedAmmoType)!=m_ammoType && !g_uCommonFlags.is(E_COMMON_FLAGS::gpDeferredReload))
 						if(OnServer()) Reload();
-					if(m_pCurrentInventory)
-						m_pCurrentInventory->m_bForceRecalcAmmos=true;
 				}
 			}
 			return true;

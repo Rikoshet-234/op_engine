@@ -54,6 +54,10 @@ protected:
 	//кадр момента пересчета UpdateSounds
 	u32				dwUpdateSounds_Frame;
 protected:
+	void ZoomInc	() override;
+	void ZoomDec	() override;
+
+
 	virtual void	OnMagazineEmpty	();
 
 	virtual void	switch2_Idle	();
@@ -122,6 +126,7 @@ public:
 
 	void	GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count) override;
 
+	u32 getCurrentAmmoType();
 	void			PlayEmptySnd()	{PlaySound	(sndEmptyClick,get_LastFP());};
 	void			PlayHideSnd()	{PlaySound	(sndHide,get_LastFP());};
 	//////////////////////////////////////////////

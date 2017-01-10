@@ -252,6 +252,8 @@ protected:
 	float			m_fIronSightZoomFactor;
 	//коэффициент увеличения прицела
 	float			m_fScopeZoomFactor;
+	//шаг изменения прицела
+	float			m_fScopeZoomDivider;
 	//когда режим приближения включен
 	bool			m_bZoomMode;
 	//от 0 до 1, показывает насколько процентов
