@@ -253,7 +253,9 @@ protected:
 	//коэффициент увеличения прицела
 	float			m_fScopeZoomFactor;
 	//шаг изменения прицела
-	float			m_fScopeZoomDivider;
+	float			m_fScopeZoomStepCount;
+	//run-time zoom factor
+	float			m_fRTZoomFactor; 
 	//когда режим приближения включен
 	bool			m_bZoomMode;
 	//от 0 до 1, показывает насколько процентов
@@ -263,8 +265,8 @@ protected:
 public:
 
 	IC bool					IsZoomEnabled		()	const	{return m_bZoomEnabled;}
-	virtual	void			ZoomInc				(){};
-	virtual	void			ZoomDec				(){};
+	virtual	void			ZoomInc				();
+	virtual	void			ZoomDec				();
 	virtual void			OnZoomIn			();
 	virtual void			OnZoomOut			();
 			bool			IsZoomed			()	const	{return m_bZoomMode;};

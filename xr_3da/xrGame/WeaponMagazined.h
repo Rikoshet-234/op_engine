@@ -24,6 +24,13 @@ protected:
 	HUD_SOUND		sndShot;
 	HUD_SOUND		sndEmptyClick;
 	HUD_SOUND		sndReload;
+
+	HUD_SOUND		sndZoomIn;
+	HUD_SOUND		sndZoomOut;
+
+	HUD_SOUND		sndZoomInc;
+	HUD_SOUND		sndZoomDec;
+
 	//звук текущего выстрела
 	HUD_SOUND*		m_pSndShotCurrent;
 
@@ -39,6 +46,10 @@ protected:
 	ESoundTypes		m_eSoundShot;
 	ESoundTypes		m_eSoundEmptyClick;
 	ESoundTypes		m_eSoundReload;
+	ESoundTypes		m_eSoundZoomIn;
+	ESoundTypes		m_eSoundZoomOut;
+	ESoundTypes		m_eSoundZoomInc;
+	ESoundTypes		m_eSoundZoomDec;
 	struct SWMmotions{
 		MotionSVec		mhud_idle;
 		MotionSVec		mhud_idle_aim;
