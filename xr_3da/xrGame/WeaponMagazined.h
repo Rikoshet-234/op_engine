@@ -24,6 +24,13 @@ protected:
 	HUD_SOUND		sndShot;
 	HUD_SOUND		sndEmptyClick;
 	HUD_SOUND		sndReload;
+
+	HUD_SOUND		sndZoomIn;
+	HUD_SOUND		sndZoomOut;
+
+	HUD_SOUND		sndZoomInc;
+	HUD_SOUND		sndZoomDec;
+
 	//звук текущего выстрела
 	HUD_SOUND*		m_pSndShotCurrent;
 
@@ -39,6 +46,10 @@ protected:
 	ESoundTypes		m_eSoundShot;
 	ESoundTypes		m_eSoundEmptyClick;
 	ESoundTypes		m_eSoundReload;
+	ESoundTypes		m_eSoundZoomIn;
+	ESoundTypes		m_eSoundZoomOut;
+	ESoundTypes		m_eSoundZoomInc;
+	ESoundTypes		m_eSoundZoomDec;
 	struct SWMmotions{
 		MotionSVec		mhud_idle;
 		MotionSVec		mhud_idle_aim;
@@ -54,6 +65,10 @@ protected:
 	//кадр момента пересчета UpdateSounds
 	u32				dwUpdateSounds_Frame;
 protected:
+	void ZoomInc	() override;
+	void ZoomDec	() override;
+
+
 	virtual void	OnMagazineEmpty	();
 
 	virtual void	switch2_Idle	();
@@ -122,6 +137,7 @@ public:
 
 	void	GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count) override;
 
+	u32 getCurrentAmmoType();
 	void			PlayEmptySnd()	{PlaySound	(sndEmptyClick,get_LastFP());};
 	void			PlayHideSnd()	{PlaySound	(sndHide,get_LastFP());};
 	//////////////////////////////////////////////

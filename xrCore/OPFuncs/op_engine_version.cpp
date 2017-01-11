@@ -3,7 +3,7 @@
 #include "op_engine_version.h"
 
 
-//#define PATCH_INFO_PRESENT
+#define PATCH_INFO_PRESENT
 
 //! Keep this defines here so you don't have to rebuild cpps when you change version
 #define ENGINE_DESCRIPTION "OP 2.1 Engine"

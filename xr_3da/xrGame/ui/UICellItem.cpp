@@ -109,10 +109,19 @@ void CUICellItem::SetOwnerList(CUIDragDropListEx* p)
 		m_pParentList->PutConditionBarUIData(p_ConditionProgressBar);
 		Ivector2 itm_grid_size = GetGridSize();
 		Ivector2 cell_size = m_pParentList->CellSize();
+		int x_size=itm_grid_size.x * cell_size.x;
+		int y_size=itm_grid_size.y * cell_size.y;
 		float x = 1.f;
-		float y = itm_grid_size.y * cell_size.y - p_ConditionProgressBar->GetHeight();
+		float y = y_size - p_ConditionProgressBar->GetHeight();
 		p_ConditionProgressBar->SetWndPos(Fvector2().set(x,y));
-		p_ConditionProgressBar->SetProgressPos(itm->GetCondition()*100+1.0f-EPS);
+		p_ConditionProgressBar->SetProgressPos(itm->GetCondition()*100/*+1.0f-EPS*/);
+		p_ConditionProgressBar->m_UIProgressItem.SetWidth(float(x_size));
+		p_ConditionProgressBar->m_UIBackgroundItem.SetWidth(float(x_size));
+		p_ConditionProgressBar->SetWidth(float(x_size));
+		p_ConditionProgressBar->m_UIProgressItem.SetStretchTexture(true);
+		p_ConditionProgressBar->m_UIBackgroundItem.SetStretchTexture(true);
+		
+		//Msg("[%s] [%f|%f] [%d|%d] [%f|%f]",itm->Name(), GetWidth(),GetHeight(),x_size,y_size,p_ConditionProgressBar->GetWidth(),p_ConditionProgressBar->GetHeight());
 		visible=true;
 	}
 	p_ConditionProgressBar->Show(visible);

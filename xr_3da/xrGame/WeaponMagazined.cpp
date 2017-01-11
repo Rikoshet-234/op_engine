@@ -28,7 +28,12 @@ CWeaponMagazined::CWeaponMagazined(LPCSTR name, ESoundTypes eSoundType) : CWeapo
 	m_eSoundShot		= ESoundTypes(SOUND_TYPE_WEAPON_SHOOTING | eSoundType);
 	m_eSoundEmptyClick	= ESoundTypes(SOUND_TYPE_WEAPON_EMPTY_CLICKING | eSoundType);
 	m_eSoundReload		= ESoundTypes(SOUND_TYPE_WEAPON_RECHARGING | eSoundType);
+	m_eSoundZoomIn		= ESoundTypes(SOUND_TYPE_ITEM_USING | eSoundType);
+	m_eSoundZoomOut		= ESoundTypes(SOUND_TYPE_ITEM_USING | eSoundType);
 	
+	m_eSoundZoomInc		= ESoundTypes(SOUND_TYPE_ITEM_USING | eSoundType);
+	m_eSoundZoomDec		= ESoundTypes(SOUND_TYPE_ITEM_USING | eSoundType);
+
 	m_pSndShotCurrent = nullptr;
 	m_sSilencerFlameParticles = m_sSilencerSmokeParticles = nullptr;
 
@@ -38,6 +43,7 @@ CWeaponMagazined::CWeaponMagazined(LPCSTR name, ESoundTypes eSoundType) : CWeapo
 	m_bLockType = false;
 	m_iCurFireMode=0;
 	m_bforceReloadAfterIdle=false;
+
 }
 
 CWeaponMagazined::~CWeaponMagazined()
@@ -48,6 +54,10 @@ CWeaponMagazined::~CWeaponMagazined()
 	HUD_SOUND::DestroySound(sndShot);
 	HUD_SOUND::DestroySound(sndEmptyClick);
 	HUD_SOUND::DestroySound(sndReload);
+	HUD_SOUND::DestroySound	(sndZoomIn);
+	HUD_SOUND::DestroySound	(sndZoomOut);
+	HUD_SOUND::DestroySound	(sndZoomDec);
+	HUD_SOUND::DestroySound	(sndZoomInc);
 }
 
 
@@ -60,6 +70,12 @@ void CWeaponMagazined::StopHUDSounds		()
 	HUD_SOUND::StopSound(sndReload);
 
 	HUD_SOUND::StopSound(sndShot);
+
+	HUD_SOUND::StopSound(sndZoomOut);
+	HUD_SOUND::StopSound(sndZoomIn);
+
+	HUD_SOUND::StopSound(sndZoomInc);
+	HUD_SOUND::StopSound(sndZoomDec);
 //.	if(sndShot.enable && sndShot.snd.feedback)
 //.		sndShot.snd.feedback->switch_to_3D();
 
@@ -83,6 +99,12 @@ void CWeaponMagazined::Load	(LPCSTR section)
 	HUD_SOUND::LoadSound(section,"snd_empty"	, sndEmptyClick	, m_eSoundEmptyClick	);
 	HUD_SOUND::LoadSound(section,"snd_reload"	, sndReload		, m_eSoundReload		);
 	
+	HUD_SOUND::LoadSound(section, "snd_zoomin",  sndZoomIn,		m_eSoundZoomIn,false);
+	HUD_SOUND::LoadSound(section, "snd_zoomout", sndZoomOut,	m_eSoundZoomOut,false);
+
+	HUD_SOUND::LoadSound(section, "snd_zoomdec", sndZoomInc,	m_eSoundZoomInc,false);
+	HUD_SOUND::LoadSound(section, "snd_zoominc", sndZoomDec,	m_eSoundZoomDec,false);
+
 	m_pSndShotCurrent = &sndShot;
 		
 	
@@ -190,7 +212,10 @@ bool CWeaponMagazined::TryReload()
 {
 	if(m_pCurrentInventory) 
 	{
-		m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAny(*m_ammoTypes[m_ammoType] ));
+		int ammoIndex=m_ammoType;
+		if (static_cast<int>(m_ammoType)!=m_iPropousedAmmoType)
+			ammoIndex=m_iPropousedAmmoType;
+		m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAny(*m_ammoTypes[ammoIndex] ));
 
 		
 		if(IsMisfire() && iAmmoElapsed)
@@ -237,6 +262,19 @@ bool CWeaponMagazined::IsAmmoAvailable()
 				return	(true);
 	return		(false);
 }
+
+void CWeaponMagazined::ZoomInc()
+{
+	PlaySound	(sndZoomInc,get_LastFP());
+	inherited::ZoomInc();
+}
+
+void CWeaponMagazined::ZoomDec()
+{
+	PlaySound	(sndZoomDec,get_LastFP());
+	inherited::ZoomDec();
+}
+
 
 void CWeaponMagazined::OnMagazineEmpty() 
 {
@@ -484,6 +522,11 @@ void CWeaponMagazined::UpdateSounds	()
 	if (sndShot.playing			()) sndShot.set_position		(get_LastFP());
 	if (sndReload.playing		()) sndReload.set_position		(get_LastFP());
 	if (sndEmptyClick.playing	())	sndEmptyClick.set_position	(get_LastFP());
+
+	if (sndZoomIn.playing		()) sndZoomIn.set_position		(get_LastFP());
+	if (sndZoomOut.playing	())	sndZoomOut.set_position	(get_LastFP());
+	if (sndZoomInc.playing		()) sndZoomInc.set_position		(get_LastFP());
+	if (sndZoomDec.playing	())	sndZoomDec.set_position	(get_LastFP());
 }
 
 LPCSTR bts(bool val)
@@ -978,7 +1021,7 @@ void CWeaponMagazined::InitAddons()
 			shared_str scope_tex_name;
 			scope_tex_name = pSettings->r_string(*m_sScopeName, "scope_texture");
 			m_fScopeZoomFactor = pSettings->r_float	(*m_sScopeName, "scope_zoom_factor");
-			
+			m_fScopeZoomStepCount = READ_IF_EXISTS(pSettings, r_float, *m_sScopeName, "scope_zoom_step_count", m_fScopeZoomStepCount==0 ? 1.0f : m_fScopeZoomStepCount);
 			if(m_UIScope && (!m_UIScope->GetTextureName() || m_UIScope->GetTextureName().equal(scope_tex_name)))
 			{
 				xr_delete(m_UIScope);
@@ -994,6 +1037,7 @@ void CWeaponMagazined::InitAddons()
 		else if(m_eScopeStatus == ALife::eAddonPermanent)
 		{
 			m_fScopeZoomFactor = pSettings->r_float	(cNameSect(), "scope_zoom_factor");
+			m_fScopeZoomStepCount = READ_IF_EXISTS(pSettings, r_float, cNameSect(), "scope_zoom_step_count", m_fScopeZoomStepCount==0 ? 1.0f : m_fScopeZoomStepCount);
 			shared_str scope_tex_name;
 			scope_tex_name = pSettings->r_string(cNameSect(), "scope_texture");
 
@@ -1152,6 +1196,12 @@ void CWeaponMagazined::OnZoomIn			()
 	if(GetState() == eIdle)
 		PlayAnimIdle();
 
+	if (H_Parent())
+	{
+		HUD_SOUND::StopSound(sndZoomOut);
+		bool b_hud_mode = (Level().CurrentEntity() == H_Parent());
+		HUD_SOUND::PlaySound(sndZoomIn,H_Parent()->Position(), H_Parent(), b_hud_mode);
+	}
 
 	CActor* pActor = smart_cast<CActor*>(H_Parent());
 	if(pActor)
@@ -1175,10 +1225,15 @@ void CWeaponMagazined::OnZoomOut		()
 	if(GetState() == eIdle)
 		PlayAnimIdle();
 
+	if (H_Parent() && !IsRotatingToZoom())
+	{
+		HUD_SOUND::StopSound(sndZoomIn);
+		bool b_hud_mode = (Level().CurrentEntity() == H_Parent());	
+		HUD_SOUND::PlaySound(sndZoomOut, H_Parent()->Position(), H_Parent(), b_hud_mode);
+	}
 	CActor* pActor = smart_cast<CActor*>(H_Parent());
 	if(pActor)
 		pActor->Cameras().RemoveCamEffector	(eCEZoom);
-
 }
 
 //переключение режимов стрельбы одиночными и очередями
@@ -1298,36 +1353,59 @@ void CWeaponMagazined::net_Import	(NET_Packet& P)
 		SetQueueSize(1);
 }
 #include "string_table.h"
+u32 CWeaponMagazined::getCurrentAmmoType()
+{
+	u32 result;
+	if(GetAmmoElapsed()==0 || m_magazine.size()==0)
+		result	= m_ammoType;
+	else
+		result	= m_magazine.back().m_LocalAmmoType;
+	return result;
+}
 void CWeaponMagazined::GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count)
 {
 	int	AE					= GetAmmoElapsed();
-	
 	if (m_iPropousedAmmoType==-1)
-		if(AE==0 || 0==m_magazine.size() )
-			m_iPropousedAmmoType	= m_ammoType;
-		else
-			m_iPropousedAmmoType	= m_magazine.back().m_LocalAmmoType;
-	
-		icon_sect_name	= *m_ammoTypes[m_iPropousedAmmoType];
-
+		m_iPropousedAmmoType	= getCurrentAmmoType();
+	icon_sect_name	= *m_ammoTypes[m_iPropousedAmmoType];
 	int sectionCount=0;
 	int	AC					= GetAmmoCurrentEx(sectionCount);
-
 	string256		sItemName;
 	strcpy_s			(sItemName, *CStringTable().translate(pSettings->r_string(icon_sect_name.c_str(), "inv_name_short")));
-
 	if ( HasFireModes() )
 		strcat_s(sItemName, GetCurrentFireModeStr());
 	else if (GetAmmoMagSize()!=0)
 		strcat_s(sItemName, " (1)");
-
-
 	str_name		= sItemName;
-
-
+	bool multiAmmo=false;
+	CWeaponAmmo *lastFounded=nullptr;
+	std::for_each(m_ammoTypes.begin(),m_ammoTypes.end(),[&](shared_str section)
+	{
+		auto founded=std::find_if(m_pCurrentInventory->m_ruck.begin(),m_pCurrentInventory->m_ruck.end(),
+			[&](CInventoryItem* item)
+			{
+				CWeaponAmmo *l_pAmmo = smart_cast<CWeaponAmmo*>(item);
+				if (!l_pAmmo)
+					return false;
+				return xr_strcmp(l_pAmmo->cNameSect().c_str(),section.c_str())==0;
+			});
+		if (founded!=m_pCurrentInventory->m_ruck.end())
+		{
+			CWeaponAmmo *ammo = smart_cast<CWeaponAmmo*>(*founded);
+			lastFounded=ammo;
+			if (xr_strcmp(icon_sect_name.c_str(),ammo->cNameSect().c_str())!=0)
+				multiAmmo=true;
+		}
+	});
+	if (!multiAmmo)
+		if (lastFounded && xr_strcmp(*m_ammoTypes[getCurrentAmmoType()],lastFounded->cNameSect())!=0)
+			multiAmmo=true;
 	if (GetAmmoMagSize()!=0)
 		if (!unlimited_ammo())
-			sprintf_s			(sItemName, "%d/%d/%d",AE,sectionCount,AC - AE);
+			if (multiAmmo)
+				sprintf_s			(sItemName, "%d/%d/%d",AE,sectionCount,AC - AE);
+			else
+				sprintf_s			(sItemName, "%d/%d",AE,AC - AE);
 		else
 			sprintf_s			(sItemName, "%d/--/--",AE);
 
