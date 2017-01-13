@@ -294,7 +294,7 @@ luabind::object	CScriptGameObject::GetImmunitiesFromBeltTable() const
 	std::for_each(bi,ei,[&](CInventoryItem* item)
 	{
 		CArtefact* artefact=smart_cast<CArtefact*>(item);
-		if (item)
+		if (artefact)
 		{
 			HitImmunity::HitTypeSVec hitVector=artefact->m_ArtefactHitImmunities.GetHitTypeVec();
 			for (HitImmunity::HitTypeSVec::iterator it=hitVector.begin();it!=hitVector.end();++it)

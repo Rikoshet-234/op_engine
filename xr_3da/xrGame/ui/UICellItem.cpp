@@ -106,22 +106,147 @@ void CUICellItem::SetOwnerList(CUIDragDropListEx* p)
 	bool visible=false;
 	if ((pWeapon || pOutfit) && m_pParentList->GetShowConditionBar() && g_uCommonFlags.test(E_COMMON_FLAGS::uiShowConditions))
 	{
-		m_pParentList->PutConditionBarUIData(p_ConditionProgressBar);
-		Ivector2 itm_grid_size = GetGridSize();
-		Ivector2 cell_size = m_pParentList->CellSize();
-		int x_size=itm_grid_size.x * cell_size.x;
-		int y_size=itm_grid_size.y * cell_size.y;
-		float x = 1.f;
-		float y = y_size - p_ConditionProgressBar->GetHeight();
-		p_ConditionProgressBar->SetWndPos(Fvector2().set(x,y));
-		p_ConditionProgressBar->SetProgressPos(itm->GetCondition()*100/*+1.0f-EPS*/);
-		p_ConditionProgressBar->m_UIProgressItem.SetWidth(float(x_size));
-		p_ConditionProgressBar->m_UIBackgroundItem.SetWidth(float(x_size));
-		p_ConditionProgressBar->SetWidth(float(x_size));
-		p_ConditionProgressBar->m_UIProgressItem.SetStretchTexture(true);
-		p_ConditionProgressBar->m_UIBackgroundItem.SetStretchTexture(true);
+		int x_size= GetGridSize().x * m_pParentList->CellSize().x;
+		int y_size= GetGridSize().y * m_pParentList->CellSize().y;
+		float x,y,width,height;
+		bool isHorizontal;
+		switch (m_pParentList->cacheData.position)
+		{
+		case left: 
+			{
+				x=2;y=2;
+				width=m_pParentList->cacheData.fatness;
+				height=y_size-2;
+				isHorizontal=false;
+			}
+			break;
+		case right: 
+			{
+				x=x_size-m_pParentList->cacheData.fatness;y=2;
+				width=m_pParentList->cacheData.fatness;
+				height=y_size-2;
+				isHorizontal=false;
+			}break;
+		case top: 
+			{
+				x=2;y=2;
+				width=x_size-2;
+				height=m_pParentList->cacheData.fatness;
+				isHorizontal=true;
+			}
+			break;
+		case bottom: 
+			{
+				x=2;y=y_size-2;
+				width=x_size-2;
+				height=m_pParentList->cacheData.fatness;
+				isHorizontal=true;
+			}
+			break;
+		case left_top: 
+			{
+				if (x_size>=y_size)
+				{
+					x=2;y=2;
+					width=x_size-2;
+					height=m_pParentList->cacheData.fatness;
+					isHorizontal=true;
+				}
+				else
+				{
+					x=2;y=2;
+					width=m_pParentList->cacheData.fatness;
+					height=y_size-2;
+					isHorizontal=false;
+				}
+			}
+			break;
+		case right_top:
+			{
+				if (x_size>=y_size)
+				{
+					x=2;y=2;
+					width=x_size-2;
+					height=m_pParentList->cacheData.fatness;
+					isHorizontal=true;
+				}
+				else
+				{
+					x=x_size-m_pParentList->cacheData.fatness;y=2;
+					width=m_pParentList->cacheData.fatness;
+					height=y_size-2;
+					isHorizontal=false;
+				}
+			}
+			break;
+		case right_bottom: 
+			{
+				if (x_size>=y_size)
+				{
+					x=2;y=y_size-2;
+					width=x_size-2;
+					height=m_pParentList->cacheData.fatness;
+					isHorizontal=true;
+				}
+				else
+				{
+					x=x_size-m_pParentList->cacheData.fatness;y=2;
+					width=m_pParentList->cacheData.fatness;
+					height=y_size-2;
+					isHorizontal=false;
+				}
+			}
+			break;
+		case left_bottom: 
+		default:
+			{
+				if (x_size>=y_size)
+				{
+					x=2;y=y_size-2;
+					width=x_size-2;
+					height=m_pParentList->cacheData.fatness;
+					isHorizontal=true;
+				}
+				else
+				{
+					x=2;y=2;
+					width=m_pParentList->cacheData.fatness;
+					height=y_size-2;
+					isHorizontal=false;
+				}
+			}
+			break;
+		}
 		
-		//Msg("[%s] [%f|%f] [%d|%d] [%f|%f]",itm->Name(), GetWidth(),GetHeight(),x_size,y_size,p_ConditionProgressBar->GetWidth(),p_ConditionProgressBar->GetHeight());
+		p_ConditionProgressBar->SetWndPos(x,y);
+		p_ConditionProgressBar->SetWndRect(0,0,width,height);		
+		p_ConditionProgressBar->SetRange(0,100);
+		p_ConditionProgressBar->SetOrientation(isHorizontal);
+
+
+		p_ConditionProgressBar->m_UIProgressItem.InitTexture("ui\\cond_pb_s");
+		p_ConditionProgressBar->m_UIProgressItem.SetStretchTexture(true);
+		p_ConditionProgressBar->m_UIProgressItem.TextureAvailable		(true);
+		p_ConditionProgressBar->m_UIProgressItem.TextureOn				();
+		p_ConditionProgressBar->m_UIProgressItem.SetWidth(x_size);
+		p_ConditionProgressBar->m_UIProgressItem.SetHeight(2); 
+
+		if (m_pParentList->cacheData.textureBack.size()>0)
+		{
+			p_ConditionProgressBar->m_UIBackgroundItem.InitTexture("ui\\cond_pb_s");
+			p_ConditionProgressBar->m_UIBackgroundItem.SetStretchTexture(true);
+			p_ConditionProgressBar->m_UIBackgroundItem.TextureAvailable		(true);
+			p_ConditionProgressBar->m_UIBackgroundItem.TextureOn				();
+			p_ConditionProgressBar->m_UIBackgroundItem.SetWidth(x_size);
+			p_ConditionProgressBar->m_UIBackgroundItem.SetHeight(2);
+			p_ConditionProgressBar->SetBackgroundPresent(true);
+		}
+		p_ConditionProgressBar->m_minColor.set(color_rgba(255,36,0,255));
+		p_ConditionProgressBar->m_maxColor.set(color_rgba(0,255,0,255));
+		p_ConditionProgressBar->m_bUseColor=true;
+		p_ConditionProgressBar->SetProgressPos(itm->GetCondition()*100);
+
+		//Msg("[%s] [%f|%f] [%d|%d] [%f|%f]",itm->Name(), GetWidth(),GetHeight(),x_size,y_size,p_ConditionProgressBar->m_UIProgressItem.GetWidth(),p_ConditionProgressBar->m_UIBackgroundItem.GetHeight());
 		visible=true;
 	}
 	p_ConditionProgressBar->Show(visible);

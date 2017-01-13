@@ -32,7 +32,7 @@ public:
 	CUIStatic			m_UIProgressItem;
 	CUIStatic			m_UIBackgroundItem;
 
-
+	void				SetOrientation(bool isHorizontal) {m_bIsHorizontal=isHorizontal;}
 						CUIProgressBar				();
 	virtual				~CUIProgressBar				();
 

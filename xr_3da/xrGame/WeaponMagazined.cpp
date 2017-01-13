@@ -213,7 +213,7 @@ bool CWeaponMagazined::TryReload()
 	if(m_pCurrentInventory) 
 	{
 		int ammoIndex=m_ammoType;
-		if (static_cast<int>(m_ammoType)!=m_iPropousedAmmoType)
+		if (static_cast<int>(m_ammoType)!=m_iPropousedAmmoType && m_iPropousedAmmoType!=-1)
 			ammoIndex=m_iPropousedAmmoType;
 		m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAny(*m_ammoTypes[ammoIndex] ));
 
@@ -698,18 +698,20 @@ void CWeaponMagazined::switch2_Fire	()
 	CInventoryOwner* io		= smart_cast<CInventoryOwner*>(H_Parent());
 	CInventoryItem* ii		= smart_cast<CInventoryItem*>(this);
 #ifdef DEBUG
-	VERIFY2					(io,make_string("no inventory owner, item %s",*cName()));
-
+	if (!io)
+		Msg(make_string("no inventory owner, item %s",*cName()).c_str());
+	else
+	{
 	if (ii != io->inventory().ActiveItem())
 		Msg					("! not an active item, item %s, owner %s, active item %s",*cName(),*H_Parent()->cName(),io->inventory().ActiveItem() ? *io->inventory().ActiveItem()->object().cName() : "no_active_item");
-
-	if ( !(io && (ii == io->inventory().ActiveItem())) ) 
-	{
-		CAI_Stalker			*stalker = smart_cast<CAI_Stalker*>(H_Parent());
-		if (stalker) {
-			stalker->planner().show						();
-			stalker->planner().show_current_world_state	();
-			stalker->planner().show_target_world_state	();
+		if ( !(io && (ii == io->inventory().ActiveItem())) ) 
+		{
+			CAI_Stalker			*stalker = smart_cast<CAI_Stalker*>(H_Parent());
+			if (stalker) {
+				stalker->planner().show						();
+				stalker->planner().show_current_world_state	();
+				stalker->planner().show_target_world_state	();
+			}
 		}
 	}
 #else
