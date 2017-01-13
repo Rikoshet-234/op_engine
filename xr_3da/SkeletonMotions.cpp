@@ -56,7 +56,13 @@ BOOL motions_value::load		(LPCSTR N, IReader *data, vecBones* bones)
 					Msg			("!Can't find bone: '%s'",buf);
 				}
 #else
-				VERIFY3			(*b_it!=BI_NONE,"Can't find bone:",buf);
+				//VERIFY3			(*b_it!=BI_NONE,"Can't find bone:",buf);
+				if (*b_it==BI_NONE)
+				{
+					Msg("! ERROR Can't find bone [%s] in ogf [%s] ",buf,m_id.c_str());
+					FATAL("ENGINE Crush. See log for details.");
+				}
+
 #endif
 				if (bRes)		rm_bones[m_idx] = u16(*b_it);
 			}

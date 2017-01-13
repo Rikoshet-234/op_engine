@@ -24,26 +24,7 @@
 
 CUIDragItem* CUIDragDropListEx::m_drag_item = NULL;
 
-struct TCachedData
-{
-	bool initialized;
-	float x;
-	float y;
-	float width;
-	float height;
-	float min_pos;
-	float max_pos;
-	float pos;
-	float inertion;
-	u32 min_color;
-	u32 max_color;
-	shared_str texture;
-	bool stretchTexture;
-	shared_str textureBack;
-	bool stretchTextureBack;
-	
-} ;
-static TCachedData cacheData;
+
 
 void CUICell::Clear()
 {
@@ -247,32 +228,6 @@ void CUIDragDropListEx::OnItemFocusLost(CUIWindow* w, void* pData)
 
 }
 
-void CUIDragDropListEx::PutConditionBarUIData(CUIProgressBar* progress)
-{
-	if (progress)
-	{
-		progress->Init(cacheData.x,cacheData.y,cacheData.width,cacheData.height,true);
-		progress->SetRange(cacheData.min_pos,cacheData.max_pos);
-		progress->SetProgressPos(cacheData.pos);
-
-		progress->m_inertion		= cacheData.inertion;
-
-		progress->m_UIProgressItem.SetOriginalRect(cacheData.x,cacheData.y,cacheData.width,cacheData.height);
-		progress->m_UIProgressItem.InitTexture(cacheData.texture.c_str());
-		progress->m_UIProgressItem.SetWndSize(progress->GetWndSize());
-		//progress->m_UIProgressItem.SetStretchTexture(cacheData.stretchTexture);
-		
-		progress->m_UIBackgroundItem.SetOriginalRect(cacheData.x,cacheData.y,cacheData.width,cacheData.height);
-		progress->m_UIBackgroundItem.InitTexture(cacheData.textureBack.c_str());
-		progress->m_UIBackgroundItem.SetWndSize(progress->GetWndSize());
-		//progress->m_UIBackgroundItem.SetStretchTexture(cacheData.stretchTextureBack);
-
-		progress->m_minColor.set(cacheData.min_color);
-		progress->m_maxColor.set(cacheData.max_color);
-		progress->m_bUseColor=true;
-	}
-}
-
 void CUIDragDropListEx::SetShowConditionBar(bool state)
 {
 	m_b_showConditionBar = state;
@@ -280,10 +235,8 @@ void CUIDragDropListEx::SetShowConditionBar(bool state)
 	{
 		CUIXml	uiXml;
 		uiXml.Init( CONFIG_PATH, UI_PATH, "cell_item.xml" );
-		cacheData.x = uiXml.ReadAttribFlt("progress_item_condition", 0, "x");
-		cacheData.y = uiXml.ReadAttribFlt("progress_item_condition", 0, "y");
-		cacheData.width = uiXml.ReadAttribFlt("progress_item_condition", 0, "width");
-		cacheData.height = uiXml.ReadAttribFlt("progress_item_condition", 0, "height");
+		cacheData.fatness = uiXml.ReadAttribFlt("progress_item_condition", 0, "fatness");
+
 		cacheData.min_pos = uiXml.ReadAttribFlt("progress_item_condition", 0, "min");
 		cacheData.max_pos = uiXml.ReadAttribFlt("progress_item_condition", 0, "max");
 		cacheData.pos = uiXml.ReadAttribFlt("progress_item_condition", 0, "pos");
@@ -291,6 +244,38 @@ void CUIDragDropListEx::SetShowConditionBar(bool state)
 		cacheData.stretchTexture=uiXml.ReadAttribInt("progress_item_condition:progress:texture", 0, "stretch")==1?true:false;
 		cacheData.textureBack=uiXml.Read("progress_item_condition:background:texture", 0, nullptr);
 		cacheData.stretchTextureBack=uiXml.ReadAttribInt("progress_item_condition:background:texture", 0, "stretch")==1?true:false;
+
+		auto tmp=uiXml.ReadAttrib("progress_item_condition", 0, "position","top");
+		if (xr_strcmp(tmp,"top")==0)
+		{
+			cacheData.position=TPosition::top;
+		} else if (xr_strcmp(tmp,"bottom")==0)
+		{
+			cacheData.position=TPosition::bottom;
+		} else if (xr_strcmp(tmp,"left")==0)
+		{
+			cacheData.position=TPosition::left;
+		} else if (xr_strcmp(tmp,"right")==0)
+		{
+			cacheData.position=TPosition::right;
+		} else if (xr_strcmp(tmp,"left_top")==0)
+		{
+			cacheData.position=TPosition::left_top;
+		} else if (xr_strcmp(tmp,"right_top")==0)
+		{
+			cacheData.position=TPosition::right_top;
+		} else if (xr_strcmp(tmp,"right_bottom")==0)
+		{
+			cacheData.position=TPosition::right_bottom;
+		} else if (xr_strcmp(tmp,"left_bottom")==0)
+		{
+			cacheData.position=TPosition::left_bottom;
+		}
+		else
+		{
+			Msg("! ERROR Invalid cell_config - condition bar location is incorrect! ");
+			FATAL("ENGINE Crush. See log for details.");
+		}
 		cacheData.min_color=CUIXmlInit::GetColor(uiXml,"progress_item_condition:min_color",0,0xff);
 		cacheData.max_color=CUIXmlInit::GetColor(uiXml,"progress_item_condition:max_color",0,0xff);
 		cacheData.inertion=uiXml.ReadAttribFlt("progress_item_condition", 0, "inertion", 0.0f);

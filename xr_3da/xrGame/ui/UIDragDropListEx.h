@@ -61,6 +61,36 @@ typedef enum //inventory list types for export to scripts (identically to Invent
 	ltUnknown			= -1
 } IWListTypes;
 
+enum TPosition
+{
+	left,
+	right,
+	top,
+	bottom,
+	left_top,
+	left_bottom,
+	right_top,
+	right_bottom
+};
+
+struct TCachedData
+{
+	bool initialized;
+	TPosition position;
+	float fatness;
+	float min_pos;
+	float max_pos;
+	float pos;
+	float inertion;
+	u32 min_color;
+	u32 max_color;
+	shared_str texture;
+	bool stretchTexture;
+	shared_str textureBack;
+	bool stretchTextureBack;
+	
+} ;
+
 class CUIDragDropListEx :public CUIWindow, public CUIWndCallback
 {
 private:
@@ -93,9 +123,10 @@ protected:
 
 	IWListTypes				listId;
 public:
+	TCachedData cacheData;
 	bool					GetShowConditionBar() const {return m_b_showConditionBar;}
 	void SetShowConditionBar(bool state);
-	void PutConditionBarUIData(CUIProgressBar* progress);
+	
 	IWListTypes				GetUIListId() const			{return listId; };
 	void					SetUIListId(IWListTypes id)	{listId=id; };
 	bool					m_b_adjustCells;
