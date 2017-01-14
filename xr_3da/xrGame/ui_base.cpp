@@ -256,13 +256,18 @@ void ui_core::RenderFont()
 
 bool ui_core::is_16_9_mode()
 {
-	return (Device.dwWidth)/float(Device.dwHeight) > (UI_BASE_WIDTH/UI_BASE_HEIGHT +0.01f);
+	float standartRatio=UI_BASE_WIDTH/UI_BASE_HEIGHT +0.01f;
+	float currRation=float(Device.dwWidth)/float(Device.dwHeight);
+	bool state=(currRation>standartRatio) && (currRation<1.8f);
+	return state;
 }
 
 
 bool ui_core::is_21_9_mode()
 {
-	return (Device.dwWidth)/float(Device.dwHeight) > 1.8f;
+	float currRation=float(Device.dwWidth)/float(Device.dwHeight);
+	bool state=currRation > 1.8f;
+	return state;
 }
 
 std::string createFileName(std::string oldFileName,std::string postfix)
