@@ -38,6 +38,7 @@ public:
 
 	virtual void			Init						();
 	void					re_init						();
+	void					re_init2					();
 	void					InitInventory				();
 	void					InitInventory_delayed		();
 	virtual bool			StopAnyMove					()					{return false;}
