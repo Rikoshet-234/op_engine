@@ -89,8 +89,7 @@ void CWeaponMagazined::net_Destroy()
 
 BOOL CWeaponMagazined::net_Spawn		(CSE_Abstract* DC)
 {
-	inherited::net_Spawn(DC);
-	return TRUE;
+	return inherited::net_Spawn(DC);
 }
 
 void CWeaponMagazined::Load	(LPCSTR section)
