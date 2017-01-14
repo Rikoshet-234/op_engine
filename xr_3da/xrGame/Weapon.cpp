@@ -84,6 +84,7 @@ CWeapon::CWeapon(LPCSTR name)
 	m_set_next_ammoType_on_reload = u32(-1);
 	m_iPropousedAmmoType=-1;
 	m_fScopeZoomStepCount=0;
+	m_fRTZoomFactor=g_fov;
 }
 
 CWeapon::~CWeapon		()
@@ -522,7 +523,6 @@ BOOL CWeapon::net_Spawn		(CSE_Abstract* DC)
 
 	VERIFY((u32)iAmmoElapsed == m_magazine.size());
 	m_bAmmoWasSpawned		= false;
-	m_fRTZoomFactor = m_fScopeZoomFactor;
 	return bResult;
 }
 
@@ -620,7 +620,8 @@ void CWeapon::save(NET_Packet &output_packet)
 	save_data		(m_flagsAddOnState, output_packet);
 	save_data		(m_ammoType,		output_packet);
 	save_data		(m_bZoomMode,		output_packet);
-	save_data		(m_fRTZoomFactor,	output_packet);
+	float reservedData=0.1f; 
+	save_data		(reservedData,	output_packet);
 }
 
 void CWeapon::load(IReader &input_packet)
@@ -632,10 +633,10 @@ void CWeapon::load(IReader &input_packet)
 	load_data		(m_ammoType,		input_packet);
 	m_iPropousedAmmoType=m_ammoType;
 	load_data		(m_bZoomMode,		input_packet);
-
 	if (m_bZoomMode)	OnZoomIn();
 		else			OnZoomOut();
-	load_data		(m_fRTZoomFactor,	input_packet);
+	float reservedData=0;
+	load_data		(reservedData,	input_packet);
 }
 
 
@@ -848,6 +849,11 @@ bool CWeapon::Action(s32 cmd, u32 flags)
 						if (l_newType>=m_ammoTypes.size())
 							l_newType=0;
 						b1 = static_cast<int>(l_newType) != m_iPropousedAmmoType;
+						if (!b1)
+						{
+							l_newType=m_ammoType;
+							break;
+						}
 						bool found=m_pCurrentInventory->GetAny(*m_ammoTypes[l_newType])!=nullptr;
 						b2 = unlimited_ammo() ? false : !found;						
 					} while( b1 && b2);
@@ -1283,7 +1289,7 @@ void CWeapon::InitAddons()
 
 float CWeapon::CurrentZoomFactor	()
 {
-	return IsScopeAttached() ? m_fRTZoomFactor : m_fIronSightZoomFactor;
+	return IsScopeAttached() ? m_fRTZoomFactor  : m_fIronSightZoomFactor;
 };
 
 void CWeapon::OnZoomIn()

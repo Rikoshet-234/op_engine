@@ -269,6 +269,15 @@ void CUIInventoryWnd::Init()
 	uiXml.SetLocalRoot					(stored_root);
 }
 
+void CUIInventoryWnd::re_init2()
+{
+	std::for_each(sourceDragDropLists.begin(),sourceDragDropLists.end(),[this](CUIDragDropListEx* list)
+	{
+		list->cacheData.initialized=false;
+		list->SetShowConditionBar(list->GetShowConditionBar());
+	});
+}
+
 void CUIInventoryWnd::re_init()
 {
 	DetachChild(UIExitButton);

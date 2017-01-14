@@ -190,6 +190,7 @@ void CUIWindow::script_register(lua_State *L)
 	
 		class_<CUIInventoryWnd, CUIWindow>("CUIInventoryWnd")
 		.def("re_init",				&CUIInventoryWnd::re_init)
+		.def("re_init2",				&CUIInventoryWnd::re_init2)
 		.def("GetUIWindowType",				&CUIInventoryWnd::GetUIWindowType)
 		.def("ClearAllSuitables",			&CUIInventoryWnd::ClearAllSuitables)
 		.def("ClearSuitablesInList",		&CUIInventoryWnd::ClearSuitablesInList)

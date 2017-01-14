@@ -87,6 +87,10 @@ void CWeaponMagazined::net_Destroy()
 	inherited::net_Destroy();
 }
 
+BOOL CWeaponMagazined::net_Spawn		(CSE_Abstract* DC)
+{
+	return inherited::net_Spawn(DC);
+}
 
 void CWeaponMagazined::Load	(LPCSTR section)
 {
@@ -1055,6 +1059,7 @@ void CWeaponMagazined::InitAddons()
 			}
 
 		}
+		m_fRTZoomFactor=m_fScopeZoomFactor; //начальное значение
 	}
 	else
 	{
