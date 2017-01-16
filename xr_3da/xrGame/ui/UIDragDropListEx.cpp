@@ -236,7 +236,7 @@ void CUIDragDropListEx::SetShowConditionBar(bool state)
 		CUIXml	uiXml;
 		uiXml.Init( CONFIG_PATH, UI_PATH, "cell_item.xml" );
 		cacheData.fatness = uiXml.ReadAttribFlt("progress_item_condition", 0, "fatness");
-
+		cacheData.indent = uiXml.ReadAttribFlt("progress_item_condition", 0, "indent");
 		cacheData.min_pos = uiXml.ReadAttribFlt("progress_item_condition", 0, "min");
 		cacheData.max_pos = uiXml.ReadAttribFlt("progress_item_condition", 0, "max");
 		cacheData.pos = uiXml.ReadAttribFlt("progress_item_condition", 0, "pos");

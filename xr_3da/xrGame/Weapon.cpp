@@ -444,7 +444,7 @@ void CWeapon::LoadFireParams		(LPCSTR section, LPCSTR prefix)
 
 void CWeapon::LoadZoomOffset (LPCSTR section, LPCSTR prefix)
 {
-	string256 full_name;
+	//string256 full_name;
 	string128 zoName;
 	sprintf_s(zoName,"%s%s",prefix,"zoom_offset");
 	string128 zxName;
@@ -1575,12 +1575,15 @@ void CWeapon::modify_holder_params		(float &range, float &fov) const
 void CWeapon::OnDrawUI()
 {
 	if(IsZoomed() && ZoomHideCrosshair()){
-		if(ZoomTexture() && !IsRotatingToZoom()){
-			ZoomTexture()->SetPos	(0,0);
-			ZoomTexture()->SetRect	(0,0,UI_BASE_WIDTH, UI_BASE_HEIGHT);
-			ZoomTexture()->Render	();
+		{
+			CUIStaticItem *scope=ZoomTexture();
+			if(scope && !IsRotatingToZoom()){
+				scope->SetPos	(0,0);
+				scope->SetRect	(0,0,UI_BASE_WIDTH, UI_BASE_HEIGHT);
+				scope->Render	();
 
-//			m_UILens.Draw();
+	//			m_UILens.Draw();
+			}
 		}
 	}
 }

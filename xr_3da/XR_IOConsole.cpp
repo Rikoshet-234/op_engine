@@ -63,7 +63,6 @@ void CConsole::Initialize()
 void CConsole::Destroy	()
 {
 	Execute						("cfg_save");
-
 	xr_delete					(pFont);
 
 	Commands.clear				();
