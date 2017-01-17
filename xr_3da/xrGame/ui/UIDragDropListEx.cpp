@@ -240,6 +240,7 @@ void CUIDragDropListEx::SetShowConditionBar(bool state)
 		cacheData.min_pos = uiXml.ReadAttribFlt("progress_item_condition", 0, "min");
 		cacheData.max_pos = uiXml.ReadAttribFlt("progress_item_condition", 0, "max");
 		cacheData.pos = uiXml.ReadAttribFlt("progress_item_condition", 0, "pos");
+		cacheData.fixed_cells = uiXml.ReadAttribFlt("progress_item_condition", 0, "fixed_cells");
 		cacheData.texture=uiXml.Read("progress_item_condition:progress:texture", 0, nullptr);
 		cacheData.stretchTexture=uiXml.ReadAttribInt("progress_item_condition:progress:texture", 0, "stretch")==1?true:false;
 		cacheData.textureBack=uiXml.Read("progress_item_condition:background:texture", 0, nullptr);

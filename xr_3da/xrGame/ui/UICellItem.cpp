@@ -229,6 +229,21 @@ void CUICellItem::SetOwnerList(CUIDragDropListEx* p)
 			break;
 		}
 		
+		if (m_pParentList->cacheData.fixed_cells>0)
+		{
+			int fixed_x_size= m_pParentList->cacheData.fixed_cells * m_pParentList->CellSize().x;
+			int fixed_y_size= m_pParentList->cacheData.fixed_cells * m_pParentList->CellSize().y;
+			if (isHorizontal)
+				if ((x_size+m_pParentList->cacheData.indent*2)>fixed_x_size)
+					width=fixed_x_size-m_pParentList->cacheData.indent*2;
+				else
+					width=x_size-m_pParentList->cacheData.indent*2;
+			else
+				if ((y_size+m_pParentList->cacheData.indent*2)>fixed_y_size)
+					height=y_size-m_pParentList->cacheData.indent*2;
+				else
+					height=y_size-m_pParentList->cacheData.indent*2;
+		}
 		p_ConditionProgressBar->SetWndPos(x,y);
 		p_ConditionProgressBar->SetWndRect(x,y,width,height);		
 		p_ConditionProgressBar->SetRange(0,100);

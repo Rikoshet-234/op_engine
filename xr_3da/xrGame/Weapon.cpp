@@ -1579,7 +1579,8 @@ void CWeapon::OnDrawUI()
 			CUIStaticItem *scope=ZoomTexture();
 			if(scope && !IsRotatingToZoom()){
 				scope->SetPos	(0,0);
-				scope->SetRect	(0,0,UI_BASE_WIDTH, UI_BASE_HEIGHT);
+				scope->SetRect(0,0,float(Device.dwWidth),float(Device.dwHeight));
+				scope->SetOriginalRect	(scope->GetOriginalRectScaled());
 				scope->Render	();
 
 	//			m_UILens.Draw();
