@@ -1306,12 +1306,12 @@ void CWeapon::OnZoomOut()
 	StartHudInertion();
 }
 
-CUIStaticItem* CWeapon::ZoomTexture()
+CUIStatic* CWeapon::ZoomTexture()
 {
 	if (UseScopeTexture())
 		return m_UIScope;
 	else
-		return NULL;
+		return nullptr;
 }
 
 void CWeapon::SwitchState(u32 S)
@@ -1576,12 +1576,14 @@ void CWeapon::OnDrawUI()
 {
 	if(IsZoomed() && ZoomHideCrosshair()){
 		{
-			CUIStaticItem *scope=ZoomTexture();
+			CUIStatic *scope=ZoomTexture();
 			if(scope && !IsRotatingToZoom()){
-				scope->SetPos	(0,0);
-				scope->SetRect(0,0,float(Device.dwWidth),float(Device.dwHeight));
-				scope->SetOriginalRect	(scope->GetOriginalRectScaled());
-				scope->Render	();
+				scope->Update();
+				scope->Draw();
+//				scope->SetPos	(0,0);
+//				scope->SetRect(0,0,float(Device.dwWidth),float(Device.dwHeight));
+//				scope->SetOriginalRect	(scope->GetOriginalRectScaled());
+//				scope->Render	();
 
 	//			m_UILens.Draw();
 			}

@@ -10,7 +10,8 @@
 #include "Actor_Flags.h"
 #include "../SkeletonAnimated.h"
 #include "game_cl_single.h"
-
+#include "ui/UIWindow.h"
+#include "ui/UIStatic.h"
 
 // refs
 class CEntity;
@@ -247,7 +248,7 @@ protected:
 	//время приближения
 	float			m_fZoomRotateTime;
 	//текстура для снайперского прицела, в режиме приближения
-	CUIStaticItem*	m_UIScope;
+	CUIStatic*	m_UIScope;
 	//коэффициент увеличения прицеливания
 	float			m_fIronSightZoomFactor;
 	//коэффициент увеличения прицела
@@ -270,7 +271,7 @@ public:
 	virtual void			OnZoomIn			();
 	virtual void			OnZoomOut			();
 			bool			IsZoomed			()	const	{return m_bZoomMode;};
-	CUIStaticItem*			ZoomTexture			();	
+	CUIStatic*			ZoomTexture			();	
 			bool			ZoomHideCrosshair	()			{return m_bHideCrosshairInZoom || ZoomTexture();}
 
 	IC float				GetZoomFactor		() const		{	return m_fZoomFactor;	}
