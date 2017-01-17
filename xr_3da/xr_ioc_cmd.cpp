@@ -220,7 +220,7 @@ public:
 class CCC_SaveCFG : public IConsole_Command
 {
 public:
-	CCC_SaveCFG(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
+	CCC_SaveCFG(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
 	virtual void Execute(LPCSTR args) 
 	{
 		string_path			cfg_full_name;
@@ -242,7 +242,7 @@ public:
 		if ( b_allow ){
 			IWriter* F			= FS.w_open(cfg_full_name);
 				CConsole::vecCMD_IT it;
-				for (it=Console->Commands.begin(); it!=Console->Commands.end(); it++)
+				for (it=Console->Commands.begin(); it!=Console->Commands.end(); ++it)
 					it->second->Save(F);
 				FS.w_close			(F);
 #ifdef MORE_SPAM

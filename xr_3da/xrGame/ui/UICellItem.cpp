@@ -114,31 +114,35 @@ void CUICellItem::SetOwnerList(CUIDragDropListEx* p)
 		{
 		case left: 
 			{
-				x=2;y=2;
+				x=m_pParentList->cacheData.indent;
+				y=m_pParentList->cacheData.indent;
 				width=m_pParentList->cacheData.fatness;
-				height=y_size-2;
+				height=y_size-m_pParentList->cacheData.indent*2;
 				isHorizontal=false;
 			}
 			break;
 		case right: 
 			{
-				x=x_size-m_pParentList->cacheData.fatness;y=2;
+				x=x_size-m_pParentList->cacheData.fatness-m_pParentList->cacheData.indent;
+				y=m_pParentList->cacheData.indent;
 				width=m_pParentList->cacheData.fatness;
-				height=y_size-2;
+				height=y_size-m_pParentList->cacheData.indent*2;
 				isHorizontal=false;
 			}break;
 		case top: 
 			{
-				x=2;y=2;
-				width=x_size-2;
+				x=m_pParentList->cacheData.indent;
+				y=m_pParentList->cacheData.indent;
+				width=x_size-m_pParentList->cacheData.indent*2;
 				height=m_pParentList->cacheData.fatness;
 				isHorizontal=true;
 			}
 			break;
 		case bottom: 
 			{
-				x=2;y=y_size-2;
-				width=x_size-2;
+				x=m_pParentList->cacheData.indent;
+				y=y_size-m_pParentList->cacheData.fatness-m_pParentList->cacheData.indent;
+				width=x_size-m_pParentList->cacheData.indent*2;
 				height=m_pParentList->cacheData.fatness;
 				isHorizontal=true;
 			}
@@ -147,16 +151,18 @@ void CUICellItem::SetOwnerList(CUIDragDropListEx* p)
 			{
 				if (x_size>=y_size)
 				{
-					x=2;y=2;
-					width=x_size-2;
+					x=m_pParentList->cacheData.indent;
+					y=m_pParentList->cacheData.indent;
+					width=x_size-m_pParentList->cacheData.indent*2;
 					height=m_pParentList->cacheData.fatness;
 					isHorizontal=true;
 				}
 				else
 				{
-					x=2;y=2;
+					x=m_pParentList->cacheData.indent;
+					y=m_pParentList->cacheData.indent;
 					width=m_pParentList->cacheData.fatness;
-					height=y_size-2;
+					height=y_size-m_pParentList->cacheData.indent*2;
 					isHorizontal=false;
 				}
 			}
@@ -165,16 +171,18 @@ void CUICellItem::SetOwnerList(CUIDragDropListEx* p)
 			{
 				if (x_size>=y_size)
 				{
-					x=2;y=2;
-					width=x_size-2;
+					x=m_pParentList->cacheData.indent;
+					y=m_pParentList->cacheData.indent;
+					width=x_size-m_pParentList->cacheData.indent*2;
 					height=m_pParentList->cacheData.fatness;
 					isHorizontal=true;
 				}
 				else
 				{
-					x=x_size-m_pParentList->cacheData.fatness;y=2;
+					x=x_size-m_pParentList->cacheData.fatness-m_pParentList->cacheData.indent;
+					y=m_pParentList->cacheData.indent;
 					width=m_pParentList->cacheData.fatness;
-					height=y_size-2;
+					height=y_size-m_pParentList->cacheData.indent*2;
 					isHorizontal=false;
 				}
 			}
@@ -183,16 +191,18 @@ void CUICellItem::SetOwnerList(CUIDragDropListEx* p)
 			{
 				if (x_size>=y_size)
 				{
-					x=2;y=y_size-2;
-					width=x_size-2;
+					x=m_pParentList->cacheData.indent;
+					y=y_size-m_pParentList->cacheData.fatness-m_pParentList->cacheData.indent;
+					width=x_size-m_pParentList->cacheData.indent*2;
 					height=m_pParentList->cacheData.fatness;
 					isHorizontal=true;
 				}
 				else
 				{
-					x=x_size-m_pParentList->cacheData.fatness;y=2;
+					x=x_size-m_pParentList->cacheData.fatness-m_pParentList->cacheData.indent;
+					y=m_pParentList->cacheData.indent;
 					width=m_pParentList->cacheData.fatness;
-					height=y_size-2;
+					height=y_size-m_pParentList->cacheData.indent*2;
 					isHorizontal=false;
 				}
 			}
@@ -202,43 +212,59 @@ void CUICellItem::SetOwnerList(CUIDragDropListEx* p)
 			{
 				if (x_size>=y_size)
 				{
-					x=2;y=y_size-2;
-					width=x_size-2;
+					x=m_pParentList->cacheData.indent;
+					y=y_size-m_pParentList->cacheData.fatness-m_pParentList->cacheData.indent;
+					width=x_size-m_pParentList->cacheData.indent*2;
 					height=m_pParentList->cacheData.fatness;
 					isHorizontal=true;
 				}
 				else
 				{
-					x=2;y=2;
+					x=m_pParentList->cacheData.indent;y=m_pParentList->cacheData.indent;
 					width=m_pParentList->cacheData.fatness;
-					height=y_size-2;
+					height=y_size-m_pParentList->cacheData.indent;
 					isHorizontal=false;
 				}
 			}
 			break;
 		}
 		
+		if (m_pParentList->cacheData.fixed_cells>0)
+		{
+			int fixed_x_size= m_pParentList->cacheData.fixed_cells * m_pParentList->CellSize().x;
+			int fixed_y_size= m_pParentList->cacheData.fixed_cells * m_pParentList->CellSize().y;
+			if (isHorizontal)
+				if ((x_size+m_pParentList->cacheData.indent*2)>fixed_x_size)
+					width=fixed_x_size-m_pParentList->cacheData.indent*2;
+				else
+					width=x_size-m_pParentList->cacheData.indent*2;
+			else
+				if ((y_size+m_pParentList->cacheData.indent*2)>fixed_y_size)
+					height=y_size-m_pParentList->cacheData.indent*2;
+				else
+					height=y_size-m_pParentList->cacheData.indent*2;
+		}
 		p_ConditionProgressBar->SetWndPos(x,y);
-		p_ConditionProgressBar->SetWndRect(0,0,width,height);		
+		p_ConditionProgressBar->SetWndRect(x,y,width,height);		
 		p_ConditionProgressBar->SetRange(0,100);
 		p_ConditionProgressBar->SetOrientation(isHorizontal);
 
 
-		p_ConditionProgressBar->m_UIProgressItem.InitTexture("ui\\cond_pb_s");
-		p_ConditionProgressBar->m_UIProgressItem.SetStretchTexture(true);
-		p_ConditionProgressBar->m_UIProgressItem.TextureAvailable		(true);
-		p_ConditionProgressBar->m_UIProgressItem.TextureOn				();
-		p_ConditionProgressBar->m_UIProgressItem.SetWidth(x_size);
-		p_ConditionProgressBar->m_UIProgressItem.SetHeight(2); 
+		p_ConditionProgressBar->m_UIProgressItem.InitTexture(m_pParentList->cacheData.texture.c_str());
+		p_ConditionProgressBar->m_UIProgressItem.SetStretchTexture(m_pParentList->cacheData.stretchTexture);
+		p_ConditionProgressBar->m_UIProgressItem.TextureAvailable(true);
+		p_ConditionProgressBar->m_UIProgressItem.TextureOn();
+		p_ConditionProgressBar->m_UIProgressItem.SetWidth(width);
+		p_ConditionProgressBar->m_UIProgressItem.SetHeight(height); 
 
 		if (m_pParentList->cacheData.textureBack.size()>0)
 		{
-			p_ConditionProgressBar->m_UIBackgroundItem.InitTexture("ui\\cond_pb_s");
-			p_ConditionProgressBar->m_UIBackgroundItem.SetStretchTexture(true);
-			p_ConditionProgressBar->m_UIBackgroundItem.TextureAvailable		(true);
-			p_ConditionProgressBar->m_UIBackgroundItem.TextureOn				();
-			p_ConditionProgressBar->m_UIBackgroundItem.SetWidth(x_size);
-			p_ConditionProgressBar->m_UIBackgroundItem.SetHeight(2);
+			p_ConditionProgressBar->m_UIBackgroundItem.InitTexture(m_pParentList->cacheData.textureBack.c_str());
+			p_ConditionProgressBar->m_UIBackgroundItem.SetStretchTexture(m_pParentList->cacheData.stretchTextureBack);
+			p_ConditionProgressBar->m_UIBackgroundItem.TextureAvailable(true);
+			p_ConditionProgressBar->m_UIBackgroundItem.TextureOn();
+			p_ConditionProgressBar->m_UIBackgroundItem.SetWidth(width);
+			p_ConditionProgressBar->m_UIBackgroundItem.SetHeight(height);
 			p_ConditionProgressBar->SetBackgroundPresent(true);
 		}
 		p_ConditionProgressBar->m_minColor.set(color_rgba(255,36,0,255));
@@ -246,7 +272,6 @@ void CUICellItem::SetOwnerList(CUIDragDropListEx* p)
 		p_ConditionProgressBar->m_bUseColor=true;
 		p_ConditionProgressBar->SetProgressPos(itm->GetCondition()*100);
 
-		//Msg("[%s] [%f|%f] [%d|%d] [%f|%f]",itm->Name(), GetWidth(),GetHeight(),x_size,y_size,p_ConditionProgressBar->m_UIProgressItem.GetWidth(),p_ConditionProgressBar->m_UIBackgroundItem.GetHeight());
 		visible=true;
 	}
 	p_ConditionProgressBar->Show(visible);

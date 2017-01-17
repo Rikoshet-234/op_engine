@@ -82,6 +82,8 @@ struct TCachedData
 	float max_pos;
 	float pos;
 	float inertion;
+	float indent;
+	float fixed_cells;
 	u32 min_color;
 	u32 max_color;
 	shared_str texture;

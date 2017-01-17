@@ -90,28 +90,23 @@ extern	float	g_fTimeFactor;
 void register_mp_console_commands();
 //-----------------------------------------------------------
 
-		BOOL	g_bCheckTime			= FALSE;
-		int		net_cl_inputupdaterate	= 50;
-		Flags32	g_mt_config				= {mtLevelPath | mtDetailPath | mtObjectHandler | mtSoundPlayer | mtAiVision | mtBullets | mtLUA_GC | mtLevelSounds | mtALife};
-#ifdef DEBUG
-		Flags32	dbg_net_Draw_Flags		= {0};
-#endif
+BOOL	g_bCheckTime			= FALSE;
+int		net_cl_inputupdaterate	= 50;
+Flags32	g_mt_config				= {mtLevelPath | mtDetailPath | mtObjectHandler | mtSoundPlayer | mtAiVision | mtBullets | mtLUA_GC | mtLevelSounds | mtALife};
+int g_AI_inactive_time = 0;
+CUIOptConCom g_OptConCom;
 
 #ifdef DEBUG
+		Flags32	dbg_net_Draw_Flags		= {0};
 		BOOL	g_bDebugNode			= FALSE;
 		u32		g_dwDebugNodeSource		= 0;
 		u32		g_dwDebugNodeDest		= 0;
-extern	BOOL	g_bDrawBulletHit;
-
+		extern	BOOL	g_bDrawBulletHit;
 		float	debug_on_frame_gather_stats_frequency	= 0.f;
+		extern LPSTR	dbg_stalker_death_anim;
+		extern BOOL		b_death_anim_velocity;
 #endif
-#ifdef DEBUG 
-extern LPSTR	dbg_stalker_death_anim;
-extern BOOL		b_death_anim_velocity;
-#endif
-int g_AI_inactive_time = 0;
 
-CUIOptConCom g_OptConCom;
 
 #ifndef PURE_ALLOC
 #	ifndef USE_MEMORY_MONITOR
@@ -558,6 +553,16 @@ public:
 		net_packet.w_begin			(M_LOAD_GAME);
 		net_packet.w_stringZ		(saved_game);
 		Level().Send				(net_packet,net_flags(TRUE));
+	}
+};
+
+class CCC_Crash : public IConsole_Command {
+public:
+	CCC_Crash(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = true; };
+	virtual void Execute(LPCSTR /**args/**/) {
+		VERIFY3					(false,"This is a test crash","Do not post it as a bug");
+		int						*pointer = 0;
+		*pointer				= 0;
 	}
 };
 
@@ -1041,16 +1046,6 @@ public		:
 	}
 };
 
-class CCC_Crash : public IConsole_Command {
-public:
-	CCC_Crash(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = true; };
-	virtual void Execute(LPCSTR /**args/**/) {
-		VERIFY3					(false,"This is a test crash","Do not post it as a bug");
-		int						*pointer = 0;
-		*pointer				= 0;
-	}
-};
-
 #ifdef DEBUG_MEMORY_MANAGER
 
 class CCC_MemAllocShowStats : public IConsole_Command {
@@ -1473,18 +1468,11 @@ void CCC_RegisterCommands()
 	CMD3(CCC_Mask,				"cl_dynamiccrosshair",	&psHUD_Flags,	HUD_CROSSHAIR_DYNAMIC);
 	CMD1(CCC_MainMenu,			"main_menu"				);
 	CMD3(CCC_Mask,				"g_autopickup",			&psActorFlags,	AF_AUTOPICKUP);
-	g_uCommonFlags.zero();
-	g_uCommonFlags.set(flAiUseTorchDynamicLights, TRUE);
-	g_uCommonFlags.set(enShowObjectHit, FALSE);
-	g_uCommonFlags.set(uiShowConditions, TRUE);
-	g_uCommonFlags.set(uiShowExtDesc, TRUE);
-	g_uCommonFlags.set(uiShowSelected, TRUE);
-	g_uCommonFlags.set(uiShowFocused, TRUE);
-	g_uCommonFlags.set(uiShowTradeSB, FALSE);
-	g_uCommonFlags.set(uiAllowOpTradeSB, FALSE);
-	g_uCommonFlags.set(invReloadWeapon, FALSE);
-	g_uCommonFlags.set(gpDeferredReload, true);
-	g_uCommonFlags.set(gpFixedReload, true);
+
+	//g_uCommonFlags.set(flAiUseTorchDynamicLights, TRUE);
+	//g_uCommonFlags.set(enShowObjectHit, FALSE);
+	//g_uCommonFlags.set(uiAllowOpTradeSB, FALSE);
+	//g_uCommonFlags.set(invReloadWeapon, FALSE);
 
 	CMD3(CCC_Mask,				"ai_use_torch_dynamic_lights",	&g_uCommonFlags,flAiUseTorchDynamicLights);
 	CMD3(CCC_Mask,				"engine_show_object_hit",		&g_uCommonFlags,enShowObjectHit);
@@ -1506,7 +1494,7 @@ void CCC_RegisterCommands()
 	CMD1(CCC_Script,			"run_script"			);
 	CMD1(CCC_ScriptCommand,		"run_string"			);
 
-
+	CMD1(CCC_Crash,		"crash"						);
 #ifndef MASTER_GOLD
 	CMD1(CCC_ALifeTimeFactor,		"al_time_factor"		);		// set time factor
 	CMD1(CCC_ALifeSwitchDistance,	"al_switch_distance"	);		// set switch distance
@@ -1663,7 +1651,7 @@ void CCC_RegisterCommands()
 	CMD4(CCC_Integer, "death_anim_velocity", &b_death_anim_velocity, FALSE,	TRUE );
 	CMD4(CCC_Integer,	"show_wnd_rect",				&g_show_wnd_rect, 0, 1);
 	CMD4(CCC_Integer,	"show_wnd_rect_all",			&g_show_wnd_rect2, 0, 1);
-	CMD1(CCC_Crash,		"crash"						);
+	
 	CMD4(CCC_Integer,		"dbg_show_ani_info",	&g_ShowAnimationInfo,	0, 1)	;
 	CMD4(CCC_Integer,		"dbg_dump_physics_step", &g_bDebugDumpPhysicsStep, 0, 1);
 #endif

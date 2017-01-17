@@ -444,7 +444,7 @@ void CWeapon::LoadFireParams		(LPCSTR section, LPCSTR prefix)
 
 void CWeapon::LoadZoomOffset (LPCSTR section, LPCSTR prefix)
 {
-	string256 full_name;
+	//string256 full_name;
 	string128 zoName;
 	sprintf_s(zoName,"%s%s",prefix,"zoom_offset");
 	string128 zxName;
@@ -1306,12 +1306,12 @@ void CWeapon::OnZoomOut()
 	StartHudInertion();
 }
 
-CUIStaticItem* CWeapon::ZoomTexture()
+CUIStatic* CWeapon::ZoomTexture()
 {
 	if (UseScopeTexture())
 		return m_UIScope;
 	else
-		return NULL;
+		return nullptr;
 }
 
 void CWeapon::SwitchState(u32 S)
@@ -1575,12 +1575,18 @@ void CWeapon::modify_holder_params		(float &range, float &fov) const
 void CWeapon::OnDrawUI()
 {
 	if(IsZoomed() && ZoomHideCrosshair()){
-		if(ZoomTexture() && !IsRotatingToZoom()){
-			ZoomTexture()->SetPos	(0,0);
-			ZoomTexture()->SetRect	(0,0,UI_BASE_WIDTH, UI_BASE_HEIGHT);
-			ZoomTexture()->Render	();
+		{
+			CUIStatic *scope=ZoomTexture();
+			if(scope && !IsRotatingToZoom()){
+				scope->Update();
+				scope->Draw();
+//				scope->SetPos	(0,0);
+//				scope->SetRect(0,0,float(Device.dwWidth),float(Device.dwHeight));
+//				scope->SetOriginalRect	(scope->GetOriginalRectScaled());
+//				scope->Render	();
 
-//			m_UILens.Draw();
+	//			m_UILens.Draw();
+			}
 		}
 	}
 }

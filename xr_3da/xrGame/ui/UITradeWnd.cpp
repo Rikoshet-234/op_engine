@@ -650,7 +650,8 @@ void CUITradeWnd::UpdateItemUICost(CUICellItem* cellItem)
 		CUIDragDropListEx* owner	= cellItem->OwnerList();
 		bool bBuying				= (owner==&UIOurBagList) || (owner==&UIOurTradeList);
 		string64			str;
-		u32 totalCost=m_pOthersTrade->GetItemPrice(CurrentIItem(), bBuying);
+		u32 singleItem=m_pOthersTrade->GetItemPrice(CurrentIItem(), bBuying);
+		u32 totalCost=0;
 		if (cellItem->HasChilds())
 			for(size_t i=0; i<cellItem->ChildsCount(); ++i)
 			{
@@ -658,7 +659,10 @@ void CUITradeWnd::UpdateItemUICost(CUICellItem* cellItem)
 				if (item)
 					totalCost+=m_pOthersTrade->GetItemPrice(item, bBuying);
 			}
-		sprintf_s				(str, "%d %s", totalCost,*CStringTable().translate("ui_st_money_regional") );
+		if (totalCost>0)
+			sprintf_s				(str, "%d/%d %s", singleItem,totalCost+singleItem,*CStringTable().translate("ui_st_money_regional"));
+		else
+			sprintf_s				(str, "%d %s", singleItem,*CStringTable().translate("ui_st_money_regional"));
 		UIItemInfo.UICost->SetText (str);
 	}
 }

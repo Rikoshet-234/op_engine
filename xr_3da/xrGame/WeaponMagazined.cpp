@@ -1018,46 +1018,36 @@ void CWeaponMagazined::InitAddons()
 
 	if(IsScopeAttached())
 	{
+		shared_str scope_tex_name;
 		if(m_eScopeStatus == ALife::eAddonAttachable)
 		{
 			m_sScopeName = pSettings->r_string(cNameSect(), "scope_name");
 			m_iScopeX	 = pSettings->r_s32(cNameSect(),"scope_x");
 			m_iScopeY	 = pSettings->r_s32(cNameSect(),"scope_y");
-
-			shared_str scope_tex_name;
 			scope_tex_name = pSettings->r_string(*m_sScopeName, "scope_texture");
 			m_fScopeZoomFactor = pSettings->r_float	(*m_sScopeName, "scope_zoom_factor");
 			m_fScopeZoomStepCount = READ_IF_EXISTS(pSettings, r_float, *m_sScopeName, "scope_zoom_step_count", m_fScopeZoomStepCount==0 ? 1.0f : m_fScopeZoomStepCount);
-			if(m_UIScope && (!m_UIScope->GetTextureName() || m_UIScope->GetTextureName().equal(scope_tex_name)))
-			{
-				xr_delete(m_UIScope);
-			}
-
-			if (!m_UIScope)
-			{
-				m_UIScope = xr_new<CUIStaticItem>();
-				m_UIScope->Init(scope_tex_name, "hud\\default", 0, 0, alNone);
-			}
-
 		}
 		else if(m_eScopeStatus == ALife::eAddonPermanent)
 		{
 			m_fScopeZoomFactor = pSettings->r_float	(cNameSect(), "scope_zoom_factor");
 			m_fScopeZoomStepCount = READ_IF_EXISTS(pSettings, r_float, cNameSect(), "scope_zoom_step_count", m_fScopeZoomStepCount==0 ? 1.0f : m_fScopeZoomStepCount);
-			shared_str scope_tex_name;
 			scope_tex_name = pSettings->r_string(cNameSect(), "scope_texture");
-
-			if(m_UIScope && (!m_UIScope->GetTextureName() || !m_UIScope->GetTextureName().equal(scope_tex_name)))
-			{
-				xr_delete(m_UIScope);
-			}
-
-			if (!m_UIScope)
-			{
-				m_UIScope = xr_new<CUIStaticItem>();
-				m_UIScope->Init(scope_tex_name, "hud\\default", 0, 0, alNone);
-			}
-
+		}
+		if(m_UIScope /*&& (!m_UIScope->GetTextureName() || m_UIScope->GetTextureName().equal(scope_tex_name))*/)
+		{
+			xr_delete(m_UIScope);
+		}
+		if (!m_UIScope)
+		{
+			m_UIScope = xr_new<CUIStatic>();
+			m_UIScope->CreateShader(scope_tex_name.c_str(),"hud\\default");
+			m_UIScope->InitTexture(scope_tex_name.c_str());
+			m_UIScope->TextureAvailable(true);
+			m_UIScope->TextureOn();
+			m_UIScope->SetStretchTexture(true);
+			m_UIScope->SetWndPos(0,0);
+			m_UIScope->SetWndSize(Fvector2().set(UI_BASE_WIDTH,UI_BASE_HEIGHT));
 		}
 		m_fRTZoomFactor=m_fScopeZoomFactor; //начальное значение
 	}
