@@ -3,6 +3,8 @@
 #include "hudtarget.h"
 
 #include "actor.h"
+#include "Inventory.h"
+#include "Weapon.h"
 #include "../igame_level.h"
 #include "clsid_game.h"
 #include "GamePersistent.h"
@@ -283,6 +285,16 @@ void CHUDManager::OnScreenRatioChanged()
 	pUI->UIMainIngameWnd->Init			();
 	pUI->UnLoad							();
 	pUI->Load							(pUI->UIGame());
+	if (g_actor)
+	{
+		CInventory inv=Actor()->inventory();
+		std::for_each(inv.m_all.begin(),inv.m_all.end(),[](CInventoryItem* item)
+		{
+			CWeapon* weapon=smart_cast<CWeapon*>(item);
+			if (weapon) 
+				weapon->OnScreenRatioChanged();
+		});
+	}
 }
 
 void CHUDManager::OnDisconnected()

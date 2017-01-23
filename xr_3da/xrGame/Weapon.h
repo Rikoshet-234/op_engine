@@ -61,6 +61,7 @@ public:
 	virtual void			OnH_A_Independent	();
 	virtual void			OnEvent				(NET_Packet& P, u16 type);// {inherited::OnEvent(P,type);}
 
+	virtual void			OnScreenRatioChanged();
 	virtual	void			Hit					(SHit* pHDS);
 
 	virtual void			reinit				();
@@ -248,7 +249,7 @@ protected:
 	//время приближения
 	float			m_fZoomRotateTime;
 	//текстура для снайперского прицела, в режиме приближения
-	CUIStatic*	m_UIScope;
+	CUIWindow*	m_UIScope;
 	//коэффициент увеличения прицеливания
 	float			m_fIronSightZoomFactor;
 	//коэффициент увеличения прицела
@@ -271,7 +272,7 @@ public:
 	virtual void			OnZoomIn			();
 	virtual void			OnZoomOut			();
 			bool			IsZoomed			()	const	{return m_bZoomMode;};
-	CUIStatic*			ZoomTexture			();	
+	CUIWindow*			ZoomTexture			();	
 			bool			ZoomHideCrosshair	()			{return m_bHideCrosshairInZoom || ZoomTexture();}
 
 	IC float				GetZoomFactor		() const		{	return m_fZoomFactor;	}

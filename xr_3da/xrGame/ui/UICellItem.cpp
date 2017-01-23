@@ -231,8 +231,8 @@ void CUICellItem::SetOwnerList(CUIDragDropListEx* p)
 		
 		if (m_pParentList->cacheData.fixed_cells>0)
 		{
-			int fixed_x_size= m_pParentList->cacheData.fixed_cells * m_pParentList->CellSize().x;
-			int fixed_y_size= m_pParentList->cacheData.fixed_cells * m_pParentList->CellSize().y;
+			float fixed_x_size= m_pParentList->cacheData.fixed_cells * m_pParentList->CellSize().x;
+			float fixed_y_size= m_pParentList->cacheData.fixed_cells * m_pParentList->CellSize().y;
 			if (isHorizontal)
 				if ((x_size+m_pParentList->cacheData.indent*2)>fixed_x_size)
 					width=fixed_x_size-m_pParentList->cacheData.indent*2;

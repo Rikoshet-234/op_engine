@@ -674,6 +674,11 @@ void CWeapon::OnEvent(NET_Packet& P, u16 type)
 			inherited::OnEvent(P,type);
 		}break;
 	}
+}
+
+void CWeapon::OnScreenRatioChanged()
+{
+	InitAddons();
 };
 
 void CWeapon::shedule_Update	(u32 dT)
@@ -810,7 +815,6 @@ void CWeapon::UpdatePosition(const Fmatrix& trans)
 	VERIFY				(!fis_zero(DET(renderable.xform)));
 }
 
-
 bool CWeapon::Action(s32 cmd, u32 flags) 
 {
 	if(inherited::Action(cmd, flags)) return true;
@@ -875,9 +879,18 @@ bool CWeapon::Action(s32 cmd, u32 flags)
 		if(IsZoomEnabled())
 			{
 				if(flags&CMD_START && !IsPending())
-					OnZoomIn();
-				else if(IsZoomed())
+				{
+					if (g_uCommonFlags.is(gpStickyScope) && IsZoomed())
+					{
+						OnZoomOut();
+					}
+					else
+						OnZoomIn();
+				}
+				else if(IsZoomed() && !g_uCommonFlags.is(gpStickyScope))
+				{
 					OnZoomOut();
+				}
 				return true;
 			}else 
 				return false;
@@ -1227,8 +1240,9 @@ void CWeapon::UpdateAddonsVisibility()
 	{
 		if(IsScopeAttached())
 		{
+
 			if(FALSE==pWeaponVisual->LL_GetBoneVisible		(bone_id))
-			pWeaponVisual->LL_SetBoneVisible				(bone_id,TRUE,TRUE);
+				pWeaponVisual->LL_SetBoneVisible				(bone_id,TRUE,TRUE);
 		}else{
 			if(pWeaponVisual->LL_GetBoneVisible				(bone_id))
 				pWeaponVisual->LL_SetBoneVisible			(bone_id,FALSE,TRUE);
@@ -1306,7 +1320,7 @@ void CWeapon::OnZoomOut()
 	StartHudInertion();
 }
 
-CUIStatic* CWeapon::ZoomTexture()
+CUIWindow* CWeapon::ZoomTexture()
 {
 	if (UseScopeTexture())
 		return m_UIScope;
@@ -1576,8 +1590,9 @@ void CWeapon::OnDrawUI()
 {
 	if(IsZoomed() && ZoomHideCrosshair()){
 		{
-			CUIStatic *scope=ZoomTexture();
+			CUIWindow *scope=ZoomTexture();
 			if(scope && !IsRotatingToZoom()){
+				
 				scope->Update();
 				scope->Draw();
 //				scope->SetPos	(0,0);

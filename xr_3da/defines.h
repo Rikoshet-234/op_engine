@@ -51,7 +51,7 @@ ENGINE_API extern	Flags32		psDeviceFlags		;
 ENGINE_API extern	Flags32		g_uCommonFlags;
 ENGINE_API enum E_COMMON_FLAGS
 {
-	flAiUseTorchDynamicLights	= 1 <<0,
+	flAiUseTorchDynamicLights	= 1<<0,
 	enShowObjectHit				= 1<<1,
 	mwShowInvulnerableIcon		= 1<<2,
 	uiShowConditions			= 1<<3,
@@ -62,7 +62,8 @@ ENGINE_API enum E_COMMON_FLAGS
 	invReloadWeapon				= 1<<8,
 	uiAllowOpTradeSB			= 1<<9,
 	gpDeferredReload			= 1<<10,
-	gpFixedReload				= 1<< 11
+	gpFixedReload				= 1<<11,
+	gpStickyScope				= 1<<12
 };
 
 

@@ -179,6 +179,10 @@ bool CUIXmlInit::InitStatic(CUIXml& xml_doc, LPCSTR path,
 	int flag = xml_doc.ReadAttribInt(path, index, "heading", 0);
 	pWnd->EnableHeading( (flag)?true:false);
 
+	LPCSTR str_name				= xml_doc.ReadAttrib(path, index, "window_name","");
+	if (xr_strlen(str_name)>0)
+		pWnd->SetWindowName(str_name);
+
 	LPCSTR str_flag				= xml_doc.ReadAttrib(path, index, "light_anim",		"");
 	int flag_cyclic				= xml_doc.ReadAttribInt(path, index, "la_cyclic",	1);
 	int flag_text				= xml_doc.ReadAttribInt(path, index, "la_text",		1);
@@ -628,18 +632,19 @@ CUIXmlInit::StaticsVec CUIXmlInit::InitAutoStaticGroup(CUIXml& xml_doc, LPCSTR p
 	XML_NODE* _stored_root				= xml_doc.GetLocalRoot();
 	xml_doc.SetLocalRoot				(xml_doc.NavigateToNode(path,index));
 
-	CUIStatic* pUIStatic				= NULL;
+	CUIStatic* pUIStatic				= nullptr;
 	string64							sname;
 	for(int i=0; i<items_num; i++)
 	{
 		pUIStatic						= xr_new<CUIStatic>();
 		InitStatic						(xml_doc, "auto_static", i, pUIStatic);
 		sprintf_s							(sname,"auto_static_%d", i);
-		pUIStatic->SetWindowName		(sname);
+		if (pUIStatic->WindowName().size()==0)
+			pUIStatic->SetWindowName		(sname);
 		pUIStatic->SetAutoDelete		(true);
 		pParentWnd->AttachChild			(pUIStatic);
 		tmpVec.push_back				(pUIStatic);
-		pUIStatic						= NULL;
+		pUIStatic						= nullptr;
 	}
 
 	xml_doc.SetLocalRoot				(_stored_root);

@@ -1486,6 +1486,7 @@ void CCC_RegisterCommands()
 	CMD3(CCC_Mask,				"winv_reload_enable",			&g_uCommonFlags,invReloadWeapon);
 	CMD3(CCC_Mask,				"gp_deffered_reload",			&g_uCommonFlags,gpDeferredReload);
 	CMD3(CCC_Mask,				"gp_fixed_reload",				&g_uCommonFlags,gpFixedReload);
+	CMD3(CCC_Mask,				"gp_sticky_scope",				&g_uCommonFlags,gpStickyScope);
 
 	CMD1(CCC_GSCheckForUpdates, "check_for_updates"		);
 	CMD1(CCC_DumpInfos,			"dump_infos"			);
