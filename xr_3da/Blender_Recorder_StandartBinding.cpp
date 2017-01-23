@@ -186,13 +186,18 @@ class cl_hemi_color	: public R_constant_setup {
 	}
 };	static cl_hemi_color		binder_hemi_color;
 
-static class cl_screen_res : public R_constant_setup		
+class cl_screen_res : public R_constant_setup		
 {	
-	virtual void setup	(R_constant* C)
+	Fvector4	result;
+	void setup	(R_constant* C) override
 	{
-		RCache.set_c	(C, static_cast<float>(Device.dwWidth), static_cast<float>(Device.dwHeight), 1.0f/static_cast<float>(Device.dwWidth), 1.0f/static_cast<float>(Device.dwHeight));
+		float _w = float(Device.dwWidth);
+		float _h = float(Device.dwHeight);
+		result.set (_w, _h, static_cast<float>(1.0)/_w, static_cast<float>(1.0)/_h);
+		RCache.set_c	(C,result);
 	}
-}	binder_screen_res;
+};	static cl_screen_res		binder_resolution;
+
 
 // Standart constant-binding
 void	CBlender_Compile::SetMapping	()
@@ -227,7 +232,7 @@ void	CBlender_Compile::SetMapping	()
 	r_Constant				("L_ambient",		&binder_amb_color);
 
 
-	r_Constant				("screen_res",		&binder_screen_res);
+	r_Constant				("c_screen",		&binder_resolution);
 
 
 	// detail

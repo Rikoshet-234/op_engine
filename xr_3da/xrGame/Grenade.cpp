@@ -231,20 +231,29 @@ bool CGrenade::Action(s32 cmd, u32 flags)
 			{
 				if(m_pCurrentInventory)
 				{
+					CGrenade *currGrenade=smart_cast<CGrenade*>(m_pCurrentInventory->m_slots[GRENADE_SLOT].m_pIItem);
+					if (!currGrenade)
+						return true;
 					TIItemContainer::iterator m_ruck_begin = m_pCurrentInventory->m_ruck.begin();
 					TIItemContainer::iterator m_ruck_end = m_pCurrentInventory->m_ruck.end();
 					xr_vector<shared_str> grenadeSections;
 					xr_vector<CInventoryItem* > grenades;
+					grenadeSections.push_back(currGrenade->cNameSect()); 
+					grenades.push_back(currGrenade);
 					std::for_each(m_ruck_begin,m_ruck_end,[&](CInventoryItem* iItemitem) //collect all section of grenades
 					{
 						CGrenade *pGrenade = smart_cast<CGrenade*>(iItemitem);
-						if (pGrenade && std::find(grenadeSections.begin(),grenadeSections.end(),pGrenade->cNameSect().c_str())==grenadeSections.end())
+						if (pGrenade)
 						{
-							grenades.push_back(iItemitem); //decreases iterations over inventory
-							grenadeSections.push_back(pGrenade->cNameSect()); 
+							bool findSections=std::find(grenadeSections.begin(),grenadeSections.end(),pGrenade->cNameSect().c_str())!=grenadeSections.end();
+							if (!findSections)
+							{
+								grenades.push_back(iItemitem); //decreases iterations over inventory
+								grenadeSections.push_back(pGrenade->cNameSect()); 
+							}
 						}
 					});
-					if (grenadeSections.size()<=1) //if only more 1 grenades
+					if (grenadeSections.size()==1) //if only more 1 grenades
 						return true;
 					std::sort(grenadeSections.begin(),grenadeSections.end()); //sort for unici access
 					xr_vector<shared_str>::iterator currItem=std::find(grenadeSections.begin(),grenadeSections.end(),cNameSect());
@@ -253,14 +262,14 @@ bool CGrenade::Action(s32 cmd, u32 flags)
 					if (currItem==grenadeSections.end())
 						currItem=grenadeSections.begin();//select new section
 					TIItemContainer::iterator f_it=grenades.begin();
-					for(;f_it!=m_ruck_end;++f_it)  //searh inventory item for new section only on grenades
+					for(;f_it!=grenades.end();++f_it)  //searh inventory item for new section only on grenades
 					{
 						CGrenade *pGrenade = smart_cast<CGrenade*>(*f_it);
 						if (pGrenade)
 							if (xr_strcmp(pGrenade->cNameSect(),*currItem)==0)
 								break;
 					};
-					if (f_it!=m_ruck_end)
+					if (f_it!=grenades.end())
 					{
 						m_pCurrentInventory->Ruck(this);
 						m_pCurrentInventory->SetActiveSlot(NO_ACTIVE_SLOT);

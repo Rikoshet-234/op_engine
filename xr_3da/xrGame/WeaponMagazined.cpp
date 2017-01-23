@@ -19,6 +19,7 @@
 #include "game_object_space.h"
 #include "GameObject.h"
 #include "script_callback_ex.h"
+#include "ui/UIXmlInit.h"
 #include "script_game_object.h"
 
 CWeaponMagazined::CWeaponMagazined(LPCSTR name, ESoundTypes eSoundType) : CWeapon(name)
@@ -1040,14 +1041,20 @@ void CWeaponMagazined::InitAddons()
 		}
 		if (!m_UIScope)
 		{
-			m_UIScope = xr_new<CUIStatic>();
-			m_UIScope->CreateShader(scope_tex_name.c_str(),"hud\\default");
-			m_UIScope->InitTexture(scope_tex_name.c_str());
-			m_UIScope->TextureAvailable(true);
-			m_UIScope->TextureOn();
-			m_UIScope->SetStretchTexture(true);
-			m_UIScope->SetWndPos(0,0);
-			m_UIScope->SetWndSize(Fvector2().set(UI_BASE_WIDTH,UI_BASE_HEIGHT));
+			CUIXml									uiXml;
+			uiXml.Init								(CONFIG_PATH, UI_PATH,"scope.xml");
+
+			m_UIScope = xr_new<CUIWindow>();
+			CUIXmlInit::InitWindow(uiXml,"wpn_scope",0,m_UIScope);
+
+			CUIWindow* scopeWindow=m_UIScope->FindChild("scope_texture");
+			if (scopeWindow)
+			{
+				CUIStatic* scopeStatic=static_cast<CUIStatic*>(scopeWindow);
+				scopeStatic->InitTexture(scope_tex_name.c_str());
+			}
+			else
+				Msg("! ERROR can't find static for scope texture in config!");
 		}
 		m_fRTZoomFactor=m_fScopeZoomFactor; //начальное значение
 	}
