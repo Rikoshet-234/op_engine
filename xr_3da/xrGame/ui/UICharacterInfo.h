@@ -58,4 +58,5 @@ public:
 	CUIStatic&			UIIcon					()		{VERIFY(m_icons[eUIIcon]);return *m_icons[eUIIcon];}	
 	CUIStatic&			UIName()				{VERIFY(m_icons[eUIName]);return *m_icons[eUIName];}	
 	const shared_str&	IconName				() {return m_texture_name;}
+	bool				m_bShowRelationData;
 };

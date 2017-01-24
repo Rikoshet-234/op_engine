@@ -288,10 +288,13 @@ public:
 	// Anomaly Detector
 private:
 	CAnomalyDetector		*m_anomaly_detector;
-
+	shared_str				m_sShortName;
 	ALife::EHitType		m_eHitType;
 
 public:
+	shared_str			GetShortName() const {return m_sShortName;}
+
+
 	CAnomalyDetector		&anomaly_detector	() {return (*m_anomaly_detector);}
 	// -----------------------------------------------------------------------------
 

@@ -15,6 +15,8 @@
 #include "trade_parameters.h"
 #include "WeaponAmmo.h"
 #include "WeaponMagazinedWGrenade.h"
+#include "trade_parameters.h"
+
 
 bool CTrade::CanTrade()
 {
@@ -155,12 +157,86 @@ float GetAmmoCostInWeapon(shared_str ammoSection)
 	return boxCost/boxSize;
 }
 
+float calcTradeFactor(const CTradeFactors* tradeFactors,float relationFactor)
+{
+	if (!tradeFactors)
+		return 0;
+	float					action_factor;
+	if (tradeFactors->friend_factor() <= tradeFactors->enemy_factor())
+		action_factor		= 
+			tradeFactors->friend_factor() +
+			(
+				tradeFactors->enemy_factor() -
+				tradeFactors->friend_factor()
+			)*
+			(1.f - relationFactor);
+	else
+		action_factor		= 
+			tradeFactors->enemy_factor() +
+			(
+				tradeFactors->friend_factor() -
+				tradeFactors->enemy_factor()
+			)*
+			relationFactor;
+
+	clamp					(
+		action_factor,
+		_min(tradeFactors->enemy_factor(),tradeFactors->friend_factor()),
+		_max(tradeFactors->enemy_factor(),tradeFactors->friend_factor())
+	);
+	return action_factor;
+}
+
+const CTradeFactors* CTrade::returnTradeFactors(bool buying,shared_str itemSection) const
+{
+	const CTradeFactors *p_trade_factors;
+	if (buying)
+	{
+		bool enabled=pThis.inv_owner->trade_parameters().enabled(CTradeParameters::action_buy(nullptr),itemSection);
+		if (!enabled) 
+			return nullptr;
+		p_trade_factors		= &pThis.inv_owner->trade_parameters().factors(CTradeParameters::action_buy(nullptr),itemSection);
+	}else
+	{
+		if( ! pThis.inv_owner->trade_parameters().enabled(CTradeParameters::action_sell(nullptr),itemSection) ) return nullptr;
+		p_trade_factors		= &pThis.inv_owner->trade_parameters().factors(CTradeParameters::action_sell(nullptr),itemSection);
+	}
+	return p_trade_factors;
+}
+
 u32	CTrade::GetItemPrice(PIItem pItem, bool b_buying)
 {
 	CArtefact				*pArtefact = smart_cast<CArtefact*>(pItem);
 
+	#pragma region computing relation factor
+	float					relation_factor;
+	CHARACTER_GOODWILL		attitude = RELATION_REGISTRY().GetAttitude(pPartner.inv_owner, pThis.inv_owner);
+	if (NO_GOODWILL == attitude)
+		relation_factor		= 0.f;
+	else
+		relation_factor		= float(attitude + 1000.f)/2000.f;
+
+	clamp					(relation_factor,0.f,1.f);
+
+	/*const SInventoryOwner	*_partner = nullptr;
+	bool					buying = true;
+	bool					is_actor = (pThis.type == TT_ACTOR) || (pPartner.type == TT_ACTOR);
+	if (is_actor) {
+		buying				= b_buying;
+		_partner			= &(buying ? pThis : pPartner);
+	}
+	else {
+		_partner			= &pPartner;
+	}*/
+#pragma endregion
+
 	// computing base_cost
-	float					base_cost;
+	float base_cost;
+	float glCost=0;
+	float slCost=0;
+	float scCost=0;
+	float amiwCost=0;
+	float griwCost=0;
 	if (pArtefact && (pThis.type == TT_ACTOR) && (pPartner.type == TT_TRADER)) {
 		CAI_Trader			*pTrader = smart_cast<CAI_Trader*>(pPartner.inv_owner);
 		VERIFY				(pTrader);
@@ -178,107 +254,71 @@ u32	CTrade::GetItemPrice(PIItem pItem, bool b_buying)
 		}
 		else if (weapon)
 		{
-			base_cost=itemCost;
 			if (weapon->IsGrenadeLauncherAttached() && weapon->GrenadeLauncherAttachable())
-				base_cost+=pSettings->r_float(weapon->GetGrenadeLauncherName(),"cost");
+			{
+				shared_str glName=weapon->GetGrenadeLauncherName();
+				glCost=pSettings->r_float(glName,"cost");
+				glCost=glCost*calcTradeFactor(returnTradeFactors(b_buying,glName),relation_factor);
+			}
 			if (weapon->IsScopeAttached() && weapon->ScopeAttachable())
-				base_cost+=pSettings->r_float(weapon->GetScopeName(),"cost");
+			{
+				shared_str scName=weapon->GetScopeName();
+				scCost=pSettings->r_float(scName,"cost");
+				scCost=scCost*calcTradeFactor(returnTradeFactors(b_buying,scName),relation_factor);
+			}
 			if (weapon->IsSilencerAttached() && weapon->SilencerAttachable())
-				base_cost+=pSettings->r_float(weapon->GetSilencerName(),"cost");
+			{
+				shared_str slName=weapon->GetSilencerName();
+				slCost=pSettings->r_float(slName,"cost");
+				scCost=scCost*calcTradeFactor(returnTradeFactors(b_buying,slName),relation_factor);
+			}
 			int ammoInWeapon=weapon->GetAmmoElapsed();
 			if (ammoInWeapon>0)
-				base_cost+=GetAmmoCostInWeapon(weapon->m_magazine.back().m_ammoSect)*ammoInWeapon;
+			{
+				shared_str amiwName=weapon->m_magazine.back().m_ammoSect;
+				amiwCost=GetAmmoCostInWeapon(amiwName)*ammoInWeapon;
+				amiwCost=amiwCost*calcTradeFactor(returnTradeFactors(b_buying,amiwName),relation_factor);
+			}
 			CWeaponMagazinedWGrenade* weaponG=smart_cast<CWeaponMagazinedWGrenade*>(pItem);
 			if (weaponG)
 				if (weaponG->m_magazine2.size()>0)
-					base_cost+=GetAmmoCostInWeapon(weaponG->m_magazine2.back().m_ammoSect)*weaponG->m_magazine2.size();
+				{
+					shared_str griwName=weaponG->m_magazine2.back().m_ammoSect;
+					griwCost=GetAmmoCostInWeapon(griwName)*weaponG->m_magazine2.size();
+					griwCost=griwCost*calcTradeFactor(returnTradeFactors(b_buying,griwName),relation_factor);
+				}
 		}
 		if (base_cost==-1)
 			base_cost			= itemCost;
 	}
 	
-	// computing condition factor
+#pragma region computing condition factor
 	// for "dead" weapon we use 10% from base cost, for "good" weapon we use full base cost
 	float					condition_factor = powf(pItem->GetCondition()*0.9f + .1f, 0.75f); 
+#pragma endregion 
 	
-	// computing relation factor
-	float					relation_factor;
 
-	CHARACTER_GOODWILL		attitude = RELATION_REGISTRY().GetAttitude(pPartner.inv_owner, pThis.inv_owner);
-
-	if (NO_GOODWILL == attitude)
-		relation_factor		= 0.f;
-	else
-		relation_factor		= float(attitude + 1000.f)/2000.f;
-
-	clamp					(relation_factor,0.f,1.f);
-
-	const SInventoryOwner	*_partner = nullptr;
-	bool					buying = true;
-	bool					is_actor = (pThis.type == TT_ACTOR) || (pPartner.type == TT_ACTOR);
-	if (is_actor) {
-//.		buying				= (pPartner.type == TT_ACTOR);
-		buying				= b_buying;
-		_partner			= &(buying ? pThis : pPartner);
-	}
-	else {
-		// rare case
-		_partner			= &pPartner;
-	}
-//.	const SInventoryOwner	&partner = *_partner;
-
-	// computing action factor
-	const CTradeFactors		*p_trade_factors;
-
-
-	if (buying){
-		if( ! pThis.inv_owner->trade_parameters().enabled(CTradeParameters::action_buy(0),pItem->object().cNameSect()) ) return 0;
-		p_trade_factors		= &pThis.inv_owner->trade_parameters().factors(CTradeParameters::action_buy(0),pItem->object().cNameSect());
-	}else{
-		if( ! pThis.inv_owner->trade_parameters().enabled(CTradeParameters::action_sell(0),pItem->object().cNameSect()) ) return 0;
-		p_trade_factors		= &pThis.inv_owner->trade_parameters().factors(CTradeParameters::action_sell(0),pItem->object().cNameSect());
-	}
-	const CTradeFactors		&trade_factors = *p_trade_factors;
-
-	float					action_factor;
-	if (trade_factors.friend_factor() <= trade_factors.enemy_factor())
-		action_factor		= 
-			trade_factors.friend_factor() +
-			(
-				trade_factors.enemy_factor() -
-				trade_factors.friend_factor()
-			)*
-			(1.f - relation_factor);
-	else
-		action_factor		= 
-			trade_factors.enemy_factor() +
-			(
-				trade_factors.friend_factor() -
-				trade_factors.enemy_factor()
-			)*
-			relation_factor;
-
-	clamp					(
-		action_factor,
-		_min(trade_factors.enemy_factor(),trade_factors.friend_factor()),
-		_max(trade_factors.enemy_factor(),trade_factors.friend_factor())
-	);
 	
-	// computing deficit_factor
+#pragma region computing action factor
+	float action_factor = calcTradeFactor(returnTradeFactors(b_buying,pItem->object().cNameSect()),relation_factor);
+#pragma endregion 
+
+#pragma region computing deficit_factor
 #if 0
 	float					deficit_factor = partner.inv_owner->deficit_factor(pItem->object().cNameSect());
 #else
 	float					deficit_factor = 1.f;
 #endif
+#pragma endregion
 
-	// total price calculation
-	u32						result = 
-		iFloor	(
-			base_cost*
-			condition_factor*
-			action_factor*
-			deficit_factor
-		);
+#pragma region total price calculation
+	u32	result = iFloor	(base_cost*condition_factor*action_factor*deficit_factor);
+	result+=iFloor(glCost);
+	result+=iFloor(slCost);
+	result+=iFloor(scCost);
+	result+=iFloor(amiwCost);
+	result+=iFloor(griwCost);
+#pragma endregion
 
 	return					(result);
 }
