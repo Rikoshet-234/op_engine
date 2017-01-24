@@ -71,6 +71,8 @@ void CBaseMonster::Load(LPCSTR section)
 		m_eHitType						= ALife::g_tfString2HitType(hitStr.c_str());
 	}
 
+	if (pSettings->line_exist(section,"short_name"))
+		m_sShortName=pSettings->r_string_wb(section, "short_name");
 }
 
 // if sound is absent just do not load that one

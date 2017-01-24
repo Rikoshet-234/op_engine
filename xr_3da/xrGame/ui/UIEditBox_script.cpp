@@ -1,6 +1,9 @@
 #include "pch_script.h"
 #include "UIEditBox.h"
 #include "UIEditBoxEx.h"
+#include "../ai_space.h"
+#include "../script_storage_space.h"
+#include "../script_engine.h"
 
 using namespace luabind;
 
@@ -8,6 +11,16 @@ using namespace luabind;
 void CUIEditBox_SetText(CUIEditBox* self,LPCSTR text)
 {
 	self->SetText(text);
+}
+
+void CUIEditBox_SetText_number(CUIEditBox* self,float number)
+{
+	ai().script_engine().script_log		(ScriptStorage::eLuaMessageTypeError,"SetText : invalid input type! use lua tostring() function for save value precision!!!");
+}
+
+void CUIEditBox_SetText_bool(CUIEditBox* self,bool value)
+{
+	self->SetText(value ? "true" : "false");
 }
 
 void CUIEditBox::script_register(lua_State *L)
@@ -30,6 +43,8 @@ void CUIEditBox::script_register(lua_State *L)
 		class_<CUIEditBox, CUICustomEdit>("CUIEditBox")
 		.def(						constructor<>())
 		.def("SetText",				&CUIEditBox_SetText)
+		.def("SetText",				&CUIEditBox_SetText_number)
+		.def("SetText",				&CUIEditBox_SetText_bool)
 		.def("InitTexture",			&CUIEditBox::InitTexture),
 
 		class_<CUIEditBoxEx, CUICustomEdit>("CUIEditBoxEx")

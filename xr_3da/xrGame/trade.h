@@ -1,9 +1,12 @@
 #pragma once
 
+#include "inventory_space.h"
+
 class CInventoryOwner;
 class CInventory;
 class CInventoryItem;
 class CEntity;
+class CTradeFactors;
 
 class CTrade 
 {
@@ -57,7 +60,9 @@ public:
 	CTrade*					GetPartnerTrade			() const;
 	CInventory*				GetPartnerInventory		() const;
 
-	u32						GetItemPrice			(CInventoryItem* pItem, bool b_buying);
+	u32						GetItemPrice			(PIItem pItem, bool b_buying);
+
+	const CTradeFactors*			returnTradeFactors(bool buying,shared_str itemSection) const;
 
 	void					UpdateTrade				();
 private:

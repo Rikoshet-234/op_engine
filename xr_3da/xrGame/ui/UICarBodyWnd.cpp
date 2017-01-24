@@ -193,18 +193,26 @@ void CUICarBodyWnd::InitCarBody(CInventoryOwner* pOur, CInventoryOwner* pOthers)
 			m_pUICharacterInfoRight->ClearInfo		();
 			if(monster)
 			{
+				m_pUICharacterInfoRight->m_bShowRelationData=false;
 				shared_str monster_tex_name = pSettings->r_string(monster->cNameSect(),"icon");
 				m_pUICharacterInfoRight->UIIcon().InitTexture(monster_tex_name.c_str());
 				m_pUICharacterInfoRight->UIIcon().SetStretchTexture(true);
-				if (monster->cNameSect().size()>0)
+				shared_str shortName=monster->GetShortName();
+				shared_str fullName=monster->cNameSect();
+				shared_str translatedName;
+				if (shortName.size()>0)
+					translatedName=CStringTable().translate(shortName);
+				else if (fullName.size()>0)
+					translatedName=CStringTable().translate(fullName);
+				if (translatedName.size()>0)
 				{
-					shared_str translatedName=CStringTable().translate(monster->cNameSect());
 					m_pUICharacterInfoRight->UIName().SetText(translatedName.c_str());
 					m_pUICharacterInfoRight->UIName().Show(true);
 				}
 			}
 		}else 
 		{
+			m_pUICharacterInfoRight->m_bShowRelationData=true;
 			m_pUICharacterInfoRight->InitCharacter	(other_id);
 		}
 	}
