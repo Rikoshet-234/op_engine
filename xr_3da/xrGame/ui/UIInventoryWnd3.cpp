@@ -90,7 +90,9 @@ void CUIInventoryWnd::ActivatePropertiesBox()
 	CSilencer*			pSilencer			= smart_cast<CSilencer*>		(CurrentIItem());
 	CGrenadeLauncher*	pGrenadeLauncher	= smart_cast<CGrenadeLauncher*>	(CurrentIItem());
 	CBottleItem*		pBottleItem			= smart_cast<CBottleItem*>		(CurrentIItem());
-	CWeaponAmmo*		pAmmoItem			= smart_cast<CWeaponAmmo*>		(CurrentIItem());
+#pragma region disable due to hard learning async state machine and plaing animation
+	//CWeaponAmmo*		pAmmoItem			= smart_cast<CWeaponAmmo*>		(CurrentIItem());
+#pragma endregion
 	
 	bool	b_show			= false;
 	bool	b_picked=false;

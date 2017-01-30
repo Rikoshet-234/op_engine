@@ -31,6 +31,7 @@ public:
 	virtual				~CXml					();
 	void				ClearInternal			();
 
+	bool 				ReInit					(LPCSTR path_alias, LPCSTR path, LPCSTR  xml_filename);
 	bool 				Init					(LPCSTR path_alias, LPCSTR path, LPCSTR  xml_filename);
 	bool 				Init					(LPCSTR path_alias, LPCSTR xml_filename);
 
@@ -98,6 +99,7 @@ protected:
 #endif
 public:
 	virtual shared_str correct_file_name		(LPCSTR path, LPCSTR fn) {return fn;}
+	void dump();
 private:
 						CXml					(const CXml& copy);
 	void				operator=				( const CXml& copy );

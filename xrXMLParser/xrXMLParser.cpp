@@ -2,7 +2,7 @@
 #pragma hdrstop
 
 #include "xrXMLParser.h"
-
+#include "xrLua/src/lobject.h"
 
 XRXMLPARSER_API CXml::CXml()
 	:	m_root			(NULL),
@@ -19,13 +19,20 @@ void CXml::ClearInternal()
 	m_Doc.Clear();
 }
 
+bool CXml::ReInit(LPCSTR path_alias, LPCSTR path, LPCSTR xml_filename)
+{
+	ClearInternal();
+	bool result=Init(path_alias,path,xml_filename);
+	R_ASSERT3(result, "error while parsing XML file", xml_filename);
+	return result;
+}
+
 void ParseFile(LPCSTR path, CMemoryWriter& W, IReader *F, CXml* xml )
 {
 	string4096	str;
 	
 	while( !F->eof() ){
 		F->r_string		(str,sizeof(str));
-
 		if (str[0] && (str[0]=='#') && strstr(str,"#include") ){
 			string256	inc_name;	
 			if (_GetItem	(str,1,inc_name,'"'))
@@ -80,6 +87,7 @@ bool CXml::Init(LPCSTR path, LPCSTR  xml_filename)
 	FS.r_close				(F);
 
 	m_Doc.Parse				((LPCSTR )W.pointer());
+
 	if (m_Doc.Error())
 	{
 		string1024			str;
@@ -88,7 +96,6 @@ bool CXml::Init(LPCSTR path, LPCSTR  xml_filename)
 	} 
 
 	m_root					= m_Doc.FirstChildElement();
-
 	return true;
 }
 
@@ -103,10 +110,10 @@ XML_NODE* CXml::NavigateToNode(XML_NODE* start_node, LPCSTR  path, int node_inde
 	strcpy						(buf_str, path);
 
 	char seps[]					= ":";
-    char *token;
+	char *token;
 	int tmp						= 0;
 
-    //разбить путь на отдельные подпути
+	//разбить путь на отдельные подпути
 	token = strtok( buf_str, seps );
 
 	if( token != NULL )
@@ -119,8 +126,8 @@ XML_NODE* CXml::NavigateToNode(XML_NODE* start_node, LPCSTR  path, int node_inde
 		}
 	}
 	
-    while( token != NULL )
-    {
+	while( token != NULL )
+	{
 		// Get next token: 
 		token = strtok( NULL, seps );
 
@@ -131,7 +138,7 @@ XML_NODE* CXml::NavigateToNode(XML_NODE* start_node, LPCSTR  path, int node_inde
 				node = node_parent->FirstChild(token);
 			}
 
-    }
+	}
 
 	return node;
 }
@@ -158,6 +165,97 @@ XML_NODE* CXml::NavigateToNodeWithAttribute(LPCSTR tag_name, LPCSTR attrib_name,
 	return NULL;
 }
 
+#pragma region dump xml from tinyxml docs
+const unsigned int NUM_INDENTS_PER_SPACE=2;
+
+const char * getIndent( unsigned int numIndents )
+{
+	static const char * pINDENT="                                      + ";
+	static const unsigned int LENGTH=strlen( pINDENT );
+	unsigned int n=numIndents*NUM_INDENTS_PER_SPACE;
+	if ( n > LENGTH ) n = LENGTH;
+	return &pINDENT[ LENGTH-n ];
+}
+
+// same as getIndent but no "+" at the end
+const char * getIndentAlt( unsigned int numIndents )
+{
+	static const char * pINDENT="                                        ";
+	static const unsigned int LENGTH=strlen( pINDENT );
+	unsigned int n=numIndents*NUM_INDENTS_PER_SPACE;
+	if ( n > LENGTH ) n = LENGTH;
+	return &pINDENT[ LENGTH-n ];
+}
+
+std::string dump_attributes(TiXmlElement* pElement, unsigned int indent)
+{
+	if ( !pElement ) return "";
+	std::string result="";
+	TiXmlAttribute* pAttrib=pElement->FirstAttribute();
+//	const char* pIndent=getIndentAlt(indent);
+	while (pAttrib)
+	{
+		std::stringstream ss;
+		ss << pAttrib->Name() << ": value=["<<pAttrib->Value()<<"]";
+		pAttrib=pAttrib->Next();
+		result+=ss.str()+(result.length()>0? " " : "");
+	}
+	return result;	
+}
+
+void dumpTree(XML_NODE* startNode, unsigned int indent = 0)
+{
+	TiXmlNode* pChild;
+	TiXmlText* pText;
+	int t = startNode->Type();
+	LPCSTR indentStr= getIndent(indent);
+	switch ( t )
+	{
+	case TiXmlNode::DOCUMENT:
+		Msg( "Document" );
+		break;
+
+	case TiXmlNode::ELEMENT:
+		{
+		std::string attrInfo=dump_attributes(startNode->ToElement(), indent+1);
+		if (attrInfo.length()==0)
+			Msg( "%sElement [%s]", indentStr,startNode->Value());
+		else
+			Msg( "%sElement [%s] attributes:(%s)", indentStr,startNode->Value() ,attrInfo.c_str());
+		}
+		break;
+
+	case TiXmlNode::COMMENT:
+		Msg( "%sComment: [%s]",indentStr, startNode->Value());
+		break;
+
+	case TiXmlNode::UNKNOWN:
+		Msg( "%sUnknown" ,indentStr);
+		break;
+
+	case TiXmlNode::TEXT:
+		pText = startNode->ToText();
+		Msg( "%sText: [%s]", indentStr,pText->Value() );
+		break;
+
+	case TiXmlNode::DECLARATION:
+		Msg( "%sDeclaration",indentStr );
+		break;
+	default:
+		break;
+	}
+	//printf( "\n" );
+	for ( pChild = startNode->FirstChild(); pChild != nullptr; pChild = pChild->NextSibling()) 
+		dumpTree( pChild, indent+1 );
+}
+
+#pragma endregion 
+void CXml::dump()
+{
+	Msg("--- start dump content for xml object based on %s ---",this->m_xml_file_name);
+	dumpTree(GetRoot());
+	Msg("--- end dump content for xml object based on %s ---",this->m_xml_file_name);
+}
 
 LPCSTR CXml::Read(LPCSTR path, int index, LPCSTR   default_str_val)
 {
@@ -246,8 +344,7 @@ float   CXml::ReadFlt(XML_NODE* node,  float default_flt_val)
 	return (float)atof		(result_str);
 }
 
-LPCSTR CXml::ReadAttrib(XML_NODE* start_node, LPCSTR path,  int index, 
-					LPCSTR attrib, LPCSTR   default_str_val)
+LPCSTR CXml::ReadAttrib(XML_NODE* start_node, LPCSTR path,  int index, 	LPCSTR attrib, LPCSTR   default_str_val)
 {
 	XML_NODE* node			= NavigateToNode(start_node, path, index);
 	LPCSTR result			= ReadAttrib(node, attrib, default_str_val);
@@ -256,8 +353,7 @@ LPCSTR CXml::ReadAttrib(XML_NODE* start_node, LPCSTR path,  int index,
 }
 
 
-LPCSTR CXml::ReadAttrib(LPCSTR path,  int index, 
-					LPCSTR attrib, LPCSTR   default_str_val)
+LPCSTR CXml::ReadAttrib(LPCSTR path,  int index, LPCSTR attrib, LPCSTR   default_str_val)
 {
 	XML_NODE* node			= NavigateToNode(path, index);
 	LPCSTR result			= ReadAttrib(node, attrib, default_str_val);
@@ -460,8 +556,8 @@ LPCSTR CXml::CheckUniqueAttrib (XML_NODE* start_node, LPCSTR tag_name, LPCSTR at
 #endif
 
 BOOL APIENTRY DllMain( HANDLE hModule, 
-                       u32  ul_reason_for_call, 
-                       LPVOID lpReserved
+					   u32  ul_reason_for_call, 
+					   LPVOID lpReserved
 					 )
 {
 	switch (ul_reason_for_call)
@@ -472,5 +568,5 @@ BOOL APIENTRY DllMain( HANDLE hModule,
 	case DLL_PROCESS_DETACH:
 		break;
 	}
-    return TRUE;
+	return TRUE;
 }

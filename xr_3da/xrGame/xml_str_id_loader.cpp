@@ -192,7 +192,6 @@ void CXML_IdToIndex::InitInternal(CXML_IdToIndex::InitFunc& f)
 		xml_file_full			+= ".xml";
 		bool xml_result			= uiXml->Init(CONFIG_PATH, GAME_PATH, xml_file_full.c_str());
 		R_ASSERT3				(xml_result, "error while parsing XML file", xml_file_full.c_str());
-
 		//общий список
 		int items_num			= uiXml->GetNodesNum(uiXml->GetRoot(), m_tag_name);
 

@@ -79,3 +79,5 @@ protected:
 	INFO_VECTOR					m_HasInfo;
 	INFO_VECTOR					m_DontHasInfo;
 };
+
+LPCSTR DialogDebugContext();

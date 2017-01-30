@@ -39,7 +39,8 @@ void CPhraseDialogExporter::script_register(lua_State *L)
 		.def("GetPhraseScript",		&CPhrase::GetPhraseScript),
 
 		class_<CPhraseDialog>("CPhraseDialog")
-		.def("AddPhrase",			&CPhraseDialog::AddPhrase_script ),
+		.def("AddPhrase",			&CPhraseDialog::AddPhrase_script )
+		.def("SetPriority",			&CPhraseDialog::SetPriority),
 
 		class_<CPhraseScript>("CPhraseScript")
 		.def("AddPrecondition",		&CPhraseScript::AddPrecondition)

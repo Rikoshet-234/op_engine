@@ -58,9 +58,10 @@ protected:
 	void				AskQuestion				();
 
 	void				SayPhrase				(const shared_str& phrase_id);
-
+	bool				m_bInitState;
 	// Функции добавления строк в листы вопросов и ответов
 public:
+	bool GetInitState() const {return m_bInitState;}
 	void				AddQuestion				(const shared_str& text, const shared_str& id,int number);
 	void				AddAnswer				(const shared_str& text, LPCSTR SpeakerName);
 protected:
