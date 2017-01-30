@@ -2,7 +2,6 @@
 #pragma hdrstop
 
 #include "xrXMLParser.h"
-#include "xrLua/src/lobject.h"
 
 XRXMLPARSER_API CXml::CXml()
 	:	m_root			(NULL),
