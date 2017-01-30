@@ -375,7 +375,9 @@ bool CUIInventoryWnd::OnItemDrop(CUICellItem* itm)
 			CScope*				pScope				= smart_cast<CScope*>			(draggedItem);
 			CSilencer*			pSilencer			= smart_cast<CSilencer*>		(draggedItem);
 			CGrenadeLauncher*	pGrenadeLauncher	= smart_cast<CGrenadeLauncher*>	(draggedItem);
-			CWeaponAmmo*		pAmmo				= smart_cast<CWeaponAmmo*>		(draggedItem);
+#pragma region disabled due i do not wont move active item to slot
+			//CWeaponAmmo*		pAmmo				= smart_cast<CWeaponAmmo*>		(draggedItem);
+#pragma endregion
 			m_pUIBagList->m_i_scroll_pos=m_pUIBagList->ScrollPos();
 			if (pScope || pSilencer || pGrenadeLauncher)
 			{
@@ -463,12 +465,13 @@ bool CUIInventoryWnd::OnItemDbClick(CUICellItem* itm)
 			}
 			else
 				break;
-			CWeaponAmmo* ammo=smart_cast<CWeaponAmmo*>(invItem);
+
 			CInventoryItem *pistol=m_pInv->m_slots[PISTOL_SLOT].m_pIItem;
 			CInventoryItem *rifle=m_pInv->m_slots[RIFLE_SLOT].m_pIItem;
 			CInventoryItem *shotgun=m_pInv->m_slots[SHOTGUN_SLOT].m_pIItem;
 #pragma region disabled due to hard learning async state machine and playng animation
-			/*if (ammo)
+			/*CWeaponAmmo* ammo=smart_cast<CWeaponAmmo*>(invItem);
+			if (ammo)
 			{				
 				if (pistol != nullptr && pistol->CanLoadAmmo(ammo,true))
 				{

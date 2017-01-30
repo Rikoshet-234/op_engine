@@ -35,7 +35,7 @@ CUITalkWnd::CUITalkWnd()
 	Init					();
 	Hide					();
 //.	SetFont					(HUD().Font().pFontHeaderRussian);
-
+	m_bInitState=false;
 	m_bNeedToUpdateQuestions = false;
 }
 
@@ -67,6 +67,7 @@ void CUITalkWnd::Init()
 
 void CUITalkWnd::InitTalkDialog()
 {
+	m_bInitState=true;
 	m_pActor = smart_cast<CActor *>(Level().CurrentEntity());
 	if (m_pActor && !m_pActor->IsTalking()) return;
 
@@ -93,6 +94,7 @@ void CUITalkWnd::InitTalkDialog()
 	UITalkDialogWnd->Show					();
 
 	UITradeWnd->Hide							();
+	m_bInitState=false;
 }
 
 void CUITalkWnd::InitOthersStartDialog()
@@ -268,7 +270,7 @@ void CUITalkWnd::Hide()
 	ToTopicMode					();
 
 	if (m_pActor->IsTalking()) m_pActor->StopTalk();
-	m_pActor = NULL;
+	m_pActor = nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -282,7 +284,7 @@ bool  CUITalkWnd::TopicMode			()
 
 void  CUITalkWnd::ToTopicMode		() 
 {
-	m_pCurrentDialog = DIALOG_SHARED_PTR((CPhraseDialog*)NULL);
+	m_pCurrentDialog = DIALOG_SHARED_PTR(static_cast<CPhraseDialog*>(nullptr));
 }
 
 //////////////////////////////////////////////////////////////////////////

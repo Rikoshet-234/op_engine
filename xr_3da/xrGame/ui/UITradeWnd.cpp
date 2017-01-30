@@ -889,12 +889,28 @@ void CUITradeWnd::ActivatePropertiesBox()
 
 	if(!CurrentIItem()->IsQuestItem())
 	{
-
-		UIPropertiesBox.AddItem("st_drop", nullptr, INVENTORY_DROP_ACTION);
-		b_show			= true;
+		if (CurrentItem()->OwnerList()==&UIOurBagList)
+		{
+			UIPropertiesBox.AddItem("st_drop", nullptr, INVENTORY_DROP_ACTION);
+			b_show			= true;
+		}
+		else if (CurrentItem()->OwnerList()==&UIOurTradeList)
+		{
+			UIPropertiesBox.AddItem("ui_carbody_move_single", nullptr, INVENTORY_DROP_ACTION);
+			b_show			= true;
+		}
 
 		if(CurrentItem()->ChildsCount())
-			UIPropertiesBox.AddItem("st_drop_all", reinterpret_cast<void*>(33), INVENTORY_DROP_ACTION);
+			if (CurrentItem()->OwnerList()==&UIOurBagList)
+			{
+				UIPropertiesBox.AddItem("st_drop_all", reinterpret_cast<void*>(33), INVENTORY_DROP_ACTION);
+				b_show			= true;
+			}
+			else if (CurrentItem()->OwnerList()==&UIOurTradeList)
+			{
+				UIPropertiesBox.AddItem("ui_carbody_move_all", nullptr, INVENTORY_DROP_ACTION);
+				b_show			= true;
+			}
 	}
 
 	if (b_show)

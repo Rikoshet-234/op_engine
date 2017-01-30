@@ -4,11 +4,16 @@
 #include "gameobject.h"
 #include "ai_debug.h"
 #include "ui/xrUIXmlParser.h"
+#include "UIGameSP.h"
+#include "Level.h"
+#include "HUDManager.h"
+#include "ui/UITalkWnd.h"
 
 SPhraseDialogData::SPhraseDialogData ()
 {
 	m_PhraseGraph.clear	();
 	m_iPriority			= 0;
+	b_bForceReload=false;
 }
 
 SPhraseDialogData::~SPhraseDialogData ()
@@ -18,10 +23,11 @@ SPhraseDialogData::~SPhraseDialogData ()
 
 CPhraseDialog::CPhraseDialog()
 {
-	m_bFinished			= false;
-	m_pSpeakerFirst		= NULL;
-	m_pSpeakerSecond	= NULL;
-	m_DialogId			= NULL;
+	m_bFirstIsSpeaking=true;
+	m_bFinished = false;
+	m_pSpeakerFirst = nullptr;
+	m_pSpeakerSecond = nullptr;
+	m_DialogId = nullptr;
 }
 
 CPhraseDialog::~CPhraseDialog()
@@ -29,8 +35,7 @@ CPhraseDialog::~CPhraseDialog()
 }
 
 
-void CPhraseDialog::Init(CPhraseDialogManager* speaker_first, 
-						 CPhraseDialogManager* speaker_second)
+void CPhraseDialog::Init(CPhraseDialogManager* speaker_first, CPhraseDialogManager* speaker_second)
 {
 	THROW(!IsInited());
 
@@ -132,13 +137,23 @@ bool CPhraseDialog::SayPhrase (DIALOG_SHARED_PTR& phrase_dialog, const shared_st
 
 		}
 
-		R_ASSERT2	(
+		if (phrase_dialog->m_PhraseVector.empty())
+		{
+			string1024 text;
+			sprintf_s(text,"No available phrase to say in [%s] , after [%s], context:\n %s",
+				phrase_dialog->m_DialogId.c_str(),phrase_id.c_str(),DialogDebugContext());
+
+			Msg("! ERROR CPhraseDialog::SayPhrase: %s", text);
+			CPhrase  *cap = phrase_dialog->AddPhrase_script (text, "error_phrase", *phrase_id, 0);
+			phrase_dialog->m_PhraseVector.push_back(cap);
+		}
+		/*R_ASSERT2	(
 			!phrase_dialog->m_PhraseVector.empty(),
 			make_string(
 				"No available phrase to say, dialog[%s]",
 				*phrase_dialog->m_DialogId
 			)
-		);
+		);*/
 
 		//упорядочить списко по убыванию благосклонности
 		std::sort(phrase_dialog->m_PhraseVector.begin(),
@@ -182,7 +197,40 @@ int	 CPhraseDialog::Priority()
 void CPhraseDialog::Load(shared_str dialog_id)
 {
 	m_DialogId = dialog_id;
-	inherited_shared::load_shared(m_DialogId, NULL);
+	bool need_load=inherited_shared::start_load_shared(m_DialogId); //начинаем загрузку
+	if (need_load) //свеже созданное
+		inherited_shared::load_shared(m_DialogId, nullptr);
+	else if (GetDialogForceReload()) //уже создавалось раньше
+	{
+		CUIGameSP* ui_sp = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
+		if (ui_sp && ui_sp->TalkMenu->GetInitState()) //читать только если идет инициализация окна диалога. в других Load - загружать наново не надо
+		{
+			ITEM_DATA item_data = *id_to_index::GetById(m_DialogId); //перечитаем xml часть диалога
+			std::string file_name=item_data._xml->m_xml_file_name;
+			const size_t sidx = file_name.rfind('\\');
+			if (std::string::npos != sidx)
+				file_name=file_name.substr(sidx+1,file_name.length());
+			bool result=item_data._xml->ReInit(CONFIG_PATH, GAME_PATH, file_name.c_str()); //физически распарсим наново xml документ
+			//item_data._xml->dump();
+	
+			/*int items_num			= item_data._xml->GetNodesNum(item_data._xml->GetRoot(), id_to_index::GetTagName());
+			item_data._xml->SetLocalRoot		(item_data._xml->GetRoot());
+			int pos=-1;
+			for(int i=0; i<items_num; ++i)
+			{
+				XML_NODE* dialog_node = item_data._xml->NavigateToNode(id_to_index::GetTagName(), i);
+				xr_string data=item_data._xml->ReadAttrib(dialog_node,"id",nullptr);
+				if (xr_strcmp(data.c_str(),m_DialogId.c_str())==0)
+				{
+					pos=i;
+					break;
+				}
+			}
+			item_data.pos_in_file=pos;*/
+			data()->SetLoad(false);
+			inherited_shared::load_shared(m_DialogId, nullptr); //перестроим грай диалогов на основании новой структуры xml
+		}
+	}
 }
 
 #include "script_engine.h"
@@ -194,7 +242,6 @@ void CPhraseDialog::load_shared	(LPCSTR)
 
 	CUIXml*		pXML		= item_data._xml;
 	pXML->SetLocalRoot		(pXML->GetRoot());
-
 	//loading from XML
 	XML_NODE* dialog_node = pXML->NavigateToNode(id_to_index::GetTagName(), item_data.pos_in_file);
 	THROW3(dialog_node, "dialog id=", *item_data.id);
@@ -205,8 +252,9 @@ void CPhraseDialog::load_shared	(LPCSTR)
 	SetPriority	( pXML->ReadAttribInt(dialog_node, "priority", 0) );
 
 	//заголовок 
-	SetCaption	( pXML->Read(dialog_node, "caption", 0, NULL) );
+	SetCaption	( pXML->Read(dialog_node, "caption", 0, nullptr) );
 
+	SetDialogForceReload(pXML->ReadAttribInt(dialog_node, "force_reload", 0)==1? true:false);
 	//предикаты начала диалога
 	data()->m_PhraseScript.Load(pXML, dialog_node);
 
@@ -250,9 +298,19 @@ void CPhraseDialog::SetPriority	(int val)
 	data()->m_iPriority = val;
 }
 
+void CPhraseDialog::SetDialogForceReload(bool value)
+{
+	data()->b_bForceReload=value;
+}
+
+bool CPhraseDialog::GetDialogForceReload()
+{
+	return data()->b_bForceReload;
+}
+
 CPhrase* CPhraseDialog::AddPhrase	(LPCSTR text, const shared_str& phrase_id, const shared_str& prev_phrase_id, int goodwil_level)
 {
-	CPhrase* phrase					= NULL;
+	CPhrase* phrase					= nullptr;
 	CPhraseGraph::CVertex* _vertex	= data()->m_PhraseGraph.vertex(phrase_id);
 	if(!_vertex) 
 	{
@@ -266,9 +324,35 @@ CPhrase* CPhraseDialog::AddPhrase	(LPCSTR text, const shared_str& phrase_id, con
 	}
 
 	if(prev_phrase_id != "")
-		data()->m_PhraseGraph.add_edge		(prev_phrase_id, phrase_id, 0.f);
+	{
+		auto edge=data()->m_PhraseGraph.vertex(prev_phrase_id);
+		if (!edge)
+			Msg("! ERROR can't add phrase to graph! Not exist previouse edge point! Dialog[%s] phrase_id[%s] prev_phrase_id[%s]",m_DialogId.c_str(),phrase_id.c_str(),prev_phrase_id.c_str());
+		else
+			data()->m_PhraseGraph.add_edge		(prev_phrase_id, phrase_id, 0.f);
+	}
 	
 	return phrase;
+}
+
+static int sNextId = 0;
+int getNextId() { return ++sNextId; }
+
+CPhrase* CPhraseDialog::AddPhrase_script(LPCSTR text, LPCSTR phrase_id, LPCSTR prev_phrase_id, int goodwil_level)
+{
+	CPhrase* ph = AddPhrase(text, phrase_id, prev_phrase_id, goodwil_level);
+	if (!ph)
+	{
+		string1024 error_text;
+		sprintf_s(error_text,"Maybe duplicate phrase_id! dialog [%s] , phrase_id[%s] Not talkin again!!!! ",
+				m_DialogId.c_str(),phrase_id);
+		Msg("! ERROR CPhraseDialog::AddPhrase_script: %s.", error_text);
+		string64 strId;
+		sprintf_s(strId,"error_phrase_%i",getNextId());
+		CPhrase  *error_phrase = AddPhrase_script (error_text, strId, prev_phrase_id, 0);
+		return error_phrase;
+	}
+	return ph;
 }
 
 void CPhraseDialog::AddPhrase	(CUIXml* pXml, XML_NODE* phrase_node, const shared_str& phrase_id, const shared_str& prev_phrase_id)
