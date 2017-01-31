@@ -363,7 +363,8 @@ void CActor::ActorUse()
 
 	
 
-	if(m_pUsableObject)m_pUsableObject->use(this);
+	if(m_pUsableObject)
+		m_pUsableObject->use(this);
 	
 	if(m_pInvBoxWeLookingAt && m_pInvBoxWeLookingAt->nonscript_usable())
 	{

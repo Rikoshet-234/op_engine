@@ -19,6 +19,7 @@
 #include "../xr_level_controller.h"
 #include "../../cameraBase.h"
 #include "UIXmlInit.h"
+#include "OPFuncs/utils.h"
 
 CUITalkWnd::CUITalkWnd()
 {
@@ -341,8 +342,8 @@ void CUITalkWnd::SayPhrase(const shared_str& phrase_id)
 void CUITalkWnd::AddQuestion(const shared_str& text, const shared_str& value,int number)
 {
 	if(text.size() == 0) return;
-	bool spaced=std::string(text.c_str()).find_first_not_of("\t\n ")!=std::string::npos; //small hack for pretranslated strings
-	UITalkDialogWnd->AddQuestion(spaced? text.c_str() : *CStringTable().translate(text),value.c_str(),number);
+	bool correct_text= OPFuncs::isCorrectString(text.c_str()); //small hack for pretranslated strings
+	UITalkDialogWnd->AddQuestion(correct_text? *CStringTable().translate(text):text.c_str() ,value.c_str(),number);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -351,12 +352,12 @@ void CUITalkWnd::AddAnswer(const shared_str& text, LPCSTR SpeakerName)
 {
 	//для пустой фразы вообще ничего не выводим
 	if(text.size() == 0) return;
-	bool spaced=std::string(text.c_str()).find_first_not_of("\t\n ")!=std::string::npos; //small hack for pretranslated strings
-	if (!spaced)
+	bool correct_text= OPFuncs::isCorrectString(text.c_str()); //small hack for pretranslated strings
+	if (correct_text)
 		PlaySnd			(text.c_str());
 
 	bool i_am = (0 == xr_strcmp(SpeakerName, m_pOurInvOwner->Name()));
-	UITalkDialogWnd->AddAnswer(SpeakerName,spaced? text.c_str() : *CStringTable().translate(text),i_am);
+	UITalkDialogWnd->AddAnswer(SpeakerName,correct_text? *CStringTable().translate(text): text.c_str() ,i_am);
 }
 
 //////////////////////////////////////////////////////////////////////////
