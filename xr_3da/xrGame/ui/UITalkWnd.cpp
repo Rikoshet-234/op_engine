@@ -19,7 +19,7 @@
 #include "../xr_level_controller.h"
 #include "../../cameraBase.h"
 #include "UIXmlInit.h"
-#include "OPFuncs/utils.h"
+#include "../OPFuncs/utils.h"
 
 CUITalkWnd::CUITalkWnd()
 {
