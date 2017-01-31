@@ -13,6 +13,9 @@
 #include "../../xrNetServer/NET_utils.h"
 #include "../Inventory.h"
 
+#include <locale>
+#include <iostream>
+
 CTimerStat forCellCreation; 
 CTimerStat forFillActor; 
 CTimerStat forFillOther; 
@@ -172,5 +175,18 @@ namespace OPFuncs
 		std::vector<std::string> elems;
 		splitString(s, delim, elems);
 		return elems;
+	}
+
+	bool isCorrectString(std::string str)
+	{
+		std::locale loc("C");
+		bool contains_alpha=std::find_if(str.begin(), str.end(), [&](char c){return std::isalpha(c,loc);}) != str.end();
+		bool contains_digits=std::find_if(str.begin(), str.end(), [&](char c){return std::isdigit(c,loc);}) != str.end();
+		bool contains_punct=std::find_if(str.begin(), str.end(), [&](char c){return c=='_';}) != str.end();
+		bool contains_other=std::find_if(str.begin(), str.end(), [&](char c)
+		{
+			return std::iscntrl(c,loc) || std::isspace(c,loc) || std::isblank(c,loc);
+		}) != str.end();
+		return (contains_alpha || contains_digits || contains_punct) && !contains_other;
 	}
 }

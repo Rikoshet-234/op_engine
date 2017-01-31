@@ -27,6 +27,8 @@ namespace OPFuncs
 	void DetachAddon(CInventoryItem* item,const char* addon_name);
 	void AttachAddon(CInventoryItem* item_to_upgrade,CInventoryItem* addon);
 	bool IsUsedInInventory(CInventoryOwner* owner,CInventoryItem* pItem);
+
+	bool isCorrectString(std::string str);
 }
 
 #endif
