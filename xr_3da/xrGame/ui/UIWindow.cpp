@@ -352,14 +352,14 @@ bool CUIWindow::OnMouse(float x, float y, EUIMessages mouse_action)
 		{
 			if(w->IsEnabled())
 			{
-				if( w->OnMouse(cursor_pos.x -w->GetWndRect().left, 
-							   cursor_pos.y -w->GetWndRect().top, mouse_action))return true;
+				if( w->OnMouse(cursor_pos.x -wndRect.left, 
+							   cursor_pos.y -wndRect.top, mouse_action))return true;
 			}
 		}
 		else if (w->IsEnabled() && w->CursorOverWindow())
 		{
-			if( w->OnMouse(cursor_pos.x -w->GetWndRect().left, 
-						   cursor_pos.y -w->GetWndRect().top, mouse_action))return true;
+			if( w->OnMouse(cursor_pos.x -wndRect.left, 
+						   cursor_pos.y -wndRect.top, mouse_action))return true;
 		}
 	}
 
