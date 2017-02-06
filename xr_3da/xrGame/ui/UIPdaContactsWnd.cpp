@@ -10,6 +10,7 @@
 #include "UIScrollView.h"
 #include "../actor.h"
 #include "../string_table.h"
+#include "UIBtnHint.h"
 
 #define PDA_CONTACT_HEIGHT 70
 
@@ -28,7 +29,8 @@ void CUIPdaContactsWnd::Show(bool status)
 {
 	inherited::Show(status);
 	if(status) UIDetailsWnd->Clear();
-
+	if (!status)
+		g_btnHint->Discard();
 }
 
 void CUIPdaContactsWnd::Init()

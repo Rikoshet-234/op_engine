@@ -1,7 +1,7 @@
 #pragma once
 #include "uiwindow.h"
 #include "UIOutfitInfo.h"
-
+#include "UIOutfitParams.h"
 
 class CInventoryItem;
 class CUIStatic;
@@ -33,6 +33,7 @@ public:
 	void				InitItem			(CInventoryItem* pInvItem);
 	void				TryAddWpnInfo		(const shared_str& wpn_section);
 	void				TryAddArtefactInfo	(const shared_str& af_section);
+	void				TryAddOutfitInfo	(CInventoryItem* outfitItem);
 
 	virtual void		Draw				();
 	bool				m_b_force_drawing;
@@ -44,6 +45,7 @@ public:
 	CUIProgressBar*		UICondProgresBar;
 	CUIWpnParams*		UIWpnParams;
 	CUIArtefactParams*	UIArtefactParams;
+	CUIOutfitParams*	UIOutfitParams;
 
 	Fvector2			UIItemImageSize; 
 	CUIStatic*			UIItemImage;

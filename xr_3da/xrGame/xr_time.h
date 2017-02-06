@@ -1,6 +1,9 @@
 #pragma once
 
 #include "alife_space.h"
+#include <luabind/luabind.hpp>
+#include <luabind/object.hpp>
+
 
 class xrTime{
 	ALife::_TIME_ID		m_time;
@@ -32,6 +35,7 @@ public:
 
 	LPCSTR	dateToString	(int mode);
 	LPCSTR	timeToString	(int mode);
+	luabind::object getTable();
 };
 
 

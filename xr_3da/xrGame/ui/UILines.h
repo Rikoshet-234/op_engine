@@ -48,7 +48,7 @@ public:
 			void			SetCutWordsMode								(bool mode);
 			void			SetUseNewLineMode							(bool mode);
 
-    // IUISimpleWindow methods
+	// IUISimpleWindow methods
 	virtual void			Init										(float x, float y, float width, float height);
 	virtual void			Draw										();
 	virtual void			Draw										(float x, float y);
@@ -56,7 +56,7 @@ public:
 IC			void			SetWndSize_inline							(const Fvector2& wnd_size);
 
 
-    // CDeviceResetNotifier methods
+	// CDeviceResetNotifier methods
 	virtual void			OnDeviceReset								();
 
 	// own methods
@@ -68,6 +68,8 @@ IC			void			SetWndSize_inline							(const Fvector2& wnd_size);
 			int				m_iCursorPos;
 			void			IncCursorPos								();
 			void			DecCursorPos								();
+					 int GetLinesCount() const {return m_lines.size();}
+					 std::string GetLongestLineText();
 protected:
 			Ivector2		m_cursor_pos;
 			void			UpdateCursor								();

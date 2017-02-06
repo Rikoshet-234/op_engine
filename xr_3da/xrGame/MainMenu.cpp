@@ -51,7 +51,7 @@ CMainMenu*	MainMenu()	{return (CMainMenu*)g_pGamePersistent->m_pMainMenu; };
 CMainMenu::CMainMenu	()
 {
 	m_Flags.zero					();
-	m_startDialog					= NULL;
+	m_startDialog					= nullptr;
 	m_screenshotFrame				= u32(-1);
 	g_pGamePersistent->m_pMainMenu	= this;
 	if (Device.b_is_Ready)			OnDeviceCreate();  	
@@ -60,9 +60,10 @@ CMainMenu::CMainMenu	()
 	m_deactivated_frame				= 0;	
 	
 	m_sPatchURL						= "";
-	m_pGameSpyFull					= NULL;
+	m_pGameSpyFull					= nullptr;
 
 	m_sPDProgress.IsInProgress		= false;
+	g_btnHint						= nullptr;
 
 	//---------------------------------------------------------------
 	m_NeedErrDialog					= ErrNoError;
@@ -71,7 +72,7 @@ CMainMenu::CMainMenu	()
 	if(!g_dedicated_server)
 	{
 		m_pGameSpyFull					= xr_new<CGameSpy_Full>();
-		
+		g_btnHint						= xr_new<CUIButtonHint>();
 		for (u32 i=0; i<u32(ErrMax); i++)
 		{
 			CUIMessageBoxEx*			pNewErrDlg;
@@ -93,7 +94,8 @@ CMainMenu::CMainMenu	()
 CMainMenu::~CMainMenu	()
 {
 	xr_delete						(m_startDialog);
-	g_pGamePersistent->m_pMainMenu	= NULL;
+	xr_delete(g_btnHint);
+	g_pGamePersistent->m_pMainMenu	= nullptr;
 	xr_delete						(m_pGameSpyFull);
 	delete_data						(m_pMB_ErrDlgs);	
 }
@@ -524,7 +526,7 @@ void CMainMenu::OnDownloadPatch(CUIWindow*, void*)
 	if (!fileName) return;
 
 	string4096 FilePath = "";
-	char* FileName = NULL;
+	char* FileName = nullptr;
 	GetFullPathName(fileName, 4096, FilePath, &FileName);
 	/*
 	if (strrchr(fileName, '/')) fileName = strrchr(fileName, '/')+1;

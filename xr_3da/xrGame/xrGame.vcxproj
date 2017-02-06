@@ -565,6 +565,7 @@
     <ClInclude Include="UIListsManipulations.h" />
     <ClInclude Include="ui\UIIconInfo.h" />
     <ClInclude Include="ui\UIListItemIconed.h" />
+    <ClInclude Include="ui\UIOutfitParams.h" />
     <ClInclude Include="wrapper_abstract.h" />
     <ClInclude Include="wrapper_abstract_inline.h" />
     <ClInclude Include="action_management_config.h" />
@@ -2287,6 +2288,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
+    <ClCompile Include="ui\UIOutfitParams.cpp" />
     <ClCompile Include="visual_memory_manager.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug_Priquel|Win32'">pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Debug_Priquel|Win32'">$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>

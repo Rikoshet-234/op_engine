@@ -2,10 +2,12 @@
 #include "UIBtnHint.h"
 #include "UIFrameLineWnd.h"
 #include "UIXmlInit.h"
+#include "UILines.h"
+#include "UILine.h"
 
+CUIButtonHint*		g_btnHint = nullptr;
 
-CUIButtonHint::CUIButtonHint	()
-:m_ownerWnd(NULL),m_enabledOnFrame(false)
+CUIButtonHint::CUIButtonHint	():m_ownerWnd(nullptr),m_enabledOnFrame(false)
 {
 	Device.seqRender.Add		(this, REG_PRIORITY_LOW-1000);
 
@@ -16,12 +18,14 @@ CUIButtonHint::CUIButtonHint	()
 
 	xml_init.InitWindow			(uiXml,"button_hint",0,this);
 	
-	m_border					= xr_new<CUIFrameLineWnd>();m_border->SetAutoDelete(true);
-	AttachChild					(m_border);
-	xml_init.InitFrameLine		(uiXml,"button_hint:frame_line",0,m_border);
+	m_border					= xr_new<CUIFrameWindow>();
+	m_border->SetAutoDelete(true);
+	CUIWindow::AttachChild					(m_border);
+	xml_init.InitFrameWindow		(uiXml,"button_hint:frame_line",0,m_border);
 
-	m_text						= xr_new<CUIStatic>();m_text->SetAutoDelete(true);
-	AttachChild					(m_text);
+	m_text						= xr_new<CUIStatic>();
+	m_text->SetAutoDelete(true);
+	CUIWindow::AttachChild					(m_text);
 	xml_init.InitStatic			(uiXml,"button_hint:description",0,m_text);
 
 
@@ -30,6 +34,11 @@ CUIButtonHint::CUIButtonHint	()
 CUIButtonHint::~CUIButtonHint	()
 {
 	Device.seqRender.Remove		(this);
+}
+
+void CUIButtonHint::Discard()
+{
+	m_ownerWnd = nullptr;
 }
 
 void CUIButtonHint::OnRender	()
@@ -45,11 +54,20 @@ void CUIButtonHint::OnRender	()
 
 void CUIButtonHint::SetHintText	(CUIWindow* w, LPCSTR text)
 {
-	m_ownerWnd					= w;
-	m_text->SetText				(text);
-	m_text->AdjustWidthToText	();
-	m_text->ResetClrAnimation		();
-	float hh =					_max(m_text->GetWidth()+30.0f, 80.0f);
-	SetWidth					(hh);
-	m_border->SetWidth			(hh);
+	m_ownerWnd= w;
+	m_text->SetText(text);
+	m_text->AdjustHeightToText();
+	Fvector2 new_size;
+
+	new_size.x				= m_text->GetWndPos().x + m_text->GetWndSize().x + 20.0f;
+	new_size.y				= _max(64.0f, m_text->GetWndPos().y+m_text->GetWndSize().y+20.0f);
+
+	m_border->SetWndSize(new_size);
+	m_text->SetWndSize(new_size);
+	SetWndSize(new_size);
+	m_text->ResetClrAnimation();
+	Msg("m_text %f %f",m_text->GetWndSize().x,m_text->GetWndSize().y);
+	Msg("m_border %f %f",m_border->GetWndSize().x,m_border->GetWndSize().y);
+	Msg("%f %f",GetWndSize().x,GetWndSize().y);
+	Msg("---------");
 }

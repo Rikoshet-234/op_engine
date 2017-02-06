@@ -35,13 +35,11 @@ CUIButton:: CUIButton()
 	SetTextAlignment			(CGameFont::alCenter); // this will create class instance for m_pLines
 	SetVTextAlignment			(valCenter);
 	m_bClickable				= true;
-	m_hint						= xr_new<CUIButtonHint>();
-	m_hint->Show(false);
 }
 
  CUIButton::~ CUIButton()
 {
-	xr_delete(m_hint);
+
 }
 
 void CUIButton::Reset()
@@ -220,8 +218,8 @@ void CUIButton::DrawText()
 	}
 
 	CUIStatic::DrawText();
-	if (m_hint->GetVisible())
-		m_hint->Draw_();
+	if(g_btnHint->Owner()==this)
+		g_btnHint->Draw_();
 }
 
 
@@ -234,9 +232,13 @@ void  CUIButton::Update()
 {
 	CUIStatic::Update();
 
-	if(CursorOverWindow() && m_hint_text.size() && !m_hint->GetVisible() && Device.dwTimeGlobal>m_dwFocusReceiveTime+500)
+	if (m_hint_text.size()>0)
 	{
-		m_hint->SetHintText	(this,*m_hint_text);
+		int i=0;
+	}
+	if(CursorOverWindow() && m_hint_text.size() && !g_btnHint->Owner() && Device.dwTimeGlobal>m_dwFocusReceiveTime+500)
+	{
+		g_btnHint->SetHintText	(this,*m_hint_text);
 
 		Fvector2 c_pos			= GetUICursor()->GetCursorPosition();
 		Frect vis_rect;
@@ -244,7 +246,7 @@ void  CUIButton::Update()
 
 		//select appropriate position
 		Frect r;
-		r.set					(0.0f, 0.0f, m_hint->GetWidth(), m_hint->GetHeight());
+		r.set					(0.0f, 0.0f, g_btnHint->GetWidth(), g_btnHint->GetHeight());
 		r.add					(c_pos.x, c_pos.y);
 
 		r.sub					(0.0f,r.height());
@@ -256,15 +258,16 @@ void  CUIButton::Update()
 		if (false==is_in2(vis_rect,r))
 			r.add				(r.width(), 45.0f);
 
-		m_hint->SetWndPos(r.lt);
-		m_hint->Show(true);
+		g_btnHint->SetWndPos(r.lt);
 	}
 }
 
 void CUIButton::OnFocusLost()
 {
 	inherited::OnFocusLost();
-	m_hint->Show(false);
+	if(g_btnHint->Owner()==this)
+		g_btnHint->Discard();
+
 }
 
 bool CUIButton::OnKeyboard(int dik, EUIMessages keyboard_action)

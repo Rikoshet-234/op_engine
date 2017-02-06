@@ -5,8 +5,10 @@
 #include "../actor.h"
 #include "../CustomOutfit.h"
 #include "../string_table.h"
-#include "UIListItemAdv.h"
+#include "UIListItem.h"
+#include "UIListWnd.h"
 #include "UIListItemIconed.h"
+#include "UIFrameLineWnd.h"
 #include "UIXmlInit.h"
 #include "../InventoryOwner.h"
 #include "../entity_alive.h"
@@ -32,33 +34,13 @@ void CUIOutfitInfo::InitFromXml(CUIXml& xml_doc)
 	AttachChild(m_list);
 
 	strconcat(sizeof(_buff),_buff, _base, ":immunities_list:icons");
-	XML_NODE* iconsNode		= xml_doc.NavigateToNode(_buff,0);
-
-	if (iconsNode)
-	{
-		for (XML_NODE* node=iconsNode->FirstChild(); node; node=node->NextSibling())
-		{
-			if (node)
-			{	
-				LPCSTR id=node->Value();
-				LPCSTR value=nullptr;
-				XML_NODE *data=node->FirstChild();
-				if (data)
-				{
-					TiXmlText *text			= data->ToText();
-					if (text)				
-						value=text->Value();
-					iconIDs.insert(mk_pair(id,value));
-
-				}
-			}
-		}
-	}
+	CUIXmlInit::GetStringTable(xml_doc,_buff,0,iconIDs);
 }
 
 void CUIOutfitInfo::Update(CCustomOutfit* outfitP)
 {
 	m_outfit				= outfitP;
+	m_list->RemoveAll();
 	NewSetItem(ALife::eHitTypeBurn,			false);
 	NewSetItem(ALife::eHitTypeShock,		false);
 	NewSetItem(ALife::eHitTypeStrike,		false);
@@ -68,6 +50,22 @@ void CUIOutfitInfo::Update(CCustomOutfit* outfitP)
 	NewSetItem(ALife::eHitTypeChemicalBurn,	false);
 	NewSetItem(ALife::eHitTypeExplosion,	false);
 	NewSetItem(ALife::eHitTypeFireWound,	false);
+	std::sort(m_lImmuneUnsortedItems.begin(),m_lImmuneUnsortedItems.end(),[](CUIListItem* i1, CUIListItem* i2)
+	{
+		CUIListItemIconed *iconedItem1=smart_cast<CUIListItemIconed*>(i1);
+		CUIListItemIconed *iconedItem2=smart_cast<CUIListItemIconed*>(i2);
+		if (!iconedItem1 || !iconedItem2)
+			return false;
+		return		lstrcmpi(iconedItem1->GetFieldText(1),iconedItem2->GetFieldText(1))<0;
+	});
+	std::for_each(m_lImmuneUnsortedItems.begin(),m_lImmuneUnsortedItems.end(),[&](CUIListItemIconed* item)
+	{
+		m_list->AddItem<CUIListItemIconed>(item);
+	});
+	/*CUIListItem* separator=xr_new<CUIListItem>();
+	separator->SetText("Модификаторы");
+	separator->SetAutoDelete(true);
+	m_list->AddItem(separator);*/
 }
 
 void CUIOutfitInfo::UpdateImmuneView()
@@ -88,9 +86,15 @@ void CUIOutfitInfo::NewSetItem(ALife::EHitType hitType, bool force_add)
 	bool emptyParam=fsimilar(_val_outfit, 0.0f) && fsimilar(_val_af, 0.0f) && !force_add;
 
 	LPCSTR hitName= ALife::g_cafHitType2String(hitType);
-	int itemIndex=m_list->FindItem((void*)hitName);
+	std::vector<CUIListItemIconed*>::iterator item_it=std::find_if(m_lImmuneUnsortedItems.begin(),m_lImmuneUnsortedItems.end(),[&](CUIListItem* item)
+	{
+		CUIListItemIconed* ii=smart_cast<CUIListItemIconed*>(item);
+		if (!ii)
+			return false;
+		return ii->GetData()==(void*)hitName;
+	});
 	CUIListItemIconed *item;
-	if (itemIndex==-1)
+	if (item_it==m_lImmuneUnsortedItems.end())
 	{
 		if (emptyParam)
 			return;
@@ -99,17 +103,18 @@ void CUIOutfitInfo::NewSetItem(ALife::EHitType hitType, bool force_add)
 		item=xr_new<CUIListItemIconed>();
 		CUIXmlInit::InitIconedColumns(uiXml,xml_path.c_str(),0,item);
 		item->SetData((void*)hitName);
-		item->SetAutoDelete(true);
-		m_list->AddItem<CUIListItemIconed>(item);
+		item->SetAutoDelete(false);
+		m_lImmuneUnsortedItems.push_back(item);
 	}
 	else 
 	{
 		if (emptyParam)
 		{
-			m_list->RemoveItem(itemIndex);
+			xr_delete(*item_it);
+			m_lImmuneUnsortedItems.erase(std::remove(m_lImmuneUnsortedItems.begin(),m_lImmuneUnsortedItems.end(),*item_it),m_lImmuneUnsortedItems.end());
 			return;
 		}
-		item=static_cast<CUIListItemIconed*>(m_list->GetItem(itemIndex));
+		item=*item_it;
 	}
 
 	xr_map<shared_str ,shared_str>::iterator icon=iconIDs.find(hitName);
@@ -119,13 +124,22 @@ void CUIOutfitInfo::NewSetItem(ALife::EHitType hitType, bool force_add)
 			item->SetFieldIcon(0,icon->second.c_str());
 	}
 	
-	string64 buff;
+	string128 buff;
 	sprintf_s(buff,"ui_inv_outfit_%s_protection",hitName);
 	item->SetFieldText(1,CStringTable().translate(buff).c_str());
+
+	string128 hint;
+	sprintf_s(hint,"ui_inv_outfit_%s_protection_hint",hitName);
+	if (CStringTable().IDExist(hint))
+	{
+		
+		item->m_hint_text=CStringTable().translate(hint);
+	}
+
 	bool outfit=false;
 	if (!fsimilar(_val_outfit, 0.0f))
 	{
-		string64 buff_outfit;
+		string128 buff_outfit;
 		sprintf_s	(buff_outfit,"%s %+3.0f%%", (_val_outfit>0.0f)?"%c[green]":"%c[red]", _val_outfit*100.0f);
 		item->SetFieldText(2,buff_outfit);
 		outfit=true;
@@ -135,7 +149,7 @@ void CUIOutfitInfo::NewSetItem(ALife::EHitType hitType, bool force_add)
 	bool art=false;
 	if( !fsimilar(_val_af, 0.0f) )
 	{
-		string64 buff_art;
+		string128 buff_art;
 		sprintf_s	(buff_art,"%s %+3.0f%%", (_val_af>0.0f)?"%c[green]":"%c[red]", _val_af*100.0f);
 		item->SetFieldText(3,buff_art);
 		art=true;
@@ -149,3 +163,5 @@ void CUIOutfitInfo::NewSetItem(ALife::EHitType hitType, bool force_add)
 	item->SetVisibility(4,outfit && art);
 	item->SetFieldText(4,buff_total);*/
 }
+
+

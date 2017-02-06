@@ -170,10 +170,9 @@ void CUIPdaWnd::Show()
 void CUIPdaWnd::Hide()
 {
 	inherited::Hide();
-
 	InventoryUtilities::SendInfoToActor("ui_pda_hide");
 	HUD().GetUI()->UIMainIngameWnd->SetFlashIconState_(CUIMainIngameWnd::efiPdaTask, false);
-
+	g_btnHint->Discard();
 }
 
 void CUIPdaWnd::UpdateDateTime()

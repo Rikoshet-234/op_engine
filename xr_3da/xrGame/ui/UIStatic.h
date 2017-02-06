@@ -167,7 +167,7 @@ public:
 	} E4States;
 
 	void SetTextColor(u32 color, E4States state);
-
+	
 	CUILines*				m_pLines;
 protected:
 	bool			m_bEnableTextHighlighting;

@@ -210,7 +210,7 @@ void CPhraseDialog::Load(shared_str dialog_id)
 			const size_t sidx = file_name.rfind('\\');
 			if (std::string::npos != sidx)
 				file_name=file_name.substr(sidx+1,file_name.length());
-			bool result=item_data._xml->ReInit(CONFIG_PATH, GAME_PATH, file_name.c_str()); //физически распарсим наново xml документ
+			item_data._xml->ReInit(CONFIG_PATH, GAME_PATH, file_name.c_str()); //физически распарсим наново xml документ
 			//item_data._xml->dump();
 	
 			/*int items_num			= item_data._xml->GetNodesNum(item_data._xml->GetRoot(), id_to_index::GetTagName());

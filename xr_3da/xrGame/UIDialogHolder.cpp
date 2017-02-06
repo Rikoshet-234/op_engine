@@ -6,6 +6,7 @@
 #include "actor.h"
 #include "xr_level_controller.h"
 #include "../../xrLua/lua_tools.h"
+#include "ui/UIBtnHint.h"
 
 dlgItem::dlgItem(CUIWindow* pWnd)
 {
@@ -108,7 +109,7 @@ void CDialogHolder::StartMenu (CUIDialogWnd* pDialog, bool bDoHideIndicators)
 void CDialogHolder::StopMenu (CUIDialogWnd* pDialog)
 {
 	R_ASSERT( pDialog->IsShown() );
-
+	g_btnHint->Discard();
 	if( MainInputReceiver()==pDialog )
 	{
 		if(UseIndicators())

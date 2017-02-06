@@ -1050,8 +1050,18 @@ void CWeaponMagazined::InitAddons()
 			CUIWindow* scopeWindow=m_UIScope->FindChild("scope_texture");
 			if (scopeWindow)
 			{
+				string_path	fn;
+				string_path final_scope_texture;
+				if (g_uCommonFlags.test(E_COMMON_FLAGS::gpOpenScope))
+				{
+					strcat(final_scope_texture,"_open");
+					if (!FS.exist(fn,"$game_textures$",scope_tex_name.c_str(),".dss"))
+						strcpy(final_scope_texture,scope_tex_name.c_str());				
+				}
+				else
+					strcpy(final_scope_texture,scope_tex_name.c_str());
 				CUIStatic* scopeStatic=static_cast<CUIStatic*>(scopeWindow);
-				scopeStatic->InitTexture(scope_tex_name.c_str());
+				scopeStatic->InitTexture(final_scope_texture);
 			}
 			else
 				Msg("! ERROR can't find static for scope texture in config!");

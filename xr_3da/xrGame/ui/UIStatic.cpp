@@ -245,7 +245,7 @@ void CUIStatic::Update()
 		}
 	}
 	
-	if(m_lanim_xform.m_lanim)
+	if(m_lanim_xform.m_lanim)	
 	{
 		if(m_lanim_xform.m_lanim_start_time<0.0f){
 			ResetXformAnimation();
