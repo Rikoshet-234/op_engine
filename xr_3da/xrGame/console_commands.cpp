@@ -56,6 +56,8 @@
 #include "hudmanager.h"
 #include "OPFuncs/utils.h"
 
+#include <tlhelp32.h>
+
 string_path		g_last_saved_game;
 
 extern void show_smart_cast_stats		();
@@ -941,6 +943,112 @@ public		:
 	void	Info	(TInfo& I) override	{	strcpy_s(I,"'on/off' or '1/0'"); }
 };
 
+class CCC_Affinity : public IConsole_Command
+{
+public		:
+	CCC_Affinity(LPCSTR N):  IConsole_Command(N)	{ bEmptyArgsHandled = true; };
+	void	Execute	(LPCSTR args) override
+	{
+		const DWORD dwOwnerPID = GetCurrentProcessId();
+		DWORD dwProcAffMask = 0, dwSystemAffMask = 0;
+		GetProcessAffinityMask(GetCurrentProcess(), &dwProcAffMask, &dwSystemAffMask);
+		if (strlen(args))
+		{
+			char* endptr;
+			DWORD dwThreadAffMask = strtoul(args, &endptr, 0);
+			HANDLE hThread = OpenThread(THREAD_SET_LIMITED_INFORMATION | THREAD_QUERY_LIMITED_INFORMATION, FALSE, Console->GetXRayPrimaryThreadId());
+			if (hThread != INVALID_HANDLE_VALUE)
+			{
+				if (0 != SetThreadAffinityMask(hThread, dwThreadAffMask & dwProcAffMask))
+				{
+					Msg("- Maximum allowed affinity mask: 0x%X, current: 0x%X", dwProcAffMask, dwThreadAffMask & dwProcAffMask);
+				}
+				else
+				{
+					Msg("- Failed to set thread affinity for thread id: 0x%08X to value 0x%X with error 0x%X"
+						, Console->GetXRayPrimaryThreadId()
+						, dwThreadAffMask & dwProcAffMask
+						, GetLastError());
+				}
+				
+				CloseHandle(hThread);
+			}
+			else
+			{
+				Msg("- Failed to get thread handle for thread id: 0x%08X", Console->GetXRayPrimaryThreadId());
+			}
+		}
+		else
+		{
+			HANDLE hThreadSnap = INVALID_HANDLE_VALUE; 
+			THREADENTRY32 te32; 
+ 
+			// Take a snapshot of all running threads  
+			hThreadSnap = CreateToolhelp32Snapshot( TH32CS_SNAPTHREAD, 0 ); 
+			if( hThreadSnap == INVALID_HANDLE_VALUE )
+			{
+				Msg("Failed to retrieve thread snapshot");
+				return;
+			}
+ 
+			// Fill in the size of the structure before using it. 
+			te32.dwSize = sizeof(THREADENTRY32); 
+ 
+			// Retrieve information about the first thread,
+			// and exit if unsuccessful
+			if( !Thread32First( hThreadSnap, &te32 ) ) 
+			{
+				Msg("Thread32First");  // Show cause of failure
+				CloseHandle( hThreadSnap );     // Must clean up the snapshot object!
+				return;
+			}
+
+			// Now walk the thread list of the system,
+			// and display information about each thread
+			// associated with the specified process
+		
+			do 
+			{ 
+				if( te32.th32OwnerProcessID == dwOwnerPID )
+				{
+					HANDLE hThread = OpenThread(THREAD_SET_LIMITED_INFORMATION | THREAD_QUERY_LIMITED_INFORMATION, FALSE, te32.th32ThreadID);
+					if (hThread != INVALID_HANDLE_VALUE)
+					{
+						DWORD dwThreadAffMask = SetThreadAffinityMask( hThread, dwProcAffMask);
+						Msg("- %s[0x%08X] Aff=0x%X", te32.th32ThreadID == Console->GetXRayPrimaryThreadId() ? "*" : "", te32.th32ThreadID, dwThreadAffMask); 
+						SetThreadAffinityMask( hThread, dwThreadAffMask);
+						CloseHandle(hThread);
+					}
+					else
+					{
+						Msg("- Failed to get thread handle for thread id: 0x%08X", te32.th32ThreadID);
+					}
+				}
+			}
+			while( Thread32Next(hThreadSnap, &te32 ) );
+
+			//  Don't forget to clean up the snapshot object.
+			CloseHandle( hThreadSnap );
+			Msg("- Maximum allowed affinity mask: 0x%X", dwProcAffMask);
+		}
+	}
+	void	Status	(TStatus& S) override
+	{
+		DWORD dwProcAffMask = 0, dwSystemAffMask = 0;
+		GetProcessAffinityMask(GetCurrentProcess(), &dwProcAffMask, &dwSystemAffMask);
+		HANDLE hThread = OpenThread(THREAD_SET_LIMITED_INFORMATION | THREAD_QUERY_LIMITED_INFORMATION, FALSE, Console->GetXRayPrimaryThreadId());
+		if (hThread != INVALID_HANDLE_VALUE)
+		{
+			const DWORD dwCurrentAffMask = SetThreadAffinityMask(hThread, dwProcAffMask);
+			SetThreadAffinityMask(hThread, dwCurrentAffMask);
+			CloseHandle(hThread);
+			sprintf_s(S, sizeof(S), "0x%X", dwCurrentAffMask);
+		}
+	}
+
+	void	Info	(TInfo& I) override	{	strcpy_s(I,"affinity value [hex|dec], i.e. g_affinity 0x3"); }
+};
+
 #ifdef DEBUG
 class CCC_RadioGroupMask2;
 class CCC_RadioMask :public CCC_Mask
@@ -1463,6 +1571,7 @@ void CCC_RegisterCommands()
 	CMD1(CCC_PHFps,				"ph_frequency"																					);
 	CMD1(CCC_PHIterations,		"ph_iterations"																					);
 	CMD1(CCC_SetGodMode,		"g_god"					);
+	CMD1(CCC_Affinity,			"g_affinity"			);
 	CMD3(CCC_Mask,				"g_unlimitedammo",		&psActorFlags,	AF_UNLIMITEDAMMO);
 	CMD1(CCC_JumpToLevel,		"jump_to_level"			);
 	CMD3(CCC_Mask,				"cl_dynamiccrosshair",	&psHUD_Flags,	HUD_CROSSHAIR_DYNAMIC);
