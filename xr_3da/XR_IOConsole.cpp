@@ -58,6 +58,8 @@ void CConsole::Initialize()
 	// Commands
 	extern void CCC_Register();
 	CCC_Register	();
+	// Initialize is called from primary thread
+	m_XRayPrimaryThreadId = GetCurrentThreadId();
 }
 
 void CConsole::Destroy	()

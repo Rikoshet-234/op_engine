@@ -40,6 +40,9 @@ private:
 	
 	BOOL			bRepeat;
 	BOOL			RecordCommands;
+
+	DWORD			m_XRayPrimaryThreadId;
+
 protected:
 	int				scroll_delta;
 	char			editor[MAX_LEN];
@@ -88,6 +91,9 @@ public:
 
 	virtual	void	Initialize	();
 	virtual void	Destroy		();
+
+	// Workaround for affinity change console command
+	DWORD			GetXRayPrimaryThreadId() { return m_XRayPrimaryThreadId; }
 };
 
 ENGINE_API extern CConsole* Console;
