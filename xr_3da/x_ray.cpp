@@ -607,19 +607,8 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance,
 #else // DEDICATED_SERVER
 	g_dedicated_server			= true;
 #endif // DEDICATED_SERVER
-	DWORD_PTR mask=1;
-	/*LPCSTR fta_param="-fta ";
-	if (strstr(lpCmdLine, fta_param)) {
-		int						sz = xr_strlen(fta_param);
-		string128				acc = "";
-		sscanf					(strstr(lpCmdLine,fta_param)+sz,"%[^ ] ",acc);
-		if (acc=="auto")
-		{
-			mask
-		}
-	}*/
-
-	SetThreadAffinityMask		(GetCurrentThread(),mask);
+	DWORD_PTR mask = SetThreadAffinityMask(GetCurrentThread(),0x1);
+	mask = SetThreadAffinityMask(GetCurrentThread(),mask&0xFFFFFFFE);
 
 	// Title window
 #ifdef SHOW_LOGO_WINDOW
