@@ -287,13 +287,10 @@ void CHUDManager::OnScreenRatioChanged()
 	pUI->Load							(pUI->UIGame());
 	if (g_actor)
 	{
-		CInventory inv=Actor()->inventory();
-		std::for_each(inv.m_all.begin(),inv.m_all.end(),[](CInventoryItem* item)
-		{
-			CWeapon* weapon=smart_cast<CWeapon*>(item);
-			if (weapon) 
-				weapon->OnScreenRatioChanged();
-		});
+		NET_Packet							P;
+		Actor()->u_EventGen(P, GE_REINIT_ADDONS, Actor()->ID());
+		P.w_u32(Device.dwFrame);
+		Actor()->u_EventSend(P);
 	}
 }
 

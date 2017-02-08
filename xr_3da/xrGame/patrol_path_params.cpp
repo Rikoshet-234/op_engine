@@ -16,7 +16,11 @@ CPatrolPathParams::CPatrolPathParams	(LPCSTR caPatrolPathToGo, const PatrolPathM
 	m_path_name			= caPatrolPathToGo;
 	m_path				= ai().patrol_paths().path(m_path_name,true);
 	
-	THROW3				(m_path,"There is no patrol path",caPatrolPathToGo);
+	if (!m_path)
+	{
+		ai().script_engine().script_log(eLuaMessageTypeError,"Patrol path [%s] not found !",caPatrolPathToGo);
+		FATAL("Engine crash. See log for details.");
+	}
 	
 	m_tPatrolPathStart	= tPatrolPathStart;
 	m_tPatrolPathStop	= tPatrolPathStop;

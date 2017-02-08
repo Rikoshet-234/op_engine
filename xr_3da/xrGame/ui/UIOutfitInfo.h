@@ -13,16 +13,6 @@ class CCustomOutfit;
 class CUIStatic;
 class CUIXml;
 
-enum restoreParams
-{
-	bleeding_restore_speed=1<<1,
-	satiety_restore_speed=1<<2,
-	radiation_restore_speed=1<<3,
-	health_restore_speed=1<<4,
-	power_restore_speed=1<<5,
-	power_loss=1<<6
-};
-
 class CUIOutfitInfo : public CUIWindow
 {
 	CCustomOutfit*		m_outfit;
@@ -37,9 +27,11 @@ public:
 	shared_str xml_path;
 
 protected:
-	void NewSetItem(ALife::EHitType hitType, bool force_add);
+	xr_map<ALife::EHitType,shared_str> immunes;
+	//xr_map<int, OPFuncs::restoreParam> restores;
 	CUIListWnd*		m_list;
 	std::vector<CUIListItemIconed*>	m_lImmuneUnsortedItems;
 	std::vector<CUIListItemIconed*>	m_lRestoreUnsortedItems;
-
+	void createImmuneItem(CCustomOutfit* outfit,ALife::EHitType hitType, bool force_add);
+	//void createRestoreItem(CCustomOutfit* outfit,int restoreId, bool force_add);
 };

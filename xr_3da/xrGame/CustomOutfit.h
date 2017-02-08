@@ -21,6 +21,7 @@ public:
 	//если на персонаже надет костюм
 	float							GetHitTypeProtection(SHit *pHDS);
 	float							GetDefHitTypeProtection(ALife::EHitType hit_type);
+	float							GetDefHitTypeProtectionOriginal(ALife::EHitType hit_type);
 
 	float							HitThruArmour		(SHit *pHDS);
 	//коэффициент на который домножается потеря силы

@@ -489,7 +489,7 @@ BOOL CWeapon::net_Spawn		(CSE_Abstract* DC)
 	if (m_ammoTypes.size()==0)
 	{
 		Msg("! ERROR invalid configuration for [%s]",E->name_replace());
-		FATAL("Engine crush. See log for details.");
+		FATAL("Engine crash. See log for details.");
 	}
 	if (m_ammoTypes.size()<=m_ammoType)
 	{

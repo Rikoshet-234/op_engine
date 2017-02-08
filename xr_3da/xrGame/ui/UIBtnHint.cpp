@@ -45,6 +45,7 @@ void CUIButtonHint::OnRender	()
 {
 	if(m_enabledOnFrame){
 		m_text->Update		();
+		m_border->GetTitleStatic()->SetStretchTexture(true);
 		m_border->Update	();
 		m_border->SetColor	(color_rgba(255,255,255,color_get_A(m_text->GetTextColor())));
 		Draw				();
@@ -57,17 +58,17 @@ void CUIButtonHint::SetHintText	(CUIWindow* w, LPCSTR text)
 	m_ownerWnd= w;
 	m_text->SetText(text);
 	m_text->AdjustHeightToText();
+	//m_text->AdjustWidthToText();
 	Fvector2 new_size;
 
-	new_size.x				= m_text->GetWndPos().x + m_text->GetWndSize().x + 20.0f;
-	new_size.y				= _max(64.0f, m_text->GetWndPos().y+m_text->GetWndSize().y+20.0f);
+	new_size.x				= m_text->GetWndPos().x+m_text->GetWndSize().x+20.0f;
+	new_size.y				= m_text->GetWndPos().y+m_text->GetWndSize().y+40.0f;
+	//m_text->SetWndSize(new_size);
+	//new_size.x					= GetWndSize().x;
+	//new_size.y					= m_text->GetWndSize().y+20.0f;
 
 	m_border->SetWndSize(new_size);
 	m_text->SetWndSize(new_size);
 	SetWndSize(new_size);
 	m_text->ResetClrAnimation();
-	Msg("m_text %f %f",m_text->GetWndSize().x,m_text->GetWndSize().y);
-	Msg("m_border %f %f",m_border->GetWndSize().x,m_border->GetWndSize().y);
-	Msg("%f %f",GetWndSize().x,GetWndSize().y);
-	Msg("---------");
 }

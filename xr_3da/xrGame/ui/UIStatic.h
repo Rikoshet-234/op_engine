@@ -29,9 +29,11 @@ private:
 	lanim_cont				m_lanim_clr;
 	lanim_cont				m_lanim_xform;
 	void					EnableHeading_int		(bool b)				{m_bHeading = b;}
+	xr_string				applTextureName;
 public:
 	using CUISimpleWindow::SetWndRect;
 
+	xr_string GetApplTextureName() {return applTextureName;}
 					CUIStatic				();
 	virtual			~CUIStatic				();
 

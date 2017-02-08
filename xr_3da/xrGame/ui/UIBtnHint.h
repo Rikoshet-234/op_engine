@@ -10,7 +10,7 @@ class CUIButtonHint :public CUIWindow, public pureRender
 	CUIWindow*			m_ownerWnd;
 
 	CUIStatic*			m_text;
-	CUIFrameWindow*	m_border;
+	CUIFrameWindow*		m_border;
 	bool				m_enabledOnFrame;
 public:
 					CUIButtonHint	();
