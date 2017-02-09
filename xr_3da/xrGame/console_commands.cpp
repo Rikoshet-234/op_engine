@@ -987,7 +987,7 @@ public		:
 		const DWORD dwOwnerPID = GetCurrentProcessId();
 		DWORD dwProcAffMask = 0, dwSystemAffMask = 0;
 		GetProcessAffinityMask(GetCurrentProcess(), &dwProcAffMask, &dwSystemAffMask);
-		if (strlen(args))
+		if (xr_strlen(args))
 		{
 			char* endptr;
 			DWORD dwThreadAffMask = strtoul(args, &endptr, 0);

@@ -7,6 +7,11 @@
 #include "UIXmlInit.h"
 #include "xrUIXmlParser.h"
 #include "UIWindow.h"
+//#include "../OPFuncs/utils.h"
+
+namespace OPFuncs {
+	struct restoreParam;
+}
 
 class CUIScrollView;
 class CCustomOutfit;
@@ -28,10 +33,11 @@ public:
 
 protected:
 	xr_map<ALife::EHitType,shared_str> immunes;
-	//xr_map<int, OPFuncs::restoreParam> restores;
+	xr_map<int, OPFuncs::restoreParam> modificators;
+	std::vector<float> artefactRestores;
 	CUIListWnd*		m_list;
 	std::vector<CUIListItemIconed*>	m_lImmuneUnsortedItems;
-	std::vector<CUIListItemIconed*>	m_lRestoreUnsortedItems;
-	void createImmuneItem(CCustomOutfit* outfit,ALife::EHitType hitType, bool force_add);
-	//void createRestoreItem(CCustomOutfit* outfit,int restoreId, bool force_add);
+	std::vector<CUIListItemIconed*>	m_lModificatorsItems;
+	void createImmuneItem(CCustomOutfit* outfit,std::pair<ALife::EHitType,shared_str> immunePair, bool force_add);
+	void createModifItem(CCustomOutfit* outfit,std::pair<int, OPFuncs::restoreParam> modifPair, bool force_add);
 };
