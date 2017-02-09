@@ -32,6 +32,7 @@ public:
 	shared_str xml_path;
 
 protected:
+	bool m_bShowModifiers;
 	xr_map<ALife::EHitType,shared_str> immunes;
 	xr_map<int, OPFuncs::restoreParam> modificators;
 	std::vector<float> artefactRestores;

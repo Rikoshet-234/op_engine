@@ -17,10 +17,10 @@
 #include "../Artifact.h"
 #include "../OPFuncs/utils.h"
 
-CUIOutfitInfo::CUIOutfitInfo(): m_outfit(nullptr), m_list(nullptr)
+CUIOutfitInfo::CUIOutfitInfo(): m_outfit(nullptr), m_bShowModifiers(false), m_list(nullptr)
 {
-	immunes=OPFuncs::CreateImmunesStringMap();
-	modificators=OPFuncs::CreateRestoresStringMap();
+	immunes = OPFuncs::CreateImmunesStringMap();
+	modificators = OPFuncs::CreateRestoresStringMap();
 }
 
 CUIOutfitInfo::~CUIOutfitInfo() {}
@@ -39,7 +39,7 @@ void CUIOutfitInfo::InitFromXml(CUIXml& xml_doc)
 	m_list->SetMessageTarget(this);
 	m_list->EnableScrollBar(true);
 	AttachChild(m_list);
-
+	m_bShowModifiers=xml_doc.ReadAttribInt(_buff,0,"show_modifiers",0)==1?true:false;
 	strconcat(sizeof(_buff),_buff, _base, ":immunities_list:icons");
 	CUIXmlInit::GetStringTable(xml_doc,_buff,0,iconIDs);
 }
@@ -275,33 +275,36 @@ void CUIOutfitInfo::Update(CCustomOutfit* outfitP)
 		});
 	}
 #pragma endregion
+	if (m_bShowModifiers)
+	{
 #pragma region update modifier lines
-	float outfitAddWeight=m_outfit ? m_outfit->m_additional_weight*m_outfit->GetCondition() : 0;
-	float artefactsWeight=g_actor ? Actor()->GetArtefactAdditionalWeight(): 0;
-	CUIListItemIconed* weightItem=findIconedItem(m_lModificatorsItems,"additional_weight",fsimilar(outfitAddWeight, 0.0f) && fsimilar(artefactsWeight, 0.0f),xml_path.c_str());
-	if (weightItem)
-		setIconedItem(iconIDs,weightItem,"additional_weight","ui_inv_outfit_additional_inventory_weight",outfitAddWeight,1,artefactsWeight,1);
-	std::for_each(modificators.begin(),modificators.end(),[&](std::pair<int, OPFuncs::restoreParam> modifPair)
-	{
-		createModifItem(m_outfit,modifPair,false);
-	});
-	if (m_lModificatorsItems.size()>0)
-	{
-		addSeparator(m_list,"ui_st_modifiers");
-		std::sort(m_lModificatorsItems.begin(),m_lModificatorsItems.end(),[](CUIListItem* i1, CUIListItem* i2)
+		float outfitAddWeight=m_outfit ? m_outfit->m_additional_weight*m_outfit->GetCondition() : 0;
+		float artefactsWeight=g_actor ? Actor()->GetArtefactAdditionalWeight(): 0;
+		CUIListItemIconed* weightItem=findIconedItem(m_lModificatorsItems,"additional_weight",fsimilar(outfitAddWeight, 0.0f) && fsimilar(artefactsWeight, 0.0f),xml_path.c_str());
+		if (weightItem)
+			setIconedItem(iconIDs,weightItem,"additional_weight","ui_inv_outfit_additional_inventory_weight",outfitAddWeight,1,artefactsWeight,1);
+		std::for_each(modificators.begin(),modificators.end(),[&](std::pair<int, OPFuncs::restoreParam> modifPair)
 		{
-			CUIListItemIconed *iconedItem1=smart_cast<CUIListItemIconed*>(i1);
-			CUIListItemIconed *iconedItem2=smart_cast<CUIListItemIconed*>(i2);
-			if (!iconedItem1 || !iconedItem2)
-				return false;
-			return		lstrcmpi(iconedItem1->GetFieldText(1),iconedItem2->GetFieldText(1))<0;
+			createModifItem(m_outfit,modifPair,false);
 		});
-		std::for_each(m_lModificatorsItems.begin(),m_lModificatorsItems.end(),[&](CUIListItemIconed* item)
+		if (m_lModificatorsItems.size()>0)
 		{
-			m_list->AddItem<CUIListItemIconed>(item);
-		});
-	}
+			addSeparator(m_list,"ui_st_modifiers");
+			std::sort(m_lModificatorsItems.begin(),m_lModificatorsItems.end(),[](CUIListItem* i1, CUIListItem* i2)
+			{
+				CUIListItemIconed *iconedItem1=smart_cast<CUIListItemIconed*>(i1);
+				CUIListItemIconed *iconedItem2=smart_cast<CUIListItemIconed*>(i2);
+				if (!iconedItem1 || !iconedItem2)
+					return false;
+				return		lstrcmpi(iconedItem1->GetFieldText(1),iconedItem2->GetFieldText(1))<0;
+			});
+			std::for_each(m_lModificatorsItems.begin(),m_lModificatorsItems.end(),[&](CUIListItemIconed* item)
+			{
+				m_list->AddItem<CUIListItemIconed>(item);
+			});
+		}
 #pragma endregion
+	}
 }
 
 void CUIOutfitInfo::UpdateImmuneView()
