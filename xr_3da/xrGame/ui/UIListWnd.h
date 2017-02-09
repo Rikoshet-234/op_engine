@@ -105,8 +105,8 @@ public:
 
 	int				GetListPosition			() const						{ return m_iFirstShownIndex; }
 
-	LIST_ITEM_LIST	GetItemsList() const {return m_ItemList;}
-
+	LIST_ITEM_LIST	GetItemsList() {return m_ItemList;}
+	LIST_ITEM_LIST	m_ItemList; 
 protected:
 	void			create_active_back		();
 	void			destroy_active_back		();
@@ -118,7 +118,7 @@ protected:
 	void			UpdateList				();
 
 	//список элементов листа
-	LIST_ITEM_LIST	m_ItemList; 
+	//LIST_ITEM_LIST	m_ItemList; 
 
 	//размеры элемента списка
 	float		m_iItemHeight;

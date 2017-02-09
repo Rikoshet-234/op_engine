@@ -114,19 +114,19 @@ void CUIWindow::script_register(lua_State *L)
 		.def("SetUIWindowType",			&CUIWindow::SetUIWindowType)
 		.def("GetUIWindowType",			&CUIWindow::GetUIWindowType)
 
-		.def("SetWndRect",				(void (CUIWindow::*)(Frect))					&CUIWindow::SetWndRect_script)
-		.def("SetWndRect",				(void (CUIWindow::*)(float,float,float,float))   &CUIWindow::SetWndRect_script)
-		.def("Init",					(void (CUIWindow::*)(float,float,float,float))   &CUIWindow::Init)
-		.def("Init",					(void (CUIWindow::*)(Frect*))			 &CUIWindow::Init)
+		.def("SetWndRect",				static_cast<void (CUIWindow::*)(Frect)>(&CUIWindow::SetWndRect_script))
+		.def("SetWndRect",				static_cast<void (CUIWindow::*)(float, float, float, float)>(&CUIWindow::SetWndRect_script))
+		.def("Init",					static_cast<void (CUIWindow::*)(float, float, float, float)>(&CUIWindow::Init))
+		.def("Init",					static_cast<void (CUIWindow::*)(Frect*)>(&CUIWindow::Init))
 		//.def("SetWndPos",				(void (CUIWindow::*)(float,float)) &CUIWindow::SetWndPos)
-		.def("SetWndPos",				(void (CUIWindow::*)(float,float)) &CUIWindow::SetWndPos_script)
+		.def("SetWndPos",				static_cast<void (CUIWindow::*)(float, float)>(&CUIWindow::SetWndPos_script))
 		.def("SetWndSize",				(void (CUIWindow::*)(float,float)) &CUIWindow::SetWndSize)
 		.def("GetWidth",				&CUIWindow::GetWidth)
 		.def("GetHeight",				&CUIWindow::GetHeight)
 		// .def("SetWidth",				&CUIWindow::SetWidth)
 		// .def("SetHeight",				&CUIWindow::SetHeight)
-		.def("SetHeight",				(void (CUIWindow::*)(float))   &CUIWindow::SetHeight_script)
-		.def("SetWidth",				(void (CUIWindow::*)(float))   &CUIWindow::SetWidth_script)
+		.def("SetHeight",				static_cast<void (CUIWindow::*)(float)>(&CUIWindow::SetHeight_script))
+		.def("SetWidth",				static_cast<void (CUIWindow::*)(float)>(&CUIWindow::SetWidth_script))
 		
 		.def("Enable",					&CUIWindow::Enable)
 		.def("IsEnabled",				&CUIWindow::IsEnabled)
@@ -158,7 +158,7 @@ void CUIWindow::script_register(lua_State *L)
 		.def("SetHeight",				&CUIFrameWindow::SetHeight)
 		.def("SetColor",				&CUIFrameWindow::SetColor)
 		.def("GetTitleStatic",			&CUIFrameWindow::GetTitleStatic)
-		.def("Init",					(void(CUIFrameWindow::*)(LPCSTR,float,float,float,float))&CUIFrameWindow::Init),
+		.def("Init",					static_cast<void(CUIFrameWindow::*)(LPCSTR, float, float, float, float)>(&CUIFrameWindow::Init)),
 
 		class_<CUIFrameLineWnd, CUIWindow>("CUIFrameLineWnd")
 		.def(					constructor<>())
@@ -167,7 +167,7 @@ void CUIWindow::script_register(lua_State *L)
 		.def("SetOrientation",					&CUIFrameLineWnd::SetOrientation)
 		.def("SetColor",						&CUIFrameLineWnd::SetColor)
 		.def("GetTitleStatic",					&CUIFrameLineWnd::GetTitleStatic)
-		.def("Init",							(void(CUIFrameLineWnd::*)(LPCSTR,float,float,float,float,bool))&CUIFrameLineWnd::Init),
+		.def("Init",							static_cast<void(CUIFrameLineWnd::*)(LPCSTR, float, float, float, float, bool)>(&CUIFrameLineWnd::Init)),
 
 		class_<CUILabel, CUIFrameLineWnd>("CUILabel")
 		.def(					constructor<>())
@@ -187,7 +187,10 @@ void CUIWindow::script_register(lua_State *L)
 
 		class_<CUIMainIngameWnd, CUIWindow>("CUIMainIngameWnd"),
 		//.def("re_init",&CUIMainIngameWnd::re_init),
-	
+
+		class_<CUIItemInfo,CUIWindow>("CUIItemInfo")
+		.def(					constructor<>()),
+		
 		class_<CUIInventoryWnd, CUIWindow>("CUIInventoryWnd")
 		.def("re_init",				&CUIInventoryWnd::re_init)
 		.def("re_init2",				&CUIInventoryWnd::re_init2)

@@ -1011,6 +1011,27 @@ bool CWeaponMagazined::Detach(const char* item_section_name, bool b_spawn_item)
 		return inherited::Detach(item_section_name, b_spawn_item);;
 }
 
+shared_str GenScopeTextureName(shared_str startTextureName,shared_str openPostfix,shared_str otherPostfix)
+{
+	string_path	fn;
+	shared_str final_scope_texture;
+	if (g_uCommonFlags.test(E_COMMON_FLAGS::gpOpenScope))
+	{
+		string256 buf;
+		sprintf_s(buf,"%s%s%s",startTextureName.c_str(),otherPostfix.c_str(),openPostfix.c_str());
+		if (FS.exist(fn,"$game_textures$",buf,".dds"))
+			final_scope_texture=buf;				
+	}
+	else
+	{
+		string256 buf;
+		sprintf_s(buf,"%s%s",startTextureName.c_str(),otherPostfix.c_str());
+		if (FS.exist(fn,"$game_textures$",buf,".dds"))
+			final_scope_texture=buf;				
+	}
+	return final_scope_texture;
+}
+
 void CWeaponMagazined::InitAddons()
 {
 	//////////////////////////////////////////////////////////////////////////
@@ -1046,12 +1067,42 @@ void CWeaponMagazined::InitAddons()
 
 			m_UIScope = xr_new<CUIWindow>();
 			CUIXmlInit::InitWindow(uiXml,"wpn_scope",0,m_UIScope);
-
 			CUIWindow* scopeWindow=m_UIScope->FindChild("scope_texture");
 			if (scopeWindow)
 			{
-				CUIStatic* scopeStatic=static_cast<CUIStatic*>(scopeWindow);
-				scopeStatic->InitTexture(scope_tex_name.c_str());
+#pragma region set texture for central part of scope 
+				CUIStatic* scopeStatic=smart_cast<CUIStatic*>(scopeWindow);
+				shared_str preparedTextureName=GenScopeTextureName(scope_tex_name,"_open","");
+				if (xr_strlen(preparedTextureName)==0)
+					preparedTextureName=scope_tex_name;
+				scopeStatic->InitTexture(preparedTextureName.c_str());
+#pragma endregion
+
+				CUIWindow* leftScopeWindow=m_UIScope->FindChild("left_texture");//find default left and right parts
+				CUIWindow* rightScopeWindow=m_UIScope->FindChild("right_texture");
+				if (leftScopeWindow && rightScopeWindow)//part found,maybe widescreen?
+				{
+					CUIStatic* leftScopeStatic=smart_cast<CUIStatic*>(leftScopeWindow);
+					CUIStatic* rightScopeStatic=smart_cast<CUIStatic*>(rightScopeWindow);
+					xr_string defTextureLeft=leftScopeStatic->GetApplTextureName();
+					shared_str lDumpTexture=GenScopeTextureName(scope_tex_name,"_open","_l");
+					if (xr_strlen(lDumpTexture)==0)
+					{
+						lDumpTexture=GenScopeTextureName(defTextureLeft.c_str(),"_open","");
+						if (xr_strlen(lDumpTexture)==0)
+							lDumpTexture=defTextureLeft.c_str();
+					}
+					xr_string defTextureRight=rightScopeStatic->GetApplTextureName();
+					shared_str rDumpTexture=GenScopeTextureName(scope_tex_name,"_open","_r");
+					if (xr_strlen(rDumpTexture)==0)
+					{
+						rDumpTexture=GenScopeTextureName(defTextureRight.c_str(),"_open","");
+						if (xr_strlen(rDumpTexture)==0)
+							rDumpTexture=defTextureRight.c_str();
+					}
+					leftScopeStatic->InitTexture(lDumpTexture.c_str());
+					rightScopeStatic->InitTexture(rDumpTexture.c_str());
+				}
 			}
 			else
 				Msg("! ERROR can't find static for scope texture in config!");

@@ -32,6 +32,13 @@ void CStringTable::Destroy	()
 	xr_delete(pData);
 }
 
+bool CStringTable::IDExist(const STRING_ID& str_id) const
+{
+	if(pData==nullptr) return false;
+	return pData->m_StringTable[str_id]!=nullptr;
+}
+
+
 void CStringTable::Init		()
 {
 	if(NULL != pData) return;

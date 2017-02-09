@@ -29,6 +29,7 @@ CUIItemInfo::CUIItemInfo()
 	UIDesc						= nullptr;
 	UIWpnParams					= nullptr;
 	UIArtefactParams			= nullptr;
+	UIOutfitParams				= nullptr;
 	UIName						= nullptr;
 	m_pInvItem					= nullptr;
 	m_b_force_drawing			= false;
@@ -38,6 +39,7 @@ CUIItemInfo::~CUIItemInfo()
 {
 	xr_delete					(UIWpnParams);
 	xr_delete					(UIArtefactParams);
+	xr_delete					(UIOutfitParams);
 }
 
 void CUIItemInfo::Init(LPCSTR xml_name){
@@ -99,9 +101,12 @@ void CUIItemInfo::Init(LPCSTR xml_name){
 	if(uiXml.NavigateToNode("descr_list",0))
 	{
 		UIWpnParams						= xr_new<CUIWpnParams>();
-		UIArtefactParams				= xr_new<CUIArtefactParams>();
 		UIWpnParams->InitFromXml		(uiXml);
+		UIArtefactParams				= xr_new<CUIArtefactParams>();
 		UIArtefactParams->InitFromXml	(uiXml);
+		UIOutfitParams					= xr_new<CUIOutfitParams>();
+		UIOutfitParams->InitFromXml		(uiXml);
+
 		UIDesc							= xr_new<CUIScrollView>(); 
 		AttachChild						(UIDesc);		
 		UIDesc->SetAutoDelete			(true);
@@ -175,6 +180,7 @@ void CUIItemInfo::InitItem(CInventoryItem* pInvItem)
 		VERIFY								(0==UIDesc->GetSize());
 		TryAddWpnInfo						(pInvItem->object().cNameSect());
 		TryAddArtefactInfo					(pInvItem->object().cNameSect());
+		TryAddOutfitInfo					(pInvItem);
 
 		if (Actor())
 			Actor()->callback(GameObject::ECallbackType::OnPrepareItemInfo)(UIDesc);
@@ -228,6 +234,15 @@ void CUIItemInfo::TryAddArtefactInfo	(const shared_str& af_section)
 	{
 		UIArtefactParams->SetInfo(af_section);
 		UIDesc->AddWindow(UIArtefactParams, false);
+	}
+}
+
+void CUIItemInfo::TryAddOutfitInfo(CInventoryItem* outfitItem)
+{
+	if (UIOutfitParams->Check(outfitItem))
+	{
+		UIOutfitParams->SetInfo(outfitItem);
+		UIDesc->AddWindow(UIOutfitParams, false);
 	}
 }
 

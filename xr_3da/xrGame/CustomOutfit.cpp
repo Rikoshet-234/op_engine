@@ -98,6 +98,12 @@ float CCustomOutfit::GetDefHitTypeProtection(ALife::EHitType hit_type)
 	return result > 0.001f ? result : 0.001f;
 }
 
+float CCustomOutfit::GetDefHitTypeProtectionOriginal(ALife::EHitType hit_type)
+{
+	float result=1.0f - m_HitTypeProtection[hit_type];
+	return result > 0.001f ? result : 0.001f;
+}
+
 float CCustomOutfit::GetHitTypeProtection(SHit *pHDS)
 {
 	float fBase = m_HitTypeProtection[pHDS->hit_type]*GetCondition();

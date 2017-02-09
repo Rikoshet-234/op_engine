@@ -8,7 +8,6 @@ class CUIButton : public CUIStatic
 {
 private:
 	typedef			CUIStatic				inherited;
-	CUIButtonHint*  m_hint;
 public:
 					CUIButton				();
 	virtual			~CUIButton				();

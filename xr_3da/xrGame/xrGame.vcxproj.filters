@@ -6600,6 +6600,9 @@
     <ClInclude Include="inventory_slots_script_enum.h">
       <Filter>AI\AScript\ScriptClasses\ScriptGameObject\enums</Filter>
     </ClInclude>
+    <ClInclude Include="ui\UIOutfitParams.h">
+      <Filter>UI\Common\ItemInfo</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -9787,6 +9790,9 @@
     </ClCompile>
     <ClCompile Include="ui\UIListItemIconed_script.cpp">
       <Filter>UI\UIWindows\ListBox\Iconed</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIOutfitParams.cpp">
+      <Filter>UI\Common\ItemInfo</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

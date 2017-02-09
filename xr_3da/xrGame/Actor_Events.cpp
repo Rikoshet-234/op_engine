@@ -229,6 +229,18 @@ void CActor::OnEvent		(NET_Packet& P, u16 type)
 		{
 			OnPlayHeadShotParticle(P);
 		}break;
+	case GE_REINIT_ADDONS:
+		{
+			u32 DeviceFrameInit=P.r_u32();
+			CInventory inv=Actor()->inventory();
+			std::for_each(inv.m_all.begin(),inv.m_all.end(),[](CInventoryItem* item)
+			{
+				CWeapon* weapon=smart_cast<CWeapon*>(item);
+				if (weapon) 
+					weapon->OnScreenRatioChanged();
+			});
+		}
+		break;
 	case GE_ACTOR_JUMPING:
 		{
 			/*

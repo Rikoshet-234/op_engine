@@ -926,6 +926,41 @@ public:
 	  }
 };
 
+class CCC_ChangeScopeVisual: public CCC_Mask
+{
+public:
+	CCC_ChangeScopeVisual(LPCSTR N,Flags32* V, u32 M):  CCC_Mask(N,V,M)	{ bEmptyArgsHandled = true; };
+void	Execute	(LPCSTR args) override
+	{
+		if (xr_strlen(args)==0)
+		{
+			Msg("- Open scope is %s",g_uCommonFlags.test(gpOpenScope)?"on":"off");
+			return;
+		}
+		bool validCmd=true;
+		if (EQ(args,"on"))	g_uCommonFlags.set(gpOpenScope,true);
+		else if (EQ(args,"off"))	g_uCommonFlags.set(gpOpenScope,false);
+		else if (EQ(args,"1"))		g_uCommonFlags.set(gpOpenScope,true);
+		else if (EQ(args,"0"))		g_uCommonFlags.set(gpOpenScope,false);
+		else 
+		{
+			InvalidSyntax();
+			validCmd=false;
+		}
+		if (validCmd)
+			if (g_actor)
+			{
+				NET_Packet							P;
+				Actor()->u_EventGen(P, GE_REINIT_ADDONS, Actor()->ID());
+				P.w_u32(Device.dwFrame);
+				Actor()->u_EventSend(P);
+			}
+	}
+
+	void	Status	(TStatus& S) override	{	strcpy_s(S,g_uCommonFlags.test(gpOpenScope)?"on":"off"); }
+	void	Info	(TInfo& I) override	{	strcpy_s(I,"'on/off' or '1/0'"); }	
+};
+
 class CCC_SetGodMode : public IConsole_Command
 {
 public		:
@@ -952,7 +987,7 @@ public		:
 		const DWORD dwOwnerPID = GetCurrentProcessId();
 		DWORD dwProcAffMask = 0, dwSystemAffMask = 0;
 		GetProcessAffinityMask(GetCurrentProcess(), &dwProcAffMask, &dwSystemAffMask);
-		if (strlen(args))
+		if (xr_strlen(args))
 		{
 			char* endptr;
 			DWORD dwThreadAffMask = strtoul(args, &endptr, 0);
@@ -1596,6 +1631,7 @@ void CCC_RegisterCommands()
 	CMD3(CCC_Mask,				"gp_deffered_reload",			&g_uCommonFlags,gpDeferredReload);
 	CMD3(CCC_Mask,				"gp_fixed_reload",				&g_uCommonFlags,gpFixedReload);
 	CMD3(CCC_Mask,				"gp_sticky_scope",				&g_uCommonFlags,gpStickyScope);
+	CMD3(CCC_ChangeScopeVisual,	"gp_open_scope",				&g_uCommonFlags,gpOpenScope);
 
 	CMD1(CCC_GSCheckForUpdates, "check_for_updates"		);
 	CMD1(CCC_DumpInfos,			"dump_infos"			);

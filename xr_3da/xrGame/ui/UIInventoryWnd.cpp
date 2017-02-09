@@ -605,7 +605,7 @@ bool CUIInventoryWnd::OnKeyboard(int dik, EUIMessages keyboard_action)
 
 	if (WINDOW_KEY_PRESSED == keyboard_action)
 	{
-//#ifdef DEBUG
+#ifdef DEBUG
 		if(DIK_NUMPAD7 == dik && CurrentIItem())
 		{
 			CurrentIItem()->ChangeCondition(-0.05f);
@@ -616,7 +616,7 @@ bool CUIInventoryWnd::OnKeyboard(int dik, EUIMessages keyboard_action)
 			CurrentIItem()->ChangeCondition(0.05f);
 			UIItemInfo.InitItem(CurrentIItem());
 		}
-//#endif
+#endif
 	}
 	if( inherited::OnKeyboard(dik,keyboard_action) )return true;
 

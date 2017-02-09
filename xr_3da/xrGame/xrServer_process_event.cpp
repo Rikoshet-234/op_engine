@@ -55,6 +55,7 @@ void xrServer::Process_event	(NET_Packet& P, ClientID sender)
 	case GEG_PLAYER_ITEM2SLOT:
 	case GEG_PLAYER_ITEM2BELT:
 	case GEG_PLAYER_ITEM2RUCK:
+	case GE_REINIT_ADDONS:
 	case GE_GRENADE_EXPLODE:
 		{
 		SendBroadcast			(BroadcastCID,P,MODE);

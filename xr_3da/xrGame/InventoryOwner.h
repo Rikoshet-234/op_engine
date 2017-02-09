@@ -132,7 +132,7 @@ public:
 	virtual float GetWeaponAccuracy			() const;
 	//максимальный переносимы вес
 	virtual float MaxCarryWeight			() const;
-
+	float GetArtefactAdditionalWeight		() const;
 	virtual CCustomOutfit*			GetOutfit()	const {return NULL;};
 
 	//////////////////////////////////////////////////////////////////////////

@@ -45,15 +45,15 @@ void CUIInventoryWnd::AddWeaponAttachInfo(u32 slot,CInventoryItem* addon,std::st
 	{
 		PIItem target = m_pInv->m_slots[slot].m_pIItem;
 		string512 buf;
-		LPCSTR name;
+		LPCSTR name="";
 		LPCSTR between=CStringTable().translate("st_attach_between").c_str();
 		if (g_uCommonFlags.test(E_COMMON_FLAGS::uiShowExtDesc))
 			name=target->Name();
 		else
 			if (xr_strlen(target->NameShort())>0)
 				name=target->NameShort();
-			else
-				name="no_short_name";
+		if (xr_strlen(name)==0)
+			between="";
 		sprintf_s(buf,"%s %s %s",OPFuncs::getComplexString(titleId,addon).c_str(),between,name);
 		UIPropertiesBox.AddItem(buf,  static_cast<void*>(target), INVENTORY_ATTACH_ADDON);
 		if (!needShow)

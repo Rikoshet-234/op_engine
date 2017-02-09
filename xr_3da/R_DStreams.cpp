@@ -46,7 +46,7 @@ void* _VertexStream::Lock	( u32 vl_Count, u32 Stride, u32& vOffset )
 	{
 		Msg("! FATAL: _VertexStream::Lock, bytes_need = %d, mSize = %d, vl_Count = %d", bytes_need, mSize, vl_Count);
 		BuildStackTrace();
-		FATAL("Engine crush! See log for detail.");
+		FATAL("Engine crash! See log for detail.");
 	}
 	//R_ASSERT			((bytes_need<=mSize) && vl_Count >0);
 

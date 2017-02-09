@@ -311,6 +311,19 @@ float CInventoryOwner::GetWeaponAccuracy	() const
 	return 0.f;
 }
 
+float CInventoryOwner::GetArtefactAdditionalWeight() const
+{
+	float ret=0;
+	TIItemContainer::const_iterator I=inventory().m_belt.begin();
+	TIItemContainer::const_iterator E=inventory().m_belt.end();
+	for(;I!=E;++I)
+	{
+		CArtefact* artefact=smart_cast<CArtefact*>(*I);
+		if (artefact)
+			ret+=artefact->m_art_additional_weight;
+	}
+	return ret;
+}
 //максимальный переносимы вес
 float  CInventoryOwner::MaxCarryWeight () const
 {
@@ -319,17 +332,7 @@ float  CInventoryOwner::MaxCarryWeight () const
 	const CCustomOutfit* outfit	= GetOutfit();
 	if(outfit)
 		ret += outfit->m_additional_weight2*outfit->GetCondition();
-
-	TIItemContainer::const_iterator I=inventory().m_belt.begin();
-	TIItemContainer::const_iterator E=inventory().m_belt.end();
-	for(;I!=E;++I)
-	{
-		CArtefact* artefact=smart_cast<CArtefact*>(*I);
-		if (artefact)
-		{
-			ret+=artefact->m_art_additional_weight;
-		}
-	}
+	ret+=GetArtefactAdditionalWeight();
 
 	return ret;
 }

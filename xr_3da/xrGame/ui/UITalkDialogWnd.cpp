@@ -111,6 +111,7 @@ void CUITalkDialogWnd::Hide()
 	InventoryUtilities::SendInfoToActor				("ui_talk_hide");
 	inherited::Show(false);
 	inherited::Enable(false);
+	g_btnHint->Discard();
 }
 
 void CUITalkDialogWnd::OnQuestionClicked(CUIWindow* w, void*)

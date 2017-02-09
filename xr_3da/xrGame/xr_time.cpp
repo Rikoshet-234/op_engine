@@ -6,6 +6,9 @@
 #include "ai_space.h"
 #include "alife_simulator.h"
 #include "alife_time_manager.h"
+#include "alife_space.h"
+#include "script_engine.h"
+
 
 #define sec2ms		1000
 #define min2ms		60*sec2ms
@@ -34,6 +37,28 @@ LPCSTR	xrTime::dateToString	(int mode)
 LPCSTR	xrTime::timeToString	(int mode)								
 { 
 	return *InventoryUtilities::GetTimeAsString(m_time,(InventoryUtilities::ETimePrecision)mode);
+}
+
+luabind::object xrTime::getTable()
+{
+	luabind::object resulTable=luabind::newtable(ai().script_engine().lua());
+	u32 y;u32 mo;u32 d;u32 h;u32 mi;u32 s;u32 ms;
+	split_time(m_time,y,mo,d,h,mi,s,ms);
+	resulTable[1]=y;
+	resulTable[2]=mo;
+	resulTable[3]=d;
+	resulTable[4]=h;
+	resulTable[5]=mi;
+	resulTable[6]=s;
+	resulTable[7]=ms;
+	resulTable["year"]=y;
+	resulTable["month"]=mo;
+	resulTable["day"]=d;
+	resulTable["hour"]=h;
+	resulTable["min"]=mi;
+	resulTable["sec"]=s;
+	resulTable["msec"]=ms;
+	return resulTable;
 }
 
 void	xrTime::add				(const xrTime& other)					
@@ -74,6 +99,6 @@ void	xrTime::get				(u32 &y, u32 &mo, u32 &d, u32 &h, u32 &mi, u32 &s, u32 &ms)
 float	xrTime::diffSec			(const xrTime& other)					
 { 
 	if(*this>other) 
-		return (m_time-other.m_time)/(float)sec2ms; 
-	return ((other.m_time-m_time)/(float)sec2ms)*(-1.0f);	
+		return (m_time-other.m_time)/static_cast<float>(sec2ms); 
+	return ((other.m_time-m_time)/static_cast<float>(sec2ms))*(-1.0f);	
 }

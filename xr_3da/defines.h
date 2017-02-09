@@ -63,7 +63,8 @@ ENGINE_API enum E_COMMON_FLAGS
 	uiAllowOpTradeSB			= 1<<9,
 	gpDeferredReload			= 1<<10,
 	gpFixedReload				= 1<<11,
-	gpStickyScope				= 1<<12
+	gpStickyScope				= 1<<12,
+	gpOpenScope					= 1<<13
 };
 
 

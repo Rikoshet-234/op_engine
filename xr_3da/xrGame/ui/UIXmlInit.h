@@ -84,6 +84,7 @@ public:
 	static bool	InitIconedColumns		(CUIXml& xml_doc, const char* path, int index, CUIListItemIconed* pWnd);
 	static Frect GetFRect				(CUIXml& xml_doc, const char* path, int index);
 	static u32	GetColor				(CUIXml& xml_doc, const char* path, int index, u32 def_clr);
+	static bool GetStringTable				(CUIXml& xml_doc, const char* path, int index, xr_map<shared_str ,shared_str> &result);
 public:
 
 	// Функция чтения алайна из xml файла и применения его к координатам.

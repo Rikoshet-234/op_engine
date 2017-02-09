@@ -6,6 +6,12 @@
 #include "UIMultiTextStatic.h"
 #include "UIXmlInit.h"
 #include "xrUIXmlParser.h"
+#include "UIWindow.h"
+//#include "../OPFuncs/utils.h"
+
+namespace OPFuncs {
+	struct restoreParam;
+}
 
 class CUIScrollView;
 class CCustomOutfit;
@@ -14,7 +20,7 @@ class CUIXml;
 
 class CUIOutfitInfo : public CUIWindow
 {
-CCustomOutfit*		m_outfit;
+	CCustomOutfit*		m_outfit;
 public:
 					CUIOutfitInfo			();
 	virtual			~CUIOutfitInfo			();
@@ -26,7 +32,13 @@ public:
 	shared_str xml_path;
 
 protected:
-	void NewSetItem(ALife::EHitType hitType, bool force_add);
+	bool m_bShowModifiers;
+	xr_map<ALife::EHitType,shared_str> immunes;
+	xr_map<int, OPFuncs::restoreParam> modificators;
+	std::vector<float> artefactRestores;
 	CUIListWnd*		m_list;
-
+	std::vector<CUIListItemIconed*>	m_lImmuneUnsortedItems;
+	std::vector<CUIListItemIconed*>	m_lModificatorsItems;
+	void createImmuneItem(CCustomOutfit* outfit,std::pair<ALife::EHitType,shared_str> immunePair, bool force_add);
+	void createModifItem(CCustomOutfit* outfit,std::pair<int, OPFuncs::restoreParam> modifPair, bool force_add);
 };

@@ -75,13 +75,13 @@ void CUILines::Init(float x, float y, float width, float heigt){
 void CUILines::SetText(const char* text){
 	
 	if (!m_pFont)
-        m_pFont = UI()->Font()->pFontLetterica16Russian;
+		m_pFont = UI()->Font()->pFontLetterica16Russian;
 
 	if (text && text[0] != 0)
 	{
 		if(m_text==text) 
 			return;
-        
+		
 		m_text		= text;
 
 		uFlags.set(flNeedReparse, TRUE);
@@ -108,8 +108,8 @@ void CUILines::DelChar(){
 	const int sz = (int)m_text.size();
 	if (m_iCursorPos < sz)
 	{
-        m_text.erase(m_text.begin()+m_iCursorPos);
-        uFlags.set(flNeedReparse, TRUE);
+		m_text.erase(m_text.begin()+m_iCursorPos);
+		uFlags.set(flNeedReparse, TRUE);
 	}
 }
 
@@ -196,7 +196,7 @@ void CUILines::ParseText(){
 
 	if ( m_pFont->IsMultibyte() ) {
 		#define UBUFFER_SIZE 100
-        u16	aMarkers[ UBUFFER_SIZE ];
+		u16	aMarkers[ UBUFFER_SIZE ];
 		CUILine tmp_line;
 		char szTempLine[ MAX_MB_CHARS ];
 		float fTargetWidth = 1.0f;
@@ -481,7 +481,7 @@ u32 CUILines::GetColorFromText(const xr_string& str)const{
 	comma2_pos = str.find(",", comma1_pos + 1);
 	comma3_pos = str.find(",", comma2_pos + 1);
 
-    R_ASSERT2(npos != comma1_pos, "CUISubLine::GetColorFromText -- can't find first comma");        
+	R_ASSERT2(npos != comma1_pos, "CUISubLine::GetColorFromText -- can't find first comma");        
 	R_ASSERT2(npos != comma2_pos, "CUISubLine::GetColorFromText -- can't find second comma");
 	R_ASSERT2(npos != comma3_pos, "CUISubLine::GetColorFromText -- can't find third comma");
 	
@@ -500,7 +500,7 @@ u32 CUILines::GetColorFromText(const xr_string& str)const{
 	single_color = str.substr(comma3_pos + 1, end - 1);
 	b = atoi(single_color.c_str());
 
-    return color_argb(a,r,g,b);
+	return color_argb(a,r,g,b);
 }
 
 CUILine* CUILines::ParseTextToColoredLine(const xr_string& str){
@@ -573,7 +573,7 @@ void CUILines::IncCursorPos(){
 		return;
 
 	if (m_iCursorPos < txt_len)
-        m_iCursorPos++;
+		m_iCursorPos++;
 
 	return;
 }
@@ -589,6 +589,30 @@ void CUILines::DecCursorPos(){
 	return;
 }
 
+std::string CUILines::GetLongestLineText()
+{
+	std::string result;
+	if (GetLinesCount()>1)
+	{
+		std::for_each(m_lines.begin(),m_lines.end(),[&](CUILine line)
+		{
+			if (line.GetSize()>int(result.size()))
+			{
+				std::string lineStr;
+				for (u32 i=0; i<line.m_subLines.size(); i++)
+				{
+					lineStr+=line.m_subLines[i].m_text.c_str();
+				}
+				result=lineStr;
+			}
+		});
+		return result;
+	}
+	else
+		return GetText();
+
+}
+
 void CUILines::UpdateCursor(){
 	if (uFlags.test(flComplexMode) && !m_text.empty())
 	{
@@ -597,7 +621,7 @@ void CUILines::UpdateCursor(){
 		int len = 0;
 		for (int i = 0; i < sz; i++)
 		{
-            int curlen = m_lines[i].GetSize();
+			int curlen = m_lines[i].GetSize();
 			if (m_iCursorPos <= len + curlen)
 			{
 				m_cursor_pos.y = i;

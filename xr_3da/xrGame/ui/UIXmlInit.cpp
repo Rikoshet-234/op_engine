@@ -784,7 +784,7 @@ bool CUIXmlInit::InitTabControl(CUIXml &xml_doc, LPCSTR path, int index, CUITabC
 
 bool CUIXmlInit::InitFrameLine(CUIXml& xml_doc, const char* path, int index, CUIFrameLineWnd* pWnd)
 {
-	R_ASSERT2(xml_doc.NavigateToNode(path,index), "XML node not found");
+	R_ASSERT3(xml_doc.NavigateToNode(path,index), "XML node not found",path);
 
 	string256 buf;
 
@@ -1396,6 +1396,27 @@ u32	CUIXmlInit::GetColor(CUIXml& xml_doc, const char* path, int index, u32 def_c
 		return color_argb(a,r,g,b);
 	}
 
+}
+
+bool CUIXmlInit::GetStringTable(CUIXml& xml_doc, const char* path, int index, xr_map<shared_str, shared_str>& result)
+{
+	XML_NODE* tableNode		= xml_doc.NavigateToNode(path,index);
+	if (tableNode)
+		for (XML_NODE* node=tableNode->FirstChild(); node; node=node->NextSibling())
+			if (node)
+			{	
+				LPCSTR id=node->Value();
+				LPCSTR value=nullptr;
+				XML_NODE *data=node->FirstChild();
+				if (data)
+				{
+					TiXmlText *text			= data->ToText();
+					if (text)				
+						value=text->Value();
+					result.insert(mk_pair(id,value));
+				}
+			}
+	return result.size()>0;
 }
 
 bool	CUIXmlInit::InitIconedColumns		(CUIXml& xml_doc, const char* path, int index, CUIListItemIconed* pWnd)
