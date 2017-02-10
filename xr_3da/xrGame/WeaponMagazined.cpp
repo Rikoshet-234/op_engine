@@ -1077,7 +1077,7 @@ void CWeaponMagazined::InitAddons()
 					preparedTextureName=scope_tex_name;
 				scopeStatic->InitTexture(preparedTextureName.c_str());
 #pragma endregion
-
+#pragma region set texture for dump (left/right) parts of scope 
 				CUIWindow* leftScopeWindow=m_UIScope->FindChild("left_texture");//find default left and right parts
 				CUIWindow* rightScopeWindow=m_UIScope->FindChild("right_texture");
 				if (leftScopeWindow && rightScopeWindow)//part found,maybe widescreen?
@@ -1103,6 +1103,7 @@ void CWeaponMagazined::InitAddons()
 					leftScopeStatic->InitTexture(lDumpTexture.c_str());
 					rightScopeStatic->InitTexture(rDumpTexture.c_str());
 				}
+#pragma endregion
 			}
 			else
 				Msg("! ERROR can't find static for scope texture in config!");

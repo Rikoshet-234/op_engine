@@ -897,7 +897,7 @@ bool CWeapon::Action(s32 cmd, u32 flags)
 
 		case kWPN_ZOOM_INC:
 		case kWPN_ZOOM_DEC:
-			if(IsZoomEnabled() && IsZoomed())
+			if(IsZoomEnabled() && IsZoomed() && IsScopeAttached())
 			{
 				if (m_fScopeZoomStepCount>1)
 					if(cmd==kWPN_ZOOM_INC)  
