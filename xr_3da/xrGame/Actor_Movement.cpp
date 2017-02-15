@@ -587,6 +587,11 @@ void CActor::StopAnyMove()
 }
 
 
+bool CActor::AnyMove()
+{
+	return ((mstate_real & (mcFwd|mcBack|mcLStrafe|mcRStrafe)) != 0);
+}
+
 bool CActor::is_jump()
 {
 	return ((mstate_real & (mcJump|mcFall|mcLanding|mcLanding2)) != 0);

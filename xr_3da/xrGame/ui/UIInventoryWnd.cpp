@@ -280,44 +280,24 @@ void CUIInventoryWnd::re_init2()
 
 void CUIInventoryWnd::re_init()
 {
-	DetachChild(UIExitButton);
-	UIStaticTime.DetachChild(&UIStaticTimeString);
-	DetachChild(&UIStaticTime);
-	UIPropertiesBox.RemoveAll();
-	UIPropertiesBox.DetachChild(static_cast<CUIWindow*>(&UIPropertiesBox.m_UIListWnd));
-	DetachChild(&UIPropertiesBox);
-
-	DetachChild(m_pUIPNVList); 
-	DetachChild(m_pUIDetectorArtsList); 
-	DetachChild(m_pUIBiodevList); 
-	DetachChild(m_pUIApparatusList); 
-	DetachChild(m_pUIDetectorAnomsList); 
-	DetachChild(m_pUIAutomaticList); 
-	DetachChild(m_pUIShotgunList); 
-	DetachChild(m_pUIPistolList); 
-	DetachChild(m_pUIKnifeList); 
-	DetachChild(m_pUIOutfitList); 
-	DetachChild(m_pUIBeltList); 
-
-	UIBagWnd.DetachChild(m_pUIBagList); 
 	sourceDragDropLists.clear();
-	UIOutfitInfo.DetachAll();
-	DetachChild(&UIOutfitInfo); 
+	UIPropertiesBox.RemoveAll();
+	UIDescrWnd.DetachChild(&UIItemInfo);
 	UIPersonalWnd.DetachChild(&UIStaticPersonal);
 	UIProgressBack.DetachChild(&UIProgressBarHealth);
 	UIProgressBack.DetachChild(&UIProgressBarPsyHealth);
 	UIProgressBack.DetachChild(&UIProgressBarRadiation);
-	DetachChild(&UIProgressBack);
-	DetachChild(&UIPersonalWnd);
-	UIDescrWnd.DetachChild(&UIItemInfo);
-	DetachChild(&UIDescrWnd);
-	DetachChild(&UIMoneyWnd);
-	DetachChild(&UIBagWnd);
-	DetachChild(&UIStaticBottom);
-	DetachChild(&UIBack);
-	DetachChild(&UIBeltSlots);
-	Init();
+	UIPropertiesBox.RemoveAll();
+	UIPropertiesBox.DetachChild(static_cast<CUIWindow*>(&UIPropertiesBox.m_UIListWnd));
+	UIBagWnd.DetachChild(m_pUIBagList); 
+	UIStaticTime.DetachChild(&UIStaticTimeString);
+	UIOutfitInfo.m_list->DetachAll();
+	UIOutfitInfo.ClearAll();
+	UIOutfitInfo.iconIDs.clear();
+	UIOutfitInfo.DetachAll();
 	m_pCurrentCellItem=nullptr;
+	DetachAll();
+	Init();
 	m_b_need_reinit=true;
 }
 
@@ -605,7 +585,7 @@ bool CUIInventoryWnd::OnKeyboard(int dik, EUIMessages keyboard_action)
 
 	if (WINDOW_KEY_PRESSED == keyboard_action)
 	{
-#ifdef DEBUG
+//#ifdef DEBUG
 		if(DIK_NUMPAD7 == dik && CurrentIItem())
 		{
 			CurrentIItem()->ChangeCondition(-0.05f);
@@ -616,7 +596,7 @@ bool CUIInventoryWnd::OnKeyboard(int dik, EUIMessages keyboard_action)
 			CurrentIItem()->ChangeCondition(0.05f);
 			UIItemInfo.InitItem(CurrentIItem());
 		}
-#endif
+//#endif
 	}
 	if( inherited::OnKeyboard(dik,keyboard_action) )return true;
 

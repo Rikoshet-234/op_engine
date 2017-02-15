@@ -46,7 +46,11 @@ IBlender* CResourceManager::_GetBlender		(LPCSTR Name)
 #ifdef _EDITOR
 	if (I==m_blenders.end())	return 0;
 #else
-	if (I==m_blenders.end())	{ Debug.fatal(DEBUG_INFO,"Shader '%s' not found in library.",Name); return 0; }
+	if (I==m_blenders.end())
+	{
+		Msg("! ERROR CResourceManager::_GetBlender Shader [%s] not found in library. Replase on 'default' shader!",Name); 
+		return _GetBlender("default");
+	}
 #endif
 	else					return I->second;
 }
@@ -227,7 +231,8 @@ Shader*	CResourceManager::_cpp_Create	(IBlender* B, LPCSTR s_shader, LPCSTR s_te
 Shader*	CResourceManager::_cpp_Create	(LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_constants, LPCSTR s_matrices)
 {
 #ifndef DEDICATED_SERVER
-	return	_cpp_Create(_GetBlender(s_shader?s_shader:"null"),s_shader,s_textures,s_constants,s_matrices);
+	IBlender* blender=_GetBlender(s_shader?s_shader:"null");
+	return	_cpp_Create(blender,s_shader,s_textures,s_constants,s_matrices);
 #else
 	return NULL;
 #endif

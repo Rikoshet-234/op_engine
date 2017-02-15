@@ -367,11 +367,14 @@ void CActor::g_SetAnimation( u32 mstate_rl )
 	//---------------------------------------------------------------
 	if (this == Level().CurrentViewEntity())
 	{	
-		if ((mstate_rl&mcSprint) != (mstate_old&mcSprint))
+		CHudItem* pHudItem = smart_cast<CHudItem*>(inventory().ActiveItem());	
+		if (pHudItem)
 		{
-			CHudItem* pHudItem = smart_cast<CHudItem*>(inventory().ActiveItem());	
-			if (pHudItem) pHudItem->onMovementChanged(mcSprint);
-		};
+			if ((mstate_rl&mcSprint) != (mstate_old&mcSprint))
+				pHudItem->onMovementChanged(mcSprint);
+			else if ((mstate_rl&mcAnyMove) != (mstate_old&mcAnyMove))
+				pHudItem->onMovementChanged(mcAnyMove);
+		}
 	};
 	//-----------------------------------------------------------------------
 	// Torso

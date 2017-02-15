@@ -85,6 +85,8 @@ public:
 	MotionSVec			mhud_switch_g, mhud_switch;
 	MotionSVec			mhud_show_g;
 	MotionSVec			mhud_hide_g;
+	MotionSVec			mhud_idle_sprint_g;
+	MotionSVec			mhud_idle_moving_g;
 	//(режим стрельбы из подствольника)
 	MotionSVec			mhud_idle_w_gl;
 	MotionSVec			mhud_idle_w_gl_aim;
@@ -92,7 +94,8 @@ public:
 	MotionSVec			mhud_shots_w_gl;
 	MotionSVec			mhud_show_w_gl;
 	MotionSVec			mhud_hide_w_gl;
-
+	MotionSVec			mhud_idle_sprint_w_gl;
+	MotionSVec			mhud_idle_moving_w_gl;
 
 	//дополнительные параметры патронов 
 	//для подствольника

@@ -278,9 +278,9 @@ void CCC_LoadCFG::Execute(LPCSTR args)
 			while (!F->eof()) {
 				F->r_string				(str,sizeof(str));
 
-				xr_string chkStr=str;
+				/*xr_string chkStr=str;
 				if (chkStr.find("gp_")!= std::string::npos || chkStr.find("ui_")!= std::string::npos)
-					Msg("= try to exec [%s]",str);
+					Msg("= try to exec [%s]",str);*/
 
 				if(allow(str))
 					Console->Execute	(str);

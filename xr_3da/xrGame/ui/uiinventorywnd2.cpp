@@ -379,7 +379,7 @@ bool CUIInventoryWnd::OnItemDrop(CUICellItem* itm)
 			//CWeaponAmmo*		pAmmo				= smart_cast<CWeaponAmmo*>		(draggedItem);
 #pragma endregion
 			m_pUIBagList->m_i_scroll_pos=m_pUIBagList->ScrollPos();
-			if (pScope || pSilencer || pGrenadeLauncher)
+			if ((pScope && weapon->CanAttach(pScope))|| (pSilencer && weapon->CanAttach(pSilencer))|| (pGrenadeLauncher && weapon->CanAttach(pGrenadeLauncher)))
 			{
 				SetCurrentItem(itm);
 				AttachAddon(weapon);

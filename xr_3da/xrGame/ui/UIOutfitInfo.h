@@ -30,13 +30,14 @@ public:
 	void InitFromXml				(CUIXml& xml_doc);
 	xr_map<shared_str ,shared_str> iconIDs;
 	shared_str xml_path;
-
+	CUIListWnd*		m_list;
+	void ClearAll();
 protected:
 	bool m_bShowModifiers;
 	xr_map<ALife::EHitType,shared_str> immunes;
 	xr_map<int, OPFuncs::restoreParam> modificators;
 	std::vector<float> artefactRestores;
-	CUIListWnd*		m_list;
+	void ClearItems(std::vector<CUIListItemIconed*> &baseList);	
 	std::vector<CUIListItemIconed*>	m_lImmuneUnsortedItems;
 	std::vector<CUIListItemIconed*>	m_lModificatorsItems;
 	void createImmuneItem(CCustomOutfit* outfit,std::pair<ALife::EHitType,shared_str> immunePair, bool force_add);

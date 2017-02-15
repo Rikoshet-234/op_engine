@@ -15,6 +15,8 @@
 #include "game_base_space.h"
 #include "MathUtils.h"
 #include "clsid_game.h"
+#include "Actor.h"
+
 #ifdef DEBUG
 #include "phdebug.h"
 #endif
@@ -69,11 +71,32 @@ void CWeaponMagazinedWGrenade::Load	(LPCSTR section)
 	animGet				(mhud_show_g,	pSettings->r_string(*hud_sect, "anim_draw_g"));
 	animGet				(mhud_hide_g,	pSettings->r_string(*hud_sect, "anim_holster_g"));
 
+	if(pSettings->line_exist(*hud_sect,"anim_idle_moving_g"))
+		animGet				(mhud_idle_moving_g,pSettings->r_string(*hud_sect, "anim_idle_moving_g"),*hud_sect,"anim_idle_moving_g");
+	else
+		mhud_idle_moving_g=mhud_idle_g;
+
+	if(pSettings->line_exist(*hud_sect,"anim_idle_sprint_g"))
+		animGet				(mhud_idle_sprint_g,pSettings->r_string(*hud_sect, "anim_idle_sprint_g"),*hud_sect,"anim_idle_sprint_g");
+	else
+		mhud_idle_sprint_g=mhud.mhud_idle_sprint;
+
+
 	animGet				(mhud_idle_w_gl,	pSettings->r_string(*hud_sect, "anim_idle_gl"));
 	animGet				(mhud_reload_w_gl,	pSettings->r_string(*hud_sect, "anim_reload_gl"));
 	animGet				(mhud_show_w_gl,	pSettings->r_string(*hud_sect, "anim_draw_gl"));
 	animGet				(mhud_hide_w_gl,	pSettings->r_string(*hud_sect, "anim_holster_gl"));
 	animGet				(mhud_shots_w_gl,	pSettings->r_string(*hud_sect, "anim_shoot_gl"));
+
+	if(pSettings->line_exist(*hud_sect,"anim_idle_moving_gl"))
+		animGet				(mhud_idle_moving_w_gl,pSettings->r_string(*hud_sect, "anim_idle_moving_gl"),*hud_sect,"anim_idle_moving_gl");
+	else
+		mhud_idle_moving_w_gl=mhud_idle_w_gl;
+
+	if(pSettings->line_exist(*hud_sect,"anim_idle_sprint_gl"))
+		animGet				(mhud_idle_sprint_w_gl,pSettings->r_string(*hud_sect, "anim_idle_sprint_gl"),*hud_sect,"anim_idle_sprint_gl");
+	else
+		mhud_idle_sprint_w_gl=mhud.mhud_idle_sprint;
 
 	if(this->IsZoomEnabled())
 	{
@@ -758,20 +781,60 @@ void CWeaponMagazinedWGrenade::PlayAnimIdle()
 	VERIFY(GetState()==eIdle);
 	if(IsGrenadeLauncherAttached())
 	{
-		if(m_bGrenadeMode)
+		if(IsZoomed())
 		{
-			if(IsZoomed())
-				m_pHUD->animPlay(random_anim(mhud_idle_g_aim), FALSE, NULL, GetState());
+			if(m_bGrenadeMode)	
+				m_pHUD->animPlay(random_anim(mhud_idle_g_aim), FALSE, nullptr, GetState());
 			else
-				m_pHUD->animPlay(random_anim(mhud_idle_g), FALSE, NULL, GetState());
+				m_pHUD->animPlay(random_anim(mhud_idle_w_gl_aim), TRUE, nullptr, GetState());
 		}
 		else
 		{
-			if(IsZoomed())
-				m_pHUD->animPlay(random_anim(mhud_idle_w_gl_aim), TRUE, NULL, GetState());
+			int actorState = 0;
+			CActor* pActor = smart_cast<CActor*>(H_Parent());
+			if(pActor)
+			{
+				CEntity::SEntityState st;
+				pActor->g_State(st);
+				if(st.bSprint)
+					actorState = 1;
+				else if(pActor->AnyMove())
+					actorState = 2;
+			}
+			if(m_bGrenadeMode)
+			{
+				switch (actorState)
+				{
+				case 0:
+					m_pHUD->animPlay(random_anim(mhud_idle_g), FALSE, nullptr, GetState());
+					break;
+				case 1:
+					m_pHUD->animPlay(random_anim(mhud_idle_sprint_g), FALSE, nullptr, GetState());
+					break;
+				case 2:
+					m_pHUD->animPlay(random_anim(mhud_idle_moving_g), FALSE, nullptr, GetState());
+					break;
+				default:
+					NODEFAULT;
+				}
+			}
 			else
-				m_pHUD->animPlay(random_anim(mhud_idle_w_gl), TRUE, NULL, GetState());
-				
+			{
+				switch (actorState)
+				{
+				case 0:
+					m_pHUD->animPlay(random_anim(mhud_idle_w_gl), FALSE, nullptr, GetState());
+					break;
+				case 1:
+					m_pHUD->animPlay(random_anim(mhud_idle_sprint_w_gl), FALSE, nullptr, GetState());
+					break;
+				case 2:
+					m_pHUD->animPlay(random_anim(mhud_idle_moving_w_gl), FALSE, nullptr, GetState());
+					break;
+				default:
+					NODEFAULT;
+				}
+			}
 		}
 	}
 	else

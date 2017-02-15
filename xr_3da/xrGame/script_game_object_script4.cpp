@@ -22,9 +22,12 @@
 #include "Inventory.h"
 #include "inventory_item.h"
 #include "car.h"
+#include "ui/UICarBodyWnd.h"
 #include "inventory_slots_script_enum.h"
 #include "item_place_change_enum.h"
 #include "ui/UIInventoryWnd.h"
+#include "ui/UITalkWnd.h"
+#include "ui/UITradeWnd.h"
 #include "UIGameSP.h"
 #include <Windows.h>
 
@@ -326,6 +329,18 @@ CUIInventoryWnd* get_inventory_wnd()
 	return pGameSP->InventoryMenu;
 }
 
+CUICarBodyWnd* get_carbody_wnd()
+{
+	CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
+	return pGameSP->UICarBodyMenu;
+}
+
+CUITradeWnd* get_trade_wnd()
+{
+	CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
+	return pGameSP->TalkMenu->GetTradeWnd();
+}
+
 #pragma region add functionality for callback,returning bool value
 
 void CScriptGameObject::SetCallbackEx(GameObject::ECallbackType type, const luabind::functor<bool> &functor)
@@ -388,6 +403,8 @@ class_<CScriptGameObject> &script_register_game_object3(class_<CScriptGameObject
 	instance
 		.def("get_slot",					&CScriptGameObject::GetSlot)
 		.def("get_inventory_wnd",			&get_inventory_wnd)
+		.def("get_carbody_wnd",				&get_carbody_wnd)
+		.def("get_trade_wnd",				&get_trade_wnd)
 		.def("invulnerable",				static_cast<bool (CScriptGameObject::*)		() const>	(&CScriptGameObject::invulnerable))
 		.def("invulnerable",				static_cast<void (CScriptGameObject::*)		(bool)>		(&CScriptGameObject::invulnerable))
 		.def("max_weight",					&CScriptGameObject::GetActorMaxWeight)

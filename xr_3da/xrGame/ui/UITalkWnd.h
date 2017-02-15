@@ -64,6 +64,7 @@ public:
 	bool GetInitState() const {return m_bInitState;}
 	void				AddQuestion				(const shared_str& text, const shared_str& id,int number);
 	void				AddAnswer				(const shared_str& text, LPCSTR SpeakerName);
+	CUITradeWnd*		GetTradeWnd() const {return UITradeWnd;}
 protected:
 	//для режима торговли
 	CUITradeWnd*			UITradeWnd;

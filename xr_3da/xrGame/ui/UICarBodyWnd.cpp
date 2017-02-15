@@ -50,6 +50,19 @@ CUICarBodyWnd::~CUICarBodyWnd()
 	std::for_each(sourceDragDropLists.begin(),sourceDragDropLists.end(),[](CUIDragDropListEx* list){list->ClearAll(true);});
 }
 
+void CUICarBodyWnd::re_init()
+{
+	sourceDragDropLists.clear();
+	m_pUIOurIcon->DetachAll();
+	m_pUIOthersIcon->DetachAll();
+	m_pUIOthersBagWnd->DetachAll();
+	m_pUIOurBagWnd->DetachAll();
+	m_pUIDescWnd->DetachAll();
+	m_pUIPropertiesBox->RemoveAll();
+	DetachAll();
+	Init();
+}
+
 void CUICarBodyWnd::Init()
 {
 	CUIXml						uiXml;
@@ -243,11 +256,6 @@ void CUICarBodyWnd::InitCarBody(CInventoryOwner* pOur, CInventoryOwner* pOthers)
 void CUICarBodyWnd::UpdateLists_delayed()
 {
 		m_b_need_update = true;
-}
-
-void CUICarBodyWnd::re_init()
-{
-	Msg("NOT IMPLEMENTED");
 }
 
 #include "UIInventoryUtilities.h"

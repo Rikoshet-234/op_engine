@@ -44,6 +44,23 @@ void CUIOutfitInfo::InitFromXml(CUIXml& xml_doc)
 	CUIXmlInit::GetStringTable(xml_doc,_buff,0,iconIDs);
 }
 
+void CUIOutfitInfo::ClearAll()
+{
+	ClearItems(m_lImmuneUnsortedItems);
+	ClearItems(m_lModificatorsItems);
+}
+
+void CUIOutfitInfo::ClearItems(std::vector<CUIListItemIconed*> &basedList)
+{
+	while(!basedList.empty())
+	{
+		auto item=basedList.front();
+		basedList.erase(std::remove(basedList.begin(),basedList.end(),item),basedList.end());
+		item->DetachAll();
+		xr_delete(item);
+	}
+}
+
 CUIListItemIconed* findIconedItem(std::vector<CUIListItemIconed*> &basedList,LPCSTR keyValue,bool emptyParam,LPCSTR xml_path)
 {
 	std::vector<CUIListItemIconed*>::iterator item_it=std::find_if(basedList.begin(),basedList.end(),[&](CUIListItem* item)

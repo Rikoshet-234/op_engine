@@ -447,7 +447,7 @@ public:
 	void					StopAnyMove				();
 
 	bool					AnyAction				()	{return (mstate_real & mcAnyAction) != 0;};
-
+	bool					AnyMove					();
 	bool					is_jump					();		
 protected:
 	u32						mstate_wishful;
@@ -471,6 +471,11 @@ public:
 			IC u32 get_state() const
 			{
 				return this->mstate_real;
+			}
+
+			IC u32 get_old_state() const
+			{
+				return this->mstate_old;
 			}
 
 			IC void set_state(u32 state)

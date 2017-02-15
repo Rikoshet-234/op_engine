@@ -52,6 +52,24 @@ CUITradeWnd::~CUITradeWnd()
 	std::for_each(sourceDragDropLists.begin(),sourceDragDropLists.end(),[](CUIDragDropListEx* list){list->ClearAll(true);});
 }
 
+void CUITradeWnd::re_init()
+{
+	sourceDragDropLists.clear();
+	UICharacterInfoLeft.DetachAll();
+	UICharacterInfoRight.DetachAll();
+	UIOurIcon.DetachAll();
+	UIOthersIcon.DetachAll();
+	UIOurBagWnd.DetachAll();
+	UIOthersBagWnd.DetachAll();
+	UIOurTradeWnd.DetachAll();
+	UIOthersTradeWnd.DetachAll();
+	UIItemInfo.DetachAll();
+	UIDescWnd.DetachAll();
+	UIPropertiesBox.RemoveAll();
+	DetachAll();
+	Init();
+}
+
 void CUITradeWnd::Init()
 {
 	CUIXml								uiXml;
@@ -720,10 +738,7 @@ void CUITradeWnd::PlaySnd(eTradeSoundActions a)
 		sounds[a].play(nullptr, sm_2D);
 }
 
-void CUITradeWnd::re_init()
-{
-	Msg("NOT IMPLEMENT");
-}
+
 
 void CUITradeWnd::ColorizeItem(CUICellItem* itm, bool b)
 {

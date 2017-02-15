@@ -31,7 +31,6 @@ class CUIInventoryWnd: public CUIDialogWnd,public CUIListManipulations
 private:
 	typedef CUIDialogWnd	inherited;
 	bool					m_b_need_reinit;
-
 public:
 							CUIInventoryWnd				();
 	virtual					~CUIInventoryWnd			();

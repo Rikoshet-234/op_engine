@@ -202,7 +202,7 @@ void CUIWindow::script_register(lua_State *L)
 		.def("SetSuitableBySectionInList",	static_cast<void (CUIInventoryWnd::*)(IWListTypes,LPCSTR)>					(&CUIInventoryWnd::SetSuitableBySectionInList))
 		.def("SetSuitableBySectionInList",	static_cast<void (CUIInventoryWnd::*)(IWListTypes,luabind::object const& )>	(&CUIInventoryWnd::SetSuitableBySectionInList)),
 
-		class_<CUITradeWnd, CUIWindow>("CUIInventoryWnd")
+		class_<CUITradeWnd, CUIWindow>("CUITradeWnd")
 		.def("re_init",						&CUITradeWnd::re_init)
 		.def("GetUIWindowType",				&CUITradeWnd::GetUIWindowType)
 		.def("ClearAllSuitables",			&CUITradeWnd::ClearAllSuitables)

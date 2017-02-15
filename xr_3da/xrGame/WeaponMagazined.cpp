@@ -124,6 +124,11 @@ void CWeaponMagazined::Load	(LPCSTR section)
 	if(pSettings->line_exist(*hud_sect,"anim_idle_sprint"))
 		animGet				(mhud.mhud_idle_sprint,pSettings->r_string(*hud_sect, "anim_idle_sprint"),*hud_sect,"anim_idle_sprint");
 
+	if(pSettings->line_exist(*hud_sect,"anim_idle_moving"))
+		animGet				(mhud.anim_idle_moving,pSettings->r_string(*hud_sect, "anim_idle_moving"),*hud_sect,"anim_idle_moving");
+	else
+		mhud.anim_idle_moving=mhud.mhud_idle;
+
 	if(IsZoomEnabled())
 		animGet				(mhud.mhud_idle_aim,pSettings->r_string(*hud_sect, "anim_idle_aim"),*hud_sect,"anim_idle_aim");
 	
@@ -1011,21 +1016,40 @@ bool CWeaponMagazined::Detach(const char* item_section_name, bool b_spawn_item)
 		return inherited::Detach(item_section_name, b_spawn_item);;
 }
 
-shared_str GenScopeTextureName(shared_str startTextureName,shared_str openPostfix,shared_str otherPostfix)
+shared_str GenScopeTextureName(shared_str startTextureName,shared_str openPostfix,shared_str partPostfix)
 {
 	string_path	fn;
 	shared_str final_scope_texture;
+	std::string fixedName=startTextureName.c_str();
+	size_t lastdot = fixedName.find_last_of("."); //remove ext if present in filename
+	if (lastdot!=std::string::npos)
+		fixedName=fixedName.substr(0, lastdot).c_str(); 
+
+	if (partPostfix.size()>0) //remove part prefix if present in filename
+	{
+		std::string testStr=fixedName.substr(fixedName.length()-partPostfix.size(), partPostfix.size()).c_str(); 
+		if (xr_strcmp(testStr.c_str(),partPostfix.c_str())==0)
+		{
+			fixedName=fixedName.substr(0,fixedName.length()-partPostfix.size());
+		}
+	}
 	if (g_uCommonFlags.test(E_COMMON_FLAGS::gpOpenScope))
 	{
 		string256 buf;
-		sprintf_s(buf,"%s%s%s",startTextureName.c_str(),otherPostfix.c_str(),openPostfix.c_str());
+		sprintf_s(buf,"%s%s%s",fixedName.c_str(),partPostfix.c_str(),openPostfix.c_str());
 		if (FS.exist(fn,"$game_textures$",buf,".dds"))
-			final_scope_texture=buf;				
+			final_scope_texture=buf;	
+		else
+		{
+			sprintf_s(buf,"%s%s",fixedName.c_str(),partPostfix.c_str());
+			if (FS.exist(fn,"$game_textures$",buf,".dds"))
+				final_scope_texture=buf;	
+		}
 	}
 	else
 	{
 		string256 buf;
-		sprintf_s(buf,"%s%s",startTextureName.c_str(),otherPostfix.c_str());
+		sprintf_s(buf,"%s%s",fixedName.c_str(),partPostfix.c_str());
 		if (FS.exist(fn,"$game_textures$",buf,".dds"))
 			final_scope_texture=buf;				
 	}
@@ -1088,15 +1112,16 @@ void CWeaponMagazined::InitAddons()
 					shared_str lDumpTexture=GenScopeTextureName(scope_tex_name,"_open","_l");
 					if (xr_strlen(lDumpTexture)==0)
 					{
-						lDumpTexture=GenScopeTextureName(defTextureLeft.c_str(),"_open","");
+						lDumpTexture=GenScopeTextureName(defTextureLeft.c_str(),"_open","_l");
 						if (xr_strlen(lDumpTexture)==0)
 							lDumpTexture=defTextureLeft.c_str();
 					}
+
 					xr_string defTextureRight=rightScopeStatic->GetApplTextureName();
 					shared_str rDumpTexture=GenScopeTextureName(scope_tex_name,"_open","_r");
 					if (xr_strlen(rDumpTexture)==0)
 					{
-						rDumpTexture=GenScopeTextureName(defTextureRight.c_str(),"_open","");
+						rDumpTexture=GenScopeTextureName(defTextureRight.c_str(),"_open","_r");
 						if (xr_strlen(rDumpTexture)==0)
 							rDumpTexture=defTextureRight.c_str();
 					}
@@ -1213,9 +1238,14 @@ bool CWeaponMagazined::TryPlayAnimIdle()
 		{
 			CEntity::SEntityState st;
 			pActor->g_State(st);
-			if(st.bSprint && mhud.mhud_idle_sprint.size())
+			if(st.bSprint && mhud.mhud_idle_sprint.size()>0)
 			{
 				m_pHUD->animPlay(random_anim(mhud.mhud_idle_sprint), TRUE, nullptr,GetState());
+				return true;
+			} 
+			else if (!st.bCrouch && pActor->AnyMove() && mhud.anim_idle_moving.size()>0)
+			{
+				m_pHUD->animPlay(random_anim(mhud.anim_idle_moving), TRUE, nullptr,GetState());
 				return true;
 			}
 		}
@@ -1315,8 +1345,66 @@ void CWeaponMagazined::StartIdleAnim			()
 
 void CWeaponMagazined::onMovementChanged	(ACTOR_DEFS::EMoveCommand cmd)
 {
-	if( (cmd == ACTOR_DEFS::mcSprint)&&(GetState()==eIdle)  )
-		PlayAnimIdle						();
+	switch (cmd)
+	{
+		case ACTOR_DEFS::mcSprint:
+		case ACTOR_DEFS::mcAnyMove:
+			{
+				if (GetState()==eIdle)
+					PlayAnimIdle();
+			}break;
+		//	{
+		//		CActor* pActor = smart_cast<CActor*>(H_Parent());
+		//		if (!pActor)
+		//			return;
+		//		bool a_new_state=!!(pActor->get_state()&mcSprint);
+		//		bool a_old_state=!!(pActor->get_old_state()&mcSprint);
+		//		Msg("mcSprint rs [%s] os[%s] state[%s]",a_new_state?"true":"false",a_old_state?"true":"false",getStateString(static_cast<EWeaponStates>(GetState())).c_str());
+
+		//		/*if (GetState()==eIdle)
+		//		{
+		//			if (a_new_state && !a_old_state) 
+		//				PlayAnimIdle();
+		//			else if (!a_new_state && a_old_state)
+		//				onMovementChanged(mcAnyMove);
+		//		}*/
+
+		//	}break;
+		//case ACTOR_DEFS::mcAnyMove:
+		//	{
+		//		CActor* pActor = smart_cast<CActor*>(H_Parent());
+		//		if (!pActor)
+		//			return;
+		//		bool a_new_state=!!(pActor->get_state()&mcSprint);
+		//		bool a_old_state=!!(pActor->get_old_state()&mcSprint);
+		//		Msg("mcAnyMove rs [%s] os[%s] state[%s]",a_new_state?"true":"false",a_old_state?"true":"false",getStateString(static_cast<EWeaponStates>(GetState())).c_str());
+		//		/*if(mhud.anim_idle_moving.size()>0 && GetState()==eIdle )
+		//		{
+		//			if (pActor->get_state()&mcAnyMove)
+		//				m_pHUD->animPlay(random_anim(mhud.anim_idle_moving), TRUE, this,GetState());
+		//			else
+		//				PlayAnimIdle();
+		//		}*/
+		//	}break;
+	case mcFwd: break;
+	case mcBack: break;
+	case mcLStrafe: break;
+	case mcRStrafe: break;
+	case mcCrouch: break;
+	case mcAccel: break;
+	case mcTurn: break;
+	case mcJump: break;
+	case mcFall: break;
+	case mcLanding: break;
+	case mcLanding2: break;
+	case mcClimb: break;
+	case mcLLookout: break;
+	case mcRLookout: break;
+	case mcAnyAction: break;
+	case mcAnyState: break;
+	case mcLookout: break;
+	default: break;
+	}
 }
 
 void	CWeaponMagazined::OnNextFireMode		()

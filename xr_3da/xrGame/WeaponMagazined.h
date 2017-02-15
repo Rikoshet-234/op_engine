@@ -58,6 +58,7 @@ protected:
 		MotionSVec		mhud_show;		//
 		MotionSVec		mhud_shots;		//
 		MotionSVec		mhud_idle_sprint;
+		MotionSVec		anim_idle_moving;
 	};
 	SWMmotions			mhud;	
 	
