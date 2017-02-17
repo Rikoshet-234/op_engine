@@ -251,6 +251,7 @@ bool CUIInventoryWnd::ToSlot(CUICellItem* itm, bool force_place)
 		SendEvent_Item2Slot					(iitem);
 
 		SendEvent_ActivateSlot				(iitem);
+		GetInventory()->SetPrevActiveSlot(iitem->GetSlot());
 		UIOutfitInfo.UpdateImmuneView();
 		InventoryUtilities::UpdateWeight					(UIBagWnd, true);
 		return								true;

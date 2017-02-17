@@ -1,4 +1,4 @@
-#pragma once
+	#pragma once
 
 class CUIWindow;
 class CUIStatic;
@@ -18,6 +18,7 @@ public:
 	IInputReceiver*			m_pStoredInputReceiver;
 							CUISequencer		();
 	void					Start				(LPCSTR tutor_name);
+	bool					CheckTutor		(LPCSTR tutor_name) const;
 	void					Stop				();
 	void					Next				();
 
@@ -42,6 +43,8 @@ public:
 
 	virtual void			IR_OnMouseWheel		(int direction)	;
 	virtual void			IR_OnActivate		(void);
+
+	fastdelegate::FastDelegate0<>	m_on_destroy_event;
 
 };
 
