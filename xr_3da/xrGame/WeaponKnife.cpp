@@ -54,8 +54,14 @@ void CWeaponKnife::Load	(LPCSTR section)
 	animGet				(mhud_attack2,	pSettings->r_string(*hud_sect,"anim_shoot2_start"));
 	animGet				(mhud_attack_e,	pSettings->r_string(*hud_sect,"anim_shoot1_end"));
 	animGet				(mhud_attack2_e,pSettings->r_string(*hud_sect,"anim_shoot2_end"));
-	if(pSettings->line_exist(*hud_sect,"anim_idle_sprint"))
-		animGet				(mhud_idle_sprint,pSettings->r_string(*hud_sect, "anim_idle_sprint"));
+
+	LPCSTR animName="anim_idle_sprint";
+	if(pSettings->line_exist(*hud_sect,animName))
+		animGet				(mhud_idle_sprint,pSettings->r_string(*hud_sect, animName),*hud_sect,animName);
+
+	animName="anim_idle_moving";
+	if(pSettings->line_exist(*hud_sect,animName))
+		animGet				(mhud_idle_moving,pSettings->r_string(*hud_sect, animName),*hud_sect,animName);
 
 	HUD_SOUND::LoadSound(section,"snd_shoot"	, m_sndShot		, ESoundTypes(SOUND_TYPE_WEAPON_SHOOTING));
 	HUD_SOUND::LoadSound(section,"snd_draw"		, sndShow		, ESoundTypes(SOUND_TYPE_ITEM_TAKING|SOUND_TYPE_WEAPON),false);
@@ -338,7 +344,14 @@ void CWeaponKnife::onMovementChanged	(ACTOR_DEFS::EMoveCommand cmd)
 	if (st.bSprint && st.fVelocity > 1) 
 	{
 		SetState(eIdle);
-		m_pHUD->animPlay(random_anim(mhud_idle_sprint), TRUE, this,  eIdle);
+		if (mhud_idle_sprint.size()>0)
+			m_pHUD->animPlay(random_anim(mhud_idle_sprint), TRUE, this,  eIdle);
+	}
+	else if (!st.bCrouch && g_actor->AnyMove())
+	{
+		SetState(eIdle);
+		if (mhud_idle_moving.size()>0)
+			m_pHUD->animPlay(random_anim(mhud_idle_moving), TRUE, this,  eIdle);
 	}
 	else
 		SwitchState(GetState() );

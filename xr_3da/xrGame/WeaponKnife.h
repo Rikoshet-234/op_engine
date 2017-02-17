@@ -15,6 +15,7 @@ protected:
 	MotionSVec			mhud_attack_e;
 	MotionSVec			mhud_attack2_e;
 	MotionSVec			mhud_idle_sprint;
+	MotionSVec			mhud_idle_moving;
 
 	HUD_SOUND			m_sndShot;
 	HUD_SOUND			sndShow;

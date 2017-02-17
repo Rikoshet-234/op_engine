@@ -16,6 +16,8 @@
 #include "MathUtils.h"
 #include "clsid_game.h"
 #include "Actor.h"
+#include "OPFuncs/ExpandedCmdParams.h"
+#include "OPFuncs/utils.h"
 
 #ifdef DEBUG
 #include "phdebug.h"
@@ -62,7 +64,7 @@ void CWeaponMagazinedWGrenade::Load	(LPCSTR section)
 	
 	// HUD :: Anims
 	R_ASSERT			(m_pHUD);
-
+#pragma region загрузка анимаций для подствольника в активном режиме подствольника
 	animGet				(mhud_idle_g,	pSettings->r_string(*hud_sect, "anim_idle_g"));
 	animGet				(mhud_reload_g,	pSettings->r_string(*hud_sect, "anim_reload_g"));
 	animGet				(mhud_shots_g,	pSettings->r_string(*hud_sect, "anim_shoot_g"));
@@ -71,32 +73,36 @@ void CWeaponMagazinedWGrenade::Load	(LPCSTR section)
 	animGet				(mhud_show_g,	pSettings->r_string(*hud_sect, "anim_draw_g"));
 	animGet				(mhud_hide_g,	pSettings->r_string(*hud_sect, "anim_holster_g"));
 
-	if(pSettings->line_exist(*hud_sect,"anim_idle_moving_g"))
-		animGet				(mhud_idle_moving_g,pSettings->r_string(*hud_sect, "anim_idle_moving_g"),*hud_sect,"anim_idle_moving_g");
-	else
-		mhud_idle_moving_g=mhud_idle_g;
+	LPCSTR animName="anim_idle_moving_g";
+	if(pSettings->line_exist(*hud_sect,animName))
+		animGet				(mhud_idle_moving_g,pSettings->r_string(*hud_sect, animName),*hud_sect,animName);
+	//else
+	//	mhud_idle_moving_g=mhud_idle_g;
 
-	if(pSettings->line_exist(*hud_sect,"anim_idle_sprint_g"))
-		animGet				(mhud_idle_sprint_g,pSettings->r_string(*hud_sect, "anim_idle_sprint_g"),*hud_sect,"anim_idle_sprint_g");
-	else
-		mhud_idle_sprint_g=mhud.mhud_idle_sprint;
-
-
+	animName="anim_idle_sprint_g";
+	if(pSettings->line_exist(*hud_sect,animName))
+		animGet				(mhud_idle_sprint_g,pSettings->r_string(*hud_sect, animName),*hud_sect,animName);
+	//else
+	//	mhud_idle_sprint_g=mhud.mhud_idle_sprint;
+#pragma endregion
+#pragma region загрузка анимаций для подствольника в режиме обычной стрельбы подствольника
 	animGet				(mhud_idle_w_gl,	pSettings->r_string(*hud_sect, "anim_idle_gl"));
 	animGet				(mhud_reload_w_gl,	pSettings->r_string(*hud_sect, "anim_reload_gl"));
 	animGet				(mhud_show_w_gl,	pSettings->r_string(*hud_sect, "anim_draw_gl"));
 	animGet				(mhud_hide_w_gl,	pSettings->r_string(*hud_sect, "anim_holster_gl"));
 	animGet				(mhud_shots_w_gl,	pSettings->r_string(*hud_sect, "anim_shoot_gl"));
 
-	if(pSettings->line_exist(*hud_sect,"anim_idle_moving_gl"))
-		animGet				(mhud_idle_moving_w_gl,pSettings->r_string(*hud_sect, "anim_idle_moving_gl"),*hud_sect,"anim_idle_moving_gl");
-	else
-		mhud_idle_moving_w_gl=mhud_idle_w_gl;
-
-	if(pSettings->line_exist(*hud_sect,"anim_idle_sprint_gl"))
-		animGet				(mhud_idle_sprint_w_gl,pSettings->r_string(*hud_sect, "anim_idle_sprint_gl"),*hud_sect,"anim_idle_sprint_gl");
-	else
-		mhud_idle_sprint_w_gl=mhud.mhud_idle_sprint;
+	animName="anim_idle_moving_gl";
+	if(pSettings->line_exist(*hud_sect,animName))
+		animGet				(mhud_idle_moving_w_gl,pSettings->r_string(*hud_sect, animName),*hud_sect,animName);
+	//else
+	//	mhud_idle_moving_w_gl=mhud_idle_w_gl;
+	animName="anim_idle_sprint_gl";
+	if(pSettings->line_exist(*hud_sect,animName))
+		animGet				(mhud_idle_sprint_w_gl,pSettings->r_string(*hud_sect, animName),*hud_sect,animName);
+	//else
+	//	mhud_idle_sprint_w_gl=mhud.mhud_idle_sprint;
+#pragma endregion
 
 	if(this->IsZoomEnabled())
 	{
@@ -779,63 +785,52 @@ void CWeaponMagazinedWGrenade::PlayAnimIdle()
 {
 	if(TryPlayAnimIdle())	return;
 	VERIFY(GetState()==eIdle);
+	MotionSVec* smAnimation = nullptr;
+	LPCSTR animName;
+	BOOL mixMode;
 	if(IsGrenadeLauncherAttached())
 	{
-		if(IsZoomed())
+		if(m_bGrenadeMode)
 		{
-			if(m_bGrenadeMode)	
-				m_pHUD->animPlay(random_anim(mhud_idle_g_aim), FALSE, nullptr, GetState());
+			mixMode=FALSE;
+			if(IsZoomed())
+			{
+				smAnimation=&mhud_idle_g_aim;
+#ifdef SHOW_ANIM_WEAPON_PLAYS
+				animName="try play [mhud_idle_g_aim]";
+#endif
+			}
 			else
-				m_pHUD->animPlay(random_anim(mhud_idle_w_gl_aim), TRUE, nullptr, GetState());
+			{
+				smAnimation=&mhud_idle_g;
+#ifdef SHOW_ANIM_WEAPON_PLAYS
+				animName="try play [mhud_idle_g]";
+#endif
+			}
 		}
 		else
 		{
-			int actorState = 0;
-			CActor* pActor = smart_cast<CActor*>(H_Parent());
-			if(pActor)
+			mixMode=TRUE;
+			if(IsZoomed())
 			{
-				CEntity::SEntityState st;
-				pActor->g_State(st);
-				if(st.bSprint)
-					actorState = 1;
-				else if(pActor->AnyMove())
-					actorState = 2;
-			}
-			if(m_bGrenadeMode)
-			{
-				switch (actorState)
-				{
-				case 0:
-					m_pHUD->animPlay(random_anim(mhud_idle_g), FALSE, nullptr, GetState());
-					break;
-				case 1:
-					m_pHUD->animPlay(random_anim(mhud_idle_sprint_g), FALSE, nullptr, GetState());
-					break;
-				case 2:
-					m_pHUD->animPlay(random_anim(mhud_idle_moving_g), FALSE, nullptr, GetState());
-					break;
-				default:
-					NODEFAULT;
-				}
+				smAnimation=&mhud_idle_w_gl_aim;
+#ifdef SHOW_ANIM_WEAPON_PLAYS
+				animName="try play [mhud.mhud_idle_w_gl_aim]";
+#endif
 			}
 			else
 			{
-				switch (actorState)
-				{
-				case 0:
-					m_pHUD->animPlay(random_anim(mhud_idle_w_gl), FALSE, nullptr, GetState());
-					break;
-				case 1:
-					m_pHUD->animPlay(random_anim(mhud_idle_sprint_w_gl), FALSE, nullptr, GetState());
-					break;
-				case 2:
-					m_pHUD->animPlay(random_anim(mhud_idle_moving_w_gl), FALSE, nullptr, GetState());
-					break;
-				default:
-					NODEFAULT;
-				}
+				smAnimation=&mhud_idle_w_gl;
+#ifdef SHOW_ANIM_WEAPON_PLAYS
+				animName="try play [mhud.mhud_idle_w_gl]";
+#endif
 			}
 		}
+#ifdef SHOW_ANIM_WEAPON_PLAYS
+		PlayAnimation(*smAnimation,mixMode,animName);
+#else
+		PlayAnimation(*smAnimation,mixMode);
+#endif
 	}
 	else
 		inherited::PlayAnimIdle();
@@ -863,6 +858,78 @@ void  CWeaponMagazinedWGrenade::PlayAnimModeSwitch()
 		m_pHUD->animPlay(random_anim(mhud_switch_g), FALSE, this, eSwitch); //fake
 	else 
 		m_pHUD->animPlay(random_anim(mhud_switch), FALSE, this, eSwitch); //fake
+}
+
+bool CWeaponMagazinedWGrenade::TryPlayAnimIdle()
+{
+	VERIFY(GetState() == eIdle);
+	if (!IsZoomed())
+	{
+		int actorState = 0;
+		CActor* pActor = smart_cast<CActor*>(H_Parent());
+		if (pActor)
+		{
+			CEntity::SEntityState st;
+			pActor->g_State(st);
+			if (st.bSprint)
+				actorState=1;
+			else if(pActor->AnyMove())	
+				actorState = 2;
+			MotionSVec* smAnimation = nullptr;
+			LPCSTR animName;
+			if (actorState==1)
+			{
+				if (m_bGrenadeMode)
+				{
+					smAnimation=&mhud_idle_sprint_g;
+#ifdef SHOW_ANIM_WEAPON_PLAYS
+					animName="mhud_idle_sprint_g";
+#endif
+				}
+				else if (IsGrenadeLauncherAttached())
+				{
+					smAnimation=&mhud_idle_sprint_w_gl;
+#ifdef SHOW_ANIM_WEAPON_PLAYS
+					animName="mhud_idle_sprint_w_gl";
+#endif
+				}
+				else 
+					return inherited::TryPlayAnimIdle();
+			}
+			else if (actorState==2)
+			{
+				if (m_bGrenadeMode)
+				{
+					smAnimation=&mhud_idle_moving_g;
+#ifdef SHOW_ANIM_WEAPON_PLAYS
+					animName="mhud_idle_moving_g";
+#endif
+				}
+				else if (IsGrenadeLauncherAttached())
+				{
+					smAnimation=&mhud_idle_moving_w_gl;
+#ifdef SHOW_ANIM_WEAPON_PLAYS
+					animName="mhud_idle_moving_w_gl";
+#endif
+				}
+				else 
+					return inherited::TryPlayAnimIdle();
+			}
+			else
+				return inherited::TryPlayAnimIdle();
+#ifdef SHOW_ANIM_WEAPON_PLAYS
+			string256 debugStr;
+			sprintf_s(debugStr,"try play [%s] GrenadeMode [%s]",animName,OPFuncs::boolToStr(m_bGrenadeMode));
+			bool result=PlayAnimation(*smAnimation,TRUE,debugStr);
+#else
+			bool result=PlayAnimation(*smAnimation,TRUE);
+#endif
+			if (!result)
+				return inherited::TryPlayAnimIdle();
+			return true;
+		}
+	}
+	return false;
 }
 
 void CWeaponMagazinedWGrenade::OnNextFireMode()

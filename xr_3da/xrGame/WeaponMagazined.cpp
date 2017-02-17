@@ -93,11 +93,27 @@ BOOL CWeaponMagazined::net_Spawn		(CSE_Abstract* DC)
 	return inherited::net_Spawn(DC);
 }
 
+bool CWeaponMagazined::PlayAnimation(MotionSVec animation,BOOL mixMode,LPCSTR debugText) 
+{
+	if(animation.size()>0)
+	{
+		m_pHUD->animPlay(random_anim(animation), mixMode, this,GetState());
+#ifdef SHOW_ANIM_WEAPON_PLAYS
+		if (debugText!=nullptr)	Msg("Done %s",debugText);
+#endif
+		return true;
+	}
+#ifdef SHOW_ANIM_WEAPON_PLAYS
+	if (debugText!=nullptr)	Msg("Fail %s",debugText);
+#endif
+	return false;
+}
+
 void CWeaponMagazined::Load	(LPCSTR section)
 {
 	inherited::Load		(section);
 		
-	// Sounds
+#pragma region Load sounds
 	HUD_SOUND::LoadSound(section,"snd_draw"		, sndShow		, m_eSoundShow		);
 	HUD_SOUND::LoadSound(section,"snd_holster"	, sndHide		, m_eSoundHide		);
 	HUD_SOUND::LoadSound(section,"snd_shoot"	, sndShot		, m_eSoundShot		);
@@ -109,25 +125,29 @@ void CWeaponMagazined::Load	(LPCSTR section)
 
 	HUD_SOUND::LoadSound(section, "snd_zoomdec", sndZoomInc,	m_eSoundZoomInc,false);
 	HUD_SOUND::LoadSound(section, "snd_zoominc", sndZoomDec,	m_eSoundZoomDec,false);
-
+#pragma endregion
 	m_pSndShotCurrent = &sndShot;
 		
 	
 	// HUD :: Anims
 	R_ASSERT			(m_pHUD);
+#pragma region Load animations
 	animGet				(mhud.mhud_idle,		pSettings->r_string(*hud_sect, "anim_idle"));
 	animGet				(mhud.mhud_reload,	pSettings->r_string(*hud_sect, "anim_reload"));
 	animGet				(mhud.mhud_show,		pSettings->r_string(*hud_sect, "anim_draw"));
 	animGet				(mhud.mhud_hide,		pSettings->r_string(*hud_sect, "anim_holster"));
 	animGet				(mhud.mhud_shots,	pSettings->r_string(*hud_sect, "anim_shoot"));
 
-	if(pSettings->line_exist(*hud_sect,"anim_idle_sprint"))
-		animGet				(mhud.mhud_idle_sprint,pSettings->r_string(*hud_sect, "anim_idle_sprint"),*hud_sect,"anim_idle_sprint");
+	LPCSTR animName="anim_idle_sprint";
+	if(pSettings->line_exist(*hud_sect,animName))
+		animGet				(mhud.mhud_idle_sprint,pSettings->r_string(*hud_sect, animName),*hud_sect,animName);
 
+	animName="anim_idle_moving";
 	if(pSettings->line_exist(*hud_sect,"anim_idle_moving"))
-		animGet				(mhud.anim_idle_moving,pSettings->r_string(*hud_sect, "anim_idle_moving"),*hud_sect,"anim_idle_moving");
-	else
-		mhud.anim_idle_moving=mhud.mhud_idle;
+		animGet				(mhud.anim_idle_moving,pSettings->r_string(*hud_sect, animName),*hud_sect,animName);
+	//else
+	//	mhud.anim_idle_moving=mhud.mhud_idle;
+#pragma endregion 
 
 	if(IsZoomEnabled())
 		animGet				(mhud.mhud_idle_aim,pSettings->r_string(*hud_sect, "anim_idle_aim"),*hud_sect,"anim_idle_aim");
@@ -539,10 +559,6 @@ void CWeaponMagazined::UpdateSounds	()
 	if (sndZoomDec.playing	())	sndZoomDec.set_position	(get_LastFP());
 }
 
-LPCSTR bts(bool val)
-{
-	return val ? "true" : "false";
-}
 
 void CWeaponMagazined::state_Fire	(float dt)
 {
@@ -1238,15 +1254,22 @@ bool CWeaponMagazined::TryPlayAnimIdle()
 		{
 			CEntity::SEntityState st;
 			pActor->g_State(st);
-			if(st.bSprint && mhud.mhud_idle_sprint.size()>0)
+			if(st.bSprint)
 			{
-				m_pHUD->animPlay(random_anim(mhud.mhud_idle_sprint), TRUE, nullptr,GetState());
-				return true;
+#ifdef SHOW_ANIM_WEAPON_PLAYS
+				return PlayAnimation(mhud.mhud_idle_sprint,TRUE,"try play [mhud.mhud_idle_sprint]");
+#else
+				return PlayAnimation(mhud.mhud_idle_sprint,TRUE);
+#endif
+						
 			} 
-			else if (!st.bCrouch && pActor->AnyMove() && mhud.anim_idle_moving.size()>0)
+			else if (!st.bCrouch && pActor->AnyMove())
 			{
-				m_pHUD->animPlay(random_anim(mhud.anim_idle_moving), TRUE, nullptr,GetState());
-				return true;
+#ifdef SHOW_ANIM_WEAPON_PLAYS				
+				return PlayAnimation(mhud.anim_idle_moving,TRUE,"try play [mhud.anim_idle_moving]");
+#else
+				return PlayAnimation(mhud.anim_idle_moving,TRUE);					
+#endif
 			}
 		}
 	}
@@ -1266,7 +1289,14 @@ void CWeaponMagazined::PlayAnimIdle()
 	}
 
 	VERIFY(GetState()==eIdle);
-	m_pHUD->animPlay(random_anim(*m), TRUE, nullptr, GetState());
+#ifdef SHOW_ANIM_WEAPON_PLAYS
+	string256 buf;
+	sprintf_s(buf,"try play [%s]",IsZoomed()?"mhud.mhud_idle_aim":"mhud.mhud_idle");
+	PlayAnimation(*m,TRUE,buf);
+#else
+	PlayAnimation(*m,TRUE);
+#endif
+	//m_pHUD->animPlay(random_anim(*m), TRUE, nullptr, GetState());
 }
 
 void CWeaponMagazined::PlayAnimShoot()
@@ -1348,62 +1378,28 @@ void CWeaponMagazined::onMovementChanged	(ACTOR_DEFS::EMoveCommand cmd)
 	switch (cmd)
 	{
 		case ACTOR_DEFS::mcSprint:
-		case ACTOR_DEFS::mcAnyMove:
-			{
-				if (GetState()==eIdle)
-					PlayAnimIdle();
-			}break;
-		//	{
-		//		CActor* pActor = smart_cast<CActor*>(H_Parent());
-		//		if (!pActor)
-		//			return;
-		//		bool a_new_state=!!(pActor->get_state()&mcSprint);
-		//		bool a_old_state=!!(pActor->get_old_state()&mcSprint);
-		//		Msg("mcSprint rs [%s] os[%s] state[%s]",a_new_state?"true":"false",a_old_state?"true":"false",getStateString(static_cast<EWeaponStates>(GetState())).c_str());
-
-		//		/*if (GetState()==eIdle)
-		//		{
-		//			if (a_new_state && !a_old_state) 
-		//				PlayAnimIdle();
-		//			else if (!a_new_state && a_old_state)
-		//				onMovementChanged(mcAnyMove);
-		//		}*/
-
-		//	}break;
-		//case ACTOR_DEFS::mcAnyMove:
-		//	{
-		//		CActor* pActor = smart_cast<CActor*>(H_Parent());
-		//		if (!pActor)
-		//			return;
-		//		bool a_new_state=!!(pActor->get_state()&mcSprint);
-		//		bool a_old_state=!!(pActor->get_old_state()&mcSprint);
-		//		Msg("mcAnyMove rs [%s] os[%s] state[%s]",a_new_state?"true":"false",a_old_state?"true":"false",getStateString(static_cast<EWeaponStates>(GetState())).c_str());
-		//		/*if(mhud.anim_idle_moving.size()>0 && GetState()==eIdle )
-		//		{
-		//			if (pActor->get_state()&mcAnyMove)
-		//				m_pHUD->animPlay(random_anim(mhud.anim_idle_moving), TRUE, this,GetState());
-		//			else
-		//				PlayAnimIdle();
-		//		}*/
-		//	}break;
-	case mcFwd: break;
-	case mcBack: break;
-	case mcLStrafe: break;
-	case mcRStrafe: break;
-	case mcCrouch: break;
-	case mcAccel: break;
-	case mcTurn: break;
-	case mcJump: break;
-	case mcFall: break;
-	case mcLanding: break;
-	case mcLanding2: break;
-	case mcClimb: break;
-	case mcLLookout: break;
-	case mcRLookout: break;
-	case mcAnyAction: break;
-	case mcAnyState: break;
-	case mcLookout: break;
-	default: break;
+		case ACTOR_DEFS::mcAnyMove: 
+			if (GetState()==eIdle) 
+				PlayAnimIdle(); 
+			break;
+		case mcFwd: break;
+		case mcBack: break;
+		case mcLStrafe: break;
+		case mcRStrafe: break;
+		case mcCrouch: break;
+		case mcAccel: break;
+		case mcTurn: break;
+		case mcJump: break;
+		case mcFall: break;
+		case mcLanding: break;
+		case mcLanding2: break;
+		case mcClimb: break;
+		case mcLLookout: break;
+		case mcRLookout: break;
+		case mcAnyAction: break;
+		case mcAnyState: break;
+		case mcLookout: break;
+		default: break;
 	}
 }
 
