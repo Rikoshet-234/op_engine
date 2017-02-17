@@ -64,7 +64,8 @@ ENGINE_API enum E_COMMON_FLAGS
 	gpDeferredReload			= 1<<10,
 	gpFixedReload				= 1<<11,
 	gpStickyScope				= 1<<12,
-	gpOpenScope					= 1<<13
+	gpOpenScope					= 1<<13,
+	gpPauseOnGameStart			= 1<<14
 };
 
 

@@ -1269,25 +1269,20 @@ void CApplication::load_draw_internal()
 		RCache.Render				(D3DPT_TRIANGLESTRIP, Offset, 2*v_cnt);
 
 
-		// Draw title
-		VERIFY						(pFontSystem);
-		pFontSystem->Clear			();
-		pFontSystem->SetColor		(color_rgba(157,140,120,255));
-		pFontSystem->SetAligment	(CGameFont::alCenter);
-		pFontSystem->OutI			(0.f,0.815f,app_title);
-		pFontSystem->OnRender		();
+		
 
 
 //draw level-specific screenshot
 		if(hLevelLogo){
 			Frect						r;
-			r.lt.set					(257,369);
-			r.lt.x						+= offs;
-			r.lt.y						+= offs;
-			r.rb.add					(r.lt,Fvector2().set(512,256));
+			r.set(offs,offs,1024,768);
+			//r.lt.set					(257,369);
+			//r.lt.x						+= offs;
+			//r.lt.y						+= offs;
+			//r.rb.add					(r.lt,Fvector2().set(512,256));
 			r.lt.mul					(k);						
 			r.rb.mul					(k);						
-			pv							= (FVF::TL*) RCache.Vertex.Lock(4,ll_hGeom.stride(),Offset);
+			pv							= static_cast<FVF::TL*>(RCache.Vertex.Lock(4, ll_hGeom.stride(), Offset));
 			pv->set						(r.lt.x,				r.rb.y,		C, 0, 1);	pv++;
 			pv->set						(r.lt.x,				r.lt.y,		C, 0, 0);	pv++;
 			pv->set						(r.rb.x,				r.rb.y,		C, 1, 1);	pv++;
@@ -1298,7 +1293,15 @@ void CApplication::load_draw_internal()
 			RCache.set_Geometry			(ll_hGeom);
 			RCache.Render				(D3DPT_TRIANGLELIST,Offset,0,4,0,2);
 		}
-
+#pragma region draw load text 
+	// Draw title
+		VERIFY						(pFontSystem);
+		pFontSystem->Clear			();
+		pFontSystem->SetColor		(color_rgba(157,140,120,255));
+		pFontSystem->SetAligment	(CGameFont::alCenter);
+		pFontSystem->OutI			(0.f,0.815f,app_title);
+		pFontSystem->OnRender		();
+#pragma endregion 
 }
 
 u32 calc_progress_color(u32 idx, u32 total, int stage, int max_stage)

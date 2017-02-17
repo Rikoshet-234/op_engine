@@ -123,6 +123,8 @@ void CWeaponMagazined::Load	(LPCSTR section)
 
 	if(pSettings->line_exist(*hud_sect,"anim_idle_sprint"))
 		animGet				(mhud.mhud_idle_sprint,pSettings->r_string(*hud_sect, "anim_idle_sprint"),*hud_sect,"anim_idle_sprint");
+	else
+		mhud.mhud_idle_sprint=mhud.mhud_idle;
 
 	if(pSettings->line_exist(*hud_sect,"anim_idle_moving"))
 		animGet				(mhud.anim_idle_moving,pSettings->r_string(*hud_sect, "anim_idle_moving"),*hud_sect,"anim_idle_moving");
