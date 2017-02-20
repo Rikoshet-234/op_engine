@@ -89,8 +89,7 @@ protected:
 	virtual void	UpdateSounds	();
 
 	bool			TryReload		();
-	bool			TryPlayAnimIdle	();
-
+	
 protected:
 	virtual void	ReloadMagazine	();
 			void	ApplySilencerKoeffs	();
@@ -105,6 +104,7 @@ public:
 	virtual			~CWeaponMagazined	();
 
 	virtual void	Load			(LPCSTR section);
+	
 	
 
 	virtual CWeaponMagazined*cast_weapon_magazined	()		 {return this;}
@@ -213,6 +213,8 @@ public:
 	virtual void	PlayAnimIdle();
 	virtual void	PlayAnimShoot();
 	virtual void	PlayReloadSound		();
+	virtual bool			TryPlayAnimIdle	();
+	bool			PlayAnimation(MotionSVec animation,BOOL mixMode,LPCSTR debugText=nullptr);
 
 };
 

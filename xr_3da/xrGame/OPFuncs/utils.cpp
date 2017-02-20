@@ -22,7 +22,10 @@ CTimerStat forFillOther;
 
 namespace OPFuncs
 {
-	
+	LPCSTR boolToStr(bool value)
+	{
+		return value ? "true" : "false";
+	}
 	double round(double number)
 	{
 		return number < 0.0 ? ceil(number - 0.5) : floor(number + 0.5);

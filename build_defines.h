@@ -13,4 +13,6 @@
 //#define CREATE_MDUMP //создавать дамп памяти
 #define SHOW_INCORRECT_r_tgt 
 
+//#define SHOW_ANIM_WEAPON_PLAYS //показывать в логе играемые анимации оружия
+
 

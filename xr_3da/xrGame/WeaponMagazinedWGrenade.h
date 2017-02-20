@@ -66,6 +66,8 @@ public:
 	virtual void	PlayAnimIdle();
 	virtual void	PlayAnimShoot();
 	virtual void	PlayAnimModeSwitch();
+	bool	TryPlayAnimIdle	() override;
+
 
 	void	OnNextFireMode		() override;
 	void	OnPrevFireMode		() override;

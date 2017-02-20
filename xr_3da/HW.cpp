@@ -47,7 +47,7 @@ void CHW::Reset		(HWND hwnd)
 	// Windoze
 	DevPP.SwapEffect			= bWindowed?D3DSWAPEFFECT_COPY:D3DSWAPEFFECT_DISCARD;
 	DevPP.Windowed				= bWindowed;
-	DevPP.PresentationInterval	= D3DPRESENT_INTERVAL_IMMEDIATE;
+	DevPP.PresentationInterval	= selectPresentInterval();
 	if( !bWindowed )		
 		DevPP.FullScreen_RefreshRateInHz	= selectRefresh	(DevPP.BackBufferWidth,DevPP.BackBufferHeight,Caps.fTarget);
 	else					DevPP.FullScreen_RefreshRateInHz	= D3DPRESENT_RATE_DEFAULT;
@@ -81,16 +81,16 @@ void CHW::CreateD3D	()
 
 	hD3D9            			= LoadLibrary(_name);
 	R_ASSERT2	           	 	(hD3D9,"Can't find 'd3d9.dll'\nPlease install latest version of DirectX before running this program");
-    typedef IDirect3D9 * WINAPI _Direct3DCreate9(UINT SDKVersion);
+	typedef IDirect3D9 * WINAPI _Direct3DCreate9(UINT SDKVersion);
 	_Direct3DCreate9* createD3D	= (_Direct3DCreate9*)GetProcAddress(hD3D9,"Direct3DCreate9");	R_ASSERT(createD3D);
-    this->pD3D 					= createD3D( D3D_SDK_VERSION );
-    R_ASSERT2					(this->pD3D,"Please install DirectX 9.0c");
+	this->pD3D 					= createD3D( D3D_SDK_VERSION );
+	R_ASSERT2					(this->pD3D,"Please install DirectX 9.0c");
 }
 
 void CHW::DestroyD3D()
 {
 	_RELEASE					(this->pD3D);
-    FreeLibrary					(hD3D9);
+	FreeLibrary					(hD3D9);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -114,12 +114,12 @@ D3DFORMAT CHW::selectDepthStencil	(D3DFORMAT fTarget)
 			DevAdapter,DevT,fTarget,
 			D3DUSAGE_DEPTHSTENCIL,D3DRTYPE_SURFACE,fDS_Try[it])))
 		{
-            if( SUCCEEDED( pD3D->CheckDepthStencilMatch(
+			if( SUCCEEDED( pD3D->CheckDepthStencilMatch(
 				DevAdapter,DevT,
-                fTarget, fTarget, fDS_Try[it]) ) )
-            {
+				fTarget, fTarget, fDS_Try[it]) ) )
+			{
 				return fDS_Try[it];
-            }
+			}
 		}
 	}
 	return D3DFMT_UNKNOWN;
@@ -274,9 +274,9 @@ void		CHW::CreateDevice		(HWND m_hWnd)
 	}
 
 
-    // Set up the presentation parameters
+	// Set up the presentation parameters
 	D3DPRESENT_PARAMETERS&	P	= DevPP;
-    ZeroMemory				( &P, sizeof(P) );
+	ZeroMemory				( &P, sizeof(P) );
 
 #ifndef _EDITOR
 	selectResolution	(P.BackBufferWidth, P.BackBufferHeight, bWindowed);
@@ -300,21 +300,21 @@ void		CHW::CreateDevice		(HWND m_hWnd)
 
 
 	// Windoze
-    P.SwapEffect			= bWindowed?D3DSWAPEFFECT_COPY:D3DSWAPEFFECT_DISCARD;
+	P.SwapEffect			= bWindowed?D3DSWAPEFFECT_COPY:D3DSWAPEFFECT_DISCARD;
 	P.hDeviceWindow			= m_hWnd;
-    P.Windowed				= bWindowed;
+	P.Windowed				= bWindowed;
 
 	// Depth/stencil
 	P.EnableAutoDepthStencil= TRUE;
-    P.AutoDepthStencilFormat= fDepth;
+	P.AutoDepthStencilFormat= fDepth;
 	P.Flags					= 0;	//. D3DPRESENTFLAG_DISCARD_DEPTHSTENCIL;
 
 	// Refresh rate
-	P.PresentationInterval	= D3DPRESENT_INTERVAL_IMMEDIATE;
-    if( !bWindowed )		P.FullScreen_RefreshRateInHz	= selectRefresh	(P.BackBufferWidth, P.BackBufferHeight,fTarget);
-    else					P.FullScreen_RefreshRateInHz	= D3DPRESENT_RATE_DEFAULT;
+	P.PresentationInterval	= selectPresentInterval();
+	if( !bWindowed )		P.FullScreen_RefreshRateInHz	= selectRefresh	(P.BackBufferWidth, P.BackBufferHeight,fTarget);
+	else					P.FullScreen_RefreshRateInHz	= D3DPRESENT_RATE_DEFAULT;
 
-    // Create the device
+	// Create the device
 	u32 GPU		= selectGPU();	
 	HRESULT R	= HW.pD3D->CreateDevice(DevAdapter,
 										DevT,
@@ -394,7 +394,7 @@ u32 CHW::selectGPU ()
 	D3DCAPS9	caps;
 	pD3D->GetDeviceCaps(DevAdapter,DevT,&caps);
 
-    if(caps.DevCaps&D3DDEVCAPS_HWTRANSFORMANDLIGHT)
+	if(caps.DevCaps&D3DDEVCAPS_HWTRANSFORMANDLIGHT)
 	{
 		if (Caps.bForceGPU_NonPure)	return D3DCREATE_HARDWARE_VERTEXPROCESSING;
 		else {
@@ -527,7 +527,7 @@ void	fill_vid_mode_list			(CHW* _hw)
 	xr_vector<LPCSTR>	_tmp;
 	u32 cnt = _hw->pD3D->GetAdapterModeCount	(_hw->DevAdapter, _hw->Caps.fTarget);
 
-    u32 i;
+	u32 i;
 	for(i=0; i<cnt;++i)
 	{
 		D3DDISPLAYMODE	Mode;

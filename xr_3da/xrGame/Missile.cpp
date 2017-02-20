@@ -82,6 +82,7 @@ void CMissile::Load(LPCSTR section)
 	m_sAnimHide			= pSettings->r_string(*hud_sect, "anim_hide");
 	m_sAnimIdle			= pSettings->r_string(*hud_sect, "anim_idle");
 	m_sAnimIdleSprint	= READ_IF_EXISTS (pSettings, r_string, *hud_sect, "anim_idle_sprint", *m_sAnimIdle);
+	m_sAnimIdleMoving	= READ_IF_EXISTS (pSettings, r_string, *hud_sect, "anim_idle_moving", *m_sAnimIdle);
 	m_sAnimPlaying		= pSettings->r_string(*hud_sect, "anim_playing");
 	m_sAnimThrowBegin	= pSettings->r_string(*hud_sect, "anim_throw_begin");
 	m_sAnimThrowIdle	= pSettings->r_string(*hud_sect, "anim_throw_idle");
@@ -179,10 +180,14 @@ void CMissile::OnH_B_Independent(bool just_before_destroy)
 u32 CMissile::idle_state()
 {
 	CActor	*actor = smart_cast<CActor*>(H_Parent());
-	if (actor && actor->get_state() & mcSprint)
-		return MS_IDLE_SPRINT;
-	else
-		return MS_IDLE;
+	if (actor)
+	{
+		if (actor->get_state() & mcSprint)
+			return MS_IDLE_SPRINT;
+		if (actor->get_state() & mcAnyMove)
+			return MS_IDLE_MOVING;
+	}
+	return MS_IDLE;
 }
 
 void CMissile::UpdateCL() 
@@ -194,7 +199,7 @@ void CMissile::UpdateCL()
 	
 // alpet: поддержка анимации спринта для болтов
 	u32		state = GetState();
-	bool	idle = ( MS_IDLE == state ) || ( MS_IDLE_SPRINT == state );	
+	bool	idle = ( MS_IDLE == state ) || ( MS_IDLE_SPRINT == state ) ||( MS_IDLE_MOVING == state );	
 	if (idle && state != idle_state())
 		SwitchState (idle_state());
 
@@ -246,6 +251,11 @@ void CMissile::State(u32 state)
 		{
 			m_bPending = false;
 			m_pHUD->animPlay(m_pHUD->animGet(*m_sAnimIdle), TRUE, this, GetState());
+		} break;
+	case MS_IDLE_MOVING:
+		{
+			m_bPending = false;
+			m_pHUD->animPlay(m_pHUD->animGet(*m_sAnimIdleMoving), TRUE, this, GetState());
 		} break;
 	case MS_IDLE_SPRINT:
 		{
