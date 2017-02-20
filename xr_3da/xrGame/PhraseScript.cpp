@@ -172,8 +172,13 @@ bool CPhraseScript::Precondition	(	const CGameObject* pSpeakerGO1,
 		luabind::functor<bool>	lua_function;
 		THROW(*Preconditions()[i]);
 		bool functor_exists = ai().script_engine().functor(*Preconditions()[i] ,lua_function);
-		THROW3(functor_exists, "Cannot find phrase precondition", *Preconditions()[i]);
-		predicate_result = lua_function	(pSpeakerGO1->lua_game_object(), pSpeakerGO2->lua_game_object(), dialog_id, phrase_id, next_phrase_id);
+		if (!functor_exists)
+		{
+			Msg("! ERROR Cannot find phrase precondition [%s] for dialog [%s]",*Preconditions()[i],dialog_id);
+			predicate_result=false;
+		}
+		else
+			predicate_result = lua_function	(pSpeakerGO1->lua_game_object(), pSpeakerGO2->lua_game_object(), dialog_id, phrase_id, next_phrase_id);
 		if(!predicate_result)
 		{
 		#ifdef DEBUG

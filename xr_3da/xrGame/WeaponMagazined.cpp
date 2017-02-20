@@ -97,7 +97,7 @@ bool CWeaponMagazined::PlayAnimation(MotionSVec animation,BOOL mixMode,LPCSTR de
 {
 	if(animation.size()>0)
 	{
-		m_pHUD->animPlay(random_anim(animation), mixMode, this,GetState());
+		m_pHUD->animPlay(random_anim(animation), mixMode, nullptr,GetState());
 #ifdef SHOW_ANIM_WEAPON_PLAYS
 		if (debugText!=nullptr)	Msg("Done %s",debugText);
 #endif
@@ -701,8 +701,8 @@ void CWeaponMagazined::OnAnimationEnd(u32 state)
 		case eHiding:	SwitchState(eHidden);   break;	// End of Hide
 		case eShowing:	SwitchState(eIdle);		break;	// End of Show
 		case eIdle:		switch2_Idle();			break;  // Keep showing idle
-
 	}
+	inherited::OnAnimationEnd(state);
 }
 void CWeaponMagazined::switch2_Idle	()
 {

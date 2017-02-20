@@ -249,19 +249,16 @@ void CMissile::State(u32 state)
 		} break;
 	case MS_IDLE:
 		{
-			Msg("idle");
 			m_bPending = false;
 			m_pHUD->animPlay(m_pHUD->animGet(*m_sAnimIdle), TRUE, this, GetState());
 		} break;
 	case MS_IDLE_MOVING:
 		{
-			Msg("moving_idle");
 			m_bPending = false;
 			m_pHUD->animPlay(m_pHUD->animGet(*m_sAnimIdleMoving), TRUE, this, GetState());
 		} break;
 	case MS_IDLE_SPRINT:
 		{
-			Msg("sprint_idle");
 			m_bPending = false;
 			m_pHUD->animPlay(m_pHUD->animGet(*m_sAnimIdleSprint), TRUE, this, GetState());
 		} break;

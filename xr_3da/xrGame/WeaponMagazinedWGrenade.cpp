@@ -514,6 +514,11 @@ void CWeaponMagazinedWGrenade::OnAnimationEnd(u32 state)
 		{
 			SwitchState(eIdle);
 		}break;
+		case eFire:
+		{
+			if(m_bGrenadeMode)
+				Reload();
+		}break;
 	}
 	inherited::OnAnimationEnd(state);
 }
@@ -784,9 +789,13 @@ void CWeaponMagazinedWGrenade::PlayAnimReload()
 void CWeaponMagazinedWGrenade::PlayAnimIdle()
 {
 	if(TryPlayAnimIdle())	return;
-	VERIFY(GetState()==eIdle);
+	//VERIFY(GetState()==eIdle);
+	if (GetState() != eIdle)
+		return;	
 	MotionSVec* smAnimation = nullptr;
+#ifdef SHOW_ANIM_WEAPON_PLAYS
 	LPCSTR animName;
+#endif
 	BOOL mixMode;
 	if(IsGrenadeLauncherAttached())
 	{
@@ -876,7 +885,9 @@ bool CWeaponMagazinedWGrenade::TryPlayAnimIdle()
 			else if(pActor->AnyMove())	
 				actorState = 2;
 			MotionSVec* smAnimation = nullptr;
+#ifdef SHOW_ANIM_WEAPON_PLAYS
 			LPCSTR animName;
+#endif
 			if (actorState==1)
 			{
 				if (m_bGrenadeMode)
