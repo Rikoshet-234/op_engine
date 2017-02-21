@@ -266,6 +266,8 @@ void CUICarBodyWnd::Hide()
 	InventoryUtilities::SendInfoToActor			("ui_car_body_hide");
 	std::for_each(sourceDragDropLists.begin(),sourceDragDropLists.end(),[](CUIDragDropListEx* list){list->ClearAll(true);});
 	inherited::Hide								();
+	m_pUIPropertiesBox->Hide();
+	m_pUIPropertiesBox->RemoveAll();
 	if(m_pInventoryBox)
 		m_pInventoryBox->m_in_use				= false;
 }
