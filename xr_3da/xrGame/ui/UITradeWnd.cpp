@@ -295,6 +295,8 @@ void CUITradeWnd::Hide()
 		HUD().GetUI()->UIGame()->RemoveCustomStatic("not_enough_money_mine");
 		HUD().GetUI()->UIGame()->RemoveCustomStatic("not_enough_money_other");
 	}
+	UIPropertiesBox.RemoveAll();
+	UIPropertiesBox.Hide();
 	std::for_each(sourceDragDropLists.begin(),sourceDragDropLists.end(),[](CUIDragDropListEx* list){list->ClearAll(true);});
 }
 
@@ -758,7 +760,8 @@ void CUITradeWnd::ProcessPropertiesBoxClicked	()
 	CUIListBoxItem* clickedItem=UIPropertiesBox.GetClickedItem();
 	if(clickedItem)
 	{
-		switch(clickedItem->GetTAG())
+		u32 itemTag=clickedItem->GetTAG();
+		switch(itemTag)
 		{
 		case INVENTORY_DETACH_GRENADE_LAUNCHER_ADDON:
 			DetachAddon(*(smart_cast<CWeapon*>(CurrentIItem()))->GetGrenadeLauncherName());
@@ -787,6 +790,24 @@ void CUITradeWnd::ProcessPropertiesBoxClicked	()
 					OPFuncs::UnloadWeapon(smart_cast<CWeaponMagazined*>(static_cast<CWeapon*>(child_itm->m_pData)));
 				}
 				SetCurrentItem(nullptr);
+			}
+			break;
+		case INVENTORY_CB_MOVE_ALL:
+		case INVENTORY_CB_MOVE_SINGLE:
+			{
+				CActor *pActor				= smart_cast<CActor*>(Level().CurrentEntity());
+				CUICellItem* moveItem=static_cast<CUICellItem*>(clickedItem->GetData());
+				if(!pActor && !moveItem)
+					break;
+				if (itemTag==INVENTORY_CB_MOVE_ALL)
+				{
+					while (moveItem->ChildsCount()!=0)
+					{
+						CUICellItem* cellItem = moveItem->Child(0);
+						OnItemDbClick(cellItem);
+					}
+				}
+				OnItemDbClick(moveItem);
 			}
 			break;
 		case INVENTORY_DROP_ACTION:
@@ -838,94 +859,98 @@ void CUITradeWnd::ProcessPropertiesBoxClicked	()
 
 void CUITradeWnd::ActivatePropertiesBox()
 {
-	if (CurrentItem()->OwnerList()==&UIOthersTradeList || CurrentItem()->OwnerList()==&UIOthersBagList) //:))))
-		return;
+	bool oppLists=CurrentItem()->OwnerList()==&UIOthersTradeList || CurrentItem()->OwnerList()==&UIOthersBagList;
 	UIPropertiesBox.RemoveAll();
 
 	bool b_show=false;
-	CWeapon*			pWeapon				= smart_cast<CWeapon*>			(CurrentIItem());
-	CMedkit*			pMedkit				= smart_cast<CMedkit*>			(CurrentIItem());
-	CAntirad*			pAntirad			= smart_cast<CAntirad*>			(CurrentIItem());
-	CEatableItem*		pEatableItem		= smart_cast<CEatableItem*>		(CurrentIItem());
-	CBottleItem*		pBottleItem			= smart_cast<CBottleItem*>		(CurrentIItem());
-
-	if (pWeapon)
+	if (oppLists)
 	{
-		if(pWeapon->GrenadeLauncherAttachable() && pWeapon->IsGrenadeLauncherAttached())
+		CWeapon*			pWeapon				= smart_cast<CWeapon*>			(CurrentIItem());
+		CMedkit*			pMedkit				= smart_cast<CMedkit*>			(CurrentIItem());
+		CAntirad*			pAntirad			= smart_cast<CAntirad*>			(CurrentIItem());
+		CEatableItem*		pEatableItem		= smart_cast<CEatableItem*>		(CurrentIItem());
+		CBottleItem*		pBottleItem			= smart_cast<CBottleItem*>		(CurrentIItem());
+
+		if (pWeapon)
 		{
-			UIPropertiesBox.AddItem(OPFuncs::getComplexString("st_detach_gl",nullptr, OPFuncs::getAddonInvName(pWeapon->GetGrenadeLauncherName().c_str()),"st_detach_gl_full").c_str(),  nullptr, INVENTORY_DETACH_GRENADE_LAUNCHER_ADDON);
-			b_show			= true;
-		}
-		if(pWeapon->ScopeAttachable() && pWeapon->IsScopeAttached())
-		{
-			UIPropertiesBox.AddItem(OPFuncs::getComplexString("st_detach_scope",nullptr, OPFuncs::getAddonInvName(pWeapon->GetScopeName().c_str()),"st_detach_scope_full").c_str(),  nullptr, INVENTORY_DETACH_SCOPE_ADDON);
-			b_show			= true;
-		}
-		if(pWeapon->SilencerAttachable() && pWeapon->IsSilencerAttached())
-		{
-			UIPropertiesBox.AddItem(OPFuncs::getComplexString("st_detach_silencer",nullptr, OPFuncs::getAddonInvName(pWeapon->GetSilencerName().c_str()),"st_detach_silencer_full").c_str(),  nullptr, INVENTORY_DETACH_SILENCER_ADDON);
-			b_show			= true;
-		}
-		if(smart_cast<CWeaponMagazined*>(pWeapon) && IsGameTypeSingle())
-		{
-			bool b = (0!=pWeapon->GetAmmoElapsed());
-			if(!b)
+			if(pWeapon->GrenadeLauncherAttachable() && pWeapon->IsGrenadeLauncherAttached())
 			{
-				CUICellItem * itm = CurrentItem();
-				for(size_t i=0; i<itm->ChildsCount(); ++i)
+				UIPropertiesBox.AddItem(OPFuncs::getComplexString("st_detach_gl",nullptr, OPFuncs::getAddonInvName(pWeapon->GetGrenadeLauncherName().c_str()),"st_detach_gl_full").c_str(),  nullptr, INVENTORY_DETACH_GRENADE_LAUNCHER_ADDON);
+				b_show			= true;
+			}
+			if(pWeapon->ScopeAttachable() && pWeapon->IsScopeAttached())
+			{
+				UIPropertiesBox.AddItem(OPFuncs::getComplexString("st_detach_scope",nullptr, OPFuncs::getAddonInvName(pWeapon->GetScopeName().c_str()),"st_detach_scope_full").c_str(),  nullptr, INVENTORY_DETACH_SCOPE_ADDON);
+				b_show			= true;
+			}
+			if(pWeapon->SilencerAttachable() && pWeapon->IsSilencerAttached())
+			{
+				UIPropertiesBox.AddItem(OPFuncs::getComplexString("st_detach_silencer",nullptr, OPFuncs::getAddonInvName(pWeapon->GetSilencerName().c_str()),"st_detach_silencer_full").c_str(),  nullptr, INVENTORY_DETACH_SILENCER_ADDON);
+				b_show			= true;
+			}
+			if(smart_cast<CWeaponMagazined*>(pWeapon) && IsGameTypeSingle())
+			{
+				bool b = (0!=pWeapon->GetAmmoElapsed());
+				if(!b)
 				{
-					pWeapon		= smart_cast<CWeaponMagazined*>(static_cast<CWeapon*>(itm->Child(i)->m_pData));
-					if(pWeapon->GetAmmoElapsed())
+					CUICellItem * itm = CurrentItem();
+					for(size_t i=0; i<itm->ChildsCount(); ++i)
 					{
-						b = true;
-						break;
+						pWeapon		= smart_cast<CWeaponMagazined*>(static_cast<CWeapon*>(itm->Child(i)->m_pData));
+						if(pWeapon->GetAmmoElapsed())
+						{
+							b = true;
+							break;
+						}
 					}
 				}
+				if(b){
+					UIPropertiesBox.AddItem(OPFuncs::getComplexString("st_unload_magazine",pWeapon).c_str(),  nullptr, INVENTORY_UNLOAD_MAGAZINE);
+					b_show			= true;
+				}
 			}
-			if(b){
-				UIPropertiesBox.AddItem(OPFuncs::getComplexString("st_unload_magazine",pWeapon).c_str(),  nullptr, INVENTORY_UNLOAD_MAGAZINE);
+		}
+		LPCSTR _action = nullptr;
+		if(pMedkit || pAntirad)
+			_action					= "st_use";
+		else if(pEatableItem)
+			if(pBottleItem)
+				_action					= "st_drink";
+			else
+				_action					= "st_eat";
+
+		if(_action){
+			UIPropertiesBox.AddItem(_action,  nullptr, INVENTORY_EAT_ACTION);
+			b_show			= true;
+		}
+
+		if(!CurrentIItem()->IsQuestItem())
+		{
+			if (CurrentItem()->GetMoveableToOther())
+			{
+				UIPropertiesBox.AddItem("ui_carbody_move_single", CurrentItem(), INVENTORY_CB_MOVE_SINGLE);
+				if (CurrentItem()->ChildsCount())
+					UIPropertiesBox.AddItem("ui_carbody_move_all", CurrentItem(), INVENTORY_CB_MOVE_ALL);
 				b_show			= true;
 			}
-		}
-	}
-	LPCSTR _action = nullptr;
-	if(pMedkit || pAntirad)
-		_action					= "st_use";
-	else if(pEatableItem)
-		if(pBottleItem)
-			_action					= "st_drink";
-		else
-			_action					= "st_eat";
-
-	if(_action){
-		UIPropertiesBox.AddItem(_action,  nullptr, INVENTORY_EAT_ACTION);
-		b_show			= true;
-	}
-
-	if(!CurrentIItem()->IsQuestItem())
-	{
-		if (CurrentItem()->OwnerList()==&UIOurBagList)
-		{
-			UIPropertiesBox.AddItem("st_drop", nullptr, INVENTORY_DROP_ACTION);
-			b_show			= true;
-		}
-		else if (CurrentItem()->OwnerList()==&UIOurTradeList)
-		{
-			UIPropertiesBox.AddItem("ui_carbody_move_single", nullptr, INVENTORY_DROP_ACTION);
-			b_show			= true;
-		}
-
-		if(CurrentItem()->ChildsCount())
 			if (CurrentItem()->OwnerList()==&UIOurBagList)
 			{
-				UIPropertiesBox.AddItem("st_drop_all", reinterpret_cast<void*>(33), INVENTORY_DROP_ACTION);
+				UIPropertiesBox.AddItem("st_drop", nullptr, INVENTORY_DROP_ACTION);
+				if(CurrentItem()->ChildsCount())
+					UIPropertiesBox.AddItem("st_drop_all", reinterpret_cast<void*>(33), INVENTORY_DROP_ACTION);
 				b_show			= true;
 			}
-			else if (CurrentItem()->OwnerList()==&UIOurTradeList)
-			{
-				UIPropertiesBox.AddItem("ui_carbody_move_all", nullptr, INVENTORY_DROP_ACTION);
-				b_show			= true;
-			}
+		}
+	}
+	else
+	{
+		if (CurrentItem()->GetMoveableToOther())
+		{
+			UIPropertiesBox.AddItem("ui_carbody_move_single", CurrentItem(), INVENTORY_CB_MOVE_SINGLE);
+			if (CurrentItem()->ChildsCount())
+				UIPropertiesBox.AddItem("ui_carbody_move_all", CurrentItem(), INVENTORY_CB_MOVE_ALL);
+			b_show			= true;
+		}
 	}
 
 	if (b_show)

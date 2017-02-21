@@ -78,9 +78,9 @@
           <path>xrGame\WeaponMagazined.cpp</path>
           <absolutePath>S:\xr_3da\xrGame\WeaponMagazined.cpp</absolutePath>
           <position>
-            <line>99</line>
-            <column>3</column>
-            <lineHash>v5xrHrbxmIUbSzEWyMDpgCJflpKyIFkMSssqlrOQUqk=</lineHash>
+            <line>84</line>
+            <column>2</column>
+            <lineHash>DTrSGrG4IkF8AcqxnyRielQDOIyt1Ni9xKm99+LJHmc=</lineHash>
           </position>
         </Favorite>
         <Favorite>
@@ -89,9 +89,9 @@
           <absolutePath>S:\xr_3da\xrGame\WeaponMagazined.h</absolutePath>
           <viewKind>7651a701-06e5-11d1-8ebd-00a0c90f26ea</viewKind>
           <position>
-            <line>1</line>
-            <column>1</column>
-            <lineHash>MKQsOPX+DUl+X5RnV/jdqXyO0xk4vKhw7lRJPnI11VI=</lineHash>
+            <line>217</line>
+            <column>22</column>
+            <lineHash>56tLrLiwWRrqhUnk02eG4LRl1Ip7n/KpNqUxBbD29js=</lineHash>
           </position>
         </Favorite>
         <Favorite>
@@ -99,9 +99,9 @@
           <path>xrGame\WeaponMagazinedWGrenade.cpp</path>
           <absolutePath>S:\xr_3da\xrGame\WeaponMagazinedWGrenade.cpp</absolutePath>
           <position>
-            <line>831</line>
+            <line>1</line>
             <column>1</column>
-            <lineHash>3y+Kn7KvAYvhfPw82rDjMiCaUs/6bAkD4D259fL8RQ4=</lineHash>
+            <lineHash>OLPYjwdm9wN2xCl26hRFXSMcB/CAPDWnpsBbkvT4pcM=</lineHash>
           </position>
         </Favorite>
         <Favorite>
@@ -109,9 +109,9 @@
           <path>xrGame\WeaponKnife.cpp</path>
           <absolutePath>S:\xr_3da\xrGame\WeaponKnife.cpp</absolutePath>
           <position>
-            <line>1</line>
-            <column>1</column>
-            <lineHash>OLPYjwdm9wN2xCl26hRFXSMcB/CAPDWnpsBbkvT4pcM=</lineHash>
+            <line>347</line>
+            <column>33</column>
+            <lineHash>Ay19Sin8T/cy8BL7t7c6VoDunD++SnXTM5FZAIzoNn4=</lineHash>
           </position>
         </Favorite>
         <Favorite>
@@ -122,6 +122,36 @@
             <line>1</line>
             <column>1</column>
             <lineHash>OLPYjwdm9wN2xCl26hRFXSMcB/CAPDWnpsBbkvT4pcM=</lineHash>
+          </position>
+        </Favorite>
+        <Favorite>
+          <name>Weapon.cpp</name>
+          <path>xrGame\Weapon.cpp</path>
+          <absolutePath>S:\xr_3da\xrGame\Weapon.cpp</absolutePath>
+          <position>
+            <line>761</line>
+            <column>1</column>
+            <lineHash>r+zdOcOUeZDveT17lNY1Jxy4c4p7s9JeQhBRv2IHFD8=</lineHash>
+          </position>
+        </Favorite>
+        <Favorite>
+          <name>weaponBM16.cpp</name>
+          <path>xrGame\weaponBM16.cpp</path>
+          <absolutePath>S:\xr_3da\xrGame\weaponBM16.cpp</absolutePath>
+          <position>
+            <line>54</line>
+            <column>5</column>
+            <lineHash>jDzSpJP+G0gn4lDTLLueBWXcNVztr7jIFc9SXZxJFXc=</lineHash>
+          </position>
+        </Favorite>
+        <Favorite>
+          <name>WeaponHUD.cpp</name>
+          <path>xrGame\WeaponHUD.cpp</path>
+          <absolutePath>S:\xr_3da\xrGame\WeaponHUD.cpp</absolutePath>
+          <position>
+            <line>162</line>
+            <column>1</column>
+            <lineHash>aclFoWm8WGJ05lYJM6sfIug2CjSv40QqrOz+q+uCdz8=</lineHash>
           </position>
         </Favorite>
       </favorites>
