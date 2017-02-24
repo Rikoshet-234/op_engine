@@ -1566,7 +1566,6 @@ void CCC_RegisterCommands()
 {
 	// options
 	g_OptConCom.Init();
-
 	CMD4(CCC_Integer,			"c_r",	&c_r	,			0,		255				);
 	CMD4(CCC_Integer,			"c_g",	&c_g	,			0,		255				);
 	CMD4(CCC_Integer,			"c_b",	&c_b	,			0,		255				);
@@ -1631,7 +1630,6 @@ void CCC_RegisterCommands()
 	CMD3(CCC_Mask,				"gp_deffered_reload",			&g_uCommonFlags,gpDeferredReload);
 	CMD3(CCC_Mask,				"gp_fixed_reload",				&g_uCommonFlags,gpFixedReload);
 	CMD3(CCC_Mask,				"gp_sticky_scope",				&g_uCommonFlags,gpStickyScope);
-	CMD3(CCC_Mask,				"gp_pause_on_start",			&g_uCommonFlags,gpPauseOnGameStart);
 	CMD3(CCC_ChangeScopeVisual,	"gp_open_scope",				&g_uCommonFlags,gpOpenScope);
 
 	CMD1(CCC_GSCheckForUpdates, "check_for_updates"		);

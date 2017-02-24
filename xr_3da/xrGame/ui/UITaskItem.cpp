@@ -114,7 +114,7 @@ void CUITaskRootItem::SetGameTask(CGameTask* gt, u16 obj_idx)
 	m_taskImage->ClipperOn			();
 	m_taskImage->SetStretchTexture	(true);
 
-	m_captionStatic->SetText		(*stbl.translate(m_GameTask->m_Title));
+	m_captionStatic->SetText		(*stbl.translate(m_GameTask->m_Title,false));
 	m_captionStatic->AdjustHeightToText	();
 
 	string512 result;

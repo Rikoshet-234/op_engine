@@ -276,6 +276,50 @@ public:
 	}
 };
 
+class ENGINE_API CCC_UserParam:public IConsole_Command
+{
+protected:
+	xr_string			value;
+public:
+	CCC_UserParam(LPCSTR N, xr_string V):IConsole_Command(N),value(V)
+	{
+		bEmptyArgsHandled=true;
+	}
+	xr_string GetValue() const {return value;}
+
+	void Save(IWriter* F) override
+	{
+		if (value.length()>0)
+			F->w_printf("%s %s\r\n",cName,value.c_str()); 
+	};
+
+	void Execute(LPCSTR args) override
+	{
+		if (xr_strlen(args)==0)
+		{
+			TStatus S;
+			Status(S);
+			Log(S);
+		}
+		else
+			value=xr_strdup(args);
+	};
+
+	void Status(TStatus& S) override
+	{
+		string256 buf;
+		sprintf_s(buf,"Value of user-defined param [%s] is [%s]",cName,value.c_str());
+		strcpy_s(S,buf);
+
+	};
+
+	void Info(TInfo& I) override
+	{
+		string256 buf;
+		sprintf_s(buf,"%s any_value_string --- user-defined param for store any value in string ",cName);
+	};
+};
+
 class ENGINE_API CCC_LoadCFG : public IConsole_Command
 {
 public:

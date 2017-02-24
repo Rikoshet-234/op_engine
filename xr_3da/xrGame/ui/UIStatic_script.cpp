@@ -38,7 +38,10 @@ void CUIStatic::script_register(lua_State *L)
 
 		.def("SetHeading",			&CUIStatic::SetHeading)
 		.def("GetHeading",			&CUIStatic::GetHeading)
-	
+		
+		.def("SetClrLightAnim",		&CUIStatic::SetClrLightAnim)
+		.def("SetXformLightAnim",	&CUIStatic::SetXformLightAnim)
+
 		.def("ClipperOn",			&CUIStatic::ClipperOn)
 		.def("ClipperOff",			(void(CUIStatic::*)(void))&CUIStatic::ClipperOff )
 		.def("GetClipperState",		&CUIStatic::GetClipperState)

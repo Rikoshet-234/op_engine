@@ -4,9 +4,9 @@
 #include "ResourceManager.h"
 
 #ifndef _EDITOR
-    #include "render.h"
+	#include "render.h"
 #endif
-    
+	
 #include "tntQAVI.h"
 #include "xrTheora_Surface.h"
 
@@ -124,8 +124,17 @@ void CTexture::apply_seq	(u32 dwStage)	{
 		u32	frame_id	= frame%(frame_data*2);
 		if (frame_id>=frame_data)	frame_id = (frame_data-1) - (frame_id%frame_data);
 		pSurface 			= seqDATA[frame_id];
-	} else {
+	}
+	else 
+	{
 		u32	frame_id	= frame%frame_data;
+#ifdef DEBUG
+		std::string nm=cName.c_str();
+		if (nm.find("l01_escape")!=std::string::npos)
+		{
+			Msg("! SEQ Select Device.dwFrame[%d] Device.dwTimeGlobal[%d] Device.dwTimeContinual[%d] frame [%d] frame_data[%d] frame_id[%d]",Device.dwFrame, Device.dwTimeGlobal,Device.dwTimeContinual,frame,frame_data,frame_id);
+		}
+#endif
 		pSurface 			= seqDATA[frame_id];
 	}
 	CHK_DX(HW.pDevice->SetTexture(dwStage,pSurface));
@@ -231,7 +240,7 @@ void CTexture::Load		()
 
 		}
 	} else
-    if (FS.exist(fn,"$game_textures$",*cName,".seq"))
+	if (FS.exist(fn,"$game_textures$",*cName,".seq"))
 	{
 		// Sequence
 		string256 buffer;

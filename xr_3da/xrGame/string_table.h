@@ -26,7 +26,7 @@ public:
 	static void					Destroy					();
 	bool						IDExist					(const STRING_ID& str_id) const;
 //.	STRING_INDEX				IndexById				(const STRING_ID& str_id)		const;
-	STRING_VALUE				translate				(const STRING_ID& str_id)		const;
+	STRING_VALUE				translate				(const STRING_ID& str_id,bool trim=true)		const;
 //.	STRING_VALUE				translate				(const STRING_INDEX str_index)	const;
 
 	static	BOOL				m_bWriteErrorsToLog;

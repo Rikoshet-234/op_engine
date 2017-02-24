@@ -8,6 +8,7 @@
 
 #include "iinputreceiver.h"
 
+class CCC_UserParam;
 //refs
 class ENGINE_API CGameFont;
 class ENGINE_API IConsole_Command;
@@ -27,6 +28,7 @@ public:
 	typedef vecCMD::iterator						vecCMD_IT;
 	enum			{ MAX_LEN = 1024 };
 private:
+	std::vector<shared_str> userDefinedNames;
 	u32				last_mm_timer;
 	float			cur_time;
 	float			rep_time;
@@ -55,6 +57,7 @@ public:
 	BOOL			bVisible;
 	vecCMD			Commands;
 
+	bool isUserDefinedParam(LPCSTR name) const;
 	void			AddCommand			(IConsole_Command*);
 	void			RemoveCommand		(IConsole_Command*);
 	void			Reset				();

@@ -361,24 +361,24 @@ void CGamePersistent::update_game_intro			()
 
 void CGamePersistent::game_loaded()
 {
-	if(Device.dwPrecacheFrame<5)
-	{
-		if (g_pGameLevel && g_pGameLevel->bReady && 
-			g_uCommonFlags.is(E_COMMON_FLAGS::gpPauseOnGameStart) &&
-			m_game_params.m_e_game_type==GAME_SINGLE)
-		{
-			VERIFY				(NULL==m_intro);
-			m_intro				= xr_new<CUISequencer>();
-			if (m_intro->CheckTutor("game_loaded"))
-			{
-				m_intro->Start		("game_loaded");
-				m_intro->m_on_destroy_event.bind(this, &CGamePersistent::update_game_loaded);
-			}
-			else
-				xr_delete(m_intro);
-		}
-		m_intro_event			= nullptr;
-	}
+	// if(Device.dwPrecacheFrame<5)
+	// {
+		// if (g_pGameLevel && g_pGameLevel->bReady && 
+			// g_uCommonFlags.is(E_COMMON_FLAGS::gpPauseOnGameStart) &&
+			// m_game_params.m_e_game_type==GAME_SINGLE)
+		// {
+			// VERIFY				(NULL==m_intro);
+			// m_intro				= xr_new<CUISequencer>();
+			// if (m_intro->CheckTutor("game_loaded"))
+			// {
+				// m_intro->Start		("game_loaded");
+				// m_intro->m_on_destroy_event.bind(this, &CGamePersistent::update_game_loaded);
+			// }
+			// else
+				// xr_delete(m_intro);
+		// }
+		// m_intro_event			= nullptr;
+	// }
 }
 
 void CGamePersistent::update_game_loaded()

@@ -1,6 +1,11 @@
 #include "pch_script.h"
 #include "console_registrator.h"
 #include "../xr_ioconsole.h"
+#include "../xr_ioc_cmd.h"
+#include "ai_space.h"
+#include "script_engine.h"
+#include <luabind/luabind.hpp>
+#include <luabind/object.hpp>
 
 using namespace luabind;
 
@@ -30,6 +35,26 @@ bool get_console_bool(CConsole* c, LPCSTR cmd)
 	return !!val;
 }
 
+luabind::object get_user_param_value(CConsole* c,LPCSTR cmd)
+{
+	
+	if (c->isUserDefinedParam(cmd))
+	{
+		CConsole::vecCMD_IT I = c->Commands.find(cmd);
+		if (I!=c->Commands.end()) 
+		{
+			CCC_UserParam* uc=smart_cast<CCC_UserParam*>(I->second);
+			if (uc)
+				return luabind::object(ai().script_engine().lua(),uc->GetValue().c_str());
+			else
+				Msg("! ERROR User-defined param [%s] not is class CCC_UserParam! Contact to developer quickly!",cmd);
+		}
+	}
+	else
+		Msg("~ WARNING User-defined param [%s] not found!",cmd);
+	return luabind::object();
+}
+
 #pragma optimize("s",on)
 void console_registrator::script_register(lua_State *L)
 {
@@ -42,6 +67,7 @@ void console_registrator::script_register(lua_State *L)
 		.def("show",						&CConsole::Show)
 		.def("hide",						&CConsole::Hide)
 //		.def("save",						&CConsole::Save)
+		.def("get_user_param_value"			,get_user_param_value)
 		.def("get_string",					&CConsole::GetString)
 		.def("get_integer",					&get_console_integer)
 		.def("get_bool",					&get_console_bool)
