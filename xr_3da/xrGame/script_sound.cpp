@@ -46,6 +46,7 @@ void CScriptSound::Play			(CScriptGameObject *object, float delay, int flags)
 {
 	if (!m_sound._handle())
 	{
+		Msg("Empty sound handle %s",m_caSoundToPlay);
 		return;
 	}
 //	THROW3						(m_sound._handle(),"There is no sound",*m_caSoundToPlay);

@@ -20,6 +20,7 @@ private:
 //	ref_shader				ll_hLogo;
 //	ref_shader				ll_hLogo1;
 	ref_shader				hLevelLogo;
+	ref_shader				hProgressBar;
 	ref_geom				ll_hGeom;
 	ref_geom				ll_hGeom2;
 

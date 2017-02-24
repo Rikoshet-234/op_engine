@@ -190,6 +190,14 @@ void addSeparator(CUIListWnd* list,shared_str textId)
 		list->AddItem(separator);
 }
 
+void addSeparatorWT(CUIListWnd* list)
+{
+		CUIListItem* separator=xr_new<CUIListItem>();
+		separator->SetAutoDelete(true);
+		separator->SetHeight(5);
+		list->AddItem(separator);
+}
+
 void CUIOutfitInfo::createImmuneItem(CCustomOutfit* outfit,std::pair<ALife::EHitType,shared_str> immunePair, bool force_add)
 {
 	float _val_outfit			= outfit ? outfit->GetDefHitTypeProtection(ALife::EHitType(immunePair.first)) : 1.0f;
@@ -277,7 +285,7 @@ void CUIOutfitInfo::Update(CCustomOutfit* outfitP)
 	});
 	if (m_lImmuneUnsortedItems.size()>0)
 	{
-		addSeparator(m_list,"ui_st_params");
+		//addSeparator(m_list,"ui_st_params");
 		std::sort(m_lImmuneUnsortedItems.begin(),m_lImmuneUnsortedItems.end(),[](CUIListItem* i1, CUIListItem* i2)
 		{
 			CUIListItemIconed *iconedItem1=smart_cast<CUIListItemIconed*>(i1);
@@ -306,7 +314,8 @@ void CUIOutfitInfo::Update(CCustomOutfit* outfitP)
 		});
 		if (m_lModificatorsItems.size()>0)
 		{
-			addSeparator(m_list,"ui_st_modifiers");
+			//addSeparator(m_list,"ui_st_modifiers");
+			addSeparatorWT(m_list);
 			std::sort(m_lModificatorsItems.begin(),m_lModificatorsItems.end(),[](CUIListItem* i1, CUIListItem* i2)
 			{
 				CUIListItemIconed *iconedItem1=smart_cast<CUIListItemIconed*>(i1);

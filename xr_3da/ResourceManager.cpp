@@ -139,7 +139,7 @@ void CResourceManager::_DeleteElement(const ShaderElement* S)
 	Msg	("! ERROR: Failed to find compiled 'shader-element'");
 }
 
-Shader*	CResourceManager::_cpp_Create	(IBlender* B, LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_constants, LPCSTR s_matrices)
+Shader*	CResourceManager::_cpp_Create	(IBlender* B, LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_constants, LPCSTR s_matrices,bool quiet)
 {
 	CBlender_Compile	C;
 	Shader				S;
@@ -228,33 +228,33 @@ Shader*	CResourceManager::_cpp_Create	(IBlender* B, LPCSTR s_shader, LPCSTR s_te
 	return N;
 }
 
-Shader*	CResourceManager::_cpp_Create	(LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_constants, LPCSTR s_matrices)
+Shader*	CResourceManager::_cpp_Create	(LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_constants, LPCSTR s_matrices,bool quiet)
 {
 #ifndef DEDICATED_SERVER
 	IBlender* blender=_GetBlender(s_shader?s_shader:"null");
-	return	_cpp_Create(blender,s_shader,s_textures,s_constants,s_matrices);
+	return	_cpp_Create(blender,s_shader,s_textures,s_constants,s_matrices,quiet);
 #else
 	return NULL;
 #endif
 }
 
-Shader*		CResourceManager::Create	(IBlender*	B,		LPCSTR s_shader,	LPCSTR s_textures,	LPCSTR s_constants, LPCSTR s_matrices)
+Shader*		CResourceManager::Create	(IBlender*	B,		LPCSTR s_shader,	LPCSTR s_textures,	LPCSTR s_constants, LPCSTR s_matrices,bool quiet)
 {
 #ifndef DEDICATED_SERVER
-	return	_cpp_Create	(B,s_shader,s_textures,s_constants,s_matrices);
+	return	_cpp_Create	(B,s_shader,s_textures,s_constants,s_matrices,quiet);
 #else
 	return NULL;
 #endif
 }
 
-Shader*		CResourceManager::Create	(LPCSTR s_shader,	LPCSTR s_textures,	LPCSTR s_constants,	LPCSTR s_matrices)
+Shader*		CResourceManager::Create	(LPCSTR s_shader,	LPCSTR s_textures,	LPCSTR s_constants,	LPCSTR s_matrices,bool quiet)
 {
 #ifndef DEDICATED_SERVER
 	#ifndef _EDITOR
-		if	(_lua_HasShader(s_shader))		return	_lua_Create	(s_shader,s_textures);
+		if	(_lua_HasShader(s_shader))		return	_lua_Create	(s_shader,s_textures,quiet);
 		else								
 	#endif
-		return	_cpp_Create	(s_shader,s_textures,s_constants,s_matrices);
+		return	_cpp_Create	(s_shader,s_textures,s_constants,s_matrices,quiet);
 #else
 	return NULL;
 #endif

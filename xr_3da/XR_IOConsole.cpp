@@ -26,6 +26,13 @@ const char *			ioc_prompt	=	">>> ";
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
+
+bool CConsole::isUserDefinedParam(LPCSTR name) const
+{
+	return std::find(userDefinedNames.begin(),userDefinedNames.end(),name)!=userDefinedNames.end();
+		// strncmp(name, "ucp_", 4) == 0;
+}
+
 void CConsole::AddCommand(IConsole_Command* C)
 {
 	Commands[C->Name()] = C;
@@ -34,7 +41,9 @@ void CConsole::RemoveCommand(IConsole_Command* C)
 {
 	vecCMD_IT it = Commands.find(C->Name());
 	if(Commands.end()!=it)
+	{
 		Commands.erase(it);
+	}
 }
 void CConsole::Reset()
 {
@@ -60,14 +69,24 @@ void CConsole::Initialize()
 	CCC_Register	();
 	// Initialize is called from primary thread
 	m_XRayPrimaryThreadId = GetCurrentThreadId();
+	if (pSettings->section_exist("allowed_param_names"))
+	{
+		CInifile::Sect& data	= pSettings->r_section("allowed_param_names");
+		std::for_each(data.Data.begin(),data.Data.end(),[&](CInifile::Item item)
+		{
+			Msg("- Create user-defined param [%s]",item.first.c_str());
+			Commands.insert(mk_pair(item.first.c_str(),xr_new<CCC_UserParam>(item.first.c_str(),"")));
+			userDefinedNames.push_back(item.first);
+		});
+	}
 }
 
 void CConsole::Destroy	()
 {
 	Execute						("cfg_save");
 	xr_delete					(pFont);
-
 	Commands.clear				();
+	userDefinedNames.clear();
 }
 
 void CConsole::OnFrame	()
@@ -468,10 +487,13 @@ outloop:
 	if (I!=Commands.end()) {
 		IConsole_Command &C = *(I->second);
 		if (C.bEnabled) {
-			if (C.bLowerCaseArgs) strlwr(last_word);
+			if (C.bLowerCaseArgs) 
+				_strlwr(last_word);
 			if (last_word[0]==0) {
-				if (C.bEmptyArgsHandled) C.Execute(last_word);
-				else {
+				if (C.bEmptyArgsHandled) 
+					C.Execute(last_word);
+				else 
+				{
 					IConsole_Command::TStatus S; C.Status(S);
 					Msg("- %s %s",C.Name(),S);
 				}
@@ -480,8 +502,10 @@ outloop:
 			Log("! Command disabled.");
 		}
 	}
-	else 
-		Log("! Unknown command: ",first_word);
+	else
+	{
+			Log("! Unknown command: ",first_word);
+	}
 	editor[0]=0;
 }
 

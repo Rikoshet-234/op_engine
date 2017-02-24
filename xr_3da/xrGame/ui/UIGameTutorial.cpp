@@ -118,6 +118,13 @@ void CUISequencer::Start(LPCSTR tutor_name)
 	m_bActive					= true;
 }
 
+bool CUISequencer::CheckTutor(LPCSTR tutor_name) const
+{
+	CUIXml uiXml;
+	uiXml.Init					(CONFIG_PATH, UI_PATH, "game_tutorials.xml");
+	return uiXml.NavigateToNode (tutor_name,0)!=nullptr;
+}
+
 void CUISequencer::Destroy()
 {
 	Device.seqFrame.Remove		(this);
@@ -127,6 +134,8 @@ void CUISequencer::Destroy()
 	IR_Release					();
 	m_bActive					= false;
 	m_pStoredInputReceiver		= NULL;
+	if(!m_on_destroy_event.empty())
+		m_on_destroy_event();
 }
 
 void CUISequencer::Stop()

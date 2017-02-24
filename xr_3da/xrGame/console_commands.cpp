@@ -1566,7 +1566,6 @@ void CCC_RegisterCommands()
 {
 	// options
 	g_OptConCom.Init();
-
 	CMD4(CCC_Integer,			"c_r",	&c_r	,			0,		255				);
 	CMD4(CCC_Integer,			"c_g",	&c_g	,			0,		255				);
 	CMD4(CCC_Integer,			"c_b",	&c_b	,			0,		255				);

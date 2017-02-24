@@ -193,7 +193,7 @@ STRING_VALUE CStringTable::ParseLine(LPCSTR str, LPCSTR skey, bool bFirst)
 	return STRING_VALUE(res.c_str());
 }
 
-STRING_VALUE CStringTable::translate (const STRING_ID& str_id) const
+STRING_VALUE CStringTable::translate (const STRING_ID& str_id,bool trim) const
 {
 	VERIFY					(pData);
 
@@ -206,7 +206,7 @@ STRING_VALUE CStringTable::translate (const STRING_ID& str_id) const
 		if (str_id==nullptr)
 			return str_id;
 		std::string resStr(str_id.c_str());
-		if (resStr.front()=='"' && resStr.back()=='"') 
+		if (trim && (resStr.front()=='"' && resStr.back()=='"')) 
 			OPFuncs::trimq(resStr);
 		return resStr.c_str();
 		//return str_id;

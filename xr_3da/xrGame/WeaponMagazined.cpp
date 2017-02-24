@@ -145,8 +145,6 @@ void CWeaponMagazined::Load	(LPCSTR section)
 	animName="anim_idle_moving";
 	if(pSettings->line_exist(*hud_sect,"anim_idle_moving"))
 		animGet				(mhud.anim_idle_moving,pSettings->r_string(*hud_sect, animName),*hud_sect,animName);
-	//else
-	//	mhud.anim_idle_moving=mhud.mhud_idle;
 #pragma endregion 
 
 	if(IsZoomEnabled())
