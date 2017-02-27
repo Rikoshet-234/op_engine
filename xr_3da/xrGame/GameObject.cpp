@@ -97,8 +97,10 @@ void CGameObject::reinit	()
 		ai_location().reinit	();
 
 	// clear callbacks	
+	TSP_BEGIN("CAI_ObjectLocation::reinit()", "spawn");
 	for (CALLBACK_MAP_IT it = m_callbacks->begin(); it != m_callbacks->end(); ++it) it->second.clear();
 	for (CALLBACK_MAP_BOOL_IT it = m_callbacks_bool->begin(); it != m_callbacks_bool->end(); ++it) it->second.clear();
+	TSP_END("CAI_ObjectLocation::reinit()", "spawn");
 }
 
 void CGameObject::reload	(LPCSTR section)
@@ -219,9 +221,11 @@ void CGameObject::OnEvent		(NET_Packet& P, u16 type)
 }
 
 void VisualCallback(CKinematics *tpKinematics);
-
+#include "../xrCore/FTimerStat.h"
 BOOL CGameObject::net_Spawn		(CSE_Abstract*	DC)
 {
+	TSP_SCOPED(_, "CGameObject::net_Spawn", "spawn");
+	TSP_BEGIN("CGameObject::net_Spawn(0)", "spawn");
 	VERIFY							(!m_spawned);
 	m_spawned						= true;
 	m_spawn_time					= Device.dwFrame;
@@ -229,14 +233,21 @@ BOOL CGameObject::net_Spawn		(CSE_Abstract*	DC)
 	VERIFY							(E);
 
 	const CSE_Visual				*visual	= smart_cast<const CSE_Visual*>(E);
-	if (visual) {
-		cNameVisual_set				(visual_name(E));
+	if (visual) 
+	{
+		TSP_BEGIN("CGameObject::net_Spawn(0.1)", "spawn");
+		LPCSTR name = visual_name(E);
+		TSP_END("CGameObject::net_Spawn(0.1)", "spawn");
+		TSP_BEGIN("CGameObject::net_Spawn(0.2)", "spawn");
+		cNameVisual_set				(name);
+		TSP_END("CGameObject::net_Spawn(0.2)", "spawn");
 		if (visual->flags.test(CSE_Visual::flObstacle)) {
 			ISpatial				*self = smart_cast<ISpatial*>(this);
 			self->spatial.type		|=	STYPE_OBSTACLE;
 		}
 	}
-
+	TSP_END("CGameObject::net_Spawn(0)", "spawn");
+	TSP_BEGIN("CGameObject::net_Spawn(1)", "spawn");
 	// Naming
 	cName_set						(E->s_name);
 	cNameSect_set					(E->s_name);
@@ -251,6 +262,8 @@ BOOL CGameObject::net_Spawn		(CSE_Abstract*	DC)
 	// XForm
 	XFORM().setXYZ					(E->o_Angle);
 	Position().set					(E->o_Position);
+	TSP_END("CGameObject::net_Spawn(1)", "spawn");
+	TSP_BEGIN("CGameObject::net_Spawn(2)", "spawn");
 #ifdef DEBUG
 	if(ph_dbg_draw_mask1.test(ph_m1_DbgTrackObject)&&stricmp(PH_DBG_ObjectTrack(),*cName())==0)
 	{
@@ -297,6 +310,8 @@ BOOL CGameObject::net_Spawn		(CSE_Abstract*	DC)
 			}
 		}
 	}
+	TSP_END("CGameObject::net_Spawn(2)", "spawn");
+	TSP_BEGIN("CGameObject::net_Spawn(3)", "spawn");
 
 	m_story_id						= ALife::_STORY_ID(-1);
 	if (O)
@@ -320,20 +335,30 @@ BOOL CGameObject::net_Spawn		(CSE_Abstract*	DC)
 		else
 			spatial.type				= (spatial.type | STYPE_VISIBLEFORAI) ^ STYPE_VISIBLEFORAI;
 	}
-
+	TSP_END("CGameObject::net_Spawn(3)", "spawn");
+	TSP_BEGIN("CGameObject::net_Spawn(4)", "spawn");
+	TSP_BEGIN("CGameObject::net_Spawn(4.1)", "spawn");
 	reload						(*cNameSect());
 	if(!g_dedicated_server)
 		CScriptBinder::reload	(*cNameSect());
-	
+	TSP_END("CGameObject::net_Spawn(4.1)", "spawn");
+	TSP_BEGIN("CGameObject::net_Spawn(4.2.1)", "spawn");
 	reinit						();
+	TSP_END("CGameObject::net_Spawn(4.2.1)", "spawn");
 	if(!g_dedicated_server)
+	{
+		
+		TSP_BEGIN("CGameObject::net_Spawn(4.2.2)", "spawn");
 		CScriptBinder::reinit	();
+		TSP_END("CGameObject::net_Spawn(4.2.2)", "spawn");
+	}
 #ifdef DEBUG
 	if(ph_dbg_draw_mask1.test(ph_m1_DbgTrackObject)&&stricmp(PH_DBG_ObjectTrack(),*cName())==0)
 	{
 		Msg("CGameObject::net_Spawn obj %s After Script Binder reinit %f,%f,%f",PH_DBG_ObjectTrack(),Position().x,Position().y,Position().z);
 	}
 #endif
+	TSP_BEGIN("CGameObject::net_Spawn(4.3)", "spawn");
 	//load custom user data from server
 	if(!E->client_data.empty())
 	{	
@@ -345,7 +370,9 @@ BOOL CGameObject::net_Spawn		(CSE_Abstract*	DC)
 	{
 //		Msg				("no client data for object [%d][%s], load is skipped",ID(),*cName());
 	}
-
+	TSP_END("CGameObject::net_Spawn(4.3)", "spawn");
+	TSP_END("CGameObject::net_Spawn(4)", "spawn");
+	TSP_BEGIN("CGameObject::net_Spawn(5)", "spawn");
 	// if we have a parent
 	if (0xffff != E->ID_Parent) {		
 		if (!Parent) {
@@ -388,7 +415,8 @@ BOOL CGameObject::net_Spawn		(CSE_Abstract*	DC)
 		}
 		inherited::net_Spawn	(DC);
 	}
-
+	TSP_END("CGameObject::net_Spawn(5)", "spawn");
+	TSP_BEGIN("CGameObject::net_Spawn(6)", "spawn");
 	m_bObjectRemoved			= false;
 
 	spawn_supplies				();
@@ -399,6 +427,7 @@ BOOL CGameObject::net_Spawn		(CSE_Abstract*	DC)
 	}
 	BOOL ret =CScriptBinder::net_Spawn(DC);
 #else
+	TSP_END("CGameObject::net_Spawn(6)", "spawn");
 	return						(CScriptBinder::net_Spawn(DC));
 #endif
 

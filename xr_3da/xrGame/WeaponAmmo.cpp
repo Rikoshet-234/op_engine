@@ -97,9 +97,10 @@ void CWeaponAmmo::Load(LPCSTR section)
 	m_boxSize				= (u16)pSettings->r_s32(section, "box_size");
 	m_boxCurr				= m_boxSize;	
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CWeaponAmmo::net_Spawn(CSE_Abstract* DC) 
 {
+	TSP_SCOPED(_, "CWeaponAmmo::net_Spawn", "spawn");
 	BOOL bResult			= inherited::net_Spawn	(DC);
 	CSE_Abstract	*e		= (CSE_Abstract*)(DC);
 	CSE_ALifeItemAmmo* l_pW	= smart_cast<CSE_ALifeItemAmmo*>(e);

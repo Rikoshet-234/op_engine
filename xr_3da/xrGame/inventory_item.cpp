@@ -447,10 +447,11 @@ bool CInventoryItem::Detach(const char* item_section_name, bool b_spawn_item)
 	}
 	return true;
 }
-
+#include "../xrCore/FTimerStat.h"
 /////////// network ///////////////////////////////
 BOOL CInventoryItem::net_Spawn			(CSE_Abstract* DC)
 {
+	TSP_SCOPED(_, "CInventoryItem::net_Spawn", "spawn");
 	m_flags.set						(FInInterpolation, FALSE);
 	m_flags.set						(FInInterpolate,	FALSE);
 //	m_bInInterpolation				= false;

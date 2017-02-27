@@ -50,9 +50,10 @@ void CGrenade::Hit					(SHit* pHDS)
 	}
 	inherited::Hit(pHDS);
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CGrenade::net_Spawn(CSE_Abstract* DC) 
 {
+	TSP_SCOPED(_, "CGrenade::net_Spawn", "spawn");
 	m_dwGrenadeIndependencyTime			= 0;
 	BOOL ret= inherited::net_Spawn		(DC);
 	Fvector box;BoundingBox().getsize	(box);

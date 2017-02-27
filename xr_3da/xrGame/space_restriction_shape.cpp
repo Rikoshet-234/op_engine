@@ -13,7 +13,7 @@
 #include "space_restrictor.h"
 #include "graph_engine.h"
 #include "../../build_defines.h"
-
+#include "../../xrCore/FTimerStat.h"
 
 struct CBorderMergePredicate {
 	CSpaceRestrictionShape			*m_restriction;
@@ -25,12 +25,17 @@ struct CBorderMergePredicate {
 
 	IC	void	operator()				(const CLevelGraph::CVertex &vertex) const
 	{
+		//TSP_SCOPED(_, __FUNCTION__, "spawn");
 		if (m_restriction->inside(ai().level_graph().vertex_id(&vertex),true) && !m_restriction->inside(ai().level_graph().vertex_id(&vertex),false))
+		{
+			//TSP_SCOPED(_, "CBorderMergePredicate::push_back", "spawn");
 			m_restriction->m_border.push_back	(ai().level_graph().vertex_id(&vertex));
+		}
 	}
 
 	IC	bool operator()					(u32 level_vertex_id) const
 	{
+		//TSP_SCOPED(_, "CBorderMergePredicate::inside", "spawn");
 		return						(m_restriction->inside(level_vertex_id,false));
 	}
 };
@@ -56,6 +61,7 @@ struct CShapeTestPredicate {
 
 void CSpaceRestrictionShape::fill_shape		(const CCF_Shape::shape_def &shape)
 {
+	TSP_SCOPED(_, __FUNCTION__, "spawn");
 	Fvector							start,dest;
 	switch (shape.type) {
 		case 0 : {
@@ -95,7 +101,6 @@ void CSpaceRestrictionShape::fill_shape		(const CCF_Shape::shape_def &shape)
 		default : NODEFAULT;
 	}
 	ai().level_graph().iterate_vertices(start,dest,CBorderMergePredicate(this));
-
 #ifdef VERIFY_RESTRICTORS
 	ai().level_graph().iterate_vertices(start,dest,CShapeTestPredicate(this));
 #endif
@@ -103,14 +108,16 @@ void CSpaceRestrictionShape::fill_shape		(const CCF_Shape::shape_def &shape)
 
 void CSpaceRestrictionShape::build_border	()
 {
+	TSP_SCOPED(_, "CSpaceRestrictionShape::build_border", "spawn");
 	m_border.clear					();
 	CCF_Shape						*shape = smart_cast<CCF_Shape*>(m_restrictor->collidable.model);
 	VERIFY							(shape);
 	xr_vector<CCF_Shape::shape_def>::const_iterator	I = shape->Shapes().begin();
 	xr_vector<CCF_Shape::shape_def>::const_iterator	E = shape->Shapes().end();
 	for ( ; I != E; ++I)
+	{
 		fill_shape					(*I);
-	
+	}
 	{
 		m_border.erase				(
 			std::remove_if(

@@ -74,9 +74,10 @@ void CPhysicItem::OnH_B_Chield		()
 
 	inherited::deactivate_physics_shell();
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CPhysicItem::net_Spawn			(CSE_Abstract* DC)
 {
+	TSP_SCOPED(_, "CPhysicsItem::net_Spawn", "spawn");
 	if (!inherited::net_Spawn(DC))
 		return				(FALSE);
 	smart_cast<CKinematics*>(Visual())->CalculateBones_Invalidate	();

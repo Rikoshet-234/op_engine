@@ -21,6 +21,7 @@
 #include "material_manager.h"
 #include "game_base_space.h"
 #include "ai/stalker/ai_stalker.h"
+#include "../../xrCore/FTimerStat.h"
 
 #define SMALL_ENTITY_RADIUS		0.6f
 #define BLOOD_MARKS_SECT		"bloody_marks"
@@ -177,6 +178,7 @@ void CEntityAlive::UnloadFireParticles()
 
 void CEntityAlive::reinit()
 {
+	TSP_SCOPED(_, __FUNCTION__, "spawn");
 	CEntity::reinit			();
 
 	m_fAccuracy				= 25.f;
@@ -222,9 +224,10 @@ void CEntityAlive::shedule_Update(u32 dt)
 		}
 	}
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CEntityAlive::net_Spawn	(CSE_Abstract* DC)
 {
+	TSP_SCOPED(_, "CEntityAlive::net_Spawn", "spawn");
 	//установить команду в соответствии с community
 /*	if(monster_community->team() != 255)
 		id_Team = monster_community->team();*/

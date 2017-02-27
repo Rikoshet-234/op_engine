@@ -35,9 +35,10 @@ CCustomDetector::~CCustomDetector(void)
 
 	m_ZoneInfoMap.clear();
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CCustomDetector::net_Spawn(CSE_Abstract* DC) 
 {
+	TSP_SCOPED(_, "CCustomDetector::net_Spawn", "spawn");
 	m_pCurrentActor		 = NULL;
 	m_pCurrentInvOwner	 = NULL;
 

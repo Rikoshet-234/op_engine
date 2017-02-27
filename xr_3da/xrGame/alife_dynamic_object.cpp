@@ -16,9 +16,7 @@
 #include "game_level_cross_table.h"
 #include "game_graph.h"
 #include "xrServer.h"
-//#define TS_ENABLE
 #include "../xrCore/FTimerStat.h"
-#undef TS_ENABLE
 
 void CSE_ALifeDynamicObject::on_spawn				()
 {
@@ -27,17 +25,11 @@ void CSE_ALifeDynamicObject::on_spawn				()
 #endif
 }
 
-extern bool g_measure;
-TSE_DECLARE(g_dynamic);
-TSE_DECLARE(g_dynamic_td);
-TSE_DECLARE(g_dynamic_bu);
 void CSE_ALifeDynamicObject::on_register			()
 {
-	if (g_measure)
-	{
-		TS_END(g_dynamic_td);
-		TS_BEGIN(g_dynamic);
-	}
+	//TSP_END("g_td_dynamic", "spawn");
+	//TSP_BEGIN("g_dynamic", "spawn");
+	
 
 	CSE_ALifeObject		*object = this;
 	while (object->ID_Parent != ALife::_OBJECT_ID(-1)) {
@@ -48,11 +40,8 @@ void CSE_ALifeDynamicObject::on_register			()
 	if (!alife().graph().level().object(object->ID,true) && !keep_saved_data_anyway())
 		client_data.clear					();
 
-	if (g_measure)
-	{
-		TS_END(g_dynamic);
-		TS_BEGIN(g_dynamic_bu);
-	}
+	//TS_END("g_dynamic", "spawn");
+	//TS_BEGIN("g_dynamic_bu", "spawn");
 }
 
 void CSE_ALifeDynamicObject::on_before_register		()

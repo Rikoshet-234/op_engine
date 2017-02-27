@@ -109,9 +109,10 @@ void CInventoryItemObject::OnEvent			(NET_Packet& P, u16 type)
 	CPhysicItem::OnEvent				(P, type);
 	CInventoryItem::OnEvent				(P, type);
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CInventoryItemObject::net_Spawn		(CSE_Abstract* DC)
 {
+	TSP_SCOPED(_, "CInventoryItemObject::net_Spawn", "spawn");
 	BOOL								res = CPhysicItem::net_Spawn(DC);
 	CInventoryItem::net_Spawn			(DC);
 	return								(res);

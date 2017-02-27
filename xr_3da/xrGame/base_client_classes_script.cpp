@@ -14,8 +14,14 @@
 #include "../skeletonanimated.h"
 #include "ai/stalker/ai_stalker.h"
 #include "../../xrNetServer/net_utils.h"
-
+#include "../xrCore/FTimerStat.h"
 using namespace luabind;
+
+BOOL CGameObjectWrapper::net_Spawn(CSE_Abstract* data)
+{
+	TSP_SCOPED(_, "CGameObjectWrapper::net_Spawn", "spawn");
+	return (luabind::call_member<bool>(this,"net_Spawn",data));
+}
 
 #pragma optimize("s",on)
 void DLL_PureScript::script_register	(lua_State *L)

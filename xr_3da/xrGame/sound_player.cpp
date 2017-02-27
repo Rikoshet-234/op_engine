@@ -66,7 +66,9 @@ u32 CSoundPlayer::add				(LPCSTR prefix, u32 max_count, ESoundTypes type, u32 pr
 {
 	SOUND_COLLECTIONS::iterator		I = m_sounds.find(internal_type);
 	if (m_sounds.end() != I)
+	{
 		return						(0);
+	}
 
 	CSoundCollectionParamsFull			sound_params;
 	sound_params.m_priority				= priority;
@@ -77,12 +79,10 @@ u32 CSoundPlayer::add				(LPCSTR prefix, u32 max_count, ESoundTypes type, u32 pr
 	sound_params.m_max_count			= max_count;
 	sound_params.m_type					= type;
 
-	typedef CSoundCollectionStorage::SOUND_COLLECTION_PAIR	SOUND_COLLECTION_PAIR;
-	const SOUND_COLLECTION_PAIR			&pair = sound_collection_storage().object(sound_params);
-	VERIFY								(pair.first == (CSoundCollectionParams&)sound_params);
-	VERIFY								(pair.second);
-	m_sounds.insert						(std::make_pair(internal_type,std::make_pair(sound_params,pair.second)));
-	return								(pair.second->m_sounds.size());
+	CSoundCollection*					collection = sound_collection_storage().object(sound_params);
+	VERIFY								(collection);
+	m_sounds.insert						(std::make_pair(internal_type,std::make_pair(sound_params,collection)));
+	return								(collection->m_sounds.size());
 }
 
 void CSoundPlayer::remove			(u32 internal_type)
@@ -255,7 +255,7 @@ CSoundPlayer::CSoundCollection::CSoundCollection	(const CSoundCollectionParams &
 		for (u32 i=0; i<params.m_max_count; ++i){
 			string256					name;
 			sprintf_s						(name,"%s%d",S,i);
-			if (FS.exist(fn,"$game_sounds$",name,".ogg")) {
+			if (FS.exist(fn,"$game_sounds$",name,".ogg")){
 				ref_sound				*temp = add(params.m_type,name);
 				if (temp)
 					m_sounds.push_back	(temp);

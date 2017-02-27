@@ -16,9 +16,10 @@ CPhysicsSkeletonObject::~CPhysicsSkeletonObject()
 
 }
 
-
+#include "../xrCore/FTimerStat.h"
 BOOL CPhysicsSkeletonObject::net_Spawn(CSE_Abstract* DC)
 {
+	TSP_SCOPED(_, "CPhysicsSkeletonObject::net_Spawn", "spawn");
 	CSE_Abstract			  *e	= (CSE_Abstract*)(DC);
 
 	inherited::net_Spawn	(DC);

@@ -21,10 +21,6 @@
 #include <chrono>
 #include <functional>
 
-//#define TS_ENABLE
-#include "../xrCore/FTimerStat.h"
-#undef TS_ENABLE
-
 #ifndef MASTER_GOLD
 #	include "custommonster.h"
 #endif // MASTER_GOLD
@@ -123,13 +119,7 @@ void CGamePersistent::RegisterModel(IRender_Visual* V)
 extern void clean_game_globals	();
 extern void init_game_globals	();
 
-TS_DECLARE(g_mmLoad);
-TS_DECLARE(g_mmForOuter);
-TS_DECLARE(g_mmFOFind);
-TS_DECLARE(g_mmFORead);
-TS_DECLARE(g_mmFOIf);
-TS_DECLARE(g_mmFOElse);
-TS_DECLARE(g_detailLoad);
+#include "../xrCore/OPFuncs/global_timers.h"
 
 void CGamePersistent::OnAppStart()
 {
@@ -146,7 +136,7 @@ void CGamePersistent::OnAppStart()
 	chrono1 = std::chrono::high_resolution_clock::now();
 	__super::OnAppStart			();
 	chrono2 = std::chrono::high_resolution_clock::now();
-	TS_P(g_detailLoad, "CDetail::Load");
+	TS_PRINT("g_detailLoad");
 	Msg("App_Start loaded at %lli msec",std::chrono::duration_cast<std::chrono::milliseconds>(chrono2-chrono1).count());
 
 	chrono1 = std::chrono::high_resolution_clock::now();
@@ -157,12 +147,12 @@ void CGamePersistent::OnAppStart()
 	chrono1 = std::chrono::high_resolution_clock::now();
 	m_pMainMenu					= xr_new<CMainMenu>();
 	chrono2 = std::chrono::high_resolution_clock::now();
-	TS_P(g_mmLoad, "MainMenu::Load");
-	TS_P(g_mmForOuter, "MainMenu::FO");
-	TS_P(g_mmFOFind, "MainMenu::FOFind");
-	TS_P(g_mmFORead, "MainMenu::FORead");
-	TS_P(g_mmFOIf, "MainMenu::FOIf");
-	TS_P(g_mmFOElse, "MainMenu::FOElse");
+	TS_PRINT("g_mmLoad");
+	TS_PRINT("g_mmForOuter");
+	TS_PRINT("g_mmFOFind");
+	TS_PRINT("g_mmFORead");
+	TS_PRINT("g_mmFOIf");
+	TS_PRINT("g_mmFOElse");
 	Msg("Main_Menu loaded at %lli msec",std::chrono::duration_cast<std::chrono::milliseconds>(chrono2-chrono1).count());
 }
 

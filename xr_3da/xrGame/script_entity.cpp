@@ -88,6 +88,7 @@ void CScriptEntity::ClearActionQueue()
 
 void CScriptEntity::reinit()
 {
+	TSP_SCOPED(_, __FUNCTION__, "spawn");
 	ResetScriptData			();
 	
 	set_script_capture		();
@@ -535,9 +536,10 @@ LPCSTR CScriptEntity::GetPatrolPathName()
 		return				("");
 	return					(*m_tpActionQueue.back()->m_tMovementAction.m_path_name);
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CScriptEntity::net_Spawn		(CSE_Abstract* DC)
 {
+	TSP_SCOPED(_, "CScriptEntity::net_Spawn", "spawn");
 	m_initialized					= true;
 	object().setVisible				(TRUE);
 	object().setEnabled				(TRUE);

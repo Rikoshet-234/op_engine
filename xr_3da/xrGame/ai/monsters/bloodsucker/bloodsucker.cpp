@@ -297,9 +297,10 @@ void CAI_Bloodsucker::CheckSpecParams(u32 spec_params)
 	}
 
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CAI_Bloodsucker::net_Spawn (CSE_Abstract* DC) 
 {
+	TSP_SCOPED(_, "CAI_Bloodsucker::net_Spawn", "spawn");
 	if (!inherited::net_Spawn(DC))
 		return(FALSE);
 

@@ -46,9 +46,10 @@ float CTeamBaseZone::Radius			() const
 {
 	return						(CFORM()->getRadius());
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CTeamBaseZone::net_Spawn	(CSE_Abstract* DC) 
 {
+	TSP_SCOPED(_, "CTeamBaseZone::net_Spawn", "spawn");
 	CCF_Shape					*l_pShape = xr_new<CCF_Shape>(this);
 	collidable.model			= l_pShape;
 

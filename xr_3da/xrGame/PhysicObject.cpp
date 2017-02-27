@@ -22,9 +22,10 @@ CPhysicObject::CPhysicObject(void)
 CPhysicObject::~CPhysicObject(void)
 {
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CPhysicObject::net_Spawn(CSE_Abstract* DC)
 {
+	TSP_SCOPED(_, "CPhysicsObject::net_Spawn", "spawn");
 	CSE_Abstract			*e	= (CSE_Abstract*)(DC);
 	CSE_ALifeObjectPhysic	*po	= smart_cast<CSE_ALifeObjectPhysic*>(e);
 	R_ASSERT				(po);

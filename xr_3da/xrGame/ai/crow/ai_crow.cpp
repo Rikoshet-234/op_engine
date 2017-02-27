@@ -122,9 +122,10 @@ void CAI_Crow::Load( LPCSTR section )
 
 
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CAI_Crow::net_Spawn		(CSE_Abstract* DC)
 {
+	TSP_SCOPED(_, "CAI_Crow::net_Spawn", "spawn");
 	BOOL R		= inherited::net_Spawn	(DC);
 	setVisible	(TRUE);
 	setEnabled	(TRUE);

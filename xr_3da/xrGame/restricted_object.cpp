@@ -60,9 +60,10 @@ IC	void construct_id_string					(LPSTR result, const xr_vector<ALife::_OBJECT_ID
 	}
 }
 #endif
-
+#include "../xrCore/FTimerStat.h"
 BOOL CRestrictedObject::net_Spawn			(CSE_Abstract* data)
 {
+	TSP_SCOPED(_, "CRestrictedObject::net_Spawn", "spawn");
 	CSE_Abstract				*abstract	= (CSE_Abstract*)(data);
 	CSE_ALifeMonsterAbstract	*monster	= smart_cast<CSE_ALifeMonsterAbstract*>(abstract);
 	VERIFY						(monster);

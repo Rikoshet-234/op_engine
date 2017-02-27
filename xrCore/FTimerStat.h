@@ -3,6 +3,7 @@
 #pragma once
 
 #include "FTimer.h"
+#include <vector>
 
 class XRCORE_API CTimerStat
 {
@@ -40,26 +41,56 @@ private:
 	CTimerStat& m_rTimer;
 };
 
+class XRCORE_API CTimerStatScopedNamed
+{
+public:
+	typedef void (*fn)(const char* name, const char* enabler);
+public:
+	CTimerStatScopedNamed(const char* name, const char* enabler, fn begin, fn end) : m_name(name), m_enabler(enabler), m_end(end) { begin(name, enabler); }
+	~CTimerStatScopedNamed() { m_end(m_name, m_enabler); }
+private:
+	CTimerStatScopedNamed(const CTimerStatScopedNamed& rTimer);
+	CTimerStatScopedNamed& operator=(const CTimerStatScopedNamed& rTimer);
+	const char* m_name;
+	const char* m_enabler;
+	fn m_end;
+};
+
 #ifdef TS_ENABLE
-	#define TS_DECLARE(x) CTimerStat x
-	#define TSE_DECLARE(x) extern CTimerStat x
-	#define TSS_DECLARE(x,y) CTimerStatScoped x(y)
-	#define TS_BEGIN(x) x.Begin()
-	#define TS_END(x) x.End()
-	#define TS_RESET(x) x.Reset()
-	#define TS_P(x,name) x.Print(name)
-	#define TS_PR(x,name) x.Print(name); x.Reset()
-	#define TS_EPR(x,name) x.End(); x.Print(name); x.Reset()
+	XRCORE_API void TSM_Init();
+	XRCORE_API void TSM_DeInit();
+	XRCORE_API void TSM_Enable(const char* enabler);
+	XRCORE_API void TSM_Disable(const char* enabler);
+	XRCORE_API void TSM_BeginProfile(const char* name, const char* enabler);
+	XRCORE_API void TSM_EndProfile(const char* name, const char* enabler);
+	XRCORE_API void TSM_Begin(const char* name, const char* enabler);
+	XRCORE_API void TSM_End(const char* name, const char* enabler);
+	XRCORE_API void TSM_Print();
+	XRCORE_API void TSM_Print(const char* name);
+
+	#define TSE_INIT() TSM_Init()
+	#define TSE_DEINIT() TSM_DeInit()
+	#define TSE_ENABLE(e) TSM_Enable(e)
+	#define TSE_DISABLE(e) TSM_Disable(e)
+	#define TSP_BEGIN(n, e) TSM_BeginProfile(n, e)
+	#define TSP_END(n, e) TSM_EndProfile(n, e)
+	#define TSP_SCOPED(s,n,e) CTimerStatScopedNamed s(n, e, TSM_BeginProfile, TSM_EndProfile);
+	#define TS_BEGIN(n, e) TSM_Begin(n, e)
+	#define TS_END(n, e) TSM_End(n, e)
+	#define TS_SCOPED(s,n,e) CTimerStatScopedNamed s(n, e, TSM_Begin, TSM_End);
+	#define TSP_PRINT() TSM_Print()
+	#define TS_PRINT(n) TSM_Print(n)
 #else
-	#define TS_DECLARE(x)
-	#define TSE_DECLARE(x)
-	#define TSS_DECLARE(x,y)
-	#define TS_BEGIN(x)
-	#define TS_END(x)
-	#define TS_RESET(x)
-	#define TS_P(x,name)
-	#define TS_EPR(x,name)
-	#define TS_PR(x,name)
+	#define TS_ENABLE(e)
+	#define TS_DISABLE(e)
+	#define TSP_BEGIN(n, e)
+	#define TSP_END(n, e)
+	#define TSP_SCOPED(s,n,e)
+	#define TS_BEGIN(n, e)
+	#define TS_END(n, e)
+	#define TS_SCOPED(s,n,e)
+	#define TSP_PRINT()
+	#define TS_PRINT()
 #endif
 
 #endif // FTimerStatH

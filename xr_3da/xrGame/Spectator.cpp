@@ -372,9 +372,10 @@ void CSpectator::cam_Update	(CActor* A)
 		// hud output
 	};
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL			CSpectator::net_Spawn				( CSE_Abstract*	DC )
 {
+	TSP_SCOPED(_, "CSpectator::net_Spawn", "spawn");
 	BOOL res = inherited::net_Spawn(DC);
 	if (!res) return FALSE;
 

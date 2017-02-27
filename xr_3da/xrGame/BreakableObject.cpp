@@ -37,10 +37,10 @@ void CBreakableObject::Load		(LPCSTR section)
 	this->shedule.t_min	= 1000;
 	this->shedule.t_max	= 1000;
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CBreakableObject::net_Spawn(CSE_Abstract* DC)
 {
-
+	TSP_SCOPED(_, "CBreakableObject::net_Spawn", "spawn");
 	CSE_Abstract			*e		= (CSE_Abstract*)(DC);
 	CSE_ALifeObjectBreakable *obj	= smart_cast<CSE_ALifeObjectBreakable*>(e);
 	R_ASSERT				(obj);

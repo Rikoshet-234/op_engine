@@ -12,6 +12,7 @@
 #include "space_restriction_manager.h"
 #include "space_restriction_bridge.h"
 #include "object_broker.h"
+#include "../../xrCore/FTimerStat.h"
 
 const u32 time_to_delete = 300000;
 
@@ -42,6 +43,7 @@ void show_restriction				(const shared_str &restrictions)
 typedef intrusive_ptr<CSpaceRestriction,RestrictionSpace::CTimeIntrusiveBase> CRestrictionPtr;
 void show_restriction				(const CRestrictionPtr &restriction)
 {
+	TS_SCOPED(_, __FUNCTION__, "spawn");
 	Msg								("out");
 	show_restriction				(restriction->out_restrictions());
 	Msg								("in");
@@ -50,6 +52,7 @@ void show_restriction				(const CRestrictionPtr &restriction)
 
 void CSpaceRestrictionManager::clear						()
 {
+	TS_SCOPED(_, __FUNCTION__, "spawn");
 	m_clients->clear				();
 	delete_data						(m_space_restrictions);
 
@@ -58,6 +61,7 @@ void CSpaceRestrictionManager::clear						()
 
 void CSpaceRestrictionManager::remove_border				(ALife::_OBJECT_ID id)
 {
+	TS_SCOPED(_, __FUNCTION__, "spawn");
 	CRestrictionPtr				client_restriction = restriction(id);
 	if (client_restriction)
 		client_restriction->remove_border	();
@@ -65,6 +69,7 @@ void CSpaceRestrictionManager::remove_border				(ALife::_OBJECT_ID id)
 
 shared_str	CSpaceRestrictionManager::in_restrictions			(ALife::_OBJECT_ID id)
 {
+	TS_SCOPED(_, __FUNCTION__, "spawn");
 	CRestrictionPtr				client_restriction = restriction(id);
 	if (client_restriction)
 		return					(client_restriction->in_restrictions());
@@ -73,6 +78,7 @@ shared_str	CSpaceRestrictionManager::in_restrictions			(ALife::_OBJECT_ID id)
 
 shared_str	CSpaceRestrictionManager::out_restrictions			(ALife::_OBJECT_ID id)
 {
+	TS_SCOPED(_, __FUNCTION__, "spawn");
 	CRestrictionPtr				client_restriction = restriction(id);
 	if (client_restriction)
 		return					(client_restriction->out_restrictions());
@@ -81,6 +87,7 @@ shared_str	CSpaceRestrictionManager::out_restrictions			(ALife::_OBJECT_ID id)
 
 shared_str	CSpaceRestrictionManager::base_in_restrictions		(ALife::_OBJECT_ID id)
 {
+	TS_SCOPED(_, __FUNCTION__, "spawn");
 	CLIENT_RESTRICTIONS::iterator	I = m_clients->find(id);
 	VERIFY							(m_clients->end() != I);
 	return							((*I).second.m_base_in_restrictions);
@@ -88,6 +95,7 @@ shared_str	CSpaceRestrictionManager::base_in_restrictions		(ALife::_OBJECT_ID id
 
 shared_str	CSpaceRestrictionManager::base_out_restrictions		(ALife::_OBJECT_ID id)
 {
+	TS_SCOPED(_, __FUNCTION__, "spawn");
 	CLIENT_RESTRICTIONS::iterator	I = m_clients->find(id);
 	VERIFY							(m_clients->end() != I);
 	return							((*I).second.m_base_out_restrictions);
@@ -95,6 +103,7 @@ shared_str	CSpaceRestrictionManager::base_out_restrictions		(ALife::_OBJECT_ID i
 
 IC	CSpaceRestrictionManager::CRestrictionPtr CSpaceRestrictionManager::restriction	(ALife::_OBJECT_ID id)
 {
+	TS_SCOPED(_, __FUNCTION__, "spawn");
 	CLIENT_RESTRICTIONS::iterator	I = m_clients->find(id);
 	VERIFY							(m_clients->end() != I);
 	return							((*I).second.m_restriction);
@@ -102,6 +111,7 @@ IC	CSpaceRestrictionManager::CRestrictionPtr CSpaceRestrictionManager::restricti
 
 IC	void CSpaceRestrictionManager::collect_garbage				()
 {
+	TS_SCOPED(_, __FUNCTION__, "spawn");
 	SPACE_RESTRICTIONS::iterator	I = m_space_restrictions.begin(), J;
 	SPACE_RESTRICTIONS::iterator	E = m_space_restrictions.end();
 	for ( ; I != E; ) {
@@ -118,11 +128,12 @@ IC	void CSpaceRestrictionManager::collect_garbage				()
 
 void CSpaceRestrictionManager::restrict							(ALife::_OBJECT_ID id, shared_str out_restrictors, shared_str in_restrictors)
 {
+	TSP_SCOPED(_, __FUNCTION__, "spawn");
 	shared_str									merged_out_restrictions = out_restrictors;
 	shared_str									merged_in_restrictions = in_restrictors;
 	shared_str									_default_out_restrictions = default_out_restrictions();
 	shared_str									_default_in_restrictions = default_in_restrictions();
-	
+
 	difference_restrictions						(_default_out_restrictions,merged_in_restrictions);
 	difference_restrictions						(_default_in_restrictions,merged_out_restrictions);
 
@@ -134,12 +145,13 @@ void CSpaceRestrictionManager::restrict							(ALife::_OBJECT_ID id, shared_str 
 	(*m_clients)[id].m_restriction				= restriction(merged_out_restrictions,merged_in_restrictions);
 	(*m_clients)[id].m_base_out_restrictions	= out_restrictors;
 	(*m_clients)[id].m_base_in_restrictions		= in_restrictors;
-	
+
 	collect_garbage								();
 }
 
 void CSpaceRestrictionManager::unrestrict						(ALife::_OBJECT_ID id)
 {
+	TS_SCOPED(_, __FUNCTION__, "spawn");
 	CLIENT_RESTRICTIONS::iterator				I = m_clients->find(id);
 	VERIFY										(I != m_clients->end());
 	m_clients->erase							(I);
@@ -148,6 +160,7 @@ void CSpaceRestrictionManager::unrestrict						(ALife::_OBJECT_ID id)
 
 bool CSpaceRestrictionManager::accessible						(ALife::_OBJECT_ID id, const Fsphere &sphere)
 {
+	TS_SCOPED(_, __FUNCTION__, "spawn");
 	CRestrictionPtr				client_restriction = restriction(id);
 	if (client_restriction)
 		return					(client_restriction->accessible(sphere));
@@ -156,6 +169,7 @@ bool CSpaceRestrictionManager::accessible						(ALife::_OBJECT_ID id, const Fsph
 
 bool CSpaceRestrictionManager::accessible					(ALife::_OBJECT_ID id, u32 level_vertex_id, float radius)
 {
+	TS_SCOPED(_, __FUNCTION__, "spawn");
 	CRestrictionPtr				client_restriction = restriction(id);
 	if (client_restriction)
 		return					(client_restriction->accessible(level_vertex_id,radius));
@@ -164,6 +178,7 @@ bool CSpaceRestrictionManager::accessible					(ALife::_OBJECT_ID id, u32 level_v
 
 CSpaceRestrictionManager::CRestrictionPtr	CSpaceRestrictionManager::restriction	(shared_str out_restrictors, shared_str in_restrictors)
 {
+	TS_SCOPED(_, __FUNCTION__, "spawn");
 	string4096					m_temp;
 	if (!xr_strlen(out_restrictors) && !xr_strlen(in_restrictors))
 		return					(0);
@@ -185,6 +200,7 @@ CSpaceRestrictionManager::CRestrictionPtr	CSpaceRestrictionManager::restriction	
 
 u32	CSpaceRestrictionManager::accessible_nearest			(ALife::_OBJECT_ID id, const Fvector &position, Fvector &result)
 {
+	TS_SCOPED(_, __FUNCTION__, "spawn");
 	CRestrictionPtr				client_restriction = restriction(id);
 	VERIFY						(client_restriction);
 	return						(client_restriction->accessible_nearest(position,result));
@@ -192,6 +208,7 @@ u32	CSpaceRestrictionManager::accessible_nearest			(ALife::_OBJECT_ID id, const 
 
 IC	bool CSpaceRestrictionManager::restriction_presented	(shared_str restrictions, shared_str restriction) const
 {
+	TS_SCOPED(_, __FUNCTION__, "spawn");
 	string4096					m_temp;
 	for (u32 i=0, n=_GetItemCount(*restrictions); i<n; ++i)
 		if (!xr_strcmp(restriction,_GetItem(*restrictions,i,m_temp)))
@@ -201,6 +218,7 @@ IC	bool CSpaceRestrictionManager::restriction_presented	(shared_str restrictions
 
 IC	void CSpaceRestrictionManager::join_restrictions		(shared_str &restrictions, shared_str update)
 {
+	TS_SCOPED(_, __FUNCTION__, "spawn");
 	string4096					m_temp1;
 	string4096					m_temp2;
 	strcpy						(m_temp2,*restrictions);
@@ -214,23 +232,96 @@ IC	void CSpaceRestrictionManager::join_restrictions		(shared_str &restrictions, 
 	restrictions				= shared_str(m_temp2);
 }
 
+struct ItemParserItem
+{
+	ItemParserItem(LPCSTR item,	size_t len) : item(item), len(len) {}
+	LPCSTR item;
+	size_t len;
+};
+
+struct ItemParser
+{
+	ItemParser(const shared_str& src)
+	{
+		if (src.size())
+		{
+			LPCSTR	res			= *src;
+			LPCSTR	last_res	= res;
+			while(0!=(res=strchr(res,',')))
+			{
+				// Trim
+				TrimAndAdd(last_res, res-1);
+
+				while(*res == ',') ++res;
+				last_res=res;
+			}
+			if (*src + src.size() - last_res)
+				TrimAndAdd(last_res, *src + src.size());
+		}
+	}
+
+	void TrimAndAdd(LPCSTR begin, LPCSTR end)
+	{
+		// "abc"
+		while(begin <= end && *end <= ' ') --end;
+		while(begin <= end && *begin <= ' ') ++begin;
+
+		// Add if anything left after trim
+		if (begin <= end)
+			items.emplace_back(ItemParserItem(begin, end-begin+1));
+	}
+
+	xr_vector<ItemParserItem> items;
+};
+
 IC	void CSpaceRestrictionManager::difference_restrictions	(shared_str &restrictions, shared_str update)
 {
+	TS_SCOPED(_, __FUNCTION__, "spawn");
+#if 0
 	string4096					m_temp1;
 	string4096					m_temp2;
 	strcpy						(m_temp2,"");
 	for (u32 i=0, n=_GetItemCount(*restrictions), count = 0; i<n; ++i)
-		if (!restriction_presented(update,_GetItem(*restrictions,i,m_temp1))) {
+	{
+		if (!restriction_presented(update,_GetItem(*restrictions,i,m_temp1)))
+		{
 			if (count)
 				strcat			(m_temp2,",");
 			strcat				(m_temp2,m_temp1);
 			++count;
 		}
+	}
+
+#else
+	string4096 m_temp2 = { 0 };
+	u32 m_temp2_pos = 0;
+	const ItemParser ipRestrisctions(restrictions);
+	const ItemParser ipUpdate(update);
+	for (auto i=ipRestrisctions.items.begin(); i != ipRestrisctions.items.end(); ++i)
+	{
+		for (auto j=ipUpdate.items.begin(); j != ipUpdate.items.end(); ++j)
+		{
+			if (i->len != j->len)
+				continue;
+
+			if (memcmp(i->item, j->item, i->len))
+				continue;
+
+			if (m_temp2_pos)
+				m_temp2[m_temp2_pos++] = ',';
+
+			memcpy(m_temp2 + m_temp2_pos, i->item, i->len);
+			m_temp2_pos += i->len;
+		}
+	}
+	m_temp2[m_temp2_pos] = 0;
+#endif
 	restrictions				= shared_str(m_temp2);
 }
 
 void CSpaceRestrictionManager::add_restrictions				(ALife::_OBJECT_ID id, shared_str add_out_restrictions, shared_str add_in_restrictions)
 {
+	TS_SCOPED(_, __FUNCTION__, "spawn");
 	CRestrictionPtr				_client_restriction = restriction(id);
 	if (!_client_restriction) {
 		restrict				(id,add_out_restrictions,add_in_restrictions);
@@ -252,6 +343,7 @@ void CSpaceRestrictionManager::add_restrictions				(ALife::_OBJECT_ID id, shared
 
 void CSpaceRestrictionManager::remove_restrictions			(ALife::_OBJECT_ID id, shared_str remove_out_restrictions, shared_str remove_in_restrictions)
 {
+	TS_SCOPED(_, __FUNCTION__, "spawn");
 	CRestrictionPtr				_client_restriction = restriction(id);
 	if (!_client_restriction)
 		return;
@@ -271,6 +363,7 @@ void CSpaceRestrictionManager::remove_restrictions			(ALife::_OBJECT_ID id, shar
 
 void CSpaceRestrictionManager::change_restrictions			(ALife::_OBJECT_ID id, shared_str add_out_restrictions, shared_str add_in_restrictions, shared_str remove_out_restrictions, shared_str remove_in_restrictions)
 {
+	TS_SCOPED(_, __FUNCTION__, "spawn");
 	CRestrictionPtr				_client_restriction = restriction(id);
 	if (!_client_restriction) {
 		restrict				(id,add_out_restrictions,add_in_restrictions);
@@ -295,6 +388,7 @@ void CSpaceRestrictionManager::change_restrictions			(ALife::_OBJECT_ID id, shar
 
 void CSpaceRestrictionManager::on_default_restrictions_changed	()
 {
+	TS_SCOPED(_, __FUNCTION__, "spawn");
 	CLIENT_RESTRICTIONS::const_iterator	I = m_clients->begin();
 	CLIENT_RESTRICTIONS::const_iterator	E = m_clients->end();
 	for ( ; I != E; ++I)

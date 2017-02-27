@@ -55,6 +55,7 @@
 
 #include "hudmanager.h"
 #include "OPFuncs/utils.h"
+#include "../xrCore/OPFuncs/global_timers.h"
 
 #include <tlhelp32.h>
 
@@ -151,7 +152,15 @@ public:
 #endif // SEVERAL_ALLOCATORS
 
 		Msg		("* [x-ray]: economy: strings[%d K], smem[%d K]",_eco_strings/1024,_eco_smem);
-
+		
+		static int s_cnt = 0;
+		s_cnt++;
+		if (s_cnt >= 2)
+		{
+			TSE_ENABLE("spawn");
+			TSE_ENABLE(g_ts_spawn);
+			Msg		("* Starting measure");
+		}
 #ifdef DEBUG
 		Msg		("* [x-ray]: file mapping: memory[%d K], count[%d]",g_file_mapped_memory/1024,g_file_mapped_count);
 		dump_file_mappings	();

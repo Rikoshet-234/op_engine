@@ -48,6 +48,7 @@ void CObjectHandler::Load			(LPCSTR section)
 
 void CObjectHandler::reinit			(CAI_Stalker *object)
 {
+	TSP_SCOPED(_, __FUNCTION__, "spawn");
 	inherited::reinit			();
 	m_hammer_is_clutched		= false;
 	planner().setup				(object);
@@ -65,9 +66,10 @@ void CObjectHandler::reload			(LPCSTR section)
 {
 	inherited::reload			(section);
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CObjectHandler::net_Spawn		(CSE_Abstract* DC)
 {
+	TSP_SCOPED(_, "CObjectHandler::net_Spawn", "spawn");
 	if (!inherited::net_Spawn(DC))
 		return					(FALSE);
 

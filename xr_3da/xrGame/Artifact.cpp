@@ -114,9 +114,10 @@ void CArtefact::Load(LPCSTR section)
 	animGet				(m_anim_show,					pSettings->r_string(*hud_sect,"anim_show"));
 	animGet				(m_anim_activate,				pSettings->r_string(*hud_sect,"anim_activate"));
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CArtefact::net_Spawn(CSE_Abstract* DC) 
 {
+	TSP_SCOPED(_, "CAI_Artefact::net_Spawn", "spawn");
 	BOOL result = inherited::net_Spawn(DC);
 	if (*m_sParticlesName && m_sParticlesName!="") 
 	{Fvector dir;

@@ -33,8 +33,11 @@ float CSpaceRestrictor::Radius		() const
 	return							(CFORM()->getRadius());
 }
 
+#include "OPFuncs/global_timers.h"
+#include "../xrCore/FTimerStat.h"
 BOOL CSpaceRestrictor::net_Spawn	(CSE_Abstract* data)
 {
+	TSP_SCOPED(_, "CSpaceRestrictor::net_Spawn", "spawn");
 	actual							(false);
 
 	CSE_Abstract					*abstract = (CSE_Abstract*)data;
@@ -45,8 +48,8 @@ BOOL CSpaceRestrictor::net_Spawn	(CSE_Abstract* data)
 
 	CCF_Shape						*shape = xr_new<CCF_Shape>(this);
 	collidable.model				= shape;
-
-	for (u32 i=0; i < se_shape->shapes.size(); ++i) {
+	for (u32 i=0; i < se_shape->shapes.size(); ++i) 
+	{
 		CShapeData::shape_def		&S = se_shape->shapes[i];
 		switch (S.type) {
 			case 0 : {
@@ -59,7 +62,6 @@ BOOL CSpaceRestrictor::net_Spawn	(CSE_Abstract* data)
 			}
 		}
 	}
-
 	shape->ComputeBounds			();
 
 	BOOL							result = inherited::net_Spawn(data);
@@ -74,7 +76,6 @@ BOOL CSpaceRestrictor::net_Spawn	(CSE_Abstract* data)
 		return						(TRUE);
 
 	Level().space_restriction_manager().register_restrictor(this,RestrictionSpace::ERestrictorTypes(se_shape->m_space_restrictor_type));
-
 	return							(TRUE);
 }
 

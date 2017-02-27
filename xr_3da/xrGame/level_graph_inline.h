@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
+#include "../../xrCore/FTimerStat.h"
 
 IC	CLevelGraph::const_vertex_iterator CLevelGraph::begin	() const
 {
@@ -609,13 +610,15 @@ template<typename P>
 IC	void CLevelGraph::iterate_vertices		(const Fvector &min_position, const Fvector &max_position, const P &predicate) const
 {
 	CVertex						*I, *E;
-
 	if (valid_vertex_position(min_position))
+	{
 		I						= std::lower_bound(m_nodes,m_nodes + header().vertex_count(),vertex_position(min_position).xz(),&vertex::predicate2);
+	}
 	else
 		I						= m_nodes;
 
-	if (valid_vertex_position(max_position)) {
+	if (valid_vertex_position(max_position)) 
+	{
 		E						= std::upper_bound(m_nodes,m_nodes + header().vertex_count(),vertex_position(max_position).xz(),&vertex::predicate);
 		if (E != (m_nodes + header().vertex_count()))
 			++E;
@@ -623,6 +626,7 @@ IC	void CLevelGraph::iterate_vertices		(const Fvector &min_position, const Fvect
 	else
 		E						= m_nodes + header().vertex_count();
 
+	TSP_SCOPED(_, __FUNCTION__, "spawn");
 	for ( ; I != E; ++I)
 		predicate				(*I);
 }

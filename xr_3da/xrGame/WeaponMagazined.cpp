@@ -90,9 +90,10 @@ void CWeaponMagazined::net_Destroy()
 {
 	inherited::net_Destroy();
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CWeaponMagazined::net_Spawn		(CSE_Abstract* DC)
 {
+	TSP_SCOPED(_, "CWeaponMagazined::net_Spawn", "spawn");
 	return inherited::net_Spawn(DC);
 }
 

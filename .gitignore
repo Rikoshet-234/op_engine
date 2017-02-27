@@ -335,3 +335,6 @@ paket-files/
 
 
 prepare_builds.cmd 
+
+# build files
+xr_build

@@ -137,9 +137,10 @@ void CollisionCallbackAlife(bool& do_colide,bool bo1,dContact& c,SGameMtl* mater
 void ContactCallbackAlife(CDB::TRI* T,dContactGeom* c)
 {
 }
+#include "../xrCore/FTimerStat.h"
 BOOL CHelicopter::net_Spawn(CSE_Abstract*	DC)
 {
-
+	TSP_SCOPED(_, "CHelicopter::net_Spawn", "spawn");
 	SetfHealth(100.0f);
 	setState(CHelicopter::eAlive);
 	m_flame_started					=false;

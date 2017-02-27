@@ -3,6 +3,7 @@
 
 #include "ModelPool.h"
 #include "../../build_defines.h"
+#include "../../xrCore/OPFuncs/global_timers.h"
 
 #ifndef _EDITOR
 	#include "..\IGame_Persistent.h"
@@ -28,6 +29,7 @@
 
 IRender_Visual*	CModelPool::Instance_Create(u32 type)
 {
+	TSP_SCOPED(_, __FUNCTION__, g_ts_spawn);
 	IRender_Visual *V = NULL;
 
 	// Check types
@@ -125,7 +127,9 @@ IRender_Visual*	CModelPool::Instance_Load		(const char* N, BOOL allow_register)
 	ogf_header			H;
 	data->r_chunk_safe	(OGF_HEADER,&H,sizeof(H));
 	V = Instance_Create (H.type);
+	TSP_BEGIN("V->Load(1)", g_ts_spawn);
 	V->Load				(N,data,0);
+	TSP_END("V->Load(1)", g_ts_spawn);
 	FS.r_close			(data);
 	g_pGamePersistent->RegisterModel(V);
 
@@ -142,7 +146,9 @@ IRender_Visual*	CModelPool::Instance_Load(LPCSTR name, IReader* data, BOOL allow
 	ogf_header			H;
 	data->r_chunk_safe	(OGF_HEADER,&H,sizeof(H));
 	V = Instance_Create (H.type);
+	TSP_BEGIN("V->Load(2)", g_ts_spawn);
 	V->Load				(name,data,0);
+	TSP_END("V->Load(2)", g_ts_spawn);
 
 	// Registration
 	if (allow_register) Instance_Register(name,V);
@@ -219,6 +225,7 @@ IRender_Visual* CModelPool::Instance_Find(LPCSTR N)
 
 IRender_Visual* CModelPool::Create(const char* name, IReader* data)
 {
+	TSP_SCOPED(_, __FUNCTION__, g_ts_spawn);
 #ifdef _EDITOR
 	if (!name||!name[0])	return 0;
 #endif
@@ -231,27 +238,36 @@ IRender_Visual* CModelPool::Create(const char* name, IReader* data)
 	POOL_IT	it			=	Pool.find	(low_name);
 	if (it!=Pool.end())
 	{
+		TSP_SCOPED(_, "Model->Spawn()", g_ts_spawn);
 		// 1. Instance found
         IRender_Visual*		Model	= it->second;
 		Model->Spawn		();
 		Pool.erase			(it);
 		return				Model;
-	} else {
+	}
+	else
+	{
+		TSP_BEGIN("Instance_Find()", g_ts_spawn);
 		// 1. Search for already loaded model (reference, base model)
 		IRender_Visual* Base		= Instance_Find		(low_name);
+		TSP_END("Instance_Find()", g_ts_spawn);
 
 		if (0==Base){
 			// 2. If not found
 			bAllowChildrenDuplicate	= FALSE;
+			TSP_BEGIN("Instance_Load()", g_ts_spawn);
 			if (data)		Base = Instance_Load(low_name,data,TRUE);
             else			Base = Instance_Load(low_name,TRUE);
+			TSP_END("Instance_Load()", g_ts_spawn);
 			bAllowChildrenDuplicate	= TRUE;
 #ifdef _EDITOR
 			if (!Base)		return 0;
 #endif
 		}
         // 3. If found - return (cloned) reference
+		TSP_BEGIN("Instance_Duplicate()", g_ts_spawn);
         IRender_Visual*		Model	= Instance_Duplicate(Base);
+		TSP_END("Instance_Duplicate()", g_ts_spawn);
         Registry.insert		( mk_pair(Model,low_name) );
         return				Model;
 	}

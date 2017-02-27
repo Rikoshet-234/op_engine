@@ -51,8 +51,10 @@ void CPhantom::Load( LPCSTR section )
 	snd_name						= pSettings->r_string(section,"sound_shoot");
 	if (snd_name&&snd_name[0])		m_state_data[stShoot].sound.create(snd_name,st_Effect,sg_SourceType);
 }
+#include "../xrCore/FTimerStat.h"
 BOOL CPhantom::net_Spawn(CSE_Abstract* DC)
 {
+	TSP_SCOPED(_, "CPhantom::net_Spawn", "spawn");
 	CSE_ALifeCreaturePhantom*	OBJ	= smart_cast<CSE_ALifeCreaturePhantom*>(DC); VERIFY(OBJ);
 	
 	// select visual at first

@@ -319,11 +319,18 @@ void CCustomZone::Load(LPCSTR section)
 	m_ef_weapon_type			= pSettings->r_u32(section,"ef_weapon_type");
 }
 
+#include "OPFuncs/global_timers.h"
+#include "../xrCore/FTimerStat.h"
 BOOL CCustomZone::net_Spawn(CSE_Abstract* DC) 
 {
-	if (!inherited::net_Spawn(DC))
-		return					(FALSE);
-
+	TSP_SCOPED(_, "CCustomZone::net_Spawn", "spawn");
+	{
+		//TSP_SCOPED(_, "g_cs_1", "spawn");
+		if (!inherited::net_Spawn(DC))
+			return					(FALSE);
+	}
+	
+	//TSP_BEGIN("g_cs_2", "spawn");
 	CSE_Abstract				*e = (CSE_Abstract*)(DC);
 	CSE_ALifeCustomZone			*Z = smart_cast<CSE_ALifeCustomZone*>(e);
 	VERIFY						(Z);
@@ -354,6 +361,8 @@ BOOL CCustomZone::net_Spawn(CSE_Abstract* DC)
 	}
 	else
 		m_pIdleLight = nullptr;
+	//TSP_END("g_cs_2", "spawn");
+	//TSP_BEGIN("g_cs_3", "spawn");
 
 	if ( m_zone_flags.test(eBlowoutLight) ) 
 	{
@@ -383,6 +392,7 @@ BOOL CCustomZone::net_Spawn(CSE_Abstract* DC)
 	{
 		m_b_always_fastmode		= spawn_ini()->r_bool("fast_mode","always_fast");
 	}
+	//TSP_END("g_cs_3", "spawn");
 	return						(TRUE);
 }
 

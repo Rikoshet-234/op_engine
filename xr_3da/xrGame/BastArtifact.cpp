@@ -79,9 +79,10 @@ void CBastArtefact::BastCollision(CEntityAlive* pEntityAlive)
 
 	}
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CBastArtefact::net_Spawn(CSE_Abstract* DC)
 {
+	TSP_SCOPED(_, "CBastArtefact::net_Spawn", "spawn");
 	BOOL result = inherited::net_Spawn(DC);
 	if(!result) return FALSE;
 

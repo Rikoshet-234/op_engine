@@ -124,9 +124,10 @@ void  CAI_Boar::BoneCallback(CBoneInstance *B)
 	M.setHPB (0.0f,-P->_cur_delta,0.0f);
 	B->mTransform.mulB_43(M);
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CAI_Boar::net_Spawn (CSE_Abstract* DC) 
 {
+	TSP_SCOPED(_, "CAI_Boar::net_Spawn", "spawn");
 	if (!inherited::net_Spawn(DC))
 		return(FALSE);
 	

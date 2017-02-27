@@ -68,9 +68,10 @@ void	CWeaponMounted::Load(LPCSTR section)
 	camRelaxSpeed		= deg2rad					(camRelaxSpeed);
 
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL	CWeaponMounted::net_Spawn(CSE_Abstract* DC)
 {
+	TSP_SCOPED(_, "CWeaponMounted::net_Spawn", "spawn");
 	CSE_Abstract			*e	= (CSE_Abstract*)(DC);
 	CSE_ALifeMountedWeapon	*mw	= smart_cast<CSE_ALifeMountedWeapon*>(e);
 	R_ASSERT				(mw);

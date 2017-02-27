@@ -42,9 +42,10 @@ void CBlackGraviArtefact::Load(LPCSTR section)
 	m_fStrikeImpulse = pSettings->r_float(section,"strike_impulse");
 	m_sParticleName = pSettings->r_string(section,"particle");
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CBlackGraviArtefact::net_Spawn(CSE_Abstract* DC)
 {
+	TSP_SCOPED(_, "CBlackGraviArtefact::net_Spawn", "spawn");
 	if(!inherited::net_Spawn(DC)) return FALSE;
 
 

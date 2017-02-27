@@ -47,9 +47,10 @@ void CWeaponRPG7::UpdateMissileVisibility()
 	pWeaponVisual->CalculateBones();
 }
 
-
+#include "../xrCore/FTimerStat.h"
 BOOL CWeaponRPG7::net_Spawn(CSE_Abstract* DC) 
 {
+	TSP_SCOPED(_, "CWeaponRPG7::net_Spawn", "spawn");
 	BOOL l_res = inherited::net_Spawn(DC);
 
 	UpdateMissileVisibility();

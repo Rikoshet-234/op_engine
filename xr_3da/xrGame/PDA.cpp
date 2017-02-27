@@ -27,9 +27,10 @@ CPda::CPda(void)
 
 CPda::~CPda() 
 {}
-
+#include "../xrCore/FTimerStat.h"
 BOOL CPda::net_Spawn(CSE_Abstract* DC) 
 {
+	TSP_SCOPED(_, "CPda::net_Spawn", "spawn");
 	inherited::net_Spawn		(DC);
 	CSE_Abstract				*abstract = (CSE_Abstract*)(DC);
 	CSE_ALifeItemPDA			*pda = smart_cast<CSE_ALifeItemPDA*>(abstract);

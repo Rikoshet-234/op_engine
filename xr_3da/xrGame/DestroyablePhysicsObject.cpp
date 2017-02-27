@@ -45,9 +45,10 @@ void CDestroyablePhysicsObject::net_Destroy()
 	CPHDestroyable::RespawnInit();
 	CPHCollisionDamageReceiver::Clear();
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CDestroyablePhysicsObject::net_Spawn(CSE_Abstract* DC)
 {
+	TSP_SCOPED(_, "CDestroyablePhysicsObject::net_Spawn", "spawn");
 	BOOL res=inherited::net_Spawn(DC);
 	CKinematics		*K=smart_cast<CKinematics*>(Visual());
 	CInifile* ini=K->LL_UserData();

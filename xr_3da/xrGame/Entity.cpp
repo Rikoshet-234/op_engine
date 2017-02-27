@@ -156,9 +156,10 @@ void CEntity::Load		(LPCSTR section)
 	m_dwBodyRemoveTime	= READ_IF_EXISTS(pSettings,r_u32,section,"body_remove_time",BODY_REMOVE_TIME);
 	//////////////////////////////////////
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CEntity::net_Spawn		(CSE_Abstract* DC)
 {
+	TSP_SCOPED(_, "CEntity::net_Spawn", "spawn");
 	m_level_death_time		= 0;
 	m_game_death_time		= 0;
 	m_killer_id				= ALife::_OBJECT_ID(-1);

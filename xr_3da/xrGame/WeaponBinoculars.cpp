@@ -50,9 +50,10 @@ void CWeaponBinoculars::OnZoomOut		()
 			xr_delete		(m_binoc_vision);
 	inherited::OnZoomOut();
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL	CWeaponBinoculars::net_Spawn			(CSE_Abstract* DC)
 {
+	TSP_SCOPED(_, "CWeaponBinoculars::net_Spawn", "spawn");
 	inherited::net_Spawn(DC);
 	return TRUE;
 }

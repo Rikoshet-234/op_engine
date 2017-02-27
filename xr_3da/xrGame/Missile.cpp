@@ -94,9 +94,10 @@ void CMissile::Load(LPCSTR section)
 
 	m_ef_weapon_type	= READ_IF_EXISTS(pSettings,r_u32,section,"ef_weapon_type",u32(-1));
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CMissile::net_Spawn(CSE_Abstract* DC) 
 {
+	TSP_SCOPED(_, "CMissile::net_Spawn", "spawn");
 	BOOL l_res = inherited::net_Spawn(DC);
 
 	dwXF_Frame					= 0xffffffff;

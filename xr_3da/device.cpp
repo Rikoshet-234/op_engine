@@ -16,6 +16,8 @@
 #include "x_ray.h"
 #include "render.h"
 
+#include "../xrCore/OPFuncs/global_timers.h"
+
 ENGINE_API CRenderDevice Device;
 ENGINE_API BOOL g_bRendering = FALSE; 
 
@@ -83,13 +85,14 @@ void CRenderDevice::End		(void)
 		if (0==dwPrecacheFrame)
 		{
 			Gamma.Update		();
-
 			if(precache_light) precache_light->set_active	(false);
 			if(precache_light) precache_light.destroy		();
 			::Sound->set_master_volume						(1.f);
 			pApp->destroy_loading_shaders					();
 			Resources->DestroyNecessaryTextures				();
 			Memory.mem_compact								();
+			TSP_PRINT();
+			TSE_DISABLE("spawn");
 			Msg												("* MEMORY USAGE: %d K",Memory.mem_usage()/1024);
 			CheckPrivilegySlowdown							();
 		}

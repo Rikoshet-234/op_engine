@@ -143,9 +143,10 @@ void CWeaponMagazinedWGrenade::net_Destroy()
 	inherited::net_Destroy();
 }
 
-
+#include "../xrCore/FTimerStat.h"
 BOOL CWeaponMagazinedWGrenade::net_Spawn(CSE_Abstract* DC) 
 {
+	TSP_SCOPED(_, "CWeaponMagazinedGrenade::net_Spawn", "spawn");
 	BOOL l_res = inherited::net_Spawn(DC);
 	 
 	UpdateGrenadeVisibility(!!iAmmoElapsed);

@@ -11,9 +11,10 @@ CVisualZone::~CVisualZone						()
 {
 
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CVisualZone::	net_Spawn						(CSE_Abstract* DC)
 {
+	TSP_SCOPED(_, "CVizualZone::net_Spawn", "spawn");
 	BOOL ret					=	inherited::net_Spawn(DC);
 	CSE_Abstract				*e = (CSE_Abstract*)(DC);
 	CSE_ALifeZoneVisual		*Z = smart_cast<CSE_ALifeZoneVisual*>(e);
