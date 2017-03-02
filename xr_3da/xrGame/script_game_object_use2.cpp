@@ -118,6 +118,21 @@ void CScriptGameObject::fake_death_stand_up()
 	monster->fake_death_stand_up();
 }
 
+void CScriptGameObject::set_fake_death_dist(float dist)
+{
+	CZombie	*monster = smart_cast<CZombie*>(&object());
+	if (!monster) {
+		ai().script_engine().script_log		(ScriptStorage::eLuaMessageTypeError,"CZombie : cannot access class member set_fake_death_dist!");
+		return;
+	}
+	monster->fakeDeathDist=dist;
+	if (dist>0)
+		monster->fake_death_fall_down();
+	else
+		monster->fake_death_stand_up();
+}
+
+
 void CScriptGameObject::berserk()
 {
 	CBaseMonster *monster = smart_cast<CBaseMonster *>(&object());

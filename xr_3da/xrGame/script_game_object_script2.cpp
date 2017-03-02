@@ -31,6 +31,11 @@ using namespace luabind;
 
 extern CScriptActionPlanner *script_action_planner(CScriptGameObject *obj);
 
+float get_object_health(CScriptGameObject *O)		   { return O->object().GetHealth(); }
+void  set_object_health(CScriptGameObject *O, float h) { O->object().SetHealth(h); }
+
+
+
 class_<CScriptGameObject> &script_register_game_object1(class_<CScriptGameObject> &instance)
 {
 	instance
@@ -63,7 +68,8 @@ class_<CScriptGameObject> &script_register_game_object1(class_<CScriptGameObject
 //		.property("enabled",				&CScriptGameObject::getEnabled,			&CScriptGameObject::setEnabled)
 
 //		.def_readonly("health",				&CScriptGameObject::GetHealth,			&CScriptGameObject::SetHealth)
-		.property("health",					&CScriptGameObject::GetHealth,			&CScriptGameObject::SetHealth)
+		//.property("health",					&CScriptGameObject::GetHealth,			&CScriptGameObject::SetHealth)
+		.property("health",					&get_object_health,						&set_object_health)
 		.property("psy_health",				&CScriptGameObject::GetPsyHealth,		&CScriptGameObject::SetPsyHealth)
 		.property("power",					&CScriptGameObject::GetPower,			&CScriptGameObject::SetPower)
 //		.property("satiety",				&CScriptGameObject::GetSatiety,			&CScriptGameObject::SetSatiety)
@@ -170,7 +176,7 @@ class_<CScriptGameObject> &script_register_game_object1(class_<CScriptGameObject
 		// zombie
 		.def("fake_death_fall_down",		&CScriptGameObject::fake_death_fall_down)
 		.def("fake_death_stand_up",			&CScriptGameObject::fake_death_stand_up)
-
+		.def("set_fake_death_dist",			&CScriptGameObject::set_fake_death_dist)
 		// base monster
 		.def("skip_transfer_enemy",			&CScriptGameObject::skip_transfer_enemy)
 		.def("set_home",					&CScriptGameObject::set_home)

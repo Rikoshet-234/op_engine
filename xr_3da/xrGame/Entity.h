@@ -32,6 +32,7 @@ protected:
 public:
 	/*virtual*/IC float			GetfHealth			() const			{ return m_entity_condition->GetHealth(); }
 	/*virtual*/IC float			SetfHealth			(float value)		{m_entity_condition->health()=value; return value;}
+
 	float						m_fMorale;
 	// Team params
 	int							id_Team;
@@ -74,6 +75,9 @@ public:
 //	virtual float			g_Health			()const	{ return GetfHealth();}
 /*	virtual*/ IC float			GetMaxHealth		()const	{ return m_entity_condition->max_health();	}
 /*	virtual*/ IC void			SetMaxHealth		(float v)	{ m_entity_condition->max_health()=v;}
+
+	float GetHealth () const override { return m_entity_condition->GetHealth(); }
+	void SetHealth (float health) override { m_entity_condition->health () = health; }
 
 	/*virtual*/ IC BOOL		g_Alive				()const	{ return GetfHealth()>0; }
 	virtual BOOL			g_State				(SEntityState&) const	{return FALSE;}

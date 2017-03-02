@@ -339,17 +339,20 @@ void CWeaponKnife::onMovementChanged	(ACTOR_DEFS::EMoveCommand cmd)
 {
 //	if( (cmd == ACTOR_DEFS::mcSprint)&&(GetState()==eIdle)  )
 //		switch2_Idle();
+	if (GetState()!=eIdle)
+		return;
 	CEntity::SEntityState st;
 	g_actor->g_State(st);
 	if (st.bSprint && st.fVelocity > 1) 
 	{
-		SetState(eIdle);
+		//SetState(eIdle);
 		if (mhud_idle_sprint.size()>0)
 			m_pHUD->animPlay(random_anim(mhud_idle_sprint), TRUE, this,  eIdle);
 	}
 	else if (!st.bCrouch && g_actor->AnyMove())
 	{
-		SetState(eIdle);
+		//Msg(CWeapon::getStateString(EWeaponStates(GetState())).c_str());
+		//SetState(eIdle);
 		if (mhud_idle_moving.size()>0)
 			m_pHUD->animPlay(random_anim(mhud_idle_moving), TRUE, this,  eIdle);
 	}

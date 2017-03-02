@@ -95,6 +95,7 @@ void CWeapon::FireTrace		(const Fvector& P, const Fvector& D)
 	if (!m_magazine.empty())
 	{
 		CCartridge &nextCartridge = m_magazine.back();
+		m_ammoType=nextCartridge.m_LocalAmmoType;
 		m_iPropousedAmmoType=nextCartridge.m_LocalAmmoType;
 	}
 

@@ -8,6 +8,7 @@
 
 #include "../control_animation_base.h"
 #include "../control_movement_base.h"
+#include "../../../actor.h"
 
 #ifdef _DEBUG
 #include <dinput.h>
@@ -17,7 +18,7 @@
 CZombie::CZombie()
 {
 	StateMan = xr_new<CStateManagerZombie>(this);
-	
+	fakeDeathAfterHit=false;
 	CControlled::init_external(this);
 }
 
@@ -35,6 +36,13 @@ void CZombie::Load(LPCSTR section)
 
 	fake_death_count		= 1 + u8(Random.randI(pSettings->r_u8(section,"FakeDeathCount")));
 	health_death_threshold	= pSettings->r_float(section,"StartFakeDeathHealthThreshold");
+
+	if (pSettings->line_exist(section,"FakeDeathDist"))
+	{
+		fakeDeathDist= pSettings->r_float(section,"FakeDeathDist");
+	}
+	else
+		fakeDeathDist=0;
 
 	SVelocityParam &velocity_none		= move().get_velocity(MonsterMovement::eVelocityParameterIdle);	
 	SVelocityParam &velocity_turn		= move().get_velocity(MonsterMovement::eVelocityParameterStand);
@@ -84,7 +92,6 @@ void CZombie::reinit()
 	last_hit_frame			= 0;
 	time_resurrect			= 0;
 	fake_death_left			= fake_death_count;
-
 	active_triple_idx		= u8(-1);
 }
 
@@ -132,7 +139,10 @@ BOOL CZombie::net_Spawn (CSE_Abstract* DC)
 		return(FALSE);
 
 	vfAssignBones	();
-
+	if (fakeDeathDist>0)
+	{
+		fake_death_fall_down();
+	}
 	return(TRUE);
 }
 
@@ -147,16 +157,19 @@ void	CZombie::Hit								(SHit* pHDS)
 
 	if (!g_Alive()) return;
 	
-	if ((pHDS->hit_type == ALife::eHitTypeFireWound) && (Device.dwFrame != last_hit_frame)) {
-		if (!com_man().ta_is_active() && (time_resurrect + TIME_RESURRECT_RESTORE < Device.dwTimeGlobal) && (conditions().GetHealth() < health_death_threshold)) {
-			if (conditions().GetHealth() < (health_death_threshold - float(fake_death_count - fake_death_left) * health_death_threshold / fake_death_count)) {
+	if ((pHDS->hit_type == ALife::eHitTypeFireWound) && (Device.dwFrame != last_hit_frame)) 
+	{
+		if (!com_man().ta_is_active() && (time_resurrect + TIME_RESURRECT_RESTORE < Device.dwTimeGlobal) && (conditions().GetHealth() < health_death_threshold)) 
+		{
+			if (conditions().GetHealth() < (health_death_threshold - float(fake_death_count - fake_death_left) * health_death_threshold / fake_death_count)) 
+			{
 				active_triple_idx			= u8(Random.randI(FAKE_DEATH_TYPES_COUNT));
 				com_man().ta_activate		(anim_triple_death[active_triple_idx]);
 				move().stop					();
 				time_dead_start				= Device.dwTimeGlobal;
-				
 				if (fake_death_left == 0)	fake_death_left = 1;
 				fake_death_left--;
+				fakeDeathAfterHit=true;
 			}
 		} 
 	}
@@ -168,13 +181,27 @@ void	CZombie::Hit								(SHit* pHDS)
 void CZombie::shedule_Update(u32 dt)
 {
 	inherited::shedule_Update(dt);
+	if (fakeDeathDist>0 && !fakeDeathAfterHit)
+	{
+		if (g_actor)
+		{
+			float dist			= MeleeChecker.distance_to_enemy	(g_actor->cast_entity_alive());
+			if (dist<=fakeDeathDist)
+			{
+				com_man().ta_pointbreak();	
+				fakeDeathDist=0;
+				time_resurrect = Device.dwTimeGlobal;
+			}
+		}
 
-	if (time_dead_start != 0) {
-		if (time_dead_start + TIME_FAKE_DEATH < Device.dwTimeGlobal) {
+	}
+	if (time_dead_start != 0) 
+	{
+		if (time_dead_start + TIME_FAKE_DEATH < Device.dwTimeGlobal) 
+		{
 			time_dead_start  = 0;
 
 			com_man().ta_pointbreak();	
-
 			time_resurrect = Device.dwTimeGlobal;
 		}
 	}

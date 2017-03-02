@@ -35,6 +35,24 @@ bool get_console_bool(CConsole* c, LPCSTR cmd)
 	return !!val;
 }
 
+void set_user_param_value(CConsole* c,LPCSTR cmd,LPCSTR value)
+{
+	if (c->isUserDefinedParam(cmd))
+	{
+		CConsole::vecCMD_IT I = c->Commands.find(cmd);
+		if (I!=c->Commands.end()) 
+		{
+			CCC_UserParam* uc=smart_cast<CCC_UserParam*>(I->second);
+			if (uc)
+				uc->SetValue(value);
+			else
+				Msg("! ERROR User-defined param [%s] not is class CCC_UserParam! Contact to developer quickly!",cmd);
+		}
+	}
+	else
+		Msg("~ WARNING User-defined param [%s] not found!",cmd);
+}
+
 luabind::object get_user_param_value(CConsole* c,LPCSTR cmd)
 {
 	
@@ -68,6 +86,7 @@ void console_registrator::script_register(lua_State *L)
 		.def("hide",						&CConsole::Hide)
 //		.def("save",						&CConsole::Save)
 		.def("get_user_param_value"			,get_user_param_value)
+		.def("set_user_param_value"			,set_user_param_value)
 		.def("get_string",					&CConsole::GetString)
 		.def("get_integer",					&get_console_integer)
 		.def("get_bool",					&get_console_bool)
