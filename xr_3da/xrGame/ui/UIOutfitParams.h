@@ -3,9 +3,14 @@
 
 #include "UIWindow.h"
 #include "UIListWnd.h"
+#include "../alife_space.h"
 
 class CInventoryItem;
 class CUIXml;
+
+namespace OPFuncs {
+	struct restoreParam;
+}
 
 class CUIOutfitParams :public CUIListWnd
 {
@@ -17,7 +22,8 @@ public:
 	void SetInfo(CInventoryItem* outfitItem) ;
 private:
 	xr_map<shared_str ,shared_str> m_mIconIDs;
-	xr_map<int,shared_str> immunes;
+	xr_map<ALife::EHitType,shared_str> immunes;
+	xr_map<int, OPFuncs::restoreParam> modificators;
 };
 
 #endif

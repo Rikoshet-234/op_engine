@@ -120,14 +120,14 @@ void setIconedItem(xr_map<shared_str ,shared_str> iconIDs,CUIListItemIconed* ite
 			break;
 		case 1:
 			{
-				LPCSTR color = (column3Value<0)?"%c[red]":"%c[green]";
-				if ((column3Value>0 && column3Value<1) || (column3Value<0 && column3Value>-1))
+				LPCSTR color = (column2Value<0)?"%c[red]":"%c[green]";
+				if ((column2Value>0 && column2Value<1) || (column2Value<0 && column2Value>-1))
 				{
-					column3Value=column3Value*1000;
-					sprintf_s	(buff_outfit,"%s%+3.0f%s", color, column3Value,CStringTable().translate("ui_inv_aw_gr").c_str());
+					column2Value=column2Value*1000;
+					sprintf_s	(buff_outfit,"%s%+3.0f%s", color, column2Value,CStringTable().translate("ui_inv_aw_gr").c_str());
 				}
 				else
-					sprintf_s	(buff_outfit,"%s%+3.0f%s", color, column3Value,CStringTable().translate("ui_inv_aw_kg").c_str());
+					sprintf_s	(buff_outfit,"%s%+3.0f%s", color, column2Value,CStringTable().translate("ui_inv_aw_kg").c_str());
 			}
 			break;
 		case 2:
@@ -135,7 +135,13 @@ void setIconedItem(xr_map<shared_str ,shared_str> iconIDs,CUIListItemIconed* ite
 				LPCSTR color=(column2Value>0.0f)?"%c[green]":"%c[red]";
 				if (addParam==BLEEDING_RESTORE_ID||addParam==RADIATION_RESTORE_ID)
 					color = (column2Value>0)?"%c[red]":"%c[green]";
-				sprintf_s	(buff_outfit,"%s%+3.0f%%", color, column2Value);
+				if (column2Value>9999)
+				{
+					column2Value/=10000;
+					sprintf_s	(buff_outfit,"%s%+3.0fk%%", color, column2Value);
+				}
+				else
+					sprintf_s	(buff_outfit,"%s%+3.0f%%", color, column2Value);
 			}
 			break;
 		default:NODEFAULT;
@@ -170,7 +176,13 @@ void setIconedItem(xr_map<shared_str ,shared_str> iconIDs,CUIListItemIconed* ite
 				LPCSTR color=(column3Value>0.0f)?"%c[green]":"%c[red]";
 				if (addParam==BLEEDING_RESTORE_ID||addParam==RADIATION_RESTORE_ID)
 					color = (column3Value>0)?"%c[red]":"%c[green]";
-				sprintf_s	(buff_art,"%s%+3.0f%%", color, column3Value);
+				if (column3Value>9999)
+				{
+					column3Value/=1000;
+					sprintf_s	(buff_art,"%s%+3.0fk%%", color, column3Value);
+				}
+				else
+					sprintf_s	(buff_art,"%s%+3.0f%%", color, column3Value);
 			}
 			break;
 		default:NODEFAULT;

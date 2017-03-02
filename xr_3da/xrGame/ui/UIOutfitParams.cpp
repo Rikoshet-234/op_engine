@@ -4,25 +4,13 @@
 #include "UIListWnd.h"
 #include "../inventory_item.h"
 #include "../CustomOutfit.h"
+#include "../OPFuncs/utils.h"
 
-std::pair<int,shared_str> createPair(ALife::EHitType hitType)
-{
-	string128 str_desc;
-	sprintf_s(str_desc,"ui_inv_outfit_%s_protection",ALife::g_cafHitType2String(hitType));
-	return mk_pair(hitType,str_desc);
-}
 
 CUIOutfitParams::CUIOutfitParams()
 {
-	immunes.insert(createPair(ALife::eHitTypeBurn));
-	immunes.insert(createPair(ALife::eHitTypeShock));
-	immunes.insert(createPair(ALife::eHitTypeStrike));
-	immunes.insert(createPair(ALife::eHitTypeWound));
-	immunes.insert(createPair(ALife::eHitTypeRadiation));
-	immunes.insert(createPair(ALife::eHitTypeTelepatic));
-	immunes.insert(createPair(ALife::eHitTypeChemicalBurn));
-	immunes.insert(createPair(ALife::eHitTypeExplosion));
-	immunes.insert(createPair(ALife::eHitTypeFireWound));
+	immunes = OPFuncs::CreateImmunesStringMap();
+	modificators = OPFuncs::CreateRestoresStringMap();
 }
 
 CUIOutfitParams::~CUIOutfitParams()
