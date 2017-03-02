@@ -1223,7 +1223,20 @@ void CApplication::load_draw_internal()
 		static float offs			= -0.5f;
 
 #pragma region draw main load background
-		back_size.set				(1024,768);
+		Frect						r;
+		r.set(offs ,offs,1024,768);
+		r.lt.mul					(k);						
+		r.rb.mul					(k);						
+		pv							= static_cast<FVF::TL*>(RCache.Vertex.Lock(4, ll_hGeom.stride(), Offset));
+		pv->set						(r.lt.x,				r.rb.y,		C, 0, 1);	pv++;
+		pv->set						(r.lt.x,				r.lt.y,		C, 0, 0);	pv++;
+		pv->set						(r.rb.x,				r.rb.y,		C, 1, 1);	pv++;
+		pv->set						(r.rb.x,				r.lt.y,		C, 1, 0);	pv++;
+		RCache.Vertex.Unlock		(4,ll_hGeom.stride());
+		//RCache.set_Shader			(hLevelLogo);
+		RCache.set_Geometry			(ll_hGeom);
+		RCache.Render				(D3DPT_TRIANGLELIST,Offset,0,4,0,2);
+		/*back_size.set				(1024,768);
 		back_text_coords.lt.set		(0,0);back_text_coords.rb.add(back_text_coords.lt,back_size);
 		back_coords.lt.set			(offs, offs); back_coords.rb.add(back_coords.lt,back_size);
 		back_coords.lt.mul			(k);back_coords.rb.mul(k);
@@ -1235,7 +1248,7 @@ void CApplication::load_draw_internal()
 		pv->set						(back_coords.rb.x,	back_coords.lt.y,	C,back_text_coords.rb.x,	back_text_coords.lt.y);	pv++;
 		RCache.Vertex.Unlock		(4,ll_hGeom.stride());
 		RCache.set_Geometry			(ll_hGeom);
-		RCache.Render				(D3DPT_TRIANGLELIST,Offset,0,4,0,2);
+		RCache.Render				(D3DPT_TRIANGLELIST,Offset,0,4,0,2);*/
 #pragma endregion
 
 #pragma region draw level-specific screenshot
