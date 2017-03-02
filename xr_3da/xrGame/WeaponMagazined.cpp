@@ -31,6 +31,7 @@ CWeaponMagazined::CWeaponMagazined(LPCSTR name, ESoundTypes eSoundType) : CWeapo
 	m_eSoundReload		= ESoundTypes(SOUND_TYPE_WEAPON_RECHARGING | eSoundType);
 	m_eSoundZoomIn		= ESoundTypes(SOUND_TYPE_ITEM_USING | eSoundType);
 	m_eSoundZoomOut		= ESoundTypes(SOUND_TYPE_ITEM_USING | eSoundType);
+	m_eSoundChangeFireMode	= ESoundTypes(SOUND_TYPE_ITEM_USING | eSoundType);
 	
 	m_eSoundZoomInc		= ESoundTypes(SOUND_TYPE_ITEM_USING | eSoundType);
 	m_eSoundZoomDec		= ESoundTypes(SOUND_TYPE_ITEM_USING | eSoundType);
@@ -55,6 +56,7 @@ CWeaponMagazined::~CWeaponMagazined()
 	HUD_SOUND::DestroySound(sndShot);
 	HUD_SOUND::DestroySound(sndEmptyClick);
 	HUD_SOUND::DestroySound(sndReload);
+	HUD_SOUND::DestroySound(sndChangeFireMode);
 	HUD_SOUND::DestroySound	(sndZoomIn);
 	HUD_SOUND::DestroySound	(sndZoomOut);
 	HUD_SOUND::DestroySound	(sndZoomDec);
@@ -71,6 +73,7 @@ void CWeaponMagazined::StopHUDSounds		()
 	HUD_SOUND::StopSound(sndReload);
 
 	HUD_SOUND::StopSound(sndShot);
+	HUD_SOUND::StopSound(sndChangeFireMode);
 
 	HUD_SOUND::StopSound(sndZoomOut);
 	HUD_SOUND::StopSound(sndZoomIn);
@@ -119,6 +122,7 @@ void CWeaponMagazined::Load	(LPCSTR section)
 	HUD_SOUND::LoadSound(section,"snd_shoot"	, sndShot		, m_eSoundShot		);
 	HUD_SOUND::LoadSound(section,"snd_empty"	, sndEmptyClick	, m_eSoundEmptyClick	);
 	HUD_SOUND::LoadSound(section,"snd_reload"	, sndReload		, m_eSoundReload		);
+	HUD_SOUND::LoadSound(section,"snd_change_firemode"	, sndChangeFireMode		, m_eSoundChangeFireMode		);
 	
 	HUD_SOUND::LoadSound(section, "snd_zoomin",  sndZoomIn,		m_eSoundZoomIn,false);
 	HUD_SOUND::LoadSound(section, "snd_zoomout", sndZoomOut,	m_eSoundZoomOut,false);
@@ -550,6 +554,7 @@ void CWeaponMagazined::UpdateSounds	()
 	if (sndShot.playing			()) sndShot.set_position		(get_LastFP());
 	if (sndReload.playing		()) sndReload.set_position		(get_LastFP());
 	if (sndEmptyClick.playing	())	sndEmptyClick.set_position	(get_LastFP());
+	if (sndChangeFireMode.playing	())	sndChangeFireMode.set_position	(get_LastFP());
 
 	if (sndZoomIn.playing		()) sndZoomIn.set_position		(get_LastFP());
 	if (sndZoomOut.playing	())	sndZoomOut.set_position	(get_LastFP());
@@ -1405,6 +1410,7 @@ void	CWeaponMagazined::OnNextFireMode		()
 {
 	if (!m_bHasDifferentFireModes) return;
 	if (GetState() != eIdle) return;
+	PlaySound	(sndChangeFireMode,get_LastFP());
 	m_iCurFireMode = (m_iCurFireMode+1+m_aFireModes.size()) % m_aFireModes.size();
 	SetQueueSize(GetCurrentFireMode());
 };
@@ -1413,6 +1419,7 @@ void	CWeaponMagazined::OnPrevFireMode		()
 {
 	if (!m_bHasDifferentFireModes) return;
 	if (GetState() != eIdle) return;
+	PlaySound	(sndChangeFireMode,get_LastFP());
 	m_iCurFireMode = (m_iCurFireMode-1+m_aFireModes.size()) % m_aFireModes.size();
 	SetQueueSize(GetCurrentFireMode());	
 };

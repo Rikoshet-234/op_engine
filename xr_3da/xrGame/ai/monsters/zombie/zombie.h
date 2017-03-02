@@ -48,6 +48,8 @@ public:
 	u8				fake_death_count;
 	float			health_death_threshold;
 	u8				fake_death_left;
+	float			fakeDeathDist;
+	bool			fakeDeathAfterHit;
 
 	bool			fake_death_fall_down	(); //return true if everything is ok
 	void			fake_death_stand_up		();

@@ -286,6 +286,7 @@ public:
 		bEmptyArgsHandled=true;
 	}
 	xr_string GetValue() const {return value;}
+	void SetValue(LPCSTR inval)  { value=xr_strdup(inval);}
 
 	void Save(IWriter* F) override
 	{
@@ -302,7 +303,7 @@ public:
 			Log(S);
 		}
 		else
-			value=xr_strdup(args);
+			SetValue(args);
 	};
 
 	void Status(TStatus& S) override

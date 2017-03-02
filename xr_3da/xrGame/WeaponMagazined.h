@@ -24,6 +24,7 @@ protected:
 	HUD_SOUND		sndShot;
 	HUD_SOUND		sndEmptyClick;
 	HUD_SOUND		sndReload;
+	HUD_SOUND		sndChangeFireMode;
 
 	HUD_SOUND		sndZoomIn;
 	HUD_SOUND		sndZoomOut;
@@ -45,6 +46,7 @@ protected:
 	ESoundTypes		m_eSoundHide;
 	ESoundTypes		m_eSoundShot;
 	ESoundTypes		m_eSoundEmptyClick;
+	ESoundTypes		m_eSoundChangeFireMode;
 	ESoundTypes		m_eSoundReload;
 	ESoundTypes		m_eSoundZoomIn;
 	ESoundTypes		m_eSoundZoomOut;

@@ -166,7 +166,6 @@ public:
 	virtual u32					ef_weapon_type				() const;
 	virtual u32					ef_detector_type			() const;
 
-public:
 	virtual	void				OnHitHealthLoss				(float NewHealth) {};	//вызывается если entity теряет здоровье
 	virtual	void				OnCriticalHitHealthLoss		() {};	//вызывается если entity умрет от хита 
 	virtual	void				OnCriticalWoundHealthLoss	() {};	//вызывается если entity умрет от потери крови 
@@ -174,6 +173,10 @@ public:
 
 	virtual	CVisualMemoryManager*visual_memory				() const {return(0);}
 	virtual	void				net_Relcase					(CObject *O);
+
+	float GetHealth() const override { return conditions().GetHealth(); }
+	void SetHealth(float health) override { conditions().ChangeHealth(health); }
+
 };
 
 #include "entity_alive_inline.h"

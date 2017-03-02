@@ -67,6 +67,10 @@ public:
 
 	virtual void	Center			(Fvector& C)	const;
 	virtual float	Radius			()				const;
+
+	float GetHealth()	const override { return fHealth; }
+	void SetHealth(float health) override	{ fHealth = health; clamp<float>(fHealth, 0, 100); }
+
 	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
 add_to_type_list(CHangingLamp)

@@ -248,6 +248,7 @@ public:
 	// Zombie
 			bool				fake_death_fall_down	();
 			void				fake_death_stand_up		();
+			void				set_fake_death_dist		(float dist);
 
 	// CBaseMonster
 			void				skip_transfer_enemy		(bool val);

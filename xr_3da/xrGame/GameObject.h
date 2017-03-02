@@ -299,6 +299,10 @@ public:
 	virtual	LPCSTR			visual_name			(CSE_Abstract *server_entity);
 
 	virtual	void			On_B_NotCurrentEntity () {};
+
+	virtual float GetHealth() const  { return -1;} 
+	virtual void SetHealth(float health) {}	
+
 };
 
 #endif // !defined(AFX_GAMEOBJECT_H__3DA72D03_C759_4688_AEBB_89FA812AA873__INCLUDED_)

@@ -1238,6 +1238,11 @@ void CWeapon::UpdateAddonsVisibility()
 	bone_id = pWeaponVisual->LL_BoneID					(wpn_scope);
 	if(ScopeAttachable())
 	{
+		if (bone_id==BI_NONE)
+		{
+			Msg("! ERROR for section[%s] set scope status [%d], but no bone[%s] were found in visual[%s]!",cNameSect().c_str(),m_eScopeStatus,wpn_scope,pWeaponVisual->dbg_name.c_str());
+			FATAL("ENGINE crash! See log for detail!");
+		}
 		if(IsScopeAttached())
 		{
 
@@ -1248,14 +1253,17 @@ void CWeapon::UpdateAddonsVisibility()
 				pWeaponVisual->LL_SetBoneVisible			(bone_id,FALSE,TRUE);
 		}
 	}
-	if(m_eScopeStatus==CSE_ALifeItemWeapon::eAddonDisabled && bone_id!=BI_NONE && 
-		pWeaponVisual->LL_GetBoneVisible(bone_id) )
-
+	if(m_eScopeStatus==CSE_ALifeItemWeapon::eAddonDisabled && bone_id!=BI_NONE && pWeaponVisual->LL_GetBoneVisible(bone_id) )
 		pWeaponVisual->LL_SetBoneVisible			(bone_id,FALSE,TRUE);
 
 	bone_id = pWeaponVisual->LL_BoneID					(wpn_silencer);
 	if(SilencerAttachable())
 	{
+		if (bone_id==BI_NONE)
+		{
+			Msg("! ERROR for section[%s] set silencer status [%d], but no bone[%s] were found in visual[%s]!",cNameSect().c_str(),m_eSilencerStatus,wpn_silencer,pWeaponVisual->dbg_name.c_str());
+			FATAL("ENGINE crash! See log for detail!");
+		}
 		if(IsSilencerAttached()){
 			if(FALSE==pWeaponVisual->LL_GetBoneVisible		(bone_id))
 				pWeaponVisual->LL_SetBoneVisible			(bone_id,TRUE,TRUE);
@@ -1264,14 +1272,17 @@ void CWeapon::UpdateAddonsVisibility()
 				pWeaponVisual->LL_SetBoneVisible			(bone_id,FALSE,TRUE);
 		}
 	}
-	if(m_eSilencerStatus==CSE_ALifeItemWeapon::eAddonDisabled && bone_id!=BI_NONE && 
-		pWeaponVisual->LL_GetBoneVisible(bone_id) )
-
+	if(m_eSilencerStatus==CSE_ALifeItemWeapon::eAddonDisabled && bone_id!=BI_NONE && pWeaponVisual->LL_GetBoneVisible(bone_id) )
 		pWeaponVisual->LL_SetBoneVisible			(bone_id,FALSE,TRUE);
 
 	bone_id = pWeaponVisual->LL_BoneID					(wpn_launcher);
 	if(GrenadeLauncherAttachable())
 	{
+		if (bone_id==BI_NONE)
+		{
+			Msg("! ERROR for section[%s] set silencer status [%d], but no bone[%s] were found in visual[%s]!",cNameSect().c_str(),m_eGrenadeLauncherStatus,wpn_launcher,pWeaponVisual->dbg_name.c_str());
+			FATAL("ENGINE crash! See log for detail!");
+		}
 		if(IsGrenadeLauncherAttached())
 		{
 			if(FALSE==pWeaponVisual->LL_GetBoneVisible		(bone_id))
@@ -1281,9 +1292,7 @@ void CWeapon::UpdateAddonsVisibility()
 				pWeaponVisual->LL_SetBoneVisible			(bone_id,FALSE,TRUE);
 		}
 	}
-	if(m_eGrenadeLauncherStatus==CSE_ALifeItemWeapon::eAddonDisabled && bone_id!=BI_NONE && 
-		pWeaponVisual->LL_GetBoneVisible(bone_id) )
-
+	if(m_eGrenadeLauncherStatus==CSE_ALifeItemWeapon::eAddonDisabled && bone_id!=BI_NONE && pWeaponVisual->LL_GetBoneVisible(bone_id) )
 		pWeaponVisual->LL_SetBoneVisible			(bone_id,FALSE,TRUE);
 	
 

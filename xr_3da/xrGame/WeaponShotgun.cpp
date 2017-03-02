@@ -257,9 +257,8 @@ void CWeaponShotgun::OnStateSwitch	(u32 S)
 		inherited::OnStateSwitch(S);
 		return;
 	}
-
 	bool requiredChangeAmmoType=m_DefaultCartridge.m_LocalAmmoType!=static_cast<u8>(m_iPropousedAmmoType);
-	bool fullMagazine=m_magazine.size() == static_cast<u32>(iMagazineSize) ;
+	bool fullMagazine=!(m_magazine.size() < static_cast<u32>(iMagazineSize)); //при баге m_magazine =>iMagazineSize
 	CWeapon::OnStateSwitch(S);
 
 	if( (fullMagazine || !HaveCartridgeInInventory(1)) && !requiredChangeAmmoType){
@@ -384,6 +383,11 @@ u8 CWeaponShotgun::AddCartridge		(u8 cnt)
 		++iAmmoElapsed;
 		l_cartridge.m_LocalAmmoType = u8(m_ammoType);
 		m_magazine.push_back(l_cartridge);
+		if (iAmmoElapsed>=iMagazineSize)//баг с продолжением???
+		{
+			cnt=0;
+			break;
+		}
 //		m_fCurrentCartirdgeDisp = l_cartridge.m_kDisp;
 	}
 	m_ammoName = (m_pAmmo) ? m_pAmmo->m_nameShort : NULL;
