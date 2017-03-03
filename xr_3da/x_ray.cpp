@@ -1217,9 +1217,6 @@ void CApplication::load_draw_internal()
 		CTexture*	T				= RCache.get_ActiveTexture(0);
 		Fvector2					tsz;
 		tsz.set						((float)T->get_Width(),(float)T->get_Height());
-		Frect						back_text_coords;
-		Frect						back_coords;
-		Fvector2					back_size;
 		static float offs			= -0.5f;
 
 #pragma region draw main load background
@@ -1233,22 +1230,8 @@ void CApplication::load_draw_internal()
 		pv->set						(r.rb.x,				r.rb.y,		C, 1, 1);	pv++;
 		pv->set						(r.rb.x,				r.lt.y,		C, 1, 0);	pv++;
 		RCache.Vertex.Unlock		(4,ll_hGeom.stride());
-		//RCache.set_Shader			(hLevelLogo);
 		RCache.set_Geometry			(ll_hGeom);
 		RCache.Render				(D3DPT_TRIANGLELIST,Offset,0,4,0,2);
-		/*back_size.set				(1024,768);
-		back_text_coords.lt.set		(0,0);back_text_coords.rb.add(back_text_coords.lt,back_size);
-		back_coords.lt.set			(offs, offs); back_coords.rb.add(back_coords.lt,back_size);
-		back_coords.lt.mul			(k);back_coords.rb.mul(k);
-		back_text_coords.lt.x/=tsz.x; back_text_coords.lt.y/=tsz.y; back_text_coords.rb.x/=tsz.x; back_text_coords.rb.y/=tsz.y;
-		pv							= (FVF::TL*) RCache.Vertex.Lock(4,ll_hGeom.stride(),Offset);
-		pv->set						(back_coords.lt.x,	back_coords.rb.y,	C,back_text_coords.lt.x,	back_text_coords.rb.y);	pv++;
-		pv->set						(back_coords.lt.x,	back_coords.lt.y,	C,back_text_coords.lt.x,	back_text_coords.lt.y);	pv++;
-		pv->set						(back_coords.rb.x,	back_coords.rb.y,	C,back_text_coords.rb.x,	back_text_coords.rb.y);	pv++;
-		pv->set						(back_coords.rb.x,	back_coords.lt.y,	C,back_text_coords.rb.x,	back_text_coords.lt.y);	pv++;
-		RCache.Vertex.Unlock		(4,ll_hGeom.stride());
-		RCache.set_Geometry			(ll_hGeom);
-		RCache.Render				(D3DPT_TRIANGLELIST,Offset,0,4,0,2);*/
 #pragma endregion
 
 #pragma region draw level-specific screenshot
@@ -1273,6 +1256,12 @@ void CApplication::load_draw_internal()
 #pragma region draw progress bar
 	if(hProgressBar)
 	{
+		Fvector2					back_size;
+		Frect						back_text_coords;
+		back_size.set				(1024,768);
+		back_text_coords.lt.set		(0,0);back_text_coords.rb.add(back_text_coords.lt,back_size);
+		back_text_coords.lt.x/=tsz.x; back_text_coords.lt.y/=tsz.y; back_text_coords.rb.x/=tsz.x; back_text_coords.rb.y/=tsz.y;
+
 		RCache.set_Shader			(hProgressBar);
 		CTexture* texture = RCache.get_ActiveTexture(0);
 		Fvector2 textureSize;
