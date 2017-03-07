@@ -7,7 +7,7 @@
 #include "../inventory_item.h"
 #include "../CustomOutfit.h"
 #include "IconedItemsHelper.h"
-#include "OPFuncs/utils.h"
+#include "../OPFuncs/utils.h"
 
 CUIOutfitParams::CUIOutfitParams()
 {
