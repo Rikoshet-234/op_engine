@@ -899,6 +899,7 @@
     <Image Include="op_load_screen_ne.bmp">
       <Filter>General\Resources</Filter>
     </Image>
+    <Image Include="op_load_screen_new.bmp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="ClientServer.txt" />

@@ -648,6 +648,7 @@
     <ClInclude Include="OPFuncs\utils.h" />
     <ClInclude Include="script_writer.h" />
     <ClInclude Include="UIListsManipulations.h" />
+    <ClInclude Include="ui\IconedItemsHelper.h" />
     <ClInclude Include="ui\UIIconInfo.h" />
     <ClInclude Include="ui\UIListItemIconed.h" />
     <ClInclude Include="ui\UIOutfitParams.h" />
@@ -2410,6 +2411,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
+    <ClCompile Include="ui\IconedItemsHelper.cpp" />
     <ClCompile Include="ui\UIIconInfo.cpp" />
     <ClCompile Include="ui\UIListItemIconed.cpp" />
     <ClCompile Include="ui\UIListItemIconed_script.cpp">

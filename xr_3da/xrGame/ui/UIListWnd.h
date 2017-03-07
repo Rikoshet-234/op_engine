@@ -20,6 +20,7 @@ private:
 
 	shared_str		m_scrollbar_profile;
 	void			DrawActiveBackFrame		(const Frect& rect, CUIListItem * itm);
+	bool m_bIgnoreScrolling;
 public:
 					CUIListWnd				();
 	virtual			~CUIListWnd				();
@@ -60,7 +61,7 @@ public:
 
 	void			SetItemHeight			(float iItemHeight); 
 	float			GetItemHeight			()							{return m_iItemHeight;}
-    virtual void	SetHeight				(float height);
+	virtual void	SetHeight				(float height);
 
 	void			SetAlwaysShowScroll		(bool flag = true)			{m_bAlwaysShowScroll = flag;}
 	void			EnableAlwaysShowScroll	(bool flag)					{m_bAlwaysShowScroll_enable = flag;}
@@ -107,6 +108,9 @@ public:
 
 	LIST_ITEM_LIST	GetItemsList() {return m_ItemList;}
 	LIST_ITEM_LIST	m_ItemList; 
+
+	CUIScrollBar* GetInternalScrollbar() const {return m_ScrollBar;}
+	void SetIgnoreScrolling(bool flag=false) {m_bIgnoreScrolling=flag;}
 protected:
 	void			create_active_back		();
 	void			destroy_active_back		();

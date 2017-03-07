@@ -52,6 +52,7 @@ LANGUAGE LANG_UKRAINIAN, SUBLANG_DEFAULT
 
 IDB_BITMAP_OP_NE        BITMAP                  "op_load_screen_ne.bmp"
 IDB_BITMAP_OP_CL        BITMAP                  "op_load_screen_cl.bmp"
+IDB_BITMAP_LOAD_NEW     BITMAP                  "op_load_screen_new.bmp"
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -108,6 +109,13 @@ BEGIN
     CONTROL         119,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE,0,0,333,165
 END
 
+IDD_STARTUP_OP_NEW DIALOGEX 0, 0, 333, 165
+STYLE DS_ABSALIGN | DS_SETFONT | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | WS_VISIBLE
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    CONTROL         121,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE,0,0,333,165
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -123,6 +131,11 @@ BEGIN
     END
 
     IDD_STARTUP_OP, DIALOG
+    BEGIN
+        RIGHTMARGIN, 332
+    END
+
+    IDD_STARTUP_OP_NEW, DIALOG
     BEGIN
         RIGHTMARGIN, 332
     END

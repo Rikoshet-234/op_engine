@@ -24,6 +24,7 @@ private:
 	};
 	_desc_info				m_desc_info;
 	CInventoryItem* m_pInvItem;
+
 public:
 						CUIItemInfo			();
 	virtual				~CUIItemInfo		();

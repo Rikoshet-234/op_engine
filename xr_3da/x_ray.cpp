@@ -23,7 +23,7 @@
 #include "../xrCore/OPFuncs/op_engine_version.h"
 
 //---------------------------------------------------------------------
-ENGINE_API CInifile* pGameIni		= NULL;
+ENGINE_API CInifile* pGameIni		= nullptr;
 BOOL	g_bIntroFinished			= FALSE;
 extern	void	Intro				( void* fn );
 extern	void	Intro_DSHOW			( void* fn );
@@ -259,7 +259,7 @@ void Startup					( )
 	// Destroy LOGO
 #ifdef SHOW_LOGO_WINDOW
 	DestroyWindow				(logoWindow);
-	logoWindow					= NULL;
+	logoWindow					= nullptr;
 #endif
 	// Main cycle
 	CheckCopyProtection			( );
@@ -404,7 +404,7 @@ struct damn_keys_filter {
 
 		if ( bScreenSaverState )
 			// Disable screensaver
-			SystemParametersInfo( SPI_SETSCREENSAVEACTIVE , FALSE , NULL , 0 );
+			SystemParametersInfo( SPI_SETSCREENSAVEACTIVE , FALSE , nullptr , 0 );
 
 		dwStickyKeysFlags = 0;
 		dwFilterKeysFlags = 0;
@@ -450,7 +450,7 @@ struct damn_keys_filter {
 	{
 		if ( bScreenSaverState )
 			// Restoring screen saver
-			SystemParametersInfo( SPI_SETSCREENSAVEACTIVE , TRUE , NULL , 0 );
+			SystemParametersInfo( SPI_SETSCREENSAVEACTIVE , TRUE , nullptr , 0 );
 
 		if ( dwStickyKeysFlags) {
 			// Restore StickyKeys feature
@@ -508,7 +508,7 @@ BOOL IsOutOfVirtualMemory()
 	if ( ( dwPhysMemInMB > 500 ) && ( ( dwPageFileInMB + dwPhysMemInMB ) > 2500  ) )
 		return 0;
 
-	hApp = GetModuleHandle( NULL );
+	hApp = GetModuleHandle( nullptr );
 
 	if ( ! LoadString( hApp , RC_VIRT_MEM_ERROR , pszError , VIRT_ERROR_SIZE ) )
 		return 0;
@@ -516,7 +516,7 @@ BOOL IsOutOfVirtualMemory()
 	if ( ! LoadString( hApp , RC_VIRT_MEM_TEXT , pszMessage , VIRT_MESSAGE_SIZE ) )
 		return 0;
 
-	MessageBox( NULL , pszMessage , pszError , MB_OK | MB_ICONHAND );
+	MessageBox( nullptr , pszMessage , pszError , MB_OK | MB_ICONHAND );
 
 	SECUROM_MARKER_HIGH_SECURITY_OFF(1)
 
@@ -612,7 +612,7 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance,
 
 	// Title window
 #ifdef SHOW_LOGO_WINDOW
-	logoWindow					= CreateDialog(GetModuleHandle(NULL),	MAKEINTRESOURCE(IDD_STARTUP_OP), 0, logDlgProc );
+	logoWindow					= CreateDialog(GetModuleHandle(nullptr),	MAKEINTRESOURCE(IDD_STARTUP_OP_NEW), nullptr, logDlgProc );
 
 	SetWindowPos				(
 		logoWindow,
@@ -644,7 +644,7 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance,
 	g_temporary_stuff			= &trivial_encryptor::decode;
 	
 	compute_build_id			();
-	Core._initialize			("xray",NULL, TRUE, fsgame[0] ? fsgame : NULL);
+	Core._initialize			("xray",nullptr, TRUE, fsgame[0] ? fsgame : NULL);
 	InitSettings				();
 
 #ifndef DEDICATED_SERVER
@@ -700,16 +700,16 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance,
 		if (/*xr_strlen(g_sLaunchOnExit_params) && */xr_strlen(g_sLaunchOnExit_app) ) 
 		{
 			string4096 ModuleFileName = "";		
-			GetModuleFileName(NULL, ModuleFileName, 4096);
+			GetModuleFileName(nullptr, ModuleFileName, 4096);
 
 			string4096 ModuleFilePath		= "";
-			char* ModuleName				= NULL;
+			char* ModuleName				= nullptr;
 			GetFullPathName					(ModuleFileName, 4096, ModuleFilePath, &ModuleName);
 			ModuleName[0]					= 0;
 			strcat							(ModuleFilePath, g_sLaunchOnExit_app);
 			_args[0] 						= g_sLaunchOnExit_app;
 			_args[1] 						= g_sLaunchOnExit_params;
-			_args[2] 						= NULL;		
+			_args[2] 						= nullptr;		
 			
 			_spawnv							(_P_NOWAIT, _args[0], _args);//, _envvar);
 		}
@@ -828,7 +828,7 @@ CApplication::CApplication()
 	Level_Scan					( );
 
 	// Font
-	pFontSystem					= NULL;
+	pFontSystem					= nullptr;
 
 	// Register us
 	Device.seqFrame.Add			(this, REG_PRIORITY_HIGH+1000);
@@ -943,7 +943,7 @@ void CApplication::LoadBegin	()
 		ll_hGeom.create		(FVF::F_TL, RCache.Vertex.Buffer(), RCache.QuadIB);
 		sh_progress.create	("hud\\default","ui\\ui_load");
 		hProgressBar.create("hud\\default","ui\\ui_load_progress_bar");
-		ll_hGeom2.create		(FVF::F_TL, RCache.Vertex.Buffer(),NULL);
+		ll_hGeom2.create		(FVF::F_TL, RCache.Vertex.Buffer(), nullptr);
 #endif
 		phase_timer.Start	();
 		load_stage			= 0;
@@ -969,6 +969,7 @@ void CApplication::destroy_loading_shaders()
 	hLevelLogo.destroy		();
 	sh_progress.destroy		();
 	hProgressBar.destroy();
+	loadedTexts.clear();
 //.	::Sound->mute			(false);
 }
 
@@ -1206,7 +1207,7 @@ void CApplication::load_draw_internal()
 		u32	C						= 0xffffffff;
 		u32	_w						= Device.dwWidth;
 		u32	_h						= Device.dwHeight;
-		FVF::TL* pv					= NULL;
+		FVF::TL* pv					= nullptr;
 
 //progress
 		float bw					= 1024.0f;
@@ -1291,10 +1292,16 @@ void CApplication::load_draw_internal()
 	
 #pragma region draw load text 
 		VERIFY						(pFontSystem);
+		if ((loadedTexts.size()==0) || (loadedTexts.back().length()> 0 && _strcmpi(loadedTexts.back().c_str(),app_title)!=0))
+			loadedTexts.push_back(app_title);
 		pFontSystem->Clear			();
-		pFontSystem->SetColor		(color_rgba(157,140,120,255));
-		pFontSystem->SetAligment	(CGameFont::alCenter);
-		pFontSystem->OutI			(0.f,0.815f,app_title);
+		pFontSystem->SetColor		(color_rgba(239, 231, 220,255));
+		pFontSystem->SetAligment	(CGameFont::alLeft);
+		pFontSystem->OutSet	(3,3);
+		for(std::vector<std::string>::iterator it = loadedTexts.begin(); it != loadedTexts.end(); ++it) 
+		{
+			pFontSystem->OutNext((*it).c_str());
+		};	
 		pFontSystem->OnRender		();
 #pragma endregion 
 }

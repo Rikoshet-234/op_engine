@@ -63,6 +63,7 @@ public:
 	virtual void			OnFrame				();
 			void			load_draw_internal	();
 			void			destroy_loading_shaders();
+	std::vector<std::string> loadedTexts;
 };
 
 extern ENGINE_API	CApplication*	pApp;

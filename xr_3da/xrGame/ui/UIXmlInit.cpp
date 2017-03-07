@@ -1436,7 +1436,6 @@ bool	CUIXmlInit::InitIconedColumns		(CUIXml& xml_doc, const char* path, int inde
 		pStatic = xr_new<CUIStatic>();
 		pStatic->SetAutoDelete(true);
 		CUIXmlInit::InitStatic(xml_doc, "static", i, pStatic);
-		pStatic->SetTextAlignment(CGameFont::alLeft);
 		pStatic->m_pLines->SetColoringMode(true);
 		sprintf_s(sname,"column_%d", i);
 		pStatic->SetWindowName(sname);

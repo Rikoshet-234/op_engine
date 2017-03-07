@@ -193,37 +193,17 @@ namespace OPFuncs
 		return (contains_alpha || contains_digits || contains_punct) && !contains_other;
 	}
 
-	std::pair<ALife::EHitType,shared_str> createPair(ALife::EHitType hitType)
+	std::string getFileNameFromPath(std::string fullPath)
 	{
-		string128 str_desc;
-		sprintf_s(str_desc,"ui_inv_outfit_%s_protection",ALife::g_cafHitType2String(hitType));
-		return mk_pair(hitType,str_desc);
-	}
-	xr_map<ALife::EHitType,shared_str> CreateImmunesStringMap()
-	{
-		xr_map<ALife::EHitType,shared_str> immunes;
-		immunes.insert(createPair(ALife::eHitTypeBurn));
-		immunes.insert(createPair(ALife::eHitTypeShock));
-		immunes.insert(createPair(ALife::eHitTypeStrike));
-		immunes.insert(createPair(ALife::eHitTypeWound));
-		immunes.insert(createPair(ALife::eHitTypeRadiation));
-		immunes.insert(createPair(ALife::eHitTypeTelepatic));
-		immunes.insert(createPair(ALife::eHitTypeChemicalBurn));
-		immunes.insert(createPair(ALife::eHitTypeExplosion));
-		immunes.insert(createPair(ALife::eHitTypeFireWound));
-		return immunes;
-	}
-
-	xr_map<int,restoreParam> CreateRestoresStringMap()
-	{
-		xr_map<int,restoreParam> restores;
-		restores.insert(mk_pair(BLEEDING_RESTORE_ID,restoreParam("bleeding_restore_speed","ui_inv_bleeding")));
-		restores.insert(mk_pair(SATIETY_RESTORE_ID,restoreParam("satiety_restore_speed","ui_inv_satiety")));
-		restores.insert(mk_pair(RADIATION_RESTORE_ID,restoreParam("radiation_restore_speed","ui_inv_radiation")));
-		restores.insert(mk_pair(HEALTH_RESTORE_ID,restoreParam("health_restore_speed","ui_inv_health")));
-		restores.insert(mk_pair(POWER_RESTORE_ID,restoreParam("power_restore_speed","ui_inv_power")));
-		restores.insert(mk_pair(POWER_LOSS_ID,restoreParam("power_loss","ui_inv_power_loss")));
-		return restores;
+	   char sep = '/';
+#ifdef _WIN32
+	   sep = '\\';
+#endif
+		size_t i = fullPath.rfind(sep, fullPath.length());
+		if (i != std::string::npos) {
+			return(fullPath.substr(i+1, fullPath.length() - i));
+		}
+		return("");
 	}
 
 }

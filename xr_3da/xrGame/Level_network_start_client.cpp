@@ -30,7 +30,7 @@ bool	CLevel::net_start_client1				()
 	// Startup client
 	string256					temp;
 	sprintf_s						(temp,"%s %s",
-								CStringTable().translate("st_client_connecting_to").c_str(), name_of_server);
+								CStringTable().translate("st_client_connecting_to").c_str(), CStringTable().translate(name_of_server).c_str());
 
 	g_pGamePersistent->LoadTitle				(temp);
 	return true;

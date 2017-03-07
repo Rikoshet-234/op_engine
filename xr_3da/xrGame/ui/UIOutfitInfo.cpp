@@ -15,12 +15,16 @@
 #include "../entity_alive.h"
 #include "../inventory.h"
 #include "../Artifact.h"
-#include "../OPFuncs/utils.h"
+#include "IconedItemsHelper.h"
+
+#define PARAMS_PATH "outfit_info:immunities_list"
+#define FILE_PATH "inventory_new.xml"
+static xmlParams s_xmlParams(FILE_PATH,PARAMS_PATH);
 
 CUIOutfitInfo::CUIOutfitInfo(): m_outfit(nullptr), m_bShowModifiers(false), m_list(nullptr)
 {
-	immunes = OPFuncs::CreateImmunesStringMap();
-	modificators = OPFuncs::CreateRestoresStringMap();
+	immunes = CreateImmunesStringMap();
+	modificators = CreateRestoresStringMap();
 }
 
 CUIOutfitInfo::~CUIOutfitInfo() {}
@@ -33,181 +37,31 @@ void CUIOutfitInfo::InitFromXml(CUIXml& xml_doc)
 
 	m_list=xr_new<CUIListWnd>();
 	m_list->SetAutoDelete(true);
-	strconcat(sizeof(_buff),_buff, _base, ":immunities_list");
-	xml_path=_buff;
-	CUIXmlInit::InitListWnd(xml_doc,_buff,0,m_list);
+	
+	CUIXmlInit::InitListWnd(xml_doc,PARAMS_PATH,0,m_list);
 	m_list->SetMessageTarget(this);
 	m_list->EnableScrollBar(true);
 	AttachChild(m_list);
-	m_bShowModifiers=xml_doc.ReadAttribInt(_buff,0,"show_modifiers",0)==1?true:false;
-	strconcat(sizeof(_buff),_buff, _base, ":immunities_list:icons");
+	m_bShowModifiers=xml_doc.ReadAttribInt(PARAMS_PATH,0,"show_modifiers",0)==1?true:false;
+	strconcat(sizeof(_buff),_buff, PARAMS_PATH, ":icons");
 	CUIXmlInit::GetStringTable(xml_doc,_buff,0,iconIDs);
 }
 
 void CUIOutfitInfo::ClearAll()
 {
 	ClearItems(m_lImmuneUnsortedItems);
-	ClearItems(m_lModificatorsItems);
+	ClearItems(m_lModificatorsUnsortedItems);
 }
 
-void CUIOutfitInfo::ClearItems(std::vector<CUIListItemIconed*> &basedList)
+void CUIOutfitInfo::ClearItems(std::vector<CUIListItemIconed*> &baseList)
 {
-	while(!basedList.empty())
+	while(!baseList.empty())
 	{
-		auto item=basedList.front();
-		basedList.erase(std::remove(basedList.begin(),basedList.end(),item),basedList.end());
+		auto item=baseList.front();
+		baseList.erase(std::remove(baseList.begin(),baseList.end(),item),baseList.end());
 		item->DetachAll();
 		xr_delete(item);
 	}
-}
-
-CUIListItemIconed* findIconedItem(std::vector<CUIListItemIconed*> &basedList,LPCSTR keyValue,bool emptyParam,LPCSTR xml_path)
-{
-	std::vector<CUIListItemIconed*>::iterator item_it=std::find_if(basedList.begin(),basedList.end(),[&](CUIListItem* item)
-	{
-		CUIListItemIconed* ii=smart_cast<CUIListItemIconed*>(item);
-		if (!ii)
-			return false;
-		return ii->GetData()==(void*)keyValue;
-	});
-	CUIListItemIconed *item;
-	if (item_it==basedList.end())
-	{
-		if (emptyParam)
-			return nullptr;
-		CUIXml uiXml;
-		uiXml.Init(CONFIG_PATH, UI_PATH, "inventory_new.xml");
-		item=xr_new<CUIListItemIconed>();
-		CUIXmlInit::InitIconedColumns(uiXml,xml_path,0,item);
-		item->SetData((void*)keyValue);
-		item->SetAutoDelete(false);
-		basedList.push_back(item);
-	}
-	else 
-	{
-		if (emptyParam)
-		{
-			xr_delete(*item_it);
-			basedList.erase(std::remove(basedList.begin(),basedList.end(),*item_it),basedList.end());
-			return nullptr;
-		}
-		item=*item_it;
-	}
-	return item;
-}
-
-void setIconedItem(xr_map<shared_str ,shared_str> iconIDs,CUIListItemIconed* item,LPCSTR iconKey,shared_str column1Value,float column2Value,int column2Type,float column3Value,int column3Type,int addParam=0)
-{
-	xr_map<shared_str ,shared_str>::iterator icon=iconIDs.find(iconKey);
-	if (icon!=iconIDs.end())
-	{
-		if (icon->second.size()>0)
-			item->SetFieldIcon(0,icon->second.c_str());
-	}
-	item->SetFieldText(1,CStringTable().translate(column1Value).c_str());
-	/*string128 hint;
-	sprintf_s(hint,"%s_hint",column1Value.c_str());
-	if (CStringTable().IDExist(hint))
-		item->m_hint_text=CStringTable().translate(hint);*/
-	bool outfitPresent=false;
-	if (!fsimilar(column2Value, 0.0f))
-	{
-		string128 buff_outfit;
-		switch(column2Type)
-		{
-		case 0:
-			sprintf_s	(buff_outfit,"%s%+3.0f%%", (column2Value>0.0f)?"%c[green]":"%c[red]", column2Value*100.0f);
-			break;
-		case 1:
-			{
-				LPCSTR color = (column2Value<0)?"%c[red]":"%c[green]";
-				if ((column2Value>0 && column2Value<1) || (column2Value<0 && column2Value>-1))
-				{
-					column2Value=column2Value*1000;
-					sprintf_s	(buff_outfit,"%s%+3.0f%s", color, column2Value,CStringTable().translate("ui_inv_aw_gr").c_str());
-				}
-				else
-					sprintf_s	(buff_outfit,"%s%+3.0f%s", color, column2Value,CStringTable().translate("ui_inv_aw_kg").c_str());
-			}
-			break;
-		case 2:
-			{
-				LPCSTR color=(column2Value>0.0f)?"%c[green]":"%c[red]";
-				if (addParam==BLEEDING_RESTORE_ID||addParam==RADIATION_RESTORE_ID)
-					color = (column2Value>0)?"%c[red]":"%c[green]";
-				if (column2Value>9999)
-				{
-					column2Value/=10000;
-					sprintf_s	(buff_outfit,"%s%+3.0fk%%", color, column2Value);
-				}
-				else
-					sprintf_s	(buff_outfit,"%s%+3.0f%%", color, column2Value);
-			}
-			break;
-		default:NODEFAULT;
-		}
-		item->SetFieldText(2,buff_outfit);
-		outfitPresent=true;
-	}
-	item->SetVisibility(2,outfitPresent);
-	bool artPresent=false;
-	if( !fsimilar(column3Value, 0.0f) )
-	{
-		string128 buff_art;
-		switch(column3Type)
-		{
-		case 0:
-			sprintf_s	(buff_art,"%s%+3.0f%%", (column3Value>0.0f)?"%c[green]":"%c[red]", column3Value*100.0f);
-			break;
-		case 1:
-			{
-				LPCSTR color = (column3Value<0)?"%c[red]":"%c[green]";
-				if ((column3Value>0 && column3Value<1) || (column3Value<0 && column3Value>-1))
-				{
-					column3Value=column3Value*1000;
-					sprintf_s	(buff_art,"%s%+3.0f%s", color, column3Value,CStringTable().translate("ui_inv_aw_gr").c_str());
-				}
-				else
-					sprintf_s	(buff_art,"%s%+3.0f%s", color, column3Value,CStringTable().translate("ui_inv_aw_kg").c_str());
-			}
-			break;
-		case 2:
-			{
-				LPCSTR color=(column3Value>0.0f)?"%c[green]":"%c[red]";
-				if (addParam==BLEEDING_RESTORE_ID||addParam==RADIATION_RESTORE_ID)
-					color = (column3Value>0)?"%c[red]":"%c[green]";
-				if (column3Value>9999)
-				{
-					column3Value/=1000;
-					sprintf_s	(buff_art,"%s%+3.0fk%%", color, column3Value);
-				}
-				else
-					sprintf_s	(buff_art,"%s%+3.0f%%", color, column3Value);
-			}
-			break;
-		default:NODEFAULT;
-		}
-		item->SetFieldText(3,buff_art);
-		artPresent=true;
-	}
-	item->SetVisibility(3,artPresent);
-}
-
-void addSeparator(CUIListWnd* list,shared_str textId)
-{
-		CUIListItem* separator=xr_new<CUIListItem>();
-		separator->SetAutoDelete(true);
-		separator->SetText(CStringTable().translate(textId).c_str());
-		separator->SetTextAlignment(ETextAlignment::alCenter);
-		list->AddItem(separator);
-}
-
-void addSeparatorWT(CUIListWnd* list)
-{
-		CUIListItem* separator=xr_new<CUIListItem>();
-		separator->SetAutoDelete(true);
-		separator->SetHeight(5);
-		list->AddItem(separator);
 }
 
 void CUIOutfitInfo::createImmuneItem(CCustomOutfit* outfit,std::pair<ALife::EHitType,shared_str> immunePair, bool force_add)
@@ -218,13 +72,13 @@ void CUIOutfitInfo::createImmuneItem(CCustomOutfit* outfit,std::pair<ALife::EHit
 	_val_af				= 1.0f - _val_af;
 	bool emptyParam=fsimilar(_val_outfit, 0.0f) && fsimilar(_val_af, 0.0f) && !force_add;
 	LPCSTR hitName= ALife::g_cafHitType2String(immunePair.first);
-	CUIListItemIconed* item=findIconedItem(m_lImmuneUnsortedItems,hitName,emptyParam,xml_path.c_str());
+	CUIListItemIconed* item= findIconedItem(m_lImmuneUnsortedItems,hitName,emptyParam,s_xmlParams);
 	if (!item)
 		return;
 	setIconedItem(iconIDs,item,hitName,immunePair.second,_val_outfit,0,_val_af,0);
 }
 
-void CUIOutfitInfo::createModifItem(CCustomOutfit* outfit,std::pair<int, OPFuncs::restoreParam> modifPair, bool force_add)
+void CUIOutfitInfo::createModifItem(CCustomOutfit* outfit,std::pair<int, restoreParam> modifPair, bool force_add)
 {
 	float outfitValue=0;
 	float artsValue=artefactRestores[modifPair.first];
@@ -280,7 +134,7 @@ void CUIOutfitInfo::createModifItem(CCustomOutfit* outfit,std::pair<int, OPFuncs
 			NODEFAULT;
 	}
 	bool emptyParam=fsimilar(outfitValue, 0.0f) && fsimilar(artsValue, 0.0f) && !force_add;
-	CUIListItemIconed* item=findIconedItem(m_lModificatorsItems,modifPair.second.paramName.c_str(),emptyParam,xml_path.c_str());
+	CUIListItemIconed* item= findIconedItem(m_lModificatorsUnsortedItems,modifPair.second.paramName.c_str(),emptyParam,s_xmlParams);
 	if (!item)
 		return;
 	setIconedItem(iconIDs,item,modifPair.second.paramName.c_str(),modifPair.second.paramDesc,outfitValue,2,artsValue,2,modifPair.first);
@@ -317,18 +171,18 @@ void CUIOutfitInfo::Update(CCustomOutfit* outfitP)
 #pragma region update modifier lines
 		float outfitAddWeight=m_outfit ? m_outfit->m_additional_weight*m_outfit->GetCondition() : 0;
 		float artefactsWeight=g_actor ? Actor()->GetArtefactAdditionalWeight(): 0;
-		CUIListItemIconed* weightItem=findIconedItem(m_lModificatorsItems,"additional_weight",fsimilar(outfitAddWeight, 0.0f) && fsimilar(artefactsWeight, 0.0f),xml_path.c_str());
+		CUIListItemIconed* weightItem= findIconedItem(m_lModificatorsUnsortedItems,"additional_weight",fsimilar(outfitAddWeight, 0.0f) && fsimilar(artefactsWeight, 0.0f),s_xmlParams);
 		if (weightItem)
 			setIconedItem(iconIDs,weightItem,"additional_weight","ui_inv_outfit_additional_inventory_weight",outfitAddWeight,1,artefactsWeight,1);
-		std::for_each(modificators.begin(),modificators.end(),[&](std::pair<int, OPFuncs::restoreParam> modifPair)
+		std::for_each(modificators.begin(),modificators.end(),[&](std::pair<int, restoreParam> modifPair)
 		{
 			createModifItem(m_outfit,modifPair,false);
 		});
-		if (m_lModificatorsItems.size()>0)
+		if (m_lModificatorsUnsortedItems.size()>0)
 		{
 			//addSeparator(m_list,"ui_st_modifiers");
 			addSeparatorWT(m_list);
-			std::sort(m_lModificatorsItems.begin(),m_lModificatorsItems.end(),[](CUIListItem* i1, CUIListItem* i2)
+			std::sort(m_lModificatorsUnsortedItems.begin(),m_lModificatorsUnsortedItems.end(),[](CUIListItem* i1, CUIListItem* i2)
 			{
 				CUIListItemIconed *iconedItem1=smart_cast<CUIListItemIconed*>(i1);
 				CUIListItemIconed *iconedItem2=smart_cast<CUIListItemIconed*>(i2);
@@ -336,7 +190,7 @@ void CUIOutfitInfo::Update(CCustomOutfit* outfitP)
 					return false;
 				return		lstrcmpi(iconedItem1->GetFieldText(1),iconedItem2->GetFieldText(1))<0;
 			});
-			std::for_each(m_lModificatorsItems.begin(),m_lModificatorsItems.end(),[&](CUIListItemIconed* item)
+			std::for_each(m_lModificatorsUnsortedItems.begin(),m_lModificatorsUnsortedItems.end(),[&](CUIListItemIconed* item)
 			{
 				m_list->AddItem<CUIListItemIconed>(item);
 			});
