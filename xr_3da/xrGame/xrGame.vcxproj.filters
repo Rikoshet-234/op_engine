@@ -6603,6 +6603,9 @@
     <ClInclude Include="ui\UIOutfitParams.h">
       <Filter>UI\Common\ItemInfo</Filter>
     </ClInclude>
+    <ClInclude Include="ui\IconedItemsHelper.h">
+      <Filter>UI\UIWindows\ListBox\Iconed</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -9793,6 +9796,9 @@
     </ClCompile>
     <ClCompile Include="ui\UIOutfitParams.cpp">
       <Filter>UI\Common\ItemInfo</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\IconedItemsHelper.cpp">
+      <Filter>UI\UIWindows\ListBox\Iconed</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

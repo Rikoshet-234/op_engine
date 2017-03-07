@@ -3,159 +3,195 @@
 #include "UIStatic.h"
 #include "../object_broker.h"
 #include "UIXmlInit.h"
+#include "../Artifact.h"
+#include "../OPFuncs/utils.h"
+#include "UIScrollView.h"
 
 CUIArtefactParams::CUIArtefactParams()
 {
-	Memory.mem_fill			(m_info_items, 0, sizeof(m_info_items));
+	immunes = CreateImmunesStringMap();
+	modificators = CreateRestoresStringMap();
+	m_list=nullptr;
+	m_bShowModifiers=false;
 }
 
 CUIArtefactParams::~CUIArtefactParams()
 {
-	for(u32 i=_item_start; i<_max_item_index; ++i)
-	{
-		CUIStatic* _s			= m_info_items[i];
-		xr_delete				(_s);
-	}
+	ClearAll();
+	xr_delete(m_list);
 }
 
-LPCSTR af_item_sect_names[] = {
-	"health_restore_speed",
-	"radiation_restore_speed",
-	"satiety_restore_speed",
-	"power_restore_speed",
-	"bleeding_restore_speed",
-	
-	"burn_immunity",
-	"strike_immunity",
-	"shock_immunity",
-	"wound_immunity",		
-	"radiation_immunity",
-	"telepatic_immunity",
-	"chemical_burn_immunity",
-	"explosion_immunity",
-	"fire_wound_immunity",
-	"additional_weight"
-};
+#define PARAMS_PATH "af_params:immunities_list"
 
-LPCSTR af_item_param_names[] = {
-	"ui_inv_health",
-	"ui_inv_radiation",
-	"ui_inv_satiety",
-	"ui_inv_power",
-	"ui_inv_bleeding",
-
-	"ui_inv_outfit_burn_protection",			// "(burn_imm)",
-	"ui_inv_outfit_strike_protection",			// "(strike_imm)",
-	"ui_inv_outfit_shock_protection",			// "(shock_imm)",
-	"ui_inv_outfit_wound_protection",			// "(wound_imm)",
-	"ui_inv_outfit_radiation_protection",		// "(radiation_imm)",
-	"ui_inv_outfit_telepatic_protection",		// "(telepatic_imm)",
-	"ui_inv_outfit_chemical_burn_protection",	// "(chemical_burn_imm)",
-	"ui_inv_outfit_explosion_protection",		// "(explosion_imm)",
-	"ui_inv_outfit_fire_wound_protection",		// "(fire_wound_imm)",
-	"ui_inv_additional_weight"
-};
-
-LPCSTR af_actor_param_names[]={
-	"satiety_health_v",
-	"radiation_v",
-	"satiety_v",
-	"satiety_power_v",
-	"wound_incarnation_v",
-};
 void CUIArtefactParams::InitFromXml(CUIXml& xml_doc)
 {
-	LPCSTR _base				= "af_params";
-	if (!xml_doc.NavigateToNode(_base, 0))	return;
-
 	string256					_buff;
-	CUIXmlInit::InitWindow		(xml_doc, _base, 0, this);
-
-	for(u32 i=_item_start; i<_max_item_index; ++i)
-	{
-		m_info_items[i]			= xr_new<CUIStatic>();
-		CUIStatic* _s			= m_info_items[i];
-		_s->SetAutoDelete		(false);
-		strconcat				(sizeof(_buff),_buff, _base, ":static_", af_item_sect_names[i]);
-		CUIXmlInit::InitStatic	(xml_doc, _buff,	0, _s);
-	}
+	m_list=xr_new<CUIListWnd>();
+	m_list->SetAutoDelete(false);
+	CUIXmlInit::InitListWnd(xml_doc,PARAMS_PATH,0,m_list);
+	m_list->EnableScrollBar(false);
+	m_list->EnableAlwaysShowScroll(false);
+	m_list->SetIgnoreScrolling(true);
+	m_bShowModifiers=xml_doc.ReadAttribInt(PARAMS_PATH,0,"show_modifiers",0)==1?true:false;
+	strconcat(sizeof(_buff),_buff, PARAMS_PATH, ":icons");
+	CUIXmlInit::GetStringTable(xml_doc,_buff,0,m_mIconIDs);
+	currentFileNameXml= OPFuncs::getFileNameFromPath(xml_doc.m_xml_file_name).c_str();
 }
 
-bool CUIArtefactParams::Check(const shared_str& af_section)
+bool CUIArtefactParams::Check(const shared_str& af_section) const
 {
 	return !!pSettings->line_exist(af_section, "af_actor_properties");
 }
 
-#include "../string_table.h"
-void CUIArtefactParams::SetInfo(const shared_str& af_section)
+bool CUIArtefactParams::Check(CInventoryItem* item) const
 {
+	return smart_cast<CArtefact*>(item)!=nullptr;
+}
 
-	string128					_buff;
-	float						_h = 0.0f;
-	DetachAll					();
-	for(u32 i=_item_start; i<_max_item_index; ++i)
+void CUIArtefactParams::SetInfo(const shared_str& af_section,CUIScrollView *parent)
+{
+	m_list->RemoveAll();
+#pragma region update immune lines
+	std::for_each(immunes.begin(),immunes.end(),[&](std::pair<ALife::EHitType,shared_str> immunePair)
 	{
-		CUIStatic* _s			= m_info_items[i];
-
-		float					_val;
-		if(i<_max_item_index1)
+		createImmuneItem(af_section,immunePair,false);
+	});
+	if (m_lImmuneUnsortedItems.size()>0)
+	{
+		std::sort(m_lImmuneUnsortedItems.begin(),m_lImmuneUnsortedItems.end(),[](CUIListItem* i1, CUIListItem* i2)
 		{
-			float _actor_val	= pSettings->r_float	("actor_condition", af_actor_param_names[i]);
-			_val				= pSettings->r_float	(af_section, af_item_sect_names[i]);
-
-			if					(fis_zero(_val))				continue;
-			
-			_val				= (_val/_actor_val)*100.0f;
-		}
-		else if (i==_item_additional_weight)
+			CUIListItemIconed *iconedItem1=smart_cast<CUIListItemIconed*>(i1);
+			CUIListItemIconed *iconedItem2=smart_cast<CUIListItemIconed*>(i2);
+			if (!iconedItem1 || !iconedItem2)
+				return false;
+			return		lstrcmpi(iconedItem1->GetFieldText(1),iconedItem2->GetFieldText(1))<0;
+		});
+		std::for_each(m_lImmuneUnsortedItems.begin(),m_lImmuneUnsortedItems.end(),[&](CUIListItemIconed* item)
 		{
-			_val=READ_IF_EXISTS(pSettings,r_float,af_section,af_item_sect_names[i],0);
-			if (_val==0 ||fis_zero(_val) ) continue;
-		} 
-		else 
-		{
-			shared_str _sect	= pSettings->r_string(af_section, "hit_absorbation_sect");
-			_val				= pSettings->r_float(_sect, af_item_sect_names[i]);
-			if					(fsimilar(_val, 1.0f))				continue;
-			_val				= (1.0f - _val);
-			_val				*= 100.0f;
-
-		}
-		LPCSTR _sn = "%";
-		if(i==_item_radiation_restore_speed || i==_item_power_restore_speed)
-		{
-			_val				/= 100.0f;
-			_sn					= "";
-		}
-
-		LPCSTR _color = (_val>0)?"%c[green]":"%c[red]";
-		
-		if(i==_item_bleeding_restore_speed)
-			_val		*=	-1.0f;
-
-		if(i==_item_bleeding_restore_speed || i==_item_radiation_restore_speed)
-			_color = (_val>0)?"%c[red]":"%c[green]";
-		if (i==_item_additional_weight)
-		{
-			_color = (_val<0)?"%c[red]":"%c[green]";
-			if ((_val>0 && _val<1) || (_val<0 && _val>-1))
-			{
-				_val=_val*1000;
-				_sn=CStringTable().translate("ui_inv_aw_gr").c_str();
-			}
-			else
-				_sn=CStringTable().translate("ui_inv_aw_kg").c_str();
-		}
-
-		sprintf_s					(	_buff, "%s %s %+.0f %s", 
-									CStringTable().translate(af_item_param_names[i]).c_str(), 
-									_color, 
-									_val, 
-									_sn);
-		_s->SetText				(_buff);
-		_s->SetWndPos			(_s->GetWndPos().x, _h);
-		_h						+= _s->GetWndSize().y;
-		AttachChild				(_s);
+			m_list->AddItem<CUIListItemIconed>(item);
+		});
 	}
-	SetHeight					(_h);
+#pragma endregion
+	#pragma region update modifiers lines
+	if (m_bShowModifiers)
+	{
+		float addWeight=READ_IF_EXISTS(pSettings,r_float,af_section,"additional_weight",0);
+		if (addWeight!=0 ||!fis_zero(addWeight)) 
+		{
+			CUIListItemIconed* weightItem= findIconedItem(m_lModificatorsUnsortedItems,"additional_weight",!!fsimilar(addWeight, 0.0f) ,xmlParams(currentFileNameXml,PARAMS_PATH));
+			if (weightItem)
+				setIconedItem(m_mIconIDs,weightItem,"additional_weight","ui_inv_outfit_additional_inventory_weight",addWeight,1,0,-1);
+		}
+		std::for_each(modificators.begin(),modificators.end(),[&](std::pair<int, restoreParam> modifPair)
+		{
+			createModifItem(af_section,modifPair,false);
+		});
+		if (m_lModificatorsUnsortedItems.size()>0)
+		{
+			if (m_lImmuneUnsortedItems.size()>0)
+				addSeparatorWT(m_list);
+			std::sort(m_lModificatorsUnsortedItems.begin(),m_lModificatorsUnsortedItems.end(),[](CUIListItem* i1, CUIListItem* i2)
+			{
+				CUIListItemIconed *iconedItem1=smart_cast<CUIListItemIconed*>(i1);
+				CUIListItemIconed *iconedItem2=smart_cast<CUIListItemIconed*>(i2);
+				if (!iconedItem1 || !iconedItem2)
+					return false;
+				return		lstrcmpi(iconedItem1->GetFieldText(1),iconedItem2->GetFieldText(1))<0;
+			});
+			std::for_each(m_lModificatorsUnsortedItems.begin(),m_lModificatorsUnsortedItems.end(),[&](CUIListItemIconed* item)
+			{
+				m_list->AddItem<CUIListItemIconed>(item);
+			});
+		}
+	}
+#pragma endregion
+	m_list->SetHeight(m_list->GetItemsCount()*m_list->GetItemHeight()+5);
+	m_list->GetInternalScrollbar()->SetPageSize(m_list->GetItemsCount());
+	m_list->ScrollToBegin();
+	parent->AddWindow(m_list,false);
+}
+
+void CUIArtefactParams::SetInfo(CInventoryItem* item,CUIScrollView *parent)
+{
+	SetInfo(item->object().cNameSect(),parent);
+}
+
+void CUIArtefactParams::ClearAll()
+{
+	ClearItems(m_lImmuneUnsortedItems);
+	ClearItems(m_lModificatorsUnsortedItems);
+}
+
+void CUIArtefactParams::ClearItems(std::vector<CUIListItemIconed*>& baseList)
+{
+	while(!baseList.empty())
+	{
+		auto item=baseList.front();
+		baseList.erase(std::remove(baseList.begin(),baseList.end(),item),baseList.end());
+		item->DetachAll();
+		xr_delete(item);
+	}
+}
+
+void CUIArtefactParams::createImmuneItem(shared_str af_section, std::pair<ALife::EHitType, shared_str> immunePair, bool force_add)
+{
+	LPCSTR hitName= ALife::g_cafHitType2String(immunePair.first);
+	string256 buff;
+	sprintf_s(buff,"%s_immunity",hitName);
+	shared_str _sect	= pSettings->r_string(af_section, "hit_absorbation_sect");
+	float art_val				= pSettings->r_float(_sect, buff);
+	bool emptyParam=fsimilar(art_val, 1.0f) && !force_add;
+	art_val= (1.0f - art_val);
+	CUIListItemIconed* item= findIconedItem(m_lImmuneUnsortedItems,hitName,emptyParam,xmlParams(currentFileNameXml,PARAMS_PATH));
+	if (!item)
+		return;
+	setIconedItem(m_mIconIDs,item,hitName,immunePair.second,art_val,0,0,-1);
+}
+
+void CUIArtefactParams::createModifItem(shared_str af_section, std::pair<int, restoreParam> modifPair, bool force_add)
+{
+	if (modifPair.first==POWER_LOSS_ID)
+		return;
+	float artValue=pSettings->r_float(af_section, modifPair.second.paramName.c_str());
+	float actorValue=pSettings->r_float	("actor_condition", modifPair.second.actorParamName.c_str());
+	switch (modifPair.first)
+	{
+		case BLEEDING_RESTORE_ID:
+			{
+				artValue = (artValue/actorValue)*100.0f*-1.0f;
+			}
+			break;
+		case SATIETY_RESTORE_ID:
+			{
+				artValue = (artValue/actorValue)*100.0f;				
+			}
+			break;
+		case RADIATION_RESTORE_ID:
+			{
+					artValue = (artValue/actorValue);
+			}
+			break;
+		case HEALTH_RESTORE_ID:
+			{
+					artValue = (artValue/actorValue)*100.0f;
+			}
+			break;
+		case POWER_RESTORE_ID:
+			{
+					artValue = (artValue/actorValue);
+			}
+			break;
+		case POWER_LOSS_ID:
+			{
+					artValue = (artValue/actorValue)*100.0f;
+			}
+			break;
+		default:
+			NODEFAULT;
+	}
+		bool emptyParam=fsimilar(artValue, 0.0f) && !force_add;
+	CUIListItemIconed* item= findIconedItem(m_lModificatorsUnsortedItems,modifPair.second.paramName.c_str(),emptyParam,xmlParams(currentFileNameXml,PARAMS_PATH));
+	if (!item)
+		return;
+	setIconedItem(m_mIconIDs,item,modifPair.second.paramName.c_str(),modifPair.second.paramDesc,artValue,2,0,-1,modifPair.first);
 }

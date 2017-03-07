@@ -3,27 +3,37 @@
 
 #include "UIWindow.h"
 #include "UIListWnd.h"
+#include "UIXmlInit.h"
 #include "../alife_space.h"
 
+struct restoreParam;
+struct xmlParams;
+class CCustomOutfit;
 class CInventoryItem;
 class CUIXml;
 
-namespace OPFuncs {
-	struct restoreParam;
-}
-
-class CUIOutfitParams :public CUIListWnd
+class CUIOutfitParams 
 {
 public:
 	CUIOutfitParams();
 	virtual ~CUIOutfitParams();
-	void InitFromXml (CUIXml& xml_doc);
+	void InitFromXml (CUIXml &xml_doc);
 	bool Check(CInventoryItem* outfitItem) const;
-	void SetInfo(CInventoryItem* outfitItem) ;
+	bool Check(shared_str section) const;
+	void SetInfo(CCustomOutfit* outfitItem,CUIScrollView *parent);
+	void ClearAll();
+	CUIListWnd*		m_list;
 private:
 	xr_map<shared_str ,shared_str> m_mIconIDs;
 	xr_map<ALife::EHitType,shared_str> immunes;
-	xr_map<int, OPFuncs::restoreParam> modificators;
+	xr_map<int, restoreParam> modificators;
+	shared_str currentFileNameXml;
+	bool m_bShowModifiers;
+	std::vector<CUIListItemIconed*>	m_lImmuneUnsortedItems;
+	std::vector<CUIListItemIconed*>	m_lModificatorsUnsortedItems;
+	void ClearItems(std::vector<CUIListItemIconed*> &baseList);	
+	void createImmuneItem(CCustomOutfit* outfit,std::pair<ALife::EHitType,shared_str> immunePair, bool force_add);
+	void createModifItem(CCustomOutfit* outfit,std::pair<int, restoreParam> modifPair, bool force_add);
 };
 
 #endif

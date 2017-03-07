@@ -17,6 +17,7 @@
 #include "ui_af_params.h"
 #include "../actor.h"
 #include "../script_callback_ex.h"
+#include "../CustomOutfit.h"
 
 CUIItemInfo::CUIItemInfo()
 {
@@ -44,7 +45,7 @@ CUIItemInfo::~CUIItemInfo()
 
 void CUIItemInfo::Init(LPCSTR xml_name){
 
-	CUIXml						uiXml;
+	CUIXml                                          uiXml;
 	bool xml_result				= uiXml.Init(CONFIG_PATH, UI_PATH, xml_name);
 	R_ASSERT2					(xml_result, "xml file not found");
 
@@ -232,8 +233,8 @@ void CUIItemInfo::TryAddArtefactInfo	(const shared_str& af_section)
 {
 	if (UIArtefactParams->Check(af_section))
 	{
-		UIArtefactParams->SetInfo(af_section);
-		UIDesc->AddWindow(UIArtefactParams, false);
+		UIArtefactParams->SetInfo(af_section,UIDesc);
+		//UIDesc->AddWindow(UIArtefactParams, false);
 	}
 }
 
@@ -241,8 +242,8 @@ void CUIItemInfo::TryAddOutfitInfo(CInventoryItem* outfitItem)
 {
 	if (UIOutfitParams->Check(outfitItem))
 	{
-		UIOutfitParams->SetInfo(outfitItem);
-		UIDesc->AddWindow(UIOutfitParams, false);
+		UIOutfitParams->SetInfo(smart_cast<CCustomOutfit*>(outfitItem),UIDesc);
+//		UIDesc->AddWindow(UIOutfitParams, false);
 	}
 }
 

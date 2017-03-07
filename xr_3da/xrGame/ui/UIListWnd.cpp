@@ -12,7 +12,8 @@ static const char	cSeparatorChar				= '%';
 
 CUIListWnd::CUIListWnd()
 {
-	m_ActiveBackgroundFrame		= NULL;
+	m_ActiveBackgroundFrame		= nullptr;
+	m_bIgnoreScrolling=false;
 	m_bListActivity				= true;
 	m_iFocusedItem				= -1;
 	m_iSelectedItem             = -1;
@@ -128,7 +129,8 @@ void CUIListWnd::RemoveItem(int index)
 
 	//выбрать нужный элемент
 	it = m_ItemList.begin();
-	for(int i=0; i<index;++i, ++it);
+	int i=0;
+	for(i=0; i<index;++i, ++it);
 
 	R_ASSERT(m_ItemList.end() != it);
 	
@@ -224,7 +226,8 @@ void CUIListWnd::UpdateList()
 	
 	//спрятать все элементы до участка 
 	//отображающейся в данный момент
-	for(int i=0; i<_min(m_ItemList.size(),m_iFirstShownIndex); ++i, ++it)
+	int i=0;
+	for(i=0; i<_min(m_ItemList.size(),m_iFirstShownIndex); ++i, ++it)
 	{
 		(*it)->Show(false);
 	}
@@ -480,12 +483,19 @@ bool CUIListWnd::OnMouse(float x, float y, EUIMessages mouse_action)
 	case WINDOW_LBUTTON_DB_CLICK:
 		break;
 	case WINDOW_MOUSE_WHEEL_DOWN:
-			m_ScrollBar->TryScrollInc	();
-			return						true;
+			if (!m_bIgnoreScrolling)
+			{
+				m_ScrollBar->TryScrollInc	();
+				return true;
+			}
 			break;
 	case WINDOW_MOUSE_WHEEL_UP:
-			m_ScrollBar->TryScrollDec();
-			return						true;
+			if (!m_bIgnoreScrolling)
+			{
+				m_ScrollBar->TryScrollDec();
+				return						true;
+			}
+			
 			break;
 	}
 

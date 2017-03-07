@@ -1,5 +1,6 @@
 #pragma once
 #include "UIWindow.h"
+#include "IconedItemsHelper.h"
 
 class CUIXml;
 class CUIStatic;
@@ -10,32 +11,23 @@ public:
 								CUIArtefactParams		();
 	virtual						~CUIArtefactParams		();
 	void 						InitFromXml				(CUIXml& xml_doc);
-	bool 						Check					(const shared_str& af_section);
-	void 						SetInfo					(const shared_str& af_section);
-
+	bool 						Check					(const shared_str& af_section) const;
+	bool						Check(CInventoryItem* item) const;
+	void 						SetInfo					(const shared_str& af_section,CUIScrollView *parent);
+	void 						SetInfo					(CInventoryItem* item,CUIScrollView *parent);
+	void ClearAll();
+	CUIListWnd*		m_list;
+private:
+	xr_map<shared_str ,shared_str> m_mIconIDs;
+	xr_map<ALife::EHitType,shared_str> immunes;
+	xr_map<int, restoreParam> modificators;
+	shared_str currentFileNameXml;
+	bool m_bShowModifiers;
+	std::vector<CUIListItemIconed*>	m_lImmuneUnsortedItems;
+	std::vector<CUIListItemIconed*>	m_lModificatorsUnsortedItems;
+	void ClearItems(std::vector<CUIListItemIconed*> &baseList);	
+	void createImmuneItem(shared_str af_section,std::pair<ALife::EHitType,shared_str> immunePair, bool force_add);
+	void createModifItem(shared_str af_section,std::pair<int, restoreParam> modifPair, bool force_add);
 protected:
-	enum{
-		_item_start						=0,
-		_item_health_restore_speed		=_item_start,
-		_item_radiation_restore_speed,
-		_item_satiety_restore_speed,
-		_item_power_restore_speed,
-		_item_bleeding_restore_speed,
-
-		_max_item_index1,
-
-		_item_burn_immunity				= _max_item_index1,
-		_item_strike_immunity,
-		_item_shock_immunity,
-		_item_wound_immunity,		
-		_item_radiation_immunity,
-		_item_telepatic_immunity,
-		_item_chemical_burn_immunity,
-		_item_explosion_immunit,
-		_item_fire_wound_immunity,
-		_item_additional_weight,
-		_max_item_index,
-
-	};
-	CUIStatic*					m_info_items[_max_item_index];
+	
 };

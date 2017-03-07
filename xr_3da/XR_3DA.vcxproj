@@ -957,6 +957,7 @@
   <ItemGroup>
     <Image Include="op_load_screen_cl.bmp" />
     <Image Include="op_load_screen_ne.bmp" />
+    <Image Include="op_load_screen_new.bmp" />
     <Image Include="stalker.ico">
       <DeploymentContent>true</DeploymentContent>
     </Image>

@@ -811,6 +811,7 @@ void CWeaponMagazinedWGrenade::PlayAnimIdle()
 			}
 			else
 			{
+				mixMode=TRUE;
 				smAnimation=&mhud_idle_g;
 #ifdef SHOW_ANIM_WEAPON_PLAYS
 				animName="try play [mhud_idle_g]";
@@ -824,14 +825,14 @@ void CWeaponMagazinedWGrenade::PlayAnimIdle()
 			{
 				smAnimation=&mhud_idle_w_gl_aim;
 #ifdef SHOW_ANIM_WEAPON_PLAYS
-				animName="try play [mhud.mhud_idle_w_gl_aim]";
+				animName="try play [mhud_idle_w_gl_aim]";
 #endif
 			}
 			else
 			{
 				smAnimation=&mhud_idle_w_gl;
 #ifdef SHOW_ANIM_WEAPON_PLAYS
-				animName="try play [mhud.mhud_idle_w_gl]";
+				animName="try play [mhud_idle_w_gl]";
 #endif
 			}
 		}
@@ -933,7 +934,7 @@ bool CWeaponMagazinedWGrenade::TryPlayAnimIdle()
 			sprintf_s(debugStr,"try play [%s] GrenadeMode [%s]",animName,OPFuncs::boolToStr(m_bGrenadeMode));
 			bool result=PlayAnimation(*smAnimation,TRUE,debugStr);
 #else
-			bool result=PlayAnimation(*smAnimation,TRUE);
+			bool result=PlayAnimation(*smAnimation,TRUE,nullptr);
 #endif
 			if (!result)
 				return inherited::TryPlayAnimIdle();

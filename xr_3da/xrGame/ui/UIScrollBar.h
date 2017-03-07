@@ -39,9 +39,11 @@ protected:
 	void			ClampByViewRect		();
 	void			SetPosScrollFromView(float view_pos, float view_width, float view_offs);
 	int				PosViewFromScroll	(int view_size, int view_offs);
-	void			SetScrollPosClamped	(int iPos) { 
-														m_iScrollPos = iPos; 
-														clamp(m_iScrollPos,m_iMinPos,m_iMaxPos-m_iPageSize+1); }
+	void			SetScrollPosClamped	(int iPos) 
+	{
+		m_iScrollPos = iPos;
+		clamp(m_iScrollPos,m_iMinPos,m_iMaxPos-m_iPageSize+1); 
+	}
 public:
 					CUIScrollBar		(void);
 	virtual			~CUIScrollBar		(void);
@@ -77,4 +79,5 @@ public:
 	
 	void			TryScrollInc		();
 	void			TryScrollDec		();
+	bool			IsHorizontal() const {return m_bIsHorizontal;}
 };

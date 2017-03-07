@@ -11,7 +11,7 @@ class ENGINE_API CMotionDef;
 //размер очереди считается бесконечность
 //заканчиваем стрельбу, только, если кончились патроны
 #define WEAPON_ININITE_QUEUE -1
-
+//#define SHOW_ANIM_WEAPON_PLAYS
 
 class CWeaponMagazined: public CWeapon
 {
@@ -156,8 +156,8 @@ public:
 	virtual void	StopedAfterQueueFired	(bool value){m_bStopedAfterQueueFired = value; }
 	
 	bool m_bforceReloadAfterIdle;
-	bool GetForeceReloadFlag() const {return m_bforceReloadAfterIdle;}
-	void SetForeceReloadFlag(bool flag) {m_bforceReloadAfterIdle=flag;}
+	bool GetForceReloadFlag() const {return m_bforceReloadAfterIdle;}
+	void SetForceReloadFlag(bool flag) {m_bforceReloadAfterIdle=flag;}
 protected:
 	//максимальный размер очереди, которой можно стрельнуть
 	int				m_iQueueSize;
@@ -216,7 +216,7 @@ public:
 	virtual void	PlayAnimShoot();
 	virtual void	PlayReloadSound		();
 	virtual bool			TryPlayAnimIdle	();
-	bool			PlayAnimation(MotionSVec animation,BOOL mixMode,LPCSTR debugText=nullptr);
+	bool			PlayAnimation(MotionSVec animation,BOOL mixMode,LPCSTR debugText=nullptr,CHudItem* callback=nullptr);
 
 };
 
