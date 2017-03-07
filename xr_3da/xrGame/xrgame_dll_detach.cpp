@@ -83,8 +83,8 @@ void init_game_globals()
 	TSP_END("MONSTER_COMMUNITY",	"init");
 	TSE_DISABLE("init");
 	TSP_PRINT();
-	TS_PRINT("g_iiFindBegin");
-	TS_PRINT("g_iiFindEnd");
+	TSS_PRINT("g_iiFindBegin");
+	TSS_PRINT("g_iiFindEnd");
 }
 
 extern CUIXml*	g_gameTaskXml;

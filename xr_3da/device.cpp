@@ -91,8 +91,11 @@ void CRenderDevice::End		(void)
 			pApp->destroy_loading_shaders					();
 			Resources->DestroyNecessaryTextures				();
 			Memory.mem_compact								();
+			TSS_END(g_ts_meas, g_ts_spawn);
+			TSS_PRINT(g_ts_meas);
 			TSP_PRINT();
 			TSE_DISABLE("spawn");
+			TSE_DISABLE(g_ts_spawn);
 			Msg												("* MEMORY USAGE: %d K",Memory.mem_usage()/1024);
 			CheckPrivilegySlowdown							();
 		}

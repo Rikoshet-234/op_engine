@@ -4,5 +4,6 @@
 
 #include "../FTimerStat.h"
 extern XRCORE_API const char* g_ts_spawn;
+extern XRCORE_API const char* g_ts_meas;
 
 #endif

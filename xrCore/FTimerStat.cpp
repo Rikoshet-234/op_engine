@@ -36,6 +36,9 @@ void CTimerStat::Reset()
 
 void CTimerStat::Print(LPCSTR name)
 {
+	if (!GetCount())
+		return;
+
 	Msg("%s: Count = %7u, Elapsed = %5I64u ms, Average = %10.3f ms, Max = %10.3f ms, Min = %10.3f ms"
 		, name
 		, GetCount()

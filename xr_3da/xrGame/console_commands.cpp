@@ -157,8 +157,9 @@ public:
 		s_cnt++;
 		if (s_cnt >= 2)
 		{
-			TSE_ENABLE("spawn");
-			TSE_ENABLE(g_ts_spawn);
+			//TSE_ENABLE("spawn");
+			//TSE_ENABLE(g_ts_spawn);
+			TSS_BEGIN(g_ts_meas, g_ts_spawn);
 			Msg		("* Starting measure");
 		}
 #ifdef DEBUG

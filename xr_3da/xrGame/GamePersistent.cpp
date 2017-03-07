@@ -136,7 +136,7 @@ void CGamePersistent::OnAppStart()
 	chrono1 = std::chrono::high_resolution_clock::now();
 	__super::OnAppStart			();
 	chrono2 = std::chrono::high_resolution_clock::now();
-	TS_PRINT("g_detailLoad");
+	TSS_PRINT("g_detailLoad");
 	Msg("App_Start loaded at %lli msec",std::chrono::duration_cast<std::chrono::milliseconds>(chrono2-chrono1).count());
 
 	chrono1 = std::chrono::high_resolution_clock::now();
@@ -147,12 +147,12 @@ void CGamePersistent::OnAppStart()
 	chrono1 = std::chrono::high_resolution_clock::now();
 	m_pMainMenu					= xr_new<CMainMenu>();
 	chrono2 = std::chrono::high_resolution_clock::now();
-	TS_PRINT("g_mmLoad");
-	TS_PRINT("g_mmForOuter");
-	TS_PRINT("g_mmFOFind");
-	TS_PRINT("g_mmFORead");
-	TS_PRINT("g_mmFOIf");
-	TS_PRINT("g_mmFOElse");
+	TSS_PRINT("g_mmLoad");
+	TSS_PRINT("g_mmForOuter");
+	TSS_PRINT("g_mmFOFind");
+	TSS_PRINT("g_mmFORead");
+	TSS_PRINT("g_mmFOIf");
+	TSS_PRINT("g_mmFOElse");
 	Msg("Main_Menu loaded at %lli msec",std::chrono::duration_cast<std::chrono::milliseconds>(chrono2-chrono1).count());
 }
 

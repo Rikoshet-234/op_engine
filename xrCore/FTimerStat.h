@@ -75,22 +75,22 @@ private:
 	#define TSP_BEGIN(n, e) TSM_BeginProfile(n, e)
 	#define TSP_END(n, e) TSM_EndProfile(n, e)
 	#define TSP_SCOPED(s,n,e) CTimerStatScopedNamed s(n, e, TSM_BeginProfile, TSM_EndProfile);
-	#define TS_BEGIN(n, e) TSM_Begin(n, e)
-	#define TS_END(n, e) TSM_End(n, e)
-	#define TS_SCOPED(s,n,e) CTimerStatScopedNamed s(n, e, TSM_Begin, TSM_End);
+	#define TSS_BEGIN(n, e) TSM_Begin(n, e)
+	#define TSS_END(n, e) TSM_End(n, e)
+	#define TSS_SCOPED(s,n,e) CTimerStatScopedNamed s(n, e, TSM_Begin, TSM_End);
 	#define TSP_PRINT() TSM_Print()
-	#define TS_PRINT(n) TSM_Print(n)
+	#define TSS_PRINT(n) TSM_Print(n)
 #else
 	#define TS_ENABLE(e)
 	#define TS_DISABLE(e)
 	#define TSP_BEGIN(n, e)
 	#define TSP_END(n, e)
 	#define TSP_SCOPED(s,n,e)
-	#define TS_BEGIN(n, e)
-	#define TS_END(n, e)
-	#define TS_SCOPED(s,n,e)
+	#define TSS_BEGIN(n, e)
+	#define TSS_END(n, e)
+	#define TSS_SCOPED(s,n,e)
 	#define TSP_PRINT()
-	#define TS_PRINT()
+	#define TSS_PRINT()
 #endif
 
 #endif // FTimerStatH

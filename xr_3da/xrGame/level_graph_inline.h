@@ -626,7 +626,7 @@ IC	void CLevelGraph::iterate_vertices		(const Fvector &min_position, const Fvect
 	else
 		E						= m_nodes + header().vertex_count();
 
-	TSP_SCOPED(_, __FUNCTION__, "spawn");
+	//TSP_SCOPED(_, __FUNCTION__, "spawn");
 	for ( ; I != E; ++I)
 		predicate				(*I);
 }

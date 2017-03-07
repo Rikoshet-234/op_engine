@@ -40,8 +40,8 @@ void CSE_ALifeDynamicObject::on_register			()
 	if (!alife().graph().level().object(object->ID,true) && !keep_saved_data_anyway())
 		client_data.clear					();
 
-	//TS_END("g_dynamic", "spawn");
-	//TS_BEGIN("g_dynamic_bu", "spawn");
+	//TSS_END("g_dynamic", "spawn");
+	//TSS_BEGIN("g_dynamic_bu", "spawn");
 }
 
 void CSE_ALifeDynamicObject::on_before_register		()
