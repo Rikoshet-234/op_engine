@@ -76,12 +76,9 @@ void CUIArtefactParams::SetInfo(const shared_str& af_section,CUIScrollView *pare
 	if (m_bShowModifiers)
 	{
 		float addWeight=READ_IF_EXISTS(pSettings,r_float,af_section,"additional_weight",0);
-		if (addWeight!=0 ||!fis_zero(addWeight)) 
-		{
-			CUIListItemIconed* weightItem= findIconedItem(m_lModificatorsUnsortedItems,"additional_weight",!!fsimilar(addWeight, 0.0f) ,xmlParams(currentFileNameXml,PARAMS_PATH));
-			if (weightItem)
-				setIconedItem(m_mIconIDs,weightItem,"additional_weight","ui_inv_outfit_additional_inventory_weight",addWeight,1,0,-1);
-		}
+		CUIListItemIconed* weightItem= findIconedItem(m_lModificatorsUnsortedItems,"additional_weight",!!fsimilar(addWeight, 0.0f) ,xmlParams(currentFileNameXml,PARAMS_PATH));
+		if (weightItem)
+			setIconedItem(m_mIconIDs,weightItem,"additional_weight","ui_inv_outfit_additional_inventory_weight",addWeight,1,0,-1);
 		std::for_each(modificators.begin(),modificators.end(),[&](std::pair<int, restoreParam> modifPair)
 		{
 			createModifItem(af_section,modifPair,false);
@@ -89,7 +86,7 @@ void CUIArtefactParams::SetInfo(const shared_str& af_section,CUIScrollView *pare
 		if (m_lModificatorsUnsortedItems.size()>0)
 		{
 			if (m_lImmuneUnsortedItems.size()>0)
-				addSeparatorWT(m_list);
+				addSeparator(m_list);
 			std::sort(m_lModificatorsUnsortedItems.begin(),m_lModificatorsUnsortedItems.end(),[](CUIListItem* i1, CUIListItem* i2)
 			{
 				CUIListItemIconed *iconedItem1=smart_cast<CUIListItemIconed*>(i1);

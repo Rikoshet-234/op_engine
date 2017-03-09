@@ -172,7 +172,7 @@ void addSeparator(CUIListWnd* list,shared_str textId)
 		list->AddItem(separator);
 }
 
-void addSeparatorWT(CUIListWnd* list)
+void addSeparator(CUIListWnd* list)
 {
 		CUIListItem* separator=xr_new<CUIListItem>();
 		separator->SetAutoDelete(true);

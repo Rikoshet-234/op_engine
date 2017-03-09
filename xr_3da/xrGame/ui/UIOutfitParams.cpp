@@ -93,7 +93,8 @@ void CUIOutfitParams::SetInfo(CCustomOutfit* outfitItem,CUIScrollView *parent)
 		});
 		if (m_lModificatorsUnsortedItems.size()>0)
 		{
-			addSeparatorWT(m_list);
+			if (m_lImmuneUnsortedItems.size()>0)
+				addSeparator(m_list);
 			std::sort(m_lModificatorsUnsortedItems.begin(),m_lModificatorsUnsortedItems.end(),[](CUIListItem* i1, CUIListItem* i2)
 			{
 				CUIListItemIconed *iconedItem1=smart_cast<CUIListItemIconed*>(i1);

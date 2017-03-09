@@ -35,7 +35,7 @@ xr_map<int,restoreParam> CreateRestoresStringMap();
 
 CUIListItemIconed* findIconedItem(std::vector<CUIListItemIconed*> &basedList,LPCSTR keyValue,bool emptyParam,xmlParams xmlData);
 void setIconedItem(xr_map<shared_str ,shared_str> iconIDs,CUIListItemIconed* item,LPCSTR iconKey,shared_str column1Value,float column2Value,int column2Type,float column3Value,int column3Type,int addParam=0);
-void addSeparatorWT(CUIListWnd* list);
+void addSeparator(CUIListWnd* list);
 void addSeparator(CUIListWnd* list,shared_str textId);
 
 #endif

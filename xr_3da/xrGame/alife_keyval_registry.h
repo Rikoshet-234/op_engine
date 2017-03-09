@@ -39,6 +39,7 @@ public:
 	u32 load(IReader &memory_stream);
 
 	luabind::object get(LPCSTR key);
+	luabind::object get(LPCSTR key,luabind::object const& def_value);
 	void set(LPCSTR key, luabind::object const& object);
 	bool exist(LPCSTR key);
 	void remove(LPCSTR key);

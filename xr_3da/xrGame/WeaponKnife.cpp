@@ -201,6 +201,7 @@ void CWeaponKnife::OnAnimationEnd(u32 state)
 			} 
 			else 
 				SwitchState(eIdle);
+
 		}break;
 	case eShowing:
 	case eIdle:	
@@ -217,9 +218,9 @@ void CWeaponKnife::switch2_Attacking	(u32 state)
 	if(m_bPending)	return;
 
 	if(state==eFire)
-		m_pHUD->animPlay(random_anim(mhud_attack),		FALSE, this, state);
+		m_pHUD->animPlay(random_anim(mhud_attack),		TRUE, this, state);
 	else //eFire2
-		m_pHUD->animPlay(random_anim(mhud_attack2),		FALSE, this, state);
+		m_pHUD->animPlay(random_anim(mhud_attack2),		TRUE, this, state);
 
 	m_attackStart	= true;
 	m_bPending		= true;
@@ -228,7 +229,10 @@ void CWeaponKnife::switch2_Attacking	(u32 state)
 void CWeaponKnife::switch2_Idle	()
 {
 	VERIFY(GetState()==eIdle);
-	m_pHUD->animPlay(random_anim(mhud_idle), TRUE, this, GetState());
+	if (ParentIsActor() && g_actor->get_state_wishful()&mcAnyMove)
+		onMovementChanged(mcAnyMove);
+	else
+		m_pHUD->animPlay(random_anim(mhud_idle), TRUE, this, GetState());
 	m_bPending = false;
 }
 
@@ -337,24 +341,23 @@ void CWeaponKnife::GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, 
 
 void CWeaponKnife::onMovementChanged	(ACTOR_DEFS::EMoveCommand cmd)
 {
-//	if( (cmd == ACTOR_DEFS::mcSprint)&&(GetState()==eIdle)  )
-//		switch2_Idle();
 	if (GetState()!=eIdle)
 		return;
 	CEntity::SEntityState st;
 	g_actor->g_State(st);
 	if (st.bSprint && st.fVelocity > 1) 
 	{
-		//SetState(eIdle);
 		if (mhud_idle_sprint.size()>0)
 			m_pHUD->animPlay(random_anim(mhud_idle_sprint), TRUE, this,  eIdle);
+		else
+			m_pHUD->animPlay(random_anim(mhud_idle), TRUE, this, eIdle);
 	}
 	else if (!st.bCrouch && g_actor->AnyMove())
 	{
-		//Msg(CWeapon::getStateString(EWeaponStates(GetState())).c_str());
-		//SetState(eIdle);
 		if (mhud_idle_moving.size()>0)
 			m_pHUD->animPlay(random_anim(mhud_idle_moving), TRUE, this,  eIdle);
+		else
+			m_pHUD->animPlay(random_anim(mhud_idle), TRUE, this, eIdle);
 	}
 	else
 		SwitchState(GetState() );
