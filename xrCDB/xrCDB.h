@@ -90,10 +90,14 @@ namespace CDB
 			}
 		}
 
-		static	void			build_thread	(void*);
-		void					build_internal	(Fvector* V, int Vcnt, TRI* T, int Tcnt, build_callback* bc=NULL, void* bcp=NULL);
-		void					build			(Fvector* V, int Vcnt, TRI* T, int Tcnt, build_callback* bc=NULL, void* bcp=NULL);
+		void					build			(Fvector* V, int Vcnt, TRI* T, int Tcnt, IWriter* writer=NULL, build_callback* bc=NULL, void* bcp=NULL);
+		void					build			(Fvector* V, int Vcnt, TRI* T, int Tcnt, IReader& reader, build_callback* bc=NULL, void* bcp=NULL);
 		u32						memory			();
+
+	private:
+		static	void			build_thread	(void*);
+		void					build_internal	(Fvector* V, int Vcnt, TRI* T, int Tcnt, IWriter* writer, build_callback* bc=NULL, void* bcp=NULL);
+		void					build_internal	(Fvector* V, int Vcnt, TRI* T, int Tcnt, IReader& reader, build_callback* bc=NULL, void* bcp=NULL);
 	};
 
 	// Collider result
