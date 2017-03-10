@@ -81,6 +81,9 @@ private:
 	#define TSP_PRINT() TSM_Print()
 	#define TSS_PRINT(n) TSM_Print(n)
 #else
+	#define TSE_INIT()
+	#define TSE_DEINIT()
+	#define TSE_DISABLE(e)
 	#define TS_ENABLE(e)
 	#define TS_DISABLE(e)
 	#define TSP_BEGIN(n, e)
@@ -90,7 +93,7 @@ private:
 	#define TSS_END(n, e)
 	#define TSS_SCOPED(s,n,e)
 	#define TSP_PRINT()
-	#define TSS_PRINT()
+	#define TSS_PRINT(n)
 #endif
 
 #endif // FTimerStatH

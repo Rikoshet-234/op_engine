@@ -725,9 +725,6 @@ Global
 		{CA2604CA-A2AC-49A1-A468-8AB5A2E6CBC9} = {6BE93BFF-E2B4-43F2-ADBB-F8971E43CD5A}
 		{893279CB-0805-405F-B484-9BB728A18261} = {6BE93BFF-E2B4-43F2-ADBB-F8971E43CD5A}
 	EndGlobalSection
-	GlobalSection(Performance) = preSolution
-		HasPerformanceSessions = true
-	EndGlobalSection
 	GlobalSection(DPCodeReviewSolutionGUID) = preSolution
 		DPCodeReviewSolutionGUID = {00000000-0000-0000-0000-000000000000}
 	EndGlobalSection
