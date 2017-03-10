@@ -2308,6 +2308,9 @@
     <Filter Include="AI\AScript\ScriptClasses\ScriptGameObject\enums">
       <UniqueIdentifier>{13f790bb-3d5f-4986-8e7f-1deb8e967ffa}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\Client\Objects\items &amp; weapons\Devices\NightVision">
+      <UniqueIdentifier>{fa97d0e8-28d4-4a87-8034-ce69e8b009bc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mt_config.h">
@@ -6606,6 +6609,9 @@
     <ClInclude Include="ui\IconedItemsHelper.h">
       <Filter>UI\UIWindows\ListBox\Iconed</Filter>
     </ClInclude>
+    <ClInclude Include="NightVisionDevice.h">
+      <Filter>Core\Client\Objects\items &amp; weapons\Devices\NightVision</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -9799,6 +9805,12 @@
     </ClCompile>
     <ClCompile Include="ui\IconedItemsHelper.cpp">
       <Filter>UI\UIWindows\ListBox\Iconed</Filter>
+    </ClCompile>
+    <ClCompile Include="NightVisionDevice.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Devices\NightVision</Filter>
+    </ClCompile>
+    <ClCompile Include="NightVisionDevice_script.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Devices\NightVision</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "inventory_item_object.h"
+#include "NightVisionDevice.h"
 
 struct SBoneProtections;
 
@@ -39,8 +40,8 @@ protected:
 	shared_str						m_ActorVisual;
 	shared_str						m_full_icon_name;
 	SBoneProtections*				m_boneProtection;	
-protected:
 	u32								m_ef_equipment_type;
+	CNightVisionDevice*				m_cNightVisionDevice;
 
 public:
 	float							m_additional_weight;
@@ -50,12 +51,13 @@ public:
 	float 					        m_fSatietyRestoreSpeed;
 	float					        m_fPowerRestoreSpeed;
 	float					        m_fBleedingRestoreSpeed; 
-
-	shared_str						m_NightVisionSect;
+	CNightVisionDevice*				GetNightVisionDevice() const { return m_cNightVisionDevice;};
+	
 	virtual u32						ef_equipment_type		() const;
 	virtual	BOOL					BonePassBullet			(int boneID);
 	const shared_str&				GetFullIconName			() const	{return m_full_icon_name;};
 
 	virtual void			net_Export			(NET_Packet& P);
 	virtual void			net_Import			(NET_Packet& P);
+	void UpdateCL() override;
 };

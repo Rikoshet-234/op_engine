@@ -352,6 +352,62 @@ void CSE_ALifeItemTorch::FillProps			(LPCSTR pref, PropItemVec& values)
 	inherited::FillProps			(pref,	 values);
 }
 
+
+////////////////////////////////////////////////////////////////////////////
+// CSE_ALifeItemNVDevice
+////////////////////////////////////////////////////////////////////////////
+CSE_ALifeItemNVDevice::CSE_ALifeItemNVDevice(LPCSTR caSection) : CSE_ALifeItem(caSection)
+{
+	m_active= false;	
+	m_enabled= true;
+	m_attached=false;
+}
+
+CSE_ALifeItemNVDevice::~CSE_ALifeItemNVDevice() {}
+
+BOOL	CSE_ALifeItemNVDevice::Net_Relevant			()
+{
+	if (m_attached) return true;
+	return inherited::Net_Relevant();
+}
+
+void CSE_ALifeItemNVDevice::STATE_Read			(NET_Packet	&tNetPacket, u16 size)
+{
+	if (m_wVersion > 20)
+		inherited::STATE_Read	(tNetPacket,size);
+}
+
+void CSE_ALifeItemNVDevice::STATE_Write		(NET_Packet	&tNetPacket)
+{
+	inherited::STATE_Write		(tNetPacket);
+}
+
+void CSE_ALifeItemNVDevice::UPDATE_Read		(NET_Packet	&tNetPacket)
+{
+	inherited::UPDATE_Read		(tNetPacket);
+	
+	BYTE F = tNetPacket.r_u8();	
+	m_active					= !!(F & eActive);
+	m_enabled					= !!(F & eEnabled);
+	m_attached					= !!(F & eAttached);
+}
+
+void CSE_ALifeItemNVDevice::UPDATE_Write		(NET_Packet	&tNetPacket)
+{
+	inherited::UPDATE_Write		(tNetPacket);
+
+	BYTE F = 0;
+
+	F |= (m_active   ?  eActive : 0);
+	F |= (m_enabled  ? eEnabled : 0);
+	F |= (m_attached  ? eAttached : 0);
+	tNetPacket.w_u8(F);
+}
+
+void CSE_ALifeItemNVDevice::FillProps			(LPCSTR pref, PropItemVec& values)
+{
+	inherited::FillProps			(pref,	 values);
+}
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeItemWeapon
 ////////////////////////////////////////////////////////////////////////////
@@ -367,7 +423,7 @@ CSE_ALifeItemWeapon::CSE_ALifeItemWeapon	(LPCSTR caSection) : CSE_ALifeItem(caSe
 	m_tHitType					= ALife::g_tfString2HitType(pSettings->r_string(caSection,"hit_type"));
 	m_caAmmoSections			= pSettings->r_string(caSection,"ammo_class");
 	if (pSettings->section_exist(caSection) && pSettings->line_exist(caSection,"visual"))
-        set_visual				(pSettings->r_string(caSection,"visual"));
+		set_visual				(pSettings->r_string(caSection,"visual"));
 
 	m_addon_flags.zero			();
 
@@ -502,13 +558,13 @@ void CSE_ALifeItemWeapon::FillProps			(LPCSTR pref, PropItemVec& items)
 	
 
 	if (m_scope_status == eAddonAttachable)
-	       PHelper().CreateFlag8(items,PrepareKey(pref,*s_name,"Addons\\Scope"), 	&m_addon_flags, eWeaponAddonScope);
+		   PHelper().CreateFlag8(items,PrepareKey(pref,*s_name,"Addons\\Scope"), 	&m_addon_flags, eWeaponAddonScope);
 
 	if (m_silencer_status == eAddonAttachable)
-        PHelper().CreateFlag8	(items,PrepareKey(pref,*s_name,"Addons\\Silencer"), 	&m_addon_flags, eWeaponAddonSilencer);
+		PHelper().CreateFlag8	(items,PrepareKey(pref,*s_name,"Addons\\Silencer"), 	&m_addon_flags, eWeaponAddonSilencer);
 
 	if (m_grenade_launcher_status == eAddonAttachable)
-        PHelper().CreateFlag8	(items,PrepareKey(pref,*s_name,"Addons\\Podstvolnik"),&m_addon_flags,eWeaponAddonGrenadeLauncher);
+		PHelper().CreateFlag8	(items,PrepareKey(pref,*s_name,"Addons\\Podstvolnik"),&m_addon_flags,eWeaponAddonGrenadeLauncher);
 }
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeItemWeaponShotGun
@@ -640,7 +696,7 @@ CSE_ALifeItemAmmo::CSE_ALifeItemAmmo		(LPCSTR caSection) : CSE_ALifeItem(caSecti
 {
 	a_elapsed					= m_boxSize = (u16)pSettings->r_s32(caSection, "box_size");
 	if (pSettings->section_exist(caSection) && pSettings->line_exist(caSection,"visual"))
-        set_visual				(pSettings->r_string(caSection,"visual"));
+		set_visual				(pSettings->r_string(caSection,"visual"));
 }
 
 CSE_ALifeItemAmmo::~CSE_ALifeItemAmmo		()
@@ -674,7 +730,7 @@ void CSE_ALifeItemAmmo::UPDATE_Write		(NET_Packet	&tNetPacket)
 }
 
 void CSE_ALifeItemAmmo::FillProps			(LPCSTR pref, PropItemVec& values) {
-  	inherited::FillProps			(pref,values);
+	inherited::FillProps			(pref,values);
 	PHelper().CreateU16			(values, PrepareKey(pref, *s_name, "Ammo: left"), &a_elapsed, 0, m_boxSize, m_boxSize);
 }
 
@@ -728,7 +784,7 @@ void CSE_ALifeItemDetector::UPDATE_Write	(NET_Packet	&tNetPacket)
 
 void CSE_ALifeItemDetector::FillProps		(LPCSTR pref, PropItemVec& items)
 {
-  	inherited::FillProps			(pref,items);
+	inherited::FillProps			(pref,items);
 }
 
 ////////////////////////////////////////////////////////////////////////////

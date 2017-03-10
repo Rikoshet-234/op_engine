@@ -25,6 +25,8 @@
 #include "CharacterPhysicsSupport.h"
 #include "InventoryBox.h"
 #include "WeaponKnife.h"
+#include "NightVisionDevice.h"
+#include "CustomOutfit.h"
 
 bool g_bAutoClearCrouch = true;
 bool g_bForceCrouch = false;
@@ -133,19 +135,25 @@ void CActor::IR_OnKeyboardPress(int cmd)
 			const xr_vector<CAttachableItem*>& all = CAttachmentOwner::attached_objects();
 			xr_vector<CAttachableItem*>::const_iterator it = all.begin();
 			xr_vector<CAttachableItem*>::const_iterator it_e = all.end();
-			for(;it!=it_e;++it){
-				CTorch* torch = smart_cast<CTorch*>(*it);
-				if (torch){		
-					torch->SwitchNightVision();
+			for(;it!=it_e;++it)
+			{
+				CCustomOutfit* outfit = smart_cast<CCustomOutfit*>(*it);
+				if (outfit && outfit->GetNightVisionDevice()) 
+				{
+					outfit->GetNightVisionDevice()->SwitchNightVision();
 					break;
 				}
+				CNightVisionDevice* nvd = smart_cast<CNightVisionDevice*>(*it);
+				if (nvd) 
+					nvd->SwitchNightVision();
 			}
 		}break;
 	case kTORCH:{ 
 		const xr_vector<CAttachableItem*>& all = CAttachmentOwner::attached_objects();
 		xr_vector<CAttachableItem*>::const_iterator it = all.begin();
 		xr_vector<CAttachableItem*>::const_iterator it_e = all.end();
-		for(;it!=it_e;++it){
+		for(;it!=it_e;++it)
+		{
 				CTorch* torch = smart_cast<CTorch*>(*it);
 				if (torch){		
 					torch->Switch();

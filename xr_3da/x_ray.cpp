@@ -1258,7 +1258,7 @@ void CApplication::load_draw_internal()
 #pragma endregion
 
 #pragma region draw progress bar
-	if(hProgressBar)
+	if(hProgressBar && lpLoadScreenEnableProgressBar)
 	{
 		Fvector2					back_size;
 		Frect						back_text_coords;
@@ -1300,7 +1300,7 @@ void CApplication::load_draw_internal()
 		pFontSystem->Clear			();
 		pFontSystem->SetColor		(color_rgba(239, 231, 220,255));
 		pFontSystem->SetAligment	(CGameFont::alLeft);
-		pFontSystem->OutSet	(3,3);
+		pFontSystem->OutSet	(lpLoadScreenTextOffsetX,lpLoadScreenTextOffsetY);
 		for(std::vector<std::string>::iterator it = loadedTexts.begin(); it != loadedTexts.end(); ++it) 
 		{
 			pFontSystem->OutNext((*it).c_str());

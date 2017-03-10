@@ -99,12 +99,30 @@ SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemTorch,CSE_ALifeItem)
 	bool							m_nightvision_active;
 	bool							m_attached;
 									CSE_ALifeItemTorch	(LPCSTR caSection);
-    virtual							~CSE_ALifeItemTorch	();
+	virtual							~CSE_ALifeItemTorch	();
 	virtual BOOL					Net_Relevant			();
 
 SERVER_ENTITY_DECLARE_END
 add_to_type_list(CSE_ALifeItemTorch)
 #define script_type_list save_type_list(CSE_ALifeItemTorch)
+
+SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemNVDevice, CSE_ALifeItem)
+	enum EStats{
+		eEnabled					= (1<<0),
+		eActive						= (1<<1),
+		eAttached					= (1<<2)
+	};
+	bool							m_active;
+	bool							m_enabled;
+	bool							m_attached;
+									CSE_ALifeItemNVDevice	(LPCSTR caSection);
+	virtual							~CSE_ALifeItemNVDevice	();
+	BOOL					Net_Relevant			() override;
+SERVER_ENTITY_DECLARE_END
+		add_to_type_list(CSE_ALifeItemNVDevice)
+#define script_type_list save_type_list(CSE_ALifeItemNVDevice)
+
+
 
 SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemAmmo,CSE_ALifeItem)
 	u16								a_elapsed;

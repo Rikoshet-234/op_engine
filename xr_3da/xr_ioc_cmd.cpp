@@ -520,6 +520,10 @@ void CCC_Register()
 	CMD1(CCC_SaveCFG,	"cfg_save"				);
 	CMD1(CCC_LoadCFG,	"cfg_load"				);
 
+	CMD4(CCC_Float,		"ls_text_offset_x",		&lpLoadScreenTextOffsetX,0.0f,	1024.0f);
+	CMD4(CCC_Float,		"ls_text_offset_y",		&lpLoadScreenTextOffsetY,0.0f,	768.0f);
+	CMD2(CCC_Bool,		"ls_show_progress",		&lpLoadScreenEnableProgressBar);
+
 #ifdef DEBUG
 //	CMD1(CCC_Crash,		"crash"					);
 

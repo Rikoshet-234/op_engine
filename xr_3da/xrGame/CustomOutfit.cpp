@@ -21,11 +21,14 @@ CCustomOutfit::CCustomOutfit()
 		m_HitTypeProtection[i] = 1.0f;
 
 	m_boneProtection = xr_new<SBoneProtections>();
+	m_cNightVisionDevice=nullptr;
 }
 
 CCustomOutfit::~CCustomOutfit() 
 {
 	xr_delete(m_boneProtection);
+	if (m_cNightVisionDevice)
+		xr_delete(m_cNightVisionDevice);
 }
 
 void CCustomOutfit::net_Export(NET_Packet& P)
@@ -38,6 +41,13 @@ void CCustomOutfit::net_Import(NET_Packet& P)
 {
 	inherited::net_Import	(P);
 	P.r_float_q8			(m_fCondition,0.0f,1.0f);
+}
+
+void CCustomOutfit::UpdateCL()
+{
+	inherited::UpdateCL();
+	if (H_Parent() && H_Parent()->ID() == Actor()->ID() && m_cNightVisionDevice)
+		m_cNightVisionDevice->UpdateSwitchNightVision();
 }
 
 void CCustomOutfit::Load(LPCSTR section) 
@@ -64,7 +74,7 @@ void CCustomOutfit::Load(LPCSTR section)
 	if (pSettings->line_exist(section, "actor_visual"))
 		m_ActorVisual = pSettings->r_string(section, "actor_visual");
 	else
-		m_ActorVisual = NULL;
+		m_ActorVisual = nullptr;
 
 	m_ef_equipment_type		= pSettings->r_u32(section,"ef_equipment_type");
 	if (pSettings->line_exist(section, "power_loss"))
@@ -75,10 +85,17 @@ void CCustomOutfit::Load(LPCSTR section)
 	m_additional_weight				= pSettings->r_float(section,"additional_inventory_weight");
 	m_additional_weight2			= pSettings->r_float(section,"additional_inventory_weight2");
 
-	if (pSettings->line_exist(section, "nightvision_sect"))
-		m_NightVisionSect = pSettings->r_string(section, "nightvision_sect");
-	else
-		m_NightVisionSect = NULL;
+	if (pSettings->line_exist(section, "night_vision_device"))
+	{
+		LPCSTR deviceSection=pSettings->r_string(section, "night_vision_device");
+		if (xr_strlen(deviceSection)>0 && pSettings->section_exist(deviceSection))
+		{
+			m_cNightVisionDevice = xr_new<CNightVisionDevice>();
+			m_cNightVisionDevice->Load(deviceSection);
+		}
+		else
+			Msg("! ERROR invalid night_vision_device [%s] for outfit [%s]",deviceSection,section);
+	}
 
 	m_full_icon_name								= pSettings->r_string(section,"full_icon_name");
 }
@@ -171,21 +188,16 @@ void	CCustomOutfit::OnMoveToRuck		()
 		CActor* pActor = smart_cast<CActor*> (m_pCurrentInventory->GetOwner());
 		if (pActor )
 		{
+			if (m_cNightVisionDevice)
+				m_cNightVisionDevice->SwitchNightVision(false);
 			CInventoryItem* currentOutfitItem=pActor->GetCurrentOutfit();
 			if (currentOutfitItem)
 				return;
-			CTorch* pTorch = smart_cast<CTorch*>(pActor->inventory().ItemFromSlot(TORCH_SLOT));
-			if(pTorch)
-			{
-				pTorch->SwitchNightVision(false);
-			}
 			if (m_ActorVisual.size())
 			{
 				shared_str DefVisual = pActor->GetDefaultVisualOutfit();
 				if (DefVisual.size())
-				{
 					pActor->ChangeVisual(DefVisual);
-				};
 			}
 		}
 	}

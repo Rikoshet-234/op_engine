@@ -238,7 +238,8 @@ bool CUIInventoryWnd::ToSlot(CUICellItem* itm, bool force_place)
 
 	if(GetInventory()->CanPutInSlot(iitem)){
 		CUIDragDropListEx* new_owner		= GetSlotList(_slot);
-		
+		if (!new_owner)
+			return false;
 		if(_slot==GRENADE_SLOT && !new_owner )return true; //fake, sorry (((
 
 		bool result							= GetInventory()->Slot(iitem);

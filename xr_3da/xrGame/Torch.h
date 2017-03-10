@@ -1,7 +1,6 @@
 #pragma once
 
 #include "inventory_item_object.h"
-//#include "night_vision_effector.h"
 #include "hudsound.h"
 #include "script_export_space.h"
 
@@ -10,7 +9,7 @@ class CMonsterEffector;
 
 class CTorch : public CInventoryItemObject {
 private:
-    typedef	CInventoryItemObject	inherited;
+	typedef	CInventoryItemObject	inherited;
 
 protected:
 	float			fBrightness;
@@ -50,25 +49,7 @@ public:
 
 	virtual bool	can_be_attached		() const;
  
-public:
-			void	SwitchNightVision		  ();
-			void	SwitchNightVision		  (bool light_on);
-			void	UpdateSwitchNightVision   ();
-			float	NightVisionBattery		  ();
 protected:
-	bool					m_bNightVisionEnabled;
-	bool					m_bNightVisionOn;
-
-	HUD_SOUND				m_NightVisionOnSnd;
-	HUD_SOUND				m_NightVisionOffSnd;
-	HUD_SOUND				m_NightVisionIdleSnd;
-	HUD_SOUND				m_NightVisionBrokenSnd;
-
-	/*float					m_NightVisionRechargeTime;
-	float					m_NightVisionRechargeTimeMin;
-	float					m_NightVisionDischargeTime;
-	float					m_NightVisionChargeTime;*/
-
 	enum EStats{
 		eTorchActive				= (1<<0),
 		eNightVisionActive			= (1<<1),

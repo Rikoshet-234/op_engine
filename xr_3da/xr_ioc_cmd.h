@@ -47,6 +47,32 @@ public		:
 	}
 };
 
+class ENGINE_API CCC_Bool:public IConsole_Command
+{
+protected:
+	bool *value;
+public:
+	CCC_Bool(LPCSTR N, bool* value): IConsole_Command(N), value(value) {}
+	void Execute(LPCSTR args) override 
+	{
+		if (EQ(args,"on"))			*value=true;
+		else if (EQ(args,"off"))	*value=false;
+		else if (EQ(args,"1"))		*value=true;
+		else if (EQ(args,"0"))		*value=false;
+		else InvalidSyntax();
+	};
+
+	void	Status	(TStatus& S) override
+	{
+		strcpy_s(S,*value?"on":"off");
+	}
+
+	void	Info	(TInfo& I) override
+	{
+		strcpy_s(I,"'on/off' or '1/0'");
+	}
+};
+
 class ENGINE_API	CCC_Mask : public IConsole_Command
 {
 protected	:
