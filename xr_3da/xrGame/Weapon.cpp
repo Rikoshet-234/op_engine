@@ -473,9 +473,10 @@ void CWeapon::animGet	(MotionSVec& lst, LPCSTR prefix)
 	R_ASSERT2			(!lst.empty(),prefix);
 }
 */
-
+#include "../xrCore/FTimerStat.h"
 BOOL CWeapon::net_Spawn		(CSE_Abstract* DC)
 {
+	TSP_SCOPED(_, "CWeapon::net_Spawn", "spawn");
 	BOOL bResult					= inherited::net_Spawn(DC);
 	CSE_Abstract					*e	= (CSE_Abstract*)(DC);
 	CSE_ALifeItemWeapon			    *E	= smart_cast<CSE_ALifeItemWeapon*>(e);

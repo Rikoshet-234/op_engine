@@ -72,9 +72,10 @@ void CWeaponStatMgun::Load(LPCSTR section)
 	camRelaxSpeed		= deg2rad					(camRelaxSpeed);
 
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CWeaponStatMgun::net_Spawn(CSE_Abstract* DC)
 {
+	TSP_SCOPED(_, "CWeaponStatGun::net_Spawn", "spawn");
 	if(!inheritedPH::net_Spawn	(DC)) return FALSE;
 
 

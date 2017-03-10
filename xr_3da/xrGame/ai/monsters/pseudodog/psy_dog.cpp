@@ -37,9 +37,10 @@ void CPsyDog::Load(LPCSTR section)
 	m_phantoms_min			= pSettings->r_u8(section,"Min_Phantoms_Count");
 	m_time_phantom_appear	= pSettings->r_u32(section,"Time_Phantom_Appear");
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CPsyDog::net_Spawn(CSE_Abstract *dc)
 {
+	TSP_SCOPED(_, "CPsydog::net_Spawn", "spawn");
 	if (!inherited::net_Spawn(dc)) return FALSE;
 
 	return TRUE;
@@ -159,8 +160,10 @@ CPsyDogPhantom::CPsyDogPhantom()
 CPsyDogPhantom::~CPsyDogPhantom()
 {
 }
+#include "../xrCore/FTimerStat.h"
 BOOL CPsyDogPhantom::net_Spawn(CSE_Abstract *dc)
 {
+	TSP_SCOPED(_, "CPsydogPhantom::net_Spawn", "spawn");
 	if (!inherited::net_Spawn(dc)) return FALSE;
 
 	CSE_ALifeMonsterBase *se_monster	= smart_cast<CSE_ALifeMonsterBase*>(dc);

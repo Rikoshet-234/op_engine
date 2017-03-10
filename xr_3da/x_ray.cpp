@@ -21,6 +21,7 @@
 #include "Text_Console.h"
 #include <process.h>
 #include "../xrCore/OPFuncs/op_engine_version.h"
+#include "../xrCore/FTimerStat.h"
 
 //---------------------------------------------------------------------
 ENGINE_API CInifile* pGameIni		= nullptr;
@@ -649,6 +650,7 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance,
 
 #ifndef DEDICATED_SERVER
 	{
+		TSE_INIT();
 		damn_keys_filter		filter;
 		(void)filter;
 #endif // DEDICATED_SERVER
@@ -695,6 +697,7 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance,
 		Startup	 					( );
 		Core._destroy				( );
 
+		TSE_DEINIT();
 		char* _args[3];
 		// check for need to execute something external
 		if (/*xr_strlen(g_sLaunchOnExit_params) && */xr_strlen(g_sLaunchOnExit_app) ) 

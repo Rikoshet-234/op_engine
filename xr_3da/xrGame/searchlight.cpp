@@ -53,9 +53,10 @@ void  CProjector::BoneCallbackY(CBoneInstance *B)
 	M.setHPB (-delta_yaw, 0.0, 0.0f);
 	B->mTransform.mulB_43(M);
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CProjector::net_Spawn(CSE_Abstract* DC)
 {
+	TSP_SCOPED(_, "CProjector::net_Spawn", "spawn");
 	CSE_Abstract				*e		= (CSE_Abstract*)(DC);
 	CSE_ALifeObjectProjector	*slight	= smart_cast<CSE_ALifeObjectProjector*>(e);
 	R_ASSERT				(slight);

@@ -9,6 +9,8 @@
 #include "client_spawn_manager.h"
 #include "../xr_object.h"
 #include "../IGame_Persistent.h"
+#include "../xrCore/OPFuncs/global_timers.h"
+#include "actor.h"
 
 void CLevel::cl_Process_Spawn(NET_Packet& P)
 {
@@ -18,8 +20,8 @@ void CLevel::cl_Process_Spawn(NET_Packet& P)
 
 	// Create DC (xrSE)
 	CSE_Abstract*	E	= F_entity_Create	(*s_name);
-	R_ASSERT2(E, *s_name);
-
+	
+	
 	E->Spawn_Read		(P);
 	if (E->s_flags.is(M_SPAWN_UPDATE))
 		E->UPDATE_Read	(P);
@@ -30,13 +32,15 @@ void CLevel::cl_Process_Spawn(NET_Packet& P)
 	if (OnServer())		{
 		E->s_flags.set(M_SPAWN_OBJECT_LOCAL, TRUE);
 	};
-
+	
 	/*
 	game_spawn_queue.push_back(E);
 	if (g_bDebugEvents)		ProcessGameSpawns();
 	/*/
+	R_ASSERT2(E, *s_name);
+	TSP_BEGIN("cl_Process_Spawn", "spawn");
 	g_sv_Spawn					(E);
-
+	TSP_END("cl_Process_Spawn", "spawn");
 	F_entity_Destroy			(E);
 	//*/
 };
@@ -76,6 +80,7 @@ void CLevel::g_cl_Spawn		(LPCSTR name, u8 rp, u16 flags, Fvector pos)
 
 void CLevel::g_sv_Spawn		(CSE_Abstract* E)
 {
+	TSP_BEGIN("g_sv_Spawn_1", "spawn");
 #ifdef DEBUG_MEMORY_MANAGER
 	u32							E_mem = 0;
 	if (g_bMEMO)	{
@@ -100,12 +105,16 @@ void CLevel::g_sv_Spawn		(CSE_Abstract* E)
 //	T.Start		();
 	CObject*	O		= Objects.Create	(*E->s_name);
 	// Msg				("--spawn--CREATE: %f ms",1000.f*T.GetAsync());
-
+	TSP_END("g_sv_Spawn_1", "spawn");
+	TSP_BEGIN("O->net_Spawn", "spawn");
 //	T.Start		();
 #ifdef DEBUG_MEMORY_MANAGER
 	mem_alloc_gather_stats		(false);
 #endif // DEBUG_MEMORY_MANAGER
-	if (0==O || (!O->net_Spawn	(E))) 
+	bool result = 0==O || (!O->net_Spawn	(E));
+	TSP_END("O->net_Spawn", "spawn");
+
+	if (result) 
 	{
 		O->net_Destroy			( );
 		if(!g_dedicated_server)
@@ -142,6 +151,7 @@ void CLevel::g_sv_Spawn		(CSE_Abstract* E)
 			cl_Process_Event(E->ID_Parent, GE_OWNERSHIP_TAKE, GEN);
 		}
 	}
+	
 	//---------------------------------------------------------
 	Game().OnSpawn(O);
 	//---------------------------------------------------------

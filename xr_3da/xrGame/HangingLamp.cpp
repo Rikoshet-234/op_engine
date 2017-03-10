@@ -74,9 +74,10 @@ void CHangingLamp::net_Destroy()
 	if(Visual())CPHSkeleton::RespawnInit();
 	inherited::net_Destroy	();
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CHangingLamp::net_Spawn(CSE_Abstract* DC)
 {
+	TSP_SCOPED(_, "CHangingLamp::net_Spawn", "spawn");
 	CSE_Abstract			*e		= (CSE_Abstract*)(DC);
 	CSE_ALifeObjectHangingLamp	*lamp	= smart_cast<CSE_ALifeObjectHangingLamp*>(e);
 	R_ASSERT				(lamp);

@@ -51,9 +51,10 @@ void CMincer::Load (LPCSTR section)
 
 	//pSettings->r_fvector3(section,whirlwind_center);
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CMincer::net_Spawn(CSE_Abstract* DC)
 {
+	TSP_SCOPED(_, "CMincer::net_Spawn", "spawn");
 	BOOL result=inherited::net_Spawn(DC);
 	Fvector C;
 	Center(C);

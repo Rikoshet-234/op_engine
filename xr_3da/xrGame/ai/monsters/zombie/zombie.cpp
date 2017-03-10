@@ -132,9 +132,10 @@ void CZombie::vfAssignBones()
 	Bones.AddBone(bone_spine, AXIS_Z);	Bones.AddBone(bone_spine, AXIS_Y); Bones.AddBone(bone_spine, AXIS_X);
 	Bones.AddBone(bone_head, AXIS_Z);	Bones.AddBone(bone_head, AXIS_Y);
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CZombie::net_Spawn (CSE_Abstract* DC) 
 {
+	TSP_SCOPED(_, "CZombie::net_Spawn", "spawn");
 	if (!inherited::net_Spawn(DC))
 		return(FALSE);
 

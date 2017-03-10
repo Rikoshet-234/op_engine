@@ -151,13 +151,35 @@ void CObjectSpace::Load	()
 {
 	IReader *F					= FS.r_open	("$level$", "level.cform");
 	R_ASSERT					(F);
+	u32 crc = crc32(F->pointer(), F->length());
+
+	FS_Path* path_level = FS.get_path("$level$");
+	string_path path_cache = {0};
+	strcat(path_cache, "level_cache\\");
+	strcat(path_cache, path_level->m_Add);
+	path_cache[xr_strlen(path_cache)-1] = 0;
+	IReader *Fcache				= FS.r_open("$app_data_root$", path_cache);
 
 	hdrCFORM					H;
 	F->r						(&H,sizeof(hdrCFORM));
 	Fvector*	verts			= (Fvector*)F->pointer();
 	CDB::TRI*	tris			= (CDB::TRI*)(verts+H.vertcount);
 	R_ASSERT					(CFORM_CURRENT_VERSION==H.version);
-	Static.build				( verts, H.vertcount, tris, H.facecount, build_callback );
+
+	if (Fcache && Fcache->r_u32() == crc)
+	{
+		Static.build(verts, H.vertcount, tris, H.facecount, *Fcache, build_callback);
+		FS.r_close(Fcache);
+	}
+	else
+	{
+		if (Fcache) FS.r_close(Fcache);
+		IWriter* writer = FS.w_open("$app_data_root$", path_cache);
+		R_ASSERT(writer);
+		writer->w_u32(crc);
+		Static.build(verts, H.vertcount, tris, H.facecount, writer, build_callback);
+		FS.w_close(writer);
+	}
 
 	m_BoundingVolume.set				(H.aabb);
 	g_SpatialSpace->initialize			(H.aabb);

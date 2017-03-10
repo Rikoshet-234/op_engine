@@ -262,6 +262,12 @@
     <ClCompile Include="OPFuncs\ExpandedCmdParams.cpp">
       <Filter>OPFuncs</Filter>
     </ClCompile>
+    <ClCompile Include="OPFuncs\global_timers.cpp">
+      <Filter>OPFuncs</Filter>
+    </ClCompile>
+    <ClCompile Include="FTimerStat.cpp">
+      <Filter>Kernel</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FTimer.h">
@@ -543,6 +549,9 @@
     </ClInclude>
     <ClInclude Include="FTimerStat.h">
       <Filter>Kernel</Filter>
+    </ClInclude>
+    <ClInclude Include="OPFuncs\global_timers.h">
+      <Filter>OPFuncs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

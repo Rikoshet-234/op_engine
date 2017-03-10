@@ -29,9 +29,10 @@ void CExplosiveRocket::Load(LPCSTR section)
 	CInventoryItem::Load(section);
 	CExplosive::Load(section);
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CExplosiveRocket::net_Spawn(CSE_Abstract* DC) 
 {
+	TSP_SCOPED(_, "CCExplosiveRocket::net_Spawn", "spawn");
 	BOOL result = inherited::net_Spawn(DC);
 	result=result&&CInventoryItem::net_Spawn(DC);
 	Fvector box;BoundingBox().getsize(box);

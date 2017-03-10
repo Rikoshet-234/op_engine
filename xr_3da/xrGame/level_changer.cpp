@@ -43,9 +43,10 @@ void CLevelChanger::net_Destroy	()
 	if(it != g_lchangers.end())
 		g_lchangers.erase(it);
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CLevelChanger::net_Spawn	(CSE_Abstract* DC) 
 {
+	TSP_SCOPED(_, "CLevelChanger::net_Spawn", "spawn");
 	m_entrance_time				= 0;
 	CCF_Shape *l_pShape			= xr_new<CCF_Shape>(this);
 	collidable.model			= l_pShape;

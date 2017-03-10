@@ -14,9 +14,10 @@
 CWeaponRG6::~CWeaponRG6()
 {
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL	CWeaponRG6::net_Spawn				(CSE_Abstract* DC)
 {
+	TSP_SCOPED(_, "CWeaponRG6::net_Spawn", "spawn");
 	BOOL l_res = inheritedSG::net_Spawn(DC);
 	if (!l_res) return l_res;
 

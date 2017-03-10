@@ -19,9 +19,10 @@ CInfoDocument::~CInfoDocument(void)
 {
 }
 
-
+#include "../xrCore/FTimerStat.h"
 BOOL CInfoDocument::net_Spawn(CSE_Abstract* DC) 
 {
+	TSP_SCOPED(_, "CInfoDocument::net_Spawn", "spawn");
 	BOOL					res = inherited::net_Spawn(DC);
 
 	CSE_Abstract			*l_tpAbstract = static_cast<CSE_Abstract*>(DC);

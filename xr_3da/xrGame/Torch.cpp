@@ -213,9 +213,10 @@ void CTorch::Switch	(bool light_on)
 		pVisual->LL_SetBoneVisible			(bi,	light_on,	TRUE); //hack
 	}
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CTorch::net_Spawn(CSE_Abstract* DC) 
 {
+	TSP_SCOPED(_, "CTorch::net_Spawn", "spawn");
 	CSE_Abstract			*e	= (CSE_Abstract*)(DC);
 	CSE_ALifeItemTorch		*torch	= smart_cast<CSE_ALifeItemTorch*>(e);
 	R_ASSERT				(torch);

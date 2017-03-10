@@ -80,8 +80,10 @@ void CClimableObject::	Load				( LPCSTR section)
 {
 	inherited::Load(section);
 }
+#include "../xrCore/FTimerStat.h"
 BOOL CClimableObject::	net_Spawn			( CSE_Abstract* DC)
 {
+	TSP_SCOPED(_, "CClimableObject::net_Spawn", "spawn");
 	CSE_Abstract				*e = (CSE_Abstract*)(DC);
 	CSE_ALifeObjectClimable	*CLB=smart_cast<CSE_ALifeObjectClimable*>(e);
 	const Fmatrix& b=CLB->shapes[0].data.box;

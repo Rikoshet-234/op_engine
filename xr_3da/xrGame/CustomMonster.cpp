@@ -174,6 +174,7 @@ void CCustomMonster::Load		(LPCSTR section)
 
 void CCustomMonster::reinit		()
 {
+	TSP_SCOPED(_, __FUNCTION__, "spawn");
 	CScriptEntity::reinit		();
 	CEntityAlive::reinit		();
 	material().reinit			();
@@ -633,9 +634,10 @@ void CCustomMonster::Die	(CObject* who)
 	//Level().RemoveMapLocationByID(this->ID());
 	Actor()->SetActorVisibility	(ID(),0.f);
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CCustomMonster::net_Spawn	(CSE_Abstract* DC)
 {
+	TSP_SCOPED(_, "CCustomMonster::net_Spawn", "spawn");
 	memory().reload				(*cNameSect());
 	memory().reinit				();
 

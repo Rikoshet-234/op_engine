@@ -173,9 +173,10 @@ void CBaseMonster::reinit()
 	
 }
 
-
+#include "../xrCore/FTimerStat.h"
 BOOL CBaseMonster::net_Spawn (CSE_Abstract* DC) 
 {
+	TSP_SCOPED(_, "CBaseMonster::net_Spawn", "spawn");
 	if (!inherited::net_Spawn(DC))
 		return(FALSE);
 

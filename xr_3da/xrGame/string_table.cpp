@@ -5,10 +5,6 @@
 #include "xr_level_controller.h"
 #include "../xrCore/OPFuncs/utils.h"
 
-//#define TS_ENABLE
-#include "../xrCore/FTimerStat.h"
-#undef TS_ENABLE
-
 #include <vector>
 #include <sstream>
 #include <iterator>
@@ -61,16 +57,11 @@ void CStringTable::Init		()
 	}
 }
 
-TSE_DECLARE(g_mmLoad);
-TSE_DECLARE(g_mmForOuter);
-TSE_DECLARE(g_mmFOFind);
-TSE_DECLARE(g_mmFORead);
-TSE_DECLARE(g_mmFOIf);
-TSE_DECLARE(g_mmFOElse);
+#include "../xrCore/OPFuncs/global_timers.h"
 
 void CStringTable::Load	(LPCSTR xml_file)
 {
-	TSS_DECLARE(mmLoad, g_mmLoad);
+	//TSS_SCOPED(mmLoad, "g_mmLoad", "spawn");
 
 	CUIXml						uiXml;
 	string_path					xml_file_full;
@@ -84,24 +75,24 @@ void CStringTable::Load	(LPCSTR xml_file)
 
 	//общий список всех записей таблицы в файле
 	int string_num = uiXml.GetNodesNum		(uiXml.GetRoot(), "string");
-	TS_BEGIN(g_mmForOuter);
+	//TSS_BEGIN("g_mmForOuter", "spawn");
 	for(int i=0; i<string_num; ++i)
 	{
 		LPCSTR string_name = uiXml.ReadAttrib(uiXml.GetRoot(), "string", i, "id", NULL);
 
 		//VERIFY3					(pData->m_StringTable.find(string_name) == pData->m_StringTable.end(), "duplicate string table id", string_name);
-		TS_BEGIN(g_mmFOFind);
+		//TSS_BEGIN("g_mmFOFind", "spawn");
 		if (!(pData->m_StringTable.find(string_name) == pData->m_StringTable.end()))
 		{
 			Msg("! WARNING: duplicate string table id %s. Ignoring.", string_name);
 		};
-		TS_END(g_mmFOFind);
-		TS_BEGIN(g_mmFORead);
+		//TSS_END("g_mmFOFind", "spawn");
+		//TSS_BEGIN("g_mmFORead", "spawn");
 		LPCSTR string_text		= uiXml.Read(uiXml.GetRoot(), "string:text", i,  NULL);
-		TS_END(g_mmFORead);
+		//TSS_END("g_mmFORead", "spawn");
 		if (lstrlen(string_text)>fixedSize) //winsor
 		{
-			TSS_DECLARE(mmFOIf, g_mmFOIf);
+			//TSS_SCOPED(mmFOIf, "g_mmFOIf", "spawn");
 			//split long text into more lines	
 			//Msg("Text in '%s' too long,splitted.",string_name);
 			std::string string_value(string_text);
@@ -120,7 +111,7 @@ void CStringTable::Load	(LPCSTR xml_file)
 		}
 		else
 		{
-			TSS_DECLARE(mmFOElse, g_mmFOElse);
+			//TSS_SCOPED(mmFOElse, "g_mmFOElse", "spawn");
 			if(m_bWriteErrorsToLog && string_text)
 				Msg("[string table] '%s' no translation in '%s'", string_name, *(pData->m_sLanguage));
 			if (!string_text)
@@ -133,8 +124,9 @@ void CStringTable::Load	(LPCSTR xml_file)
 			pData->m_StringTable[string_name] = str_val;
 		}
 	}
-	TS_END(g_mmForOuter);
+	//TSS_END("g_mmForOuter", "spawn");
 }
+
 void CStringTable::ReparseKeyBindings()
 {
 	if(!pData)					return;

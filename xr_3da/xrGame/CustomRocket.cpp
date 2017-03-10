@@ -66,9 +66,10 @@ void CCustomRocket::reinit		()
 	m_vPrevVel.set(0,0,0);
 }
 
-
+#include "../xrCore/FTimerStat.h"
 BOOL CCustomRocket::net_Spawn(CSE_Abstract* DC) 
 {
+	TSP_SCOPED(_, "CCustomRocket::net_Spawn", "spawn");
 	m_eState = eInactive;
 	BOOL result = inherited::net_Spawn(DC);
 	m_LaunchXForm.set(XFORM());

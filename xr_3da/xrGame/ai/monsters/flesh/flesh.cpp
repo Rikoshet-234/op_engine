@@ -20,9 +20,10 @@ CAI_Flesh::~CAI_Flesh()
 {
 	xr_delete(StateMan);
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CAI_Flesh::net_Spawn (CSE_Abstract* DC) 
 {
+	TSP_SCOPED(_, "CAI_Flesh::net_Spawn", "spawn");
 	if (!inherited::net_Spawn(DC))
 		return(FALSE);
 

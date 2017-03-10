@@ -117,9 +117,10 @@ void CScriptBinder::reload			(LPCSTR section)
 	}
 #endif // DEBUG_MEMORY_MANAGER
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CScriptBinder::net_Spawn		(CSE_Abstract* DC)
 {
+	TSP_SCOPED(_, "CScriptBinder::net_Spawn", "spawn");
 #ifdef DEBUG_MEMORY_MANAGER
 	u32									start = 0;
 	if (g_bMEMO)

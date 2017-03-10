@@ -13,10 +13,6 @@
 #	include "object_broker.h"
 #endif // XRGAME_EXPORTS
 
-//#define TS_ENABLE
-#include "../xrCore/FTimerStat.h"
-#undef TS_ENABLE
-
 void _destroy_item_data_vector_cont(T_VECTOR* vec)
 {
 	auto it = vec->begin();
@@ -163,9 +159,7 @@ void CXML_IdToIndex::DeleteIdToIndexData()
 	xr_delete(m_pItemDataMap);
 }
 
-TSE_DECLARE(g_iiForOuter);
-TSE_DECLARE(g_iiForInner);
-TSE_DECLARE(g_iiFIFind);
+#include "../xrCore/OPFuncs/global_timers.h"
 
 void CXML_IdToIndex::InitInternal(CXML_IdToIndex::InitFunc& f)
 {
@@ -181,11 +175,14 @@ void CXML_IdToIndex::InitInternal(CXML_IdToIndex::InitFunc& f)
 	string_path	xml_file;
 	int			count = _GetItemCount(m_file_str);
 	int			index = 0;
-	TS_BEGIN(g_iiForOuter);
+	TSP_BEGIN("g_iiForOuter", "init");
 	for (int it=0; it<count; ++it)	
 	{
+		TSP_BEGIN("g_iiGetItem", "init");
 		_GetItem(m_file_str, it, xml_file);
+		TSP_END("g_iiGetItem", "init");
 
+		TSP_BEGIN("g_iiNewXml", "init");
 		CUIXml* uiXml			= xr_new<CUIXml>();
 		xr_string				xml_file_full;
 		xml_file_full			= xml_file;
@@ -194,10 +191,11 @@ void CXML_IdToIndex::InitInternal(CXML_IdToIndex::InitFunc& f)
 		R_ASSERT3				(xml_result, "error while parsing XML file", xml_file_full.c_str());
 		//общий список
 		int items_num			= uiXml->GetNodesNum(uiXml->GetRoot(), m_tag_name);
-
-		TS_BEGIN(g_iiForInner);
+		TSP_END("g_iiNewXml", "init");
+		TSP_BEGIN("g_iiForInner", "init");
 		for(int i=0; i<items_num; ++i)
 		{
+			TSP_BEGIN("g_iiReadAttr", "init");
 			LPCSTR item_name	= uiXml->ReadAttrib(uiXml->GetRoot(), m_tag_name, i, "id", NULL);
 
 			if(!item_name)
@@ -206,15 +204,16 @@ void CXML_IdToIndex::InitInternal(CXML_IdToIndex::InitFunc& f)
 				sprintf_s(buf, "id for item don't set, number %d in %s", i, xml_file);
 				R_ASSERT2(item_name, buf);
 			}
-			
+			TSP_END("g_iiReadAttr", "init");
 
 			//проверетить ID на уникальность
-			TS_BEGIN(g_iiFIFind);
+			TSP_BEGIN("g_iiFIFind", "init");
 			shared_str id(item_name);
 			bool exist = m_pItemDataMap->exist(id);
-			TS_END(g_iiFIFind);
+			TSP_END("g_iiFIFind", "init");
 			R_ASSERT3(!exist, "duplicate item id", item_name);
 
+			TSP_BEGIN("g_iiInsert", "init");
 			ITEM_DATA			data;
 			data.id				= id;
 			data.index			= index;
@@ -222,12 +221,15 @@ void CXML_IdToIndex::InitInternal(CXML_IdToIndex::InitFunc& f)
 			data._xml			= uiXml;
 			m_pItemDataMap->insert(id, m_pItemDataVector->size());
 			m_pItemDataVector->push_back(data);
-
+			TSP_END("g_iiInsert", "init");
 			index++; 
 		}
-		TS_END(g_iiForInner);
+		TSP_END("g_iiForInner", "init");
 		if(0==items_num)
+		{
+			TSP_SCOPED(_, "g_iiDeleteData", "init");
 			delete_data(uiXml);
+		}
 	}
-	TS_END(g_iiForOuter);
+	TSP_END("g_iiForOuter", "init");
 }

@@ -101,9 +101,10 @@ void CMovementManager::reload		(LPCSTR section)
 {
 	locations().reload				(section);
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CMovementManager::net_Spawn	(CSE_Abstract* data)
 {
+	TSP_SCOPED(_, "MovementManager::net_Spawn", "spawn");
 	return							(restrictions().net_Spawn(data));
 }
 

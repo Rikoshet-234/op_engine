@@ -97,9 +97,10 @@ void CEatableItemObject::OnEvent			(NET_Packet& P, u16 type)
 	CPhysicItem::OnEvent				(P, type);
 	CEatableItem::OnEvent				(P, type);
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CEatableItemObject::net_Spawn		(CSE_Abstract* DC)
 {
+	TSP_SCOPED(_, "CEatableItemObject::net_Spawn", "spawn");
 	BOOL								res = CPhysicItem::net_Spawn(DC);
 	CEatableItem::net_Spawn			(DC);
 	return								(res);

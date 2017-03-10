@@ -199,9 +199,10 @@ void CPoltergeist::shedule_Update(u32 dt)
 	ability()->update_schedule();
 }
 
-
+#include "../xrCore/FTimerStat.h"
 BOOL CPoltergeist::net_Spawn (CSE_Abstract* DC) 
 {
+	TSP_SCOPED(_, "CPoltergeist::net_Spawn", "spawn");
 	if (!inherited::net_Spawn(DC)) return(FALSE);
 
 	// спаунится нивидимым

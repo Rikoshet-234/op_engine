@@ -53,9 +53,10 @@ void CEatableItem::Load(LPCSTR section)
 	m_fMaxPowerUpInfluence		= READ_IF_EXISTS	(pSettings,r_float,section,"eat_max_power",0.0f);
 	VERIFY						(m_iPortionsNum<10000);
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CEatableItem::net_Spawn				(CSE_Abstract* DC)
 {
+	TSP_SCOPED(_, "CEatableItem::net_Spawn", "spawn");
 	if (!inherited::net_Spawn(DC)) return FALSE;
 
 	m_iPortionsNum = m_iStartPortionsNum;

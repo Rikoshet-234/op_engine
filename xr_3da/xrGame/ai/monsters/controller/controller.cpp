@@ -270,9 +270,10 @@ bool CController::is_community_friend_overrides(const CEntityAlive *entity_alive
 		m_friend_community_overrides.end()
 	);
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CController::net_Spawn(CSE_Abstract *DC)
 {
+	TSP_SCOPED(_, "CController::net_Spawn", "spawn");
 	if (!inherited::net_Spawn(DC))
 		return(FALSE);
 

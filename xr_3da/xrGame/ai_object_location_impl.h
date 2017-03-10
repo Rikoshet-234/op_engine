@@ -12,18 +12,22 @@
 #include "ai_space.h"
 #include "game_graph.h"
 #include "level_graph.h"
+#include "../../xrCore/FTimerStat.h"
 
 IC	void CAI_ObjectLocation::init()
 {
+	TSP_BEGIN("CAI_ObjectLocation::init(1)", "spawn");
 	if (ai().get_level_graph())
 		ai().level_graph().set_invalid_vertex	(m_level_vertex_id);
 	else
 		m_level_vertex_id	= u32(-1);
-
+	TSP_END("CAI_ObjectLocation::init(1)", "spawn");
+	TSP_BEGIN("CAI_ObjectLocation::init(2)", "spawn");
 	if (ai().get_game_graph())
 		ai().game_graph().set_invalid_vertex	(m_game_vertex_id);
 	else
 		m_game_vertex_id						= GameGraph::_GRAPH_ID(-1);
+	TSP_END("CAI_ObjectLocation::init(2)", "spawn");
 }
 
 IC	void CAI_ObjectLocation::game_vertex(const CGameGraph::CVertex *game_vertex)

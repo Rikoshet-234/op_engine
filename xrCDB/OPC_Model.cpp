@@ -128,6 +128,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Precompiled Header
 #include "stdafx.h"
+
 #pragma hdrstop
 
 using namespace Opcode;
@@ -256,4 +257,43 @@ bool OPCODE_Model::Build(const OPCODECREATE& create)
 	}
 #endif // __MESHMERIZER_H__
 	return true;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *	Builds a collision model.
+ *	\param		create		[in] model creation structure
+ *	\return		true if success
+ */
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void OPCODE_Model::Store(IWriter& writer)
+{
+	// 1. Store optimized tree type
+	writer.w_u8(mNoLeaf?(u8)1:(u8)0);
+	writer.w_u8(mQuantized?(u8)1:(u8)0);
+
+	// 2. Store optimized tree
+	mTree->Store(writer);
+}
+
+void OPCODE_Model::Restore(IReader& reader)
+{
+	// 1. Restore optimized tree type
+	mNoLeaf = reader.r_u8() == 1;
+	mQuantized = reader.r_u8() == 1;
+
+	// 2. Create tree of selected type
+	if(mNoLeaf)
+	{
+		if(mQuantized)	mTree = xr_new<AABBQuantizedNoLeafTree>();
+		else			mTree = xr_new<AABBNoLeafTree>();
+	}
+	else
+	{
+		if(mQuantized)	mTree = xr_new<AABBQuantizedTree>();
+		else			mTree = xr_new<AABBCollisionTree>();
+	}
+
+	// 3. Restore tree
+	mTree->Restore(reader);
 }

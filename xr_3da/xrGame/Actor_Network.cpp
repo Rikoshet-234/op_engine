@@ -491,8 +491,11 @@ void	CActor::net_Import_Physic_proceed	( )
 	CrPr_SetActivationStep(0);
 };
 
+#include "../xrCore/FTimerStat.h"
+
 BOOL CActor::net_Spawn		(CSE_Abstract* DC)
 {
+	TSP_SCOPED(_, "CActor::net_Spawn", "spawn");
 	m_holder_id				= ALife::_OBJECT_ID(-1);
 	m_feel_touch_characters = 0;
 	m_snd_noise			= 0.0f;

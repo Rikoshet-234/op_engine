@@ -38,8 +38,10 @@ static enum EEnableState
 	stNotDefitnite		
 };
 static u8 st_enable_state=(u8)stNotDefitnite;
+#include "../xrCore/FTimerStat.h"
 BOOL CPhysicsShellHolder::net_Spawn				(CSE_Abstract*	DC)
 {
+	TSP_SCOPED(_, "CPhysicsShellHolder::net_Spawn", "spawn");
 	CParticlesPlayer::net_SpawnParticles		();
 	st_enable_state=(u8)stNotDefitnite;
 	b_sheduled									=	true;

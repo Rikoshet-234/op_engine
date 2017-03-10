@@ -76,9 +76,10 @@ void CHudItemObject::OnH_A_Independent	()
 	CHudItem::OnH_A_Independent				();
 	CInventoryItemObject::OnH_A_Independent	();
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CHudItemObject::net_Spawn			(CSE_Abstract* DC)
 {
+	TSP_SCOPED(_, "CHudItemObject::net_Spawn", "spawn");
 	return						(
 		CInventoryItemObject::net_Spawn(DC) &&
 		CHudItem::net_Spawn(DC)

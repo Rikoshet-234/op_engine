@@ -15,9 +15,10 @@ CMedkit::CMedkit(void)
 CMedkit::~CMedkit(void) 
 {
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CMedkit::net_Spawn(CSE_Abstract* DC) 
 {
+	TSP_SCOPED(_, "CMedkit::net_Spawn", "spawn");
 	return		(inherited::net_Spawn(DC));
 }
 

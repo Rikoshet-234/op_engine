@@ -26,7 +26,7 @@
 #include "clsid_game.h"
 #include "Artifact.h"
 #include "alife_object_registry.h"
-
+#include "../../xrCore/FTimerStat.h"
 #include "CustomOutfit.h"
 
 CInventoryOwner::CInventoryOwner			()
@@ -93,14 +93,16 @@ void CInventoryOwner::reload				(LPCSTR section)
 
 void CInventoryOwner::reinit				()
 {
+	TSP_SCOPED(_, __FUNCTION__, "spawn");
 	CAttachmentOwner::reinit	();
 	m_item_to_spawn				= shared_str();
 	m_ammo_in_box_to_spawn		= 0;
 }
-
+#include "../xrCore/FTimerStat.h"
 //call this after CGameObject::net_Spawn
 BOOL CInventoryOwner::net_Spawn		(CSE_Abstract* DC)
 {
+	TSP_SCOPED(_, "CInventoryOwner::net_Spawn", "spawn");
 	if (!m_pTrade)
 		m_pTrade				= xr_new<CTrade>(this);
 

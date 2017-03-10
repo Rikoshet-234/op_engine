@@ -146,9 +146,10 @@ void	CCar::Load					( LPCSTR section )
 	ISpatial*		self				=	smart_cast<ISpatial*> (this);
 	if (self)		self->spatial.type	|=	STYPE_VISIBLEFORAI;	
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL	CCar::net_Spawn				(CSE_Abstract* DC)
 {
+	TSP_SCOPED(_, "CCar::net_Spawn", "spawn");
 #ifdef DEBUG
 	InitDebug();
 #endif

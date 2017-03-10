@@ -694,11 +694,11 @@ void CScriptGameObject::add_restrictions		(LPCSTR out, LPCSTR in)
 		return;
 	}
 	
-//	xr_vector<ALife::_OBJECT_ID>			temp0;
-//	xr_vector<ALife::_OBJECT_ID>			temp1;
+	xr_vector<ALife::_OBJECT_ID>			temp0;
+	xr_vector<ALife::_OBJECT_ID>			temp1;
 
-//	construct_restriction_vector			(out,temp0);
-//	construct_restriction_vector			(in,temp1);
+	construct_restriction_vector			(out,temp0);
+	construct_restriction_vector			(in,temp1);
 
 //	if (!xr_strcmp(monster->cName(),"mil_freedom_stalker0004")) {
 //		int i = 0;

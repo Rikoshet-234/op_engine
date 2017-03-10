@@ -7,10 +7,6 @@
 
 #pragma once
 
-//#define TS_ENABLE
-#include "../xrCore/FTimerStat.h"
-#undef TS_ENABLE
-
 //T_ID, T_INDEX -	тип индекса и id
 
 //ITEM_DATA		-	структура с пол€ми id и index типа T_ID и T_INDEX,
@@ -19,10 +15,6 @@
 
 //T_INIT		-	класс где определена статическа€ InitIdToIndex
 //					функци€ инициализации section_name и line_name
-
-TSE_DECLARE(g_iiForOuter);
-TSE_DECLARE(g_iiForInner);
-TSE_DECLARE(g_iiFIFind);
 
 #define TEMPLATE_SPECIALIZATION		template<u32 ITEM_REC_NUM, typename ITEM_DATA, typename T_ID, typename T_INDEX, typename T_INIT>
 #define CSINI_IdToIndex CIni_IdToIndex	<ITEM_REC_NUM, ITEM_DATA, T_ID, T_INDEX, T_INIT>
@@ -48,7 +40,6 @@ protected:
 	template <>
 	static  void				LoadItemData<0>  (u32 count, LPCSTR cfgRecord)
 	{
-		TS_BEGIN(g_iiForInner);
 		for (u32 k = 0; k < count; k+= 1)
 		{
 			string64 buf;
@@ -59,13 +50,11 @@ protected:
 			m_pItemDataVector->push_back(item_data);
 			xr_free(id_str_lwr);
 		}
-		TS_END(g_iiForInner);
 	}
 
 	template <>
 	static  void				LoadItemData<1>  (u32 count, LPCSTR cfgRecord)
 	{
-		TS_BEGIN(g_iiForInner);
 		for (u32 k = 0; k < count; k+= 2)
 		{
 			string64 buf, buf1;
@@ -77,7 +66,6 @@ protected:
 			m_pItemDataVector->push_back(item_data);
 			xr_free(id_str_lwr);
 		}
-		TS_END(g_iiForInner);
 	}
 
 	//им€ секции и линии откуда будут загружатьс€ id
@@ -173,7 +161,6 @@ void CSINI_IdToIndex::DeleteIdToIndexData	()
 TEMPLATE_SPECIALIZATION
 typename void	CSINI_IdToIndex::InitInternal ()
 {
-	TS_BEGIN(g_iiForOuter);
 	VERIFY(!m_pItemDataVector);
 	T_INIT::InitIdToIndex();
 	{
@@ -187,7 +174,6 @@ typename void	CSINI_IdToIndex::InitInternal ()
 		LoadItemData<ITEM_REC_NUM>(count, cfgRecord);
 
 	}
-	TS_END(g_iiForOuter);
 }
 	
 

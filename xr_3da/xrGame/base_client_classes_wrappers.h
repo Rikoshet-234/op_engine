@@ -286,10 +286,7 @@ public:
 		self->CGameObject::net_Export(*packet);
 	}
 
-	virtual BOOL			net_Spawn			(CSE_Abstract* data)
-	{
-		return			(luabind::call_member<bool>(this,"net_Spawn",data));
-	}
+	virtual BOOL			net_Spawn			(CSE_Abstract* data);
 
 	static	bool			net_Spawn_static	(CGameObject *self, CSE_Abstract *abstract)
 	{

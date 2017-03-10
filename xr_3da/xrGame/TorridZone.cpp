@@ -12,9 +12,10 @@ CTorridZone::~CTorridZone()
 {
 	xr_delete			(m_animator);
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CTorridZone::net_Spawn(CSE_Abstract* DC)
 {
+	TSP_SCOPED(_, "CTorridZone::net_Spawn", "spawn");
 	if (!inherited::net_Spawn(DC))
 		return			(FALSE);
 

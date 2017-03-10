@@ -31,9 +31,10 @@ void CScriptZone::reinit		()
 {
 	inherited::reinit		();
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CScriptZone::net_Spawn	(CSE_Abstract* DC) 
 {
+	TSP_SCOPED(_, "CScriptZone::net_Spawn", "spawn");
 	feel_touch.clear			();
 
 	if (!inherited::net_Spawn(DC))

@@ -109,11 +109,17 @@ SpaceRestrictionHolder::CBaseRestrictionPtr CSpaceRestrictionHolder::restriction
 	return					(bridge);
 }
 
+#include "OPFuncs/global_timers.h"
+
 void CSpaceRestrictionHolder::register_restrictor				(CSpaceRestrictor *space_restrictor, const RestrictionSpace::ERestrictorTypes &restrictor_type)
 {
+	TSP_SCOPED(_, "CSpaceRestrictionHolder::register_restrictor", "spawn");
+
 	string4096					m_temp_string;
 	shared_str					space_restrictors = space_restrictor->cName();
-	if (restrictor_type != RestrictionSpace::eDefaultRestrictorTypeNone) {
+	if (restrictor_type != RestrictionSpace::eDefaultRestrictorTypeNone) 
+	{
+		TSP_SCOPED(_, "CSpaceRestrictionHolder::register_restrictor_1", "spawn");
 		shared_str				*temp = 0, temp1;
 		if (restrictor_type == RestrictionSpace::eDefaultRestrictorTypeOut)
 			temp			= &m_default_out_restrictions;
@@ -128,14 +134,17 @@ void CSpaceRestrictionHolder::register_restrictor				(CSpaceRestrictor *space_re
 			strconcat		(sizeof(m_temp_string),m_temp_string,**temp,",",*space_restrictors);
 		else
 			strconcat		(sizeof(m_temp_string),m_temp_string,**temp,*space_restrictors);
-
 		*temp				= normalize_string(m_temp_string);
 		
 		if (xr_strcmp(*temp,temp1))
+		{
+			TSP_SCOPED(_,"CSpaceRestrictionHolder::register_restrictor_1_3", "spawn");
 			on_default_restrictions_changed	();
+		}
 	}
-	
+	TSP_BEGIN("CSpaceRestrictionHolder::register_restrictor_2", "spawn");
 	CSpaceRestrictionShape	*shape = xr_new<CSpaceRestrictionShape>(space_restrictor,restrictor_type != RestrictionSpace::eDefaultRestrictorTypeNone);
+	TSP_END("CSpaceRestrictionHolder::register_restrictor_2", "spawn");
 	RESTRICTIONS::iterator	I = m_restrictions.find(space_restrictors);
 	if (I == m_restrictions.end()) {
 		CSpaceRestrictionBridge	*bridge = xr_new<CSpaceRestrictionBridge>(shape);

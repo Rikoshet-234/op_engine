@@ -726,16 +726,20 @@ void CLocatorAPI::_initialize	(u32 flags, LPCSTR target_folder, LPCSTR fs_name)
 void CLocatorAPI::_destroy		()
 {
 	CloseLog		();
-
+	FILE* dmp = fopen("lapi.txt", "w");
+	fprintf(dmp, "--- Files ---\n");
 	for				(files_it I=files.begin(); I!=files.end(); I++)
 	{
 		char* str	= LPSTR(I->name);
+		fprintf(dmp, "%s\n", str);
 		xr_free		(str);
 	}
 	files.clear		();
+	fprintf(dmp, "--- Paths ---\n");
 	for				(PathPairIt p_it=pathes.begin(); p_it!=pathes.end(); p_it++)
 	{
 		char* str	= LPSTR(p_it->first);
+		fprintf(dmp, "%s\n", str);
 		xr_free		(str);
 		xr_delete	(p_it->second);
 	}
@@ -746,6 +750,7 @@ void CLocatorAPI::_destroy		()
 		CloseHandle	(a_it->hSrcFile);
 	}
 	archives.clear	();
+	fclose(dmp);
 }
 
 const CLocatorAPI::file* CLocatorAPI::exist			(const char* fn)

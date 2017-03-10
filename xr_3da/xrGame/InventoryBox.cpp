@@ -46,9 +46,10 @@ void CInventoryBox::OnEvent(NET_Packet& P, u16 type)
 		}break;
 	};
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CInventoryBox::net_Spawn(CSE_Abstract* DC)
 {
+	TSP_SCOPED(_, "CInventoryBox::net_Spawn", "spawn");
 	inherited::net_Spawn	(DC);
 	setVisible				(TRUE);
 	setEnabled				(TRUE);

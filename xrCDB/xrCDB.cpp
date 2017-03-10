@@ -54,6 +54,8 @@ struct	BTHREAD_params
 	int					Vcnt;
 	TRI*				T;
 	int					Tcnt;
+	IReader*			reader;
+	IWriter*			writer;
 	build_callback*		BC;
 	void*				BCP;
 };
@@ -64,13 +66,16 @@ void	MODEL::build_thread		(void *params)
 	FPU::m64r					();
 	BTHREAD_params	P			= *( (BTHREAD_params*)params );
 	P.M->cs.Enter				();
-	P.M->build_internal			(P.V,P.Vcnt,P.T,P.Tcnt,P.BC,P.BCP);
+	if (P.reader)
+		P.M->build_internal			(P.V,P.Vcnt,P.T,P.Tcnt,*P.reader,P.BC,P.BCP);
+	else
+		P.M->build_internal			(P.V,P.Vcnt,P.T,P.Tcnt, P.writer,P.BC,P.BCP);
 	P.M->status					= S_READY;
 	P.M->cs.Leave				();
 	//Msg						("* xrCDB: cform build completed, memory usage: %d K",P.M->memory()/1024);
 }
 
-void	MODEL::build			(Fvector* V, int Vcnt, TRI* T, int Tcnt, build_callback* bc, void* bcp)
+void	MODEL::build			(Fvector* V, int Vcnt, TRI* T, int Tcnt, IWriter* writer, build_callback* bc, void* bcp)
 {
 	R_ASSERT					(S_INIT == status);
     R_ASSERT					((Vcnt>=4)&&(Tcnt>=2));
@@ -81,17 +86,38 @@ void	MODEL::build			(Fvector* V, int Vcnt, TRI* T, int Tcnt, build_callback* bc,
 #else
 	if(!strstr(Core.Params, "-mt_cdb"))
 	{
-		build_internal				(V,Vcnt,T,Tcnt,bc,bcp);
+		build_internal				(V,Vcnt,T,Tcnt,writer,bc,bcp);
 	}else
 	{
-		BTHREAD_params				P = { this, V, Vcnt, T, Tcnt, bc, bcp };
+		BTHREAD_params				P = { this, V, Vcnt, T, Tcnt, NULL, writer, bc, bcp };
 		thread_spawn				(build_thread,"CDB-construction",0,&P);
 		while						(S_INIT	== status)	Sleep	(5);
 	}
 #endif
 }
 
-void	MODEL::build_internal	(Fvector* V, int Vcnt, TRI* T, int Tcnt, build_callback* bc, void* bcp)
+void	MODEL::build			(Fvector* V, int Vcnt, TRI* T, int Tcnt, IReader& reader, build_callback* bc, void* bcp)
+{
+	R_ASSERT					(S_INIT == status);
+    R_ASSERT					((Vcnt>=4)&&(Tcnt>=2));
+
+	_initialize_cpu_thread		();
+#ifdef _EDITOR    
+	build_internal				(V,Vcnt,T,Tcnt,bc,bcp);
+#else
+	if(!strstr(Core.Params, "-mt_cdb"))
+	{
+		build_internal				(V,Vcnt,T,Tcnt,reader,bc,bcp);
+	}else
+	{
+		BTHREAD_params				P = { this, V, Vcnt, T, Tcnt, &reader, NULL, bc, bcp };
+		thread_spawn				(build_thread,"CDB-construction",0,&P);
+		while						(S_INIT	== status)	Sleep	(5);
+	}
+#endif
+}
+
+void	MODEL::build_internal	(Fvector* V, int Vcnt, TRI* T, int Tcnt, IWriter* writer, build_callback* bc, void* bcp)
 {
 	// verts
 	verts_count	= Vcnt;
@@ -123,7 +149,7 @@ void	MODEL::build_internal	(Fvector* V, int Vcnt, TRI* T, int Tcnt, build_callba
 		*temp_ptr++	= tris[i].verts[1];
 		*temp_ptr++	= tris[i].verts[2];
 	}
-	
+
 	// Build a non quantized no-leaf tree
 	OPCODECREATE	OPCC;
 	OPCC.NbTris		= tris_count;
@@ -134,7 +160,6 @@ void	MODEL::build_internal	(Fvector* V, int Vcnt, TRI* T, int Tcnt, build_callba
 	OPCC.NoLeaf		= true;
 	OPCC.Quantized	= false;
 	// if (Memory.debug_mode) OPCC.KeepOriginal = true;
-
 	tree			= xr_new<OPCODE_Model> ();
 	if (!tree->Build(OPCC)) {
 		xr_free		(verts);
@@ -143,8 +168,35 @@ void	MODEL::build_internal	(Fvector* V, int Vcnt, TRI* T, int Tcnt, build_callba
 		return;
 	};
 
+	if (writer)
+	{
+		tree->Store(*writer);
+	}
 	// Free temporary tris
 	xr_free			(temp_tris);
+	return;
+}
+
+void	MODEL::build_internal	(Fvector* V, int Vcnt, TRI* T, int Tcnt, IReader& reader, build_callback* bc, void* bcp)
+{
+	// verts
+	verts_count	= Vcnt;
+	verts		= xr_alloc<Fvector>	(verts_count);
+	CopyMemory	(verts,V,verts_count*sizeof(Fvector));
+
+	// tris
+	tris_count	= Tcnt;
+	tris		= xr_alloc<TRI>		(tris_count);
+	CopyMemory	(tris,T,tris_count*sizeof(TRI));
+
+	// callback
+	if (bc)		bc	(verts,Vcnt,tris,Tcnt,bcp);
+
+	// Release data pointers
+	status		= S_BUILD;
+
+	tree = xr_new<OPCODE_Model> ();
+	tree->Restore(reader);
 	return;
 }
 

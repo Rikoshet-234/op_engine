@@ -53,9 +53,10 @@ void CBaseGraviZone ::Load(LPCSTR section)
 	else
 		m_sTeleParticlesSmall = NULL;
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CBaseGraviZone ::net_Spawn(CSE_Abstract* DC)
 {
+	TSP_SCOPED(_, "CBaseGraviZone::net_Spawn", "spawn");
 	return inherited::net_Spawn(DC);
 }
 void CBaseGraviZone ::net_Destroy()

@@ -23,10 +23,6 @@
 #include "string_table.h"
 #include "../igame_persistent.h"
 
-//#define TS_ENABLE
-#include "../xrCore/FTimerStat.h"
-#undef TS_ENABLE
-
 using namespace ALife;
 
 extern string_path g_last_saved_game;
@@ -90,23 +86,7 @@ void CALifeStorageManager::save	(LPCSTR save_name, bool update_name)
 		strcpy					(m_save_name,save);
 }
 
-bool g_measure = false;
-TS_DECLARE(g_dynamic_td);
-TS_DECLARE(g_dynamic);
-TS_DECLARE(g_dynamic_bu);
-TS_DECLARE(g_human);
-TS_DECLARE(g_human_inherited);
-TS_DECLARE(g_human_brain);
-TS_DECLARE(g_human_specific);
-TSE_DECLARE(g_brain_select_task);
-TSE_DECLARE(g_brain_st);
-TSE_DECLARE(g_brain_al);
-TSE_DECLARE(g_brain_for);
-TSE_DECLARE(g_brain_for_en);
-TSE_DECLARE(g_brain_reg);
-TSE_DECLARE(g_has_info);
-TSE_DECLARE(g_has_info_registry);
-TSE_DECLARE(g_has_info_find_if);
+#include "../xrCore/OPFuncs/global_timers.h"
 
 void CALifeStorageManager::load	(void *buffer, const u32 &buffer_size, LPCSTR file_name)
 {
@@ -139,43 +119,19 @@ void CALifeStorageManager::load	(void *buffer, const u32 &buffer_size, LPCSTR fi
 	can_register_objects		(true);
 	
 	Msg("* Start objects on_register'ed...");
-	//g_measure = true;
+	//TS_ENABLE("spawn");
 	CTimer t;
 	t.Start();
 	int i = 0;
 	for (I = B; I != E; ++I, ++i)
 	{
-		if (g_measure)
-		{
-			TS_BEGIN(g_dynamic_td);
-		}
+		//TSP_BEGIN("g_dynamic_td", "spawn");
 		(*I).second->on_register();
-		if(g_measure)
-		{
-			TS_END(g_dynamic_bu);
-		}
+		//TSP_END("g_dynamic_bu", "spawn");
 	}
 	Msg("* %u objects on_register'ed (%2.3fs)", objects().objects().size(), t.GetElapsed_sec());
-	if (g_measure)
-	{
-		TS_P(g_dynamic_td, "*  Dynam_TD");
-		TS_P(g_dynamic, "*  Dynamic");
-		TS_P(g_brain_st, "*    Dynam_BR_ST");
-		TS_P(g_brain_al, "*    Dynam_BR_AL");
-		TS_P(g_has_info_registry, "*       HasInfo::registry");
-		TS_P(g_has_info_find_if, "*       HasInfo::find_if");
-		TS_P(g_has_info, "*      HasInfo");
-		TS_P(g_brain_for_en, "*     Dynam_BR_FO_EN");
-		TS_P(g_brain_for, "*    Dynam_BR_FO");
-		TS_P(g_brain_reg, "*    Dynam_BR_RE");
-		TS_P(g_brain_select_task, "*   Dynam_BR");
-		TS_P(g_dynamic_bu, "*  Dynam_BU");
-		TS_P(g_human_inherited, "*   HumanI");
-		TS_P(g_human_brain, "*   HumanB");
-		TS_P(g_human_specific, "*   HumanS");
-		TS_P(g_human, "*  Human__");
-	}
-	g_measure = false;
+	TSP_PRINT();
+	//TS_DISABLE("spawn");
 }
 
 bool CALifeStorageManager::load	(LPCSTR save_name)

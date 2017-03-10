@@ -112,9 +112,10 @@ void CAI_Trader::LookAtActor(CBoneInstance *B)
 }
 
 //////////////////////////////////////////////////////////////////////////
-
+#include "../xrCore/FTimerStat.h"
 BOOL CAI_Trader::net_Spawn			(CSE_Abstract* DC)
 {
+	TSP_SCOPED(_, "CAI_Trader::net_Spawn", "spawn");
 	CSE_Abstract			*e	= (CSE_Abstract*)(DC);
 	CSE_ALifeTrader			*l_tpTrader = smart_cast<CSE_ALifeTrader*>(e);
 	R_ASSERT				(l_tpTrader);

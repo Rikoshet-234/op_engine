@@ -29,9 +29,10 @@ void CScriptObject::reinit				()
 	CScriptEntity::reinit			();
 	CGameObject::reinit				();
 }
-
+#include "../xrCore/FTimerStat.h"
 BOOL CScriptObject::net_Spawn			(CSE_Abstract* DC)
 {
+	TSP_SCOPED(_, "CScriptObject::net_Spawn", "spawn");
 	return	(
 		CGameObject::net_Spawn(DC) &&
 		CScriptEntity::net_Spawn(DC)

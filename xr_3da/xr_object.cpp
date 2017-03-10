@@ -25,8 +25,11 @@ void CObject::cNameSect_set		(shared_str N)
 	NameSection	=	N; 
 }
 #include "SkeletonCustom.h"
+#include "../xrCore/OPFuncs/global_timers.h"
+
 void CObject::cNameVisual_set	(shared_str N)
 { 
+	TSP_SCOPED(_, __FUNCTION__, g_ts_spawn);
 	// check if equal
 	if (*N && *NameVisual)
 		if (N==NameVisual)		return;
@@ -37,7 +40,9 @@ void CObject::cNameVisual_set	(shared_str N)
 		IRender_Visual			*old_v = renderable.visual;
 		
 		NameVisual				= N;
+		TSP_BEGIN("Render->model_Create", g_ts_spawn);
 		renderable.visual		= Render->model_Create	(*N);
+		TSP_END("Render->model_Create", g_ts_spawn);
 		
 		CKinematics* old_k	= old_v?old_v->dcast_PKinematics():NULL;
 		CKinematics* new_k	= renderable.visual->dcast_PKinematics();
@@ -51,7 +56,9 @@ void CObject::cNameVisual_set	(shared_str N)
 		::Render->model_Delete	(renderable.visual);
 		NameVisual				= 0;
 	}
+	TSP_BEGIN("OnChangeVisual()", g_ts_spawn);
 	OnChangeVisual				();
+	TSP_END("OnChangeVisual()", g_ts_spawn);
 }
 
 // flagging

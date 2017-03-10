@@ -31,10 +31,6 @@
 #	endif
 #endif
 
-//#define TS_ENABLE
-#include "../xrCore/FTimerStat.h"
-#undef TS_ENABLE
-
 #define MAX_ITEM_FOOD_COUNT			3
 #define MAX_ITEM_MEDIKIT_COUNT		3
 #define MAX_AMMO_ATTACH_COUNT		10
@@ -123,31 +119,20 @@ void CALifeMonsterBrain::process_task			()
 	movement().detail().target		(*task);
 }
 
-#define MEAS_BEGIN(timer) if (g_measure) { TS_BEGIN(timer); }
-#define MEAS_END(timer) if (g_measure) { TS_END(timer); }
-#define MEAS(timer) g_measure ? timer : g_dummy
-
-extern bool g_measure;
-TS_DECLARE(g_brain_select_task);
-TS_DECLARE(g_brain_st);
-TS_DECLARE(g_brain_al);
-TS_DECLARE(g_brain_for);
-TS_DECLARE(g_brain_for_en);
-TS_DECLARE(g_brain_reg);
-TS_DECLARE(g_dummy);
+#include "../xrCore/OPFuncs/global_timers.h"
 
 void CALifeMonsterBrain::select_task			()
 {
-	TSS_DECLARE(_, MEAS(g_brain_select_task));
+	//TSP_SCOPED(_, "g_brain_select_task", "spawn");
 
 	{
-		TSS_DECLARE(_l, MEAS(g_brain_st));
+		//TSP_SCOPED(_l, "g_brain_st", "spawn");
 		if (object().m_smart_terrain_id != 0xffff)
 			return;
 	}
 
 	{
-		TSS_DECLARE(_l, MEAS(g_brain_al));
+		//TSP_SCOPED(_l, "g_brain_al", "spawn");
 		if (!can_choose_alife_tasks())
 			return;
 	}
@@ -162,10 +147,10 @@ void CALifeMonsterBrain::select_task			()
 	CALifeSmartTerrainRegistry::OBJECTS::const_iterator	I = ai().alife().smart_terrains().objects().begin();
 	CALifeSmartTerrainRegistry::OBJECTS::const_iterator	E = ai().alife().smart_terrains().objects().end();
 	{
-		TSS_DECLARE(_l, MEAS(g_brain_for));
+		//TSP_SCOPED(_l, "g_brain_for", "spawn");
 		for ( ; I != E; ++I) 
 		{
-			TSS_DECLARE(_l_en, MEAS(g_brain_for_en));
+			//TSP_SCOPED(_l_en, "g_brain_for_en", "spawn");
 			if (!(*I).second->enabled(&object()))
 				continue;
 
@@ -178,7 +163,7 @@ void CALifeMonsterBrain::select_task			()
 	}
 
 	{
-		TSS_DECLARE(_l, MEAS(g_brain_reg));
+		//TSP_SCOPED(_l, "g_brain_reg", "spawn");
 		if (object().m_smart_terrain_id != 0xffff) {
 			smart_terrain().register_npc	(&object());
 			m_last_search_time				= 0;

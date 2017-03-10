@@ -23,10 +23,6 @@
 #include "../xrLua/lua_tools.h"
 #include "script_game_object.h"
 
-//#define TS_ENABLE
-#include "../xrCore/FTimerStat.h"
-#undef TS_ENABLE
-
 using namespace luabind;
 
 typedef xr_vector<std::pair<shared_str,int> >	STORY_PAIRS;
@@ -348,47 +344,24 @@ private:
 	shared_str element;
 };
 
-extern bool g_measure;
-TS_DECLARE(g_has_info);
-TS_DECLARE(g_has_info_registry);
-TS_DECLARE(g_has_info_find_if);
-TS_DECLARE(g_dummy_ip);
-
-#define MEAS(timer) g_measure ? timer : g_dummy_ip
+#include "../xrCore/OPFuncs/global_timers.h"
 
 bool has_info									(const CALifeSimulator *self, const ALife::_OBJECT_ID &id, LPCSTR info_id)
 {
-	TSS_DECLARE(_, MEAS(g_has_info));
-
-	if (g_measure)
-	{
-		TS_BEGIN(g_has_info_registry);
-	}
+	//TSP_SCOPED(_, "g_has_info", "spawn");
+	//TSP_BEGIN("g_has_info_registry", "spawn");
 	const CKnownInfoContainer* known_info = registry(self,id);
-	if (g_measure)
-	{
-		TS_END(g_has_info_registry);
-	}
+	//TSP_END("g_has_info_registry", "spawn");
 	if (!known_info)
 		return							(false);
 
-	if (g_measure)
-	{
-		TS_BEGIN(g_has_info_find_if);
-	}
+	//TSP_BEGIN("g_has_info_find_if", "spawn");
 	//bool found = std::find_if(known_info->begin(), known_info->end(), CFindByIDPred(info_id)) != known_info->end();
 	shared_str info_id_str(info_id);
 	bool found = known_info->exist(info_id_str);
+	//TSP_END("g_has_info_find_if", "spawn");
 
-	if (g_measure)
-	{
-		TS_END(g_has_info_find_if);
-	}
-
-	if (!found)
-		return							(false);
-
-	return								(true);
+	return found;
 }
 
 bool dont_has_info								(const CALifeSimulator *self, const ALife::_OBJECT_ID &id, LPCSTR info_id)
