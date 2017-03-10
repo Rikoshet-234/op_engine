@@ -81,9 +81,9 @@ private:
 	#define TSP_PRINT() TSM_Print()
 	#define TSS_PRINT(n) TSM_Print(n)
 #else
+	#define TSE_DISABLE(n)
 	#define TSE_INIT()
 	#define TSE_DEINIT()
-	#define TSE_DISABLE(e)
 	#define TS_ENABLE(e)
 	#define TS_DISABLE(e)
 	#define TSP_BEGIN(n, e)

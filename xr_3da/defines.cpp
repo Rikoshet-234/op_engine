@@ -14,8 +14,6 @@ Flags32		g_uCommonFlags		= {flAiUseTorchDynamicLights|uiShowConditions|uiShowExt
 // textures 
 int			psTextureLOD		= 0;
 
-int			c_r		=0;
-int			c_g		=0;
-int			c_b		=0;
-int			c_a		=0;
-int			c_c		=0;
+float lpLoadScreenTextOffsetX=0;
+float lpLoadScreenTextOffsetY=0;
+bool lpLoadScreenEnableProgressBar=true;

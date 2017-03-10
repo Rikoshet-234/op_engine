@@ -11,7 +11,7 @@
 #define _SHOW_REF(msg, x)   { if(x) { x->AddRef(); Log(msg,u32(x->Release()));}}
 
 // textures
-ENGINE_API extern	int		psTextureLOD		;
+ENGINE_API extern	int		psTextureLOD;
 
 // psDeviceFlags
 enum {
@@ -48,7 +48,9 @@ ENGINE_API extern	u32			psCurrentVidMode[];
 ENGINE_API extern	u32			psCurrentBPP		;
 ENGINE_API extern	Flags32		psDeviceFlags		;
 
+
 ENGINE_API extern	Flags32		g_uCommonFlags;
+
 ENGINE_API enum E_COMMON_FLAGS
 {
 	flAiUseTorchDynamicLights	= 1<<0,
@@ -67,12 +69,9 @@ ENGINE_API enum E_COMMON_FLAGS
 	gpOpenScope					= 1<<13
 };
 
-
-ENGINE_API extern	int			c_r		;
-ENGINE_API extern	int			c_g		;
-ENGINE_API extern	int			c_b		;
-ENGINE_API extern	int			c_a		;
-ENGINE_API extern	int			c_c		;
+ENGINE_API extern	float			lpLoadScreenTextOffsetX;
+ENGINE_API extern	float			lpLoadScreenTextOffsetY;
+ENGINE_API extern	bool			lpLoadScreenEnableProgressBar;
 
 // game path definition
 #define _game_data_				"$game_data$"
