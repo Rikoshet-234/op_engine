@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <BinOutputDir>c:\Games\S.T.A.L.K.E.R. Shadow of Chernobyl\bin_vs2015\</BinOutputDir>
+    <LibrariesOutputDir>$(SolutionDir)\xr_build\libraries\$(Platform)\$(Configuration)</LibrariesOutputDir>
+    <IntermediateOutputDir>$(SolutionDir)\xr_build\intermediate\$(Platform)\$(Configuration)\$(ProjectName)</IntermediateOutputDir>
+    <BinariesOutputDir>$(SolutionDir)\xr_build\binaries\$(Platform)\$(Configuration)</BinariesOutputDir>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup />
+  <ItemGroup>
+    <BuildMacro Include="BinOutputDir">
+      <Value>$(BinOutputDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="LibrariesOutputDir">
+      <Value>$(LibrariesOutputDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="IntermediateOutputDir">
+      <Value>$(IntermediateOutputDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="BinariesOutputDir">
+      <Value>$(BinariesOutputDir)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

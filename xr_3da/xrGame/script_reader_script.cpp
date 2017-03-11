@@ -12,15 +12,15 @@
 
 using namespace luabind;
 
-bool r_eof(IReader *self)
+bool r_eof(IReader *pself)
 {
-	return			(!!self->eof());
+	return			(!!pself->eof());
 }
 
-LPCSTR r_stringZ(IReader *self)
+LPCSTR r_stringZ(IReader *pself)
 {
 	shared_str		temp;
-	self->r_stringZ	(temp);
+	pself->r_stringZ	(temp);
 	return			(*temp);
 }
 
@@ -35,14 +35,14 @@ LPCSTR r_string(IReader *self)
 		return &empty;
 }
 
-bool r_bool(IReader *self)
+bool r_bool(IReader *pself)
 {
-	return			(!!self->r_u8());
+	return			(!!pself->r_u8());
 }
 
-void r_fvector3(IReader *self, Fvector *arg0)
+void r_fvector3(IReader *pself, Fvector *arg0)
 {
-	self->r_fvector3(*arg0);
+	pself->r_fvector3(*arg0);
 }
 
 #pragma optimize("s",on)

@@ -245,16 +245,16 @@ void CRestrictions::Dump() const
 	for(u32 i=0; i<_RANK_COUNT+1; ++i)
 	{
 		const rank_rest_vec& v = m_restrictions[i];
-		rank_rest_vec::const_iterator it		= v.begin();
-		rank_rest_vec::const_iterator it_e		= v.end();
+		rank_rest_vec::const_iterator it2		= v.begin();
+		rank_rest_vec::const_iterator it2_e		= v.end();
 		if(i<_RANK_COUNT)
 			Msg("---	for rank %d  ---count=[%d]", i, v.size());
 		else
 			Msg("---	base restrictions ---count=[%d]", v.size());
 
-		for(;it!=it_e;++it)
+		for(;it2!=it2_e;++it2)
 		{
-			Msg("	[%s]:[%d]", (*it).first.c_str(), (*it).second);
+			Msg("	[%s]:[%d]", (*it2).first.c_str(), (*it2).second);
 		}
 		Msg("-----------------------------------------");
 	}

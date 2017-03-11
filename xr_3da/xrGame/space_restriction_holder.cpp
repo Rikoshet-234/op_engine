@@ -74,11 +74,11 @@ shared_str CSpaceRestrictionHolder::normalize_string		(shared_str space_restrict
 	LPSTR					result_string = (LPSTR)_alloca((n+1)*sizeof(char));
 	LPSTR					pointer = result_string;
 	{
-		LPSTR				*I = strings;
+		LPSTR				*I2 = strings;
 		LPSTR				*E = string_current;
-		for ( ; I != E; ++I) {
-			for (LPSTR i = *I; *i; ++i, ++pointer)
-				*pointer	= *i;
+		for ( ; I2 != E; ++I2) {
+			for (LPSTR i2 = *I2; *i2; ++i2, ++pointer)
+				*pointer	= *i2;
 
 			*pointer		= ',';
 			++pointer;

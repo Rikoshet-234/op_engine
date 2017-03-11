@@ -289,8 +289,8 @@ void CHudItem::animGet	(MotionSVec& lst, LPCSTR prefix,LPCSTR section,LPCSTR par
 	{
 		string128		sh_anim;
 		sprintf_s			(sh_anim,"%s%d",prefix,i);
-		const MotionID	&M = m_pHUD->animGet(sh_anim);
-		if (M)			lst.push_back(M);
+		const MotionID	&m = m_pHUD->animGet(sh_anim);
+		if (m)			lst.push_back(m);
 	}
 	if (lst.empty())
 	{
@@ -308,8 +308,8 @@ void CHudItem::animGet	(MotionSVec& lst, LPCSTR prefix)
 	{
 		string128		sh_anim;
 		sprintf_s			(sh_anim,"%s%d",prefix,i);
-		const MotionID	&M = m_pHUD->animGet(sh_anim);
-		if (M)			lst.push_back(M);
+		const MotionID	&m = m_pHUD->animGet(sh_anim);
+		if (m)			lst.push_back(m);
 	}
 	R_ASSERT2			(!lst.empty(),prefix);
 }

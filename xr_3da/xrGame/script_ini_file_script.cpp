@@ -23,17 +23,17 @@ CScriptIniFile *get_game_ini()
 }
 #endif // XRGAME_EXPORTS
 
-bool r_line(CScriptIniFile *self, LPCSTR S, int L,	xr_string &N, xr_string &V)
+bool r_line(CScriptIniFile *pself, LPCSTR S, int L,	xr_string &N, xr_string &V)
 {
-	THROW3			(self->section_exist(S),"Cannot find section",S);
-	THROW2			((int)self->line_count(S) > L,"Invalid line number");
+	THROW3			(pself->section_exist(S),"Cannot find section",S);
+	THROW2			((int)pself->line_count(S) > L,"Invalid line number");
 	
 	N				= "";
 	V				= "";
 	
 	LPCSTR			n,v;
-	bool			result = !!self->r_line(S,L,&n,&v);
-	if (!result)
+	bool			result_ = !!pself->r_line(S,L,&n,&v);
+	if (!result_)
 		return		(false);
 
 	N				= n;

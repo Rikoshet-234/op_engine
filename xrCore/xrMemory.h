@@ -124,10 +124,18 @@ XRCORE_API	char* 	xr_strdup	(const char* string);
 #	endif
 #else // DEBUG_MEMORY_NAME
 #	if !(defined(__BORLANDC__) || defined(NO_XRNEW))
+#if _MSC_VER >= 2000
+	void*	    operator new		(size_t size);
+    void	    operator delete		(void *p);
+	void*	    operator new[]		(size_t size);
+	void		operator delete[]	(void* p);
+#else
+    //#pragma todo("jarni: solve C4595")
 	IC void*	operator new		(size_t size)		{	return Memory.mem_alloc(size?size:1);				}
 	IC void		operator delete		(void *p)			{	xr_free(p);											}
 	IC void*	operator new[]		(size_t size)		{	return Memory.mem_alloc(size?size:1);				}
 	IC void		operator delete[]	(void* p)			{	xr_free(p);											}
+#endif
 #	endif
 #endif // DEBUG_MEMORY_MANAGER
 

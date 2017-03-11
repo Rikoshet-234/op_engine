@@ -120,7 +120,7 @@ namespace Feel {
 
 			{
 				diff.resize	(_max(seen.size(),query.size()));
-				xr_vector<CObject*>::iterator	E = std::set_difference(
+				E = std::set_difference(
 					seen.begin(), seen.end(),
 					query.begin(),query.end(),
 					diff.begin() );

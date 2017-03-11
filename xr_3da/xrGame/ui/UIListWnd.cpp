@@ -129,8 +129,7 @@ void CUIListWnd::RemoveItem(int index)
 
 	//выбрать нужный элемент
 	it = m_ItemList.begin();
-	int i=0;
-	for(i=0; i<index;++i, ++it);
+	for(int i=0; i<index;++i, ++it);
 
 	R_ASSERT(m_ItemList.end() != it);
 	
@@ -152,9 +151,9 @@ void CUIListWnd::RemoveItem(int index)
 
 	//перенумеровать индексы заново
 	i=0;
-	for(LIST_ITEM_LIST_it it=m_ItemList.begin();  m_ItemList.end() != it; ++it,i++)
+	for(LIST_ITEM_LIST_it it2=m_ItemList.begin();  m_ItemList.end() != it2; ++it2,i++)
 	{
-		(*it)->SetIndex(i);
+		(*it2)->SetIndex(i);
 	}
 
 }
@@ -226,8 +225,7 @@ void CUIListWnd::UpdateList()
 	
 	//спрятать все элементы до участка 
 	//отображающейся в данный момент
-	int i=0;
-	for(i=0; i<_min(m_ItemList.size(),m_iFirstShownIndex); ++i, ++it)
+	for(int i=0; i<_min(m_ItemList.size(),m_iFirstShownIndex); ++i, ++it)
 	{
 		(*it)->Show(false);
 	}

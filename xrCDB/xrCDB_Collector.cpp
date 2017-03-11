@@ -119,9 +119,7 @@ namespace CDB
 		edge							*edges = (edge*)_alloca(edge_count*sizeof(edge));
 #endif
 		edge							*i = edges;
-		xr_vector<TRI>::const_iterator	B = faces.begin(), I = B;
-		xr_vector<TRI>::const_iterator	E = faces.end();
-		for ( ; I != E; ++I) {
+		for (auto B = faces.begin(), I = B; I != faces.end(); ++I) {
 			u32							face_id = u32(I - B);
 
 			(*i).face_id				= face_id;
@@ -154,13 +152,13 @@ namespace CDB
 		dest.assign						(edge_count,u32(-1));
 
 		{
-			edge						*I = edges, *J;
 			edge						*E = edges + edge_count;
-			for ( ; I != E; ++I) {
+			for (edge *I = edges; I != E; ++I)
+            {
 				if (I + 1 == E)
 					continue;
 
-				J							= I + 1;
+				edge *J						= I + 1;
 
 				if ((*I).vertex_id0 != (*J).vertex_id0)
 					continue;

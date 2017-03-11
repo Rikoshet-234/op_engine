@@ -278,3 +278,24 @@ XRCORE_API		BOOL			is_stack_ptr		( void* _ptr)
 	ptrdiff_t	difference		= (ptrdiff_t)_abs(s64(ptrdiff_t(ptr_local) - ptrdiff_t(ptr_refsound)));
 	return		(difference < (512*1024));
 }
+
+#if _MSC_VER >= 2000
+void*   operator new(size_t size)
+{ 
+    return Memory.mem_alloc(size ? size : 1); 
+}
+
+void    operator delete(void *p)
+{ 
+    xr_free(p); 
+}
+
+void*	operator new[](size_t size)
+{	
+    return Memory.mem_alloc(size ? size : 1);
+}
+
+void	operator delete[](void* p){	
+    xr_free(p);
+}
+#endif

@@ -37,34 +37,34 @@ CALifeSimulator *alife				()
 	return			(const_cast<CALifeSimulator*>(ai().get_alife()));
 }
 
-CSE_ALifeDynamicObject *alife_object		(const CALifeSimulator *self, ALife::_OBJECT_ID object_id)
+CSE_ALifeDynamicObject *alife_object		(const CALifeSimulator *pself, ALife::_OBJECT_ID object_id)
 {
-	VERIFY			(self);
-	return			(self->objects().object(object_id,true));
+	VERIFY			(pself);
+	return			(pself->objects().object(object_id,true));
 }
 
-CSE_ALifeDynamicObject *alife_object		(const CALifeSimulator *self, CScriptGameObject* object)
+CSE_ALifeDynamicObject *alife_object		(const CALifeSimulator *pself, CScriptGameObject* object)
 {
-	VERIFY			(self);
+	VERIFY			(pself);
 	if (object==nullptr)
 	{
 		ai().script_engine().print_stack();
 		FATAL("Input object is nil!");
 	}
-	return			(self->objects().object(u16(object->ID()),true));
+	return			(pself->objects().object(u16(object->ID()),true));
 }
 
-bool valid_object_id						(const CALifeSimulator *self, ALife::_OBJECT_ID object_id)
+bool valid_object_id						(const CALifeSimulator *pself, ALife::_OBJECT_ID object_id)
 {
-	VERIFY			(self);
+	VERIFY			(pself);
 	return			(object_id != 0xffff);
 }
 
-CSE_ALifeDynamicObject *alife_object		(const CALifeSimulator *self, LPCSTR name)
+CSE_ALifeDynamicObject *alife_object		(const CALifeSimulator *pself, LPCSTR name)
 {
-	VERIFY			(self);
+	VERIFY			(pself);
 	
-	for (CALifeObjectRegistry::OBJECT_REGISTRY::const_iterator it = self->objects().objects().begin(); it != self->objects().objects().end(); it++) {
+	for (CALifeObjectRegistry::OBJECT_REGISTRY::const_iterator it = pself->objects().objects().begin(); it != pself->objects().objects().end(); it++) {
 		CSE_ALifeDynamicObject	*obj = it->second;
 		if (xr_strcmp(obj->name_replace(),name) == 0)
 			return	(it->second);
@@ -74,15 +74,15 @@ CSE_ALifeDynamicObject *alife_object		(const CALifeSimulator *self, LPCSTR name)
 }
 
 
-CSE_ALifeDynamicObject *alife_object		(const CALifeSimulator *self, ALife::_OBJECT_ID id, bool no_assert)
+CSE_ALifeDynamicObject *alife_object		(const CALifeSimulator *pself, ALife::_OBJECT_ID id, bool no_assert)
 {
-	VERIFY			(self);
-	return			(self->objects().object(id,no_assert));
+	VERIFY			(pself);
+	return			(pself->objects().object(id,no_assert));
 }
 
-CSE_ALifeDynamicObject *alife_story_object	(const CALifeSimulator *self, ALife::_STORY_ID id)
+CSE_ALifeDynamicObject *alife_story_object	(const CALifeSimulator *pself, ALife::_STORY_ID id)
 {
-	return			(self->story_objects().object(id,true));
+	return			(pself->story_objects().object(id,true));
 }
 
 template <typename _id_type>
@@ -159,12 +159,12 @@ void remove_out_restriction	(CALifeSimulator *alife, CSE_ALifeMonsterAbstract *m
 	alife->remove_restriction	(monster->ID,id,RestrictionSpace::eRestrictorTypeOut);
 }
 
-u32 get_level_id(CALifeSimulator *self)
+u32 get_level_id(CALifeSimulator *pself)
 {
-	return						(self->graph().level().level_id());
+	return						(pself->graph().level().level_id());
 }
 
-CSE_ALifeDynamicObject *CALifeSimulator__create	(CALifeSimulator *self, ALife::_SPAWN_ID spawn_id)
+CSE_ALifeDynamicObject *CALifeSimulator__create	(CALifeSimulator *pself, ALife::_SPAWN_ID spawn_id)
 {
 	const CALifeSpawnRegistry::SPAWN_GRAPH::CVertex	*vertex = ai().alife().spawns().spawns().vertex(spawn_id);
 	THROW2								(vertex,"Invalid spawn id!");
@@ -173,21 +173,21 @@ CSE_ALifeDynamicObject *CALifeSimulator__create	(CALifeSimulator *self, ALife::_
 	THROW								(spawn);
 
 	CSE_ALifeDynamicObject				*object;
-	self->create						(object,spawn,spawn_id);
+	pself->create						(object,spawn,spawn_id);
 
 	return								(object);
 }
 
-CSE_Abstract *CALifeSimulator__spawn_item		(CALifeSimulator *self, LPCSTR section, const Fvector &position, u32 level_vertex_id, GameGraph::_GRAPH_ID game_vertex_id)
+CSE_Abstract *CALifeSimulator__spawn_item		(CALifeSimulator *pself, LPCSTR section, const Fvector &position, u32 level_vertex_id, GameGraph::_GRAPH_ID game_vertex_id)
 {
-	THROW								(self);
-	return								(self->spawn_item(section,position,level_vertex_id,game_vertex_id,ALife::_OBJECT_ID(-1)));
+	THROW								(pself);
+	return								(pself->spawn_item(section,position,level_vertex_id,game_vertex_id,ALife::_OBJECT_ID(-1)));
 }
 
-CSE_Abstract *CALifeSimulator__spawn_item2		(CALifeSimulator *self, LPCSTR section, const Fvector &position, u32 level_vertex_id, GameGraph::_GRAPH_ID game_vertex_id, ALife::_OBJECT_ID id_parent)
+CSE_Abstract *CALifeSimulator__spawn_item2		(CALifeSimulator *pself, LPCSTR section, const Fvector &position, u32 level_vertex_id, GameGraph::_GRAPH_ID game_vertex_id, ALife::_OBJECT_ID id_parent)
 {
 	if (id_parent == ALife::_OBJECT_ID(-1))
-		return							(self->spawn_item(section,position,level_vertex_id,game_vertex_id,id_parent));
+		return							(pself->spawn_item(section,position,level_vertex_id,game_vertex_id,id_parent));
 
 	CSE_ALifeDynamicObject				*object = ai().alife().objects().object(id_parent,true);
 	if (!object) {
@@ -196,15 +196,15 @@ CSE_Abstract *CALifeSimulator__spawn_item2		(CALifeSimulator *self, LPCSTR secti
 	}
 
 	if (!object->m_bOnline)
-		return							(self->spawn_item(section,position,level_vertex_id,game_vertex_id,id_parent));
+		return							(pself->spawn_item(section,position,level_vertex_id,game_vertex_id,id_parent));
 
 	NET_Packet							packet;
 	packet.w_begin						(M_SPAWN);
 	packet.w_stringZ					(section);
 	
-	CSE_Abstract						*item = self->spawn_item(section,position,level_vertex_id,game_vertex_id,id_parent,false);
+	CSE_Abstract						*item = pself->spawn_item(section,position,level_vertex_id,game_vertex_id,id_parent,false);
 	item->Spawn_Write					(packet,FALSE);
-	self->server().FreeID				(item->ID,0);
+	pself->server().FreeID				(item->ID,0);
 	F_entity_Destroy					(item);
 
 	ClientID							clientID;
@@ -213,13 +213,13 @@ CSE_Abstract *CALifeSimulator__spawn_item2		(CALifeSimulator *self, LPCSTR secti
 	u16									dummy;
 	packet.r_begin						(dummy);
 	VERIFY								(dummy == M_SPAWN);
-	return								(self->server().Process_spawn(packet,clientID));
+	return								(pself->server().Process_spawn(packet,clientID));
 }
 
-CSE_Abstract *CALifeSimulator__spawn_ammo		(CALifeSimulator *self, LPCSTR section, const Fvector &position, u32 level_vertex_id, GameGraph::_GRAPH_ID game_vertex_id, ALife::_OBJECT_ID id_parent, int ammo_to_spawn)
+CSE_Abstract *CALifeSimulator__spawn_ammo		(CALifeSimulator *pself, LPCSTR section, const Fvector &position, u32 level_vertex_id, GameGraph::_GRAPH_ID game_vertex_id, ALife::_OBJECT_ID id_parent, int ammo_to_spawn)
 {
 //	if (id_parent == ALife::_OBJECT_ID(-1))
-//		return							(self->spawn_item(section,position,level_vertex_id,game_vertex_id,id_parent));
+//		return							(pself->spawn_item(section,position,level_vertex_id,game_vertex_id,id_parent));
 	CSE_ALifeDynamicObject				*object = 0;
 	if (id_parent != ALife::_OBJECT_ID(-1)) {
 		object							= ai().alife().objects().object(id_parent,true);
@@ -230,7 +230,7 @@ CSE_Abstract *CALifeSimulator__spawn_ammo		(CALifeSimulator *self, LPCSTR sectio
 	}
 
 	if (!object || !object->m_bOnline) {
-		CSE_Abstract					*item = self->spawn_item(section,position,level_vertex_id,game_vertex_id,id_parent);
+		CSE_Abstract					*item = pself->spawn_item(section,position,level_vertex_id,game_vertex_id,id_parent);
 
 		CSE_ALifeItemAmmo				*ammo = smart_cast<CSE_ALifeItemAmmo*>(item);
 		THROW							(ammo);
@@ -244,7 +244,7 @@ CSE_Abstract *CALifeSimulator__spawn_ammo		(CALifeSimulator *self, LPCSTR sectio
 	packet.w_begin						(M_SPAWN);
 	packet.w_stringZ					(section);
 	
-	CSE_Abstract						*item = self->spawn_item(section,position,level_vertex_id,game_vertex_id,id_parent,false);
+	CSE_Abstract						*item = pself->spawn_item(section,position,level_vertex_id,game_vertex_id,id_parent,false);
 
 	CSE_ALifeItemAmmo					*ammo = smart_cast<CSE_ALifeItemAmmo*>(item);
 	THROW								(ammo);
@@ -252,7 +252,7 @@ CSE_Abstract *CALifeSimulator__spawn_ammo		(CALifeSimulator *self, LPCSTR sectio
 	ammo->a_elapsed						= (u16)ammo_to_spawn;
 
 	item->Spawn_Write					(packet,FALSE);
-	self->server().FreeID				(item->ID,0);
+	pself->server().FreeID				(item->ID,0);
 	F_entity_Destroy					(item);
 
 	ClientID							clientID;
@@ -261,24 +261,24 @@ CSE_Abstract *CALifeSimulator__spawn_ammo		(CALifeSimulator *self, LPCSTR sectio
 	u16									dummy;
 	packet.r_begin						(dummy);
 	VERIFY								(dummy == M_SPAWN);
-	return								(self->server().Process_spawn(packet,clientID));
+	return								(pself->server().Process_spawn(packet,clientID));
 }
 
-ALife::_SPAWN_ID CALifeSimulator__spawn_id		(CALifeSimulator *self, ALife::_SPAWN_STORY_ID spawn_story_id)
+ALife::_SPAWN_ID CALifeSimulator__spawn_id		(CALifeSimulator *pself, ALife::_SPAWN_STORY_ID spawn_story_id)
 {
-	return								(((const CALifeSimulator *)self)->spawns().spawn_id(spawn_story_id));
+	return								(((const CALifeSimulator *)pself)->spawns().spawn_id(spawn_story_id));
 }
 
-void CALifeSimulator__release					(CALifeSimulator *self, CSE_Abstract *object, bool)
+void CALifeSimulator__release					(CALifeSimulator *pself, CSE_Abstract *object, bool)
 {
-	VERIFY								(self);
-//	self->release						(object,true);
+	VERIFY								(pself);
+//	pself->release						(object,true);
 
 	THROW								(object);
 	CSE_ALifeObject						*alife_object = smart_cast<CSE_ALifeObject*>(object);
 	THROW								(alife_object);
 	if (!alife_object->m_bOnline) {
-		self->release					(object,true);
+		pself->release					(object,true);
 		return;
 	}
 
@@ -291,13 +291,13 @@ void CALifeSimulator__release					(CALifeSimulator *self, CSE_Abstract *object, 
 	Level().Send						(packet,net_flags(TRUE,TRUE));
 }
 
-void CALifeSimulator___release					(CALifeSimulator *self, CSE_Abstract *object)
+void CALifeSimulator___release					(CALifeSimulator *pself, CSE_Abstract *object)
 {
-	 CALifeSimulator__release(self,object,true);
+	 CALifeSimulator__release(pself,object,true);
 }
 
 
-LPCSTR get_level_name							(const CALifeSimulator *self, int level_id)
+LPCSTR get_level_name							(const CALifeSimulator *pself, int level_id)
 {
 	if (level_id <= 0)
 	{
@@ -323,16 +323,16 @@ LPCSTR get_level_name							(const CALifeSimulator *self, int level_id)
 	//return								(result);
 }
 
-CSE_ALifeCreatureActor *get_actor				(const CALifeSimulator *self)
+CSE_ALifeCreatureActor *get_actor				(const CALifeSimulator *pself)
 {
-	THROW								(self);
-	return								(self->graph().actor());
+	THROW								(pself);
+	return								(pself->graph().actor());
 }
 
-CKnownInfoContainer *registry						(const CALifeSimulator *self, const ALife::_OBJECT_ID &id)
+CKnownInfoContainer *registry						(const CALifeSimulator *pself, const ALife::_OBJECT_ID &id)
 {
-	THROW								(self);
-	return								(self->registry(info_portions).object(id, true));
+	THROW								(pself);
+	return								(pself->registry(info_portions).object(id, true));
 }
 
 class CFindByIDPred
@@ -346,11 +346,11 @@ private:
 
 #include "../xrCore/OPFuncs/global_timers.h"
 
-bool has_info									(const CALifeSimulator *self, const ALife::_OBJECT_ID &id, LPCSTR info_id)
+bool has_info									(const CALifeSimulator *pself, const ALife::_OBJECT_ID &id, LPCSTR info_id)
 {
 	//TSP_SCOPED(_, "g_has_info", "spawn");
 	//TSP_BEGIN("g_has_info_registry", "spawn");
-	const CKnownInfoContainer* known_info = registry(self,id);
+	const CKnownInfoContainer* known_info = registry(pself,id);
 	//TSP_END("g_has_info_registry", "spawn");
 	if (!known_info)
 		return							(false);
@@ -364,21 +364,21 @@ bool has_info									(const CALifeSimulator *self, const ALife::_OBJECT_ID &id,
 	return found;
 }
 
-bool dont_has_info								(const CALifeSimulator *self, const ALife::_OBJECT_ID &id, LPCSTR info_id)
+bool dont_has_info								(const CALifeSimulator *pself, const ALife::_OBJECT_ID &id, LPCSTR info_id)
 {
-	THROW								(self);
+	THROW								(pself);
 	// absurdly, but only because of scriptwriters needs
-	return								(!has_info(self,id,info_id));
+	return								(!has_info(pself,id,info_id));
 }
 
-//void disable_info_portion						(const CALifeSimulator *self, const ALife::_OBJECT_ID &id)
+//void disable_info_portion						(const CALifeSimulator *pself, const ALife::_OBJECT_ID &id)
 //{
-//	THROW								(self);
+//	THROW								(pself);
 //}
 
-//void give_info_portion							(const CALifeSimulator *self, const ALife::_OBJECT_ID &id)
+//void give_info_portion							(const CALifeSimulator *pself, const ALife::_OBJECT_ID &id)
 //{
-//	THROW								(self);
+//	THROW								(pself);
 //}
 
 #pragma optimize("s",on)

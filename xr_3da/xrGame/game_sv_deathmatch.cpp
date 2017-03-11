@@ -898,9 +898,9 @@ void	game_sv_Deathmatch::OnPlayerBuyFinished		(ClientID id_who, NET_Packet& P)
 		xr_vector<u16>::iterator	EDI = ItemsToDelete.end();
 		for ( ; IDI != EDI; ++IDI) 
 		{
-			NET_Packet			P;
-			u_EventGen			(P,GE_DESTROY,*IDI);
-			Level().Send(P,net_flags(TRUE,TRUE));
+			NET_Packet			p;
+			u_EventGen			(p,GE_DESTROY,*IDI);
+			Level().Send(p,net_flags(TRUE,TRUE));
 		};
 	};
 
