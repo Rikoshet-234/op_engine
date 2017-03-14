@@ -385,11 +385,13 @@ void CSE_ALifeItemNVDevice::STATE_Write		(NET_Packet	&tNetPacket)
 void CSE_ALifeItemNVDevice::UPDATE_Read		(NET_Packet	&tNetPacket)
 {
 	inherited::UPDATE_Read		(tNetPacket);
-	
-	BYTE F = tNetPacket.r_u8();	
-	m_active					= !!(F & eActive);
-	m_enabled					= !!(F & eEnabled);
-	m_attached					= !!(F & eAttached);
+	if (m_wVersion > 119 || (m_wVersion<119 && !tNetPacket.r_eof())) //second part of if - old object loaded, but new version update updated ^)
+	{
+		BYTE F = tNetPacket.r_u8();	
+		m_active					= !!(F & eActive);
+		m_enabled					= !!(F & eEnabled);
+		m_attached					= !!(F & eAttached);
+	} 
 }
 
 void CSE_ALifeItemNVDevice::UPDATE_Write		(NET_Packet	&tNetPacket)

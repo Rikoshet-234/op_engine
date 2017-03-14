@@ -14,11 +14,11 @@ protected:
 	HUD_SOUND				snd_DeviceOff;
 	HUD_SOUND				snd_DeviceIdle;
 	HUD_SOUND				snd_DeviceBroken;
-	shared_str				m_sDeviceSect;	
 	shared_str				m_sEffectorSect;
 	xr_vector<shared_str>	m_vDisableMaps;
 public:
 	CNightVisionDevice();
+	shared_str				m_sDeviceSect;	
 	virtual ~CNightVisionDevice();
 	virtual void Load(LPCSTR section);
 	void SwitchNightVision();

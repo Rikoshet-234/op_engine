@@ -12,8 +12,8 @@
 #include "InventoryOwner.h"
 #include "../StatGraph.h"
 #include "PhraseDialogManager.h"
-
 #include "step_manager.h"
+
 
 using namespace ACTOR_DEFS;
 
@@ -119,7 +119,7 @@ public:
 public:
 	//information receive & dialogs
 	virtual bool OnReceiveInfo		(shared_str info_id) const;
-	virtual void OnDisableInfo		(shared_str info_id) const;
+	virtual bool OnDisableInfo		(shared_str info_id) const;
 //	virtual void ReceivePdaMessage	(u16 who, EPdaMsg msg, shared_str info_id);
 
 	virtual void	 NewPdaContact		(CInventoryOwner*);
@@ -788,7 +788,9 @@ private:
 
 public:
 	virtual bool				register_schedule				() const {return false;}
+
 };
+
 
 extern bool		isActorAccelerated			(u32 mstate, bool ZoomMode);
 

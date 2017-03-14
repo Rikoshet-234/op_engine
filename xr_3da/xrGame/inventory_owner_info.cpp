@@ -119,7 +119,7 @@ void CInventoryOwner::DumpInfo(shared_str ids) const
 }
 
 
-void CInventoryOwner::OnDisableInfo(shared_str info_id) const
+bool CInventoryOwner::OnDisableInfo(shared_str info_id) const
 {
 	VERIFY( info_id.size() );
 	//удалить запись из реестра
@@ -132,8 +132,10 @@ void CInventoryOwner::OnDisableInfo(shared_str info_id) const
 	CKnownInfoContainer& known_info = m_known_info_registry->registry().objects();
 
 	auto it = known_info.find(info_id);
-	if( known_info.end() == it)	return;
+	if( known_info.end() == it)	
+		return false;
 	known_info.erase(it);
+	return true;
 }
 
 void CInventoryOwner::TransferInfo(shared_str info_id, bool add_info) const

@@ -153,6 +153,12 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector &vControlAccel, float &Ju
 			mstate_wf &= ~mcAnyMove;
 			mstate_wf &= ~mcJump;
 		}
+		if(mstate_wf&mcJump)
+		{
+			mstate_wishful	&=		~mcJump;
+			mstate_real		&=		~mcJump;
+			mstate_wf &= ~mcJump;
+		}
 			//character_physics_support()->movement()->EnableCharacter();
 		//return;
 	}
@@ -552,26 +558,26 @@ bool	CActor::CanMove				()
 {
 	if( conditions().IsCantWalk() )
 	{
-		if(mstate_wishful&mcAnyMove)
+		if(mstate_wishful&mcAnyMove || mstate_wishful&mcJump)
 		{
 			HUD().GetUI()->AddInfoMessage("cant_walk");
 		}
 		return false;
-	}else
+	}
+	
 	if( conditions().IsCantWalkWeight() )
 	{
-		if(mstate_wishful&mcAnyMove)
+		if(mstate_wishful&mcAnyMove || mstate_wishful&mcJump)
 		{
 			HUD().GetUI()->AddInfoMessage("cant_walk_weight");
 		}
 		return false;
-	
 	}
 
 	if(IsTalking())
 		return false;
-	else
-		return true;
+
+	return true;
 }
 
 void CActor::StopAnyMove()

@@ -19,6 +19,7 @@
 #include "game_object_space.h"
 #include "script_callback_ex.h"
 #include "item_place_change_enum.h"
+#include "UIGameSP.h"
 
 using namespace InventoryUtilities;
 
@@ -994,6 +995,7 @@ CInventoryItem *CInventory::get_object_by_id(ALife::_OBJECT_ID tObjectID)
 #include "game_object_space.h"
 #include "script_callback_ex.h"
 #include "script_game_object.h"
+#include "HUDManager.h"
 bool CInventory::Eat(PIItem pIItem)
 {
 	R_ASSERT(pIItem->m_pCurrentInventory==this);
@@ -1004,6 +1006,13 @@ bool CInventory::Eat(PIItem pIItem)
 	CEntityAlive *entity_alive = smart_cast<CEntityAlive*>(m_pOwner);
 	R_ASSERT				(entity_alive);
 	
+	if (Actor()->get_state()&mcClimb)
+	{
+		HUD().GetUI()->AddInfoMessage("cant_eat_any");
+		HUD().GetUI()->UIGame()->HideShownDialogs();
+		return true;
+	}
+
 	pItemToEat->UseBy		(entity_alive);
 
 	if(IsGameTypeSingle() && Actor()->m_inventory == this)

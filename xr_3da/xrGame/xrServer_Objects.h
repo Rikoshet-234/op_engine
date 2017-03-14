@@ -152,7 +152,9 @@
 // 118 - CALifeHumanBrain				removed property m_tpKnownCustomers, sad but true
 // 119  -
 //------------------------------------------------------------------------------
-#define SPAWN_VERSION	u16(118)
+// winsor, op21
+// 120 - CSE_ALifeItemNVDevice - change type from config for exists pnv, for backward compability
+#define SPAWN_VERSION	u16(120)
 
 SERVER_ENTITY_DECLARE_BEGIN2(CSE_Shape,ISE_Shape,CShapeData)
 public:

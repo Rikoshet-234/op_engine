@@ -142,19 +142,22 @@ bool CActor::OnReceiveInfo(shared_str info_id) const
 }
 
 
-void CActor::OnDisableInfo(shared_str info_id) const
+bool CActor::OnDisableInfo(shared_str info_id) const
 {
-	CInventoryOwner::OnDisableInfo(info_id);
-
+	if (!CInventoryOwner::OnDisableInfo(info_id))
+		return false;
+	callback(GameObject::OnDisableInfoPortion)(lua_game_object(), *info_id);
 	if(!HUD().GetUI())
-		return;
+		return false;
 
 	//только если находимся в режиме single
 	CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-	if(!pGameSP) return;
+	if(!pGameSP) 
+		return false;
 
 	if(pGameSP->TalkMenu->IsShown())
 		pGameSP->TalkMenu->NeedUpdateQuestions();
+	return true;
 }
 
 void  CActor::ReceivePhrase		(DIALOG_SHARED_PTR& phrase_dialog)

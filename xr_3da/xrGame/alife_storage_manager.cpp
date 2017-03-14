@@ -57,7 +57,7 @@ void CALifeStorageManager::save	(LPCSTR save_name, bool update_name)
 		spawns().save			(stream);
 		objects().save			(stream);
 		registry().save			(stream);
-		keyvals().save			(stream);
+		keyvals().save			(stream);	
 
 		source_count			= stream.tell();
 		void					*source_data = stream.pointer();
@@ -93,12 +93,12 @@ void CALifeStorageManager::load	(void *buffer, const u32 &buffer_size, LPCSTR fi
 	IReader						source(buffer,buffer_size);
 	header().load				(source);
 	time_manager().load			(source);
+	keyvals().load				(source);
 	spawns().load				(source,file_name);
 
 #ifdef PRIQUEL
 	graph().on_load				();
 #endif // PRIQUEL
-
 	objects().load				(source);
 
 	VERIFY						(can_register_objects());
@@ -113,8 +113,6 @@ void CALifeStorageManager::load	(void *buffer, const u32 &buffer_size, LPCSTR fi
 		register_object			((*I).second,false);
 	} 
 	registry().load				(source);
-
-	keyvals().load				(source);
 
 	can_register_objects		(true);
 	

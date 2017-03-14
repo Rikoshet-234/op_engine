@@ -109,7 +109,7 @@ public:
 	//персонаж получил новую порцию информации
 	virtual bool OnReceiveInfo	(shared_str info_id) const;
 	//убрать информацию
-	virtual void OnDisableInfo	(shared_str info_id) const;
+	virtual bool OnDisableInfo	(shared_str info_id) const;
 	//передать/удалить информацию через сервер
 	virtual void TransferInfo	(shared_str info_id, bool add_info) const;
 	//есть ли информация у персонажа

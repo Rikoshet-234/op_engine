@@ -14,6 +14,7 @@
 #include "xr_time.h"
 #include "character_info_defs.h"
 #include "inventory_space.h"
+//#include "NightVisionDevice.h"
 
 enum EPdaMsg;
 enum ESoundTypes;
@@ -81,6 +82,7 @@ struct STasks;
 class CCar;
 class CDangerObject;
 class CScriptGameObject;
+class CNightVisionDevice;
 
 #ifdef DEBUG
 	template <typename _object_type>
@@ -218,6 +220,7 @@ public:
 			_DECLARE_FUNCTION10(IsTorch					,			bool);
 			_DECLARE_FUNCTION10(IsWeaponGL				,			bool);
 			_DECLARE_FUNCTION10(IsInventoryBox			,			bool);
+			_DECLARE_FUNCTION10(IsPNV					,			bool);
 														
 			CScriptEntityAction	*GetCurrentAction	() const;
 			void				AddAction			(const CScriptEntityAction *tpEntityAction, bool bHighPriority = false);
@@ -618,6 +621,7 @@ public:
 			luabind::object		GetImmunitiesTable() const;
 			luabind::object		GetImmunitiesFromBeltTable() const;
 			bool				InventoryMoveItem(CScriptGameObject* item,u32 to,bool force) const;
+			CNightVisionDevice*	GetCurrentPNV();
 			
 	DECLARE_SCRIPT_REGISTER_FUNCTION
 };

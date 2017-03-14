@@ -164,8 +164,11 @@ luabind::object CALifeKeyvalContainer::get(LPCSTR key)
 luabind::object CALifeKeyvalContainer::get(LPCSTR key, luabind::object const& def_value)
 {
 	luabind::object result=get(key);
-	if (!result.is_valid() || result.type()==LUA_TNIL)
-		return def_value;
+	if ((!result.is_valid() || result.type()==LUA_TNIL) && def_value.type()!=LUA_TNIL)
+	{
+		set(key,def_value);
+		return get(key);
+	}
 	return result;
 }
 

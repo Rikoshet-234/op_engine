@@ -243,6 +243,7 @@ bool CScriptGameObject::IsInvBoxEmpty()
 #include "BottleItem.h"
 #include "Torch.h"
 #include "InventoryBox.h"
+#include "NightVisionDevice.h"
 #include "ai/monsters/basemonster/base_monster.h"
 
 #define TEST_OBJECT_CLASS(A,B)\
@@ -280,6 +281,7 @@ TEST_OBJECT_CLASS(CScriptGameObject::IsBottleItem,			CBottleItem)
 TEST_OBJECT_CLASS(CScriptGameObject::IsTorch,				CTorch)
 TEST_OBJECT_CLASS(CScriptGameObject::IsWeaponGL,			CWeaponMagazinedWGrenade)
 TEST_OBJECT_CLASS(CScriptGameObject::IsInventoryBox,		CInventoryBox)
+TEST_OBJECT_CLASS(CScriptGameObject::IsPNV,					CNightVisionDevice)
 		
 		
 		

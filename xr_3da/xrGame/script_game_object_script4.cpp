@@ -17,6 +17,7 @@
 #include "script_storage_space.h"
 #include "script_engine.h"
 #include "CustomMonster.h"
+#include "CustomOutfit.h"
 #include "Actor.h"
 #include "Actor_Flags.h"
 #include "Inventory.h"
@@ -29,7 +30,7 @@
 #include "ui/UITalkWnd.h"
 #include "ui/UITradeWnd.h"
 #include "UIGameSP.h"
-#include <Windows.h>
+#include "NightVisionDevice.h"
 
 using namespace luabind;
 
@@ -43,7 +44,7 @@ void CInventoryItem::script_register(lua_State *L)
 		];
 }
 
-#pragma region functions for export
+
 
 u32 CScriptGameObject::GetSlot() const
 {
@@ -323,6 +324,7 @@ luabind::object	CScriptGameObject::GetImmunitiesFromBeltTable() const
 
 #pragma endregion
 
+#pragma region get main precreated  windows
 CUIInventoryWnd* get_inventory_wnd()
 {
 	CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
@@ -340,6 +342,7 @@ CUITradeWnd* get_trade_wnd()
 	CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
 	return pGameSP->TalkMenu->GetTradeWnd();
 }
+#pragma endregion
 
 #pragma region add functionality for callback,returning bool value
 
@@ -397,6 +400,17 @@ void CScriptGameObject::IterateInventoryBoxId(luabind::functor<void> functor) co
 
 #pragma endregion
 
+CNightVisionDevice* CScriptGameObject::GetCurrentPNV()
+{
+	CActor* pActor = smart_cast<CActor*>(&object());	
+	if(!pActor) 
+		return nullptr;
+	CCustomOutfit* outfit = smart_cast<CCustomOutfit*>(pActor->inventory().ItemFromSlot(OUTFIT_SLOT));
+	if (outfit && outfit->GetNightVisionDevice())
+		return outfit->GetNightVisionDevice();
+	CNightVisionDevice* nvd = smart_cast<CNightVisionDevice*>(pActor->inventory().ItemFromSlot(PNV_SLOT));
+	return nvd;
+}
 
 class_<CScriptGameObject> &script_register_game_object3(class_<CScriptGameObject> &instance)
 {
@@ -447,8 +461,10 @@ class_<CScriptGameObject> &script_register_game_object3(class_<CScriptGameObject
 		.def("is_torch",					&CScriptGameObject::IsTorch)
 		.def("is_weaponGL",					&CScriptGameObject::IsWeaponGL)
 		.def("is_inventory_box",			&CScriptGameObject::IsInventoryBox)
+		.def("is_pnv",						&CScriptGameObject::IsPNV)
 		.def("iterate_box_obj",				&CScriptGameObject::IterateInventoryBoxObject)
 		.def("iterate_box_obj",				&CScriptGameObject::IterateInventoryBoxId)
+		.def("get_current_pnv",				&CScriptGameObject::GetCurrentPNV)
 		
 	;
 

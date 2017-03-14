@@ -64,6 +64,7 @@ namespace GameObject {
 		OnInventoryItemPlaceChange,
 		OnKeyboardPress,
 		OnPrepareItemInfo,
+		OnDisableInfoPortion,
 		eDummy = u32(-1),
 	};
 };
