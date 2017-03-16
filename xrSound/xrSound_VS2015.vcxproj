@@ -21,6 +21,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{CCCA7859-EB86-493E-9B53-C4235F45B3C5}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
+    <ProjectName>xrSound</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'" Label="Configuration">
@@ -74,7 +75,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(BinOutputDir)\</OutDir>
     <IntDir>$(IntermediateOutputDir)\</IntDir>
-    <IgnoreImportLibrary>true</IgnoreImportLibrary>
+    <IgnoreImportLibrary>false</IgnoreImportLibrary>
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(SolutionDir)\SDK\eax\Include;$(SolutionDir)\SDK\Xiph\Include;$(SolutionDir)\SDK\dx9sdk\dx9sdk\include;$(SolutionDir)\SDK\OpenAL\Include;$(SolutionDir)\xrCore;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)\SDK\eax;$(LibrariesOutputDir)\;$(SolutionDir)\SDK\OpenAL\libs;$(SolutionDir)\SDK\eax\Include;$(SolutionDir)\SDK\Xiph\Libs;$(LibraryPath)</LibraryPath>
@@ -105,7 +106,7 @@
       <IntrinsicFunctions>false</IntrinsicFunctions>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
-      <PreprocessorDefinitions>WIN32;DEBUG;_WINDOWS;_USRDLL;XRSOUND_EXPORTS;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_ALLOW_RTCc_IN_STL;_SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS;WIN32;DEBUG;_WINDOWS;_USRDLL;XRSOUND_EXPORTS;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>false</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -129,7 +130,7 @@
     </ClCompile>
     <Link>
       <AdditionalOptions>/NODEFAULTLIB:LIBCMTD /ignore:4099 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>vorbisfile_static_d.lib;ogg_static_d.lib;OpenAL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>vorbisfile_static_d.lib;ogg_static_d.lib;OpenAL32.lib;legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <GenerateMapFile>false</GenerateMapFile>
@@ -197,7 +198,7 @@
       <OmitFramePointers>true</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;XRSOUND_EXPORTS;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS;WIN32;NDEBUG;_WINDOWS;_USRDLL;XRSOUND_EXPORTS;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling />
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -349,15 +350,15 @@
     <ClCompile Include="SoundRender_Cache.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\xrCDB\xrCDB.vcxproj">
+    <ProjectReference Include="..\xrCDB\xrCDB_VS2015.vcxproj">
       <Project>{a19b1df2-82ec-4364-8bdf-85d13a1c89b5}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\xrCore\xrCore.vcxproj">
+    <ProjectReference Include="..\xrCore\xrCore_VS2015.vcxproj">
       <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\xrOpenAL\OpenAL-Windows\Router\Router.vcxproj">
+    <ProjectReference Include="..\xrOpenAL\OpenAL-Windows\Router\Router_VS2015.vcxproj">
       <Project>{566551f4-4ef1-4cb4-a131-f982e7606907}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>

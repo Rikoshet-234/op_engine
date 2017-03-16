@@ -32,7 +32,10 @@ template<class T>
 		public:
 		
 		class iterator;
-		typedef  class iterator
+#if _MSC_VER < 1900
+		typedef
+#endif
+            class iterator
 			{
 				
 						T		*my_ptr;

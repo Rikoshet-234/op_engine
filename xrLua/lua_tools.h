@@ -13,7 +13,9 @@ extern "C" {
 	#define LUATOOLS_EXPORT __declspec(dllexport)
 #else
 	#define LUATOOLS_EXPORT __declspec(dllimport)
+#if _MSC_VER < 1900
 	#pragma comment(lib,"xrLua")
+#endif
 #endif 
 
 

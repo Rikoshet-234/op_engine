@@ -3,9 +3,9 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
     <BinOutputDir>c:\Games\S.T.A.L.K.E.R. Shadow of Chernobyl\bin_vs2015\</BinOutputDir>
-    <LibrariesOutputDir>$(SolutionDir)\xr_build\libraries\$(Platform)\$(Configuration)</LibrariesOutputDir>
-    <IntermediateOutputDir>$(SolutionDir)\xr_build\intermediate\$(Platform)\$(Configuration)\$(ProjectName)</IntermediateOutputDir>
-    <BinariesOutputDir>$(SolutionDir)\xr_build\binaries\$(Platform)\$(Configuration)</BinariesOutputDir>
+    <LibrariesOutputDir>$(SolutionDir)\xr_build\libraries\$(PlatformTarget)_$(PlatformToolset)\$(Configuration)</LibrariesOutputDir>
+    <IntermediateOutputDir>$(SolutionDir)\xr_build\intermediate\$(PlatformTarget)_$(PlatformToolset)\$(Configuration)\$(ProjectName)</IntermediateOutputDir>
+    <BinariesOutputDir>$(SolutionDir)\xr_build\binaries\$(PlatformTarget)_$(PlatformToolset)\$(Configuration)</BinariesOutputDir>
   </PropertyGroup>
   <PropertyGroup />
   <ItemDefinitionGroup />

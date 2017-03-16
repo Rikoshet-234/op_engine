@@ -12,10 +12,14 @@
     //! declaration of 'rLineInfo' hides previous local declaration
     //! jarni: I hope BugTrap is written well and this is not an error
     #pragma warning(disable:4456)
-
     //! non-member operator new or delete functions may not be declared inline
     //! jarni: VS2015 doesn't line inline new, can't do it not inlined because it doesn't see it sometimes.
     #pragma warning(disable:4595)
+    //! "<hash_map> is deprecated and will be REMOVED. Please use <unordered_map>. You can define _SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS to acknowledge that you have received this warning."
+    //! jarni: This will be removed when unordered_map will be used instead of hash_map
+    #ifndef _SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS
+    #define _SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS
+    #endif
 #endif
 
 #include "stdafx.h"

@@ -282,7 +282,11 @@ XRCORE_API		BOOL			is_stack_ptr		( void* _ptr)
 #if _MSC_VER >= 2000
 void*   operator new(size_t size)
 { 
-    return Memory.mem_alloc(size ? size : 1); 
+#ifdef DEBUG_MEMORY_NAME
+    return Memory.mem_alloc(size ? size : 1, "C++ NEW"); 
+#else
+    return Memory.mem_alloc(size ? size : 1);
+#endif
 }
 
 void    operator delete(void *p)
@@ -292,7 +296,11 @@ void    operator delete(void *p)
 
 void*	operator new[](size_t size)
 {	
+#ifdef DEBUG_MEMORY_NAME
+    return Memory.mem_alloc(size ? size : 1, "C++ NEW");
+#else
     return Memory.mem_alloc(size ? size : 1);
+#endif
 }
 
 void	operator delete[](void* p){	
