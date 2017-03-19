@@ -1330,18 +1330,56 @@ bool CUIXmlInit::InitListBox(CUIXml& xml_doc, const char* path, int index, CUILi
 bool CUIXmlInit::InitTrackBar(CUIXml& xml_doc, const char* path, int index, CUITrackBar* pWnd)
 {
 	InitWindow			(xml_doc, path, 0, pWnd);
-	
 	int is_integer		= xml_doc.ReadAttribInt(path, index, "is_integer", 0);
 	pWnd->SetType		(!is_integer);
 	InitOptionsItem		(xml_doc, path, 0, pWnd);
-
 	int invert			= xml_doc.ReadAttribInt(path, index, "invert", 0);
 	pWnd->SetInvert		(!!invert);
 	float step			= xml_doc.ReadAttribFlt(path, index, "step", 0.1f);
 	pWnd->SetStep		(step);
-	
-
 	return				true;
+}
+
+bool CUIXmlInit::InitTrackBarCustom(CUIXml& xml_doc, const char* path, int index, CUITrackBarCustom* pWnd)
+{
+	InitWindow			(xml_doc, path, 0, pWnd);
+	int is_integer		= xml_doc.ReadAttribInt(path, index, "is_integer", 0);
+	pWnd->SetType		(!is_integer);
+	int invert			= xml_doc.ReadAttribInt(path, index, "invert", 0);
+	pWnd->SetInvert		(!!invert);
+	float step			= xml_doc.ReadAttribFlt(path, index, "step", 0.1f);
+	pWnd->SetStep		(step);
+	float max			= xml_doc.ReadAttribFlt(path, index, "max", 1.0f);
+	pWnd->SetMaxValue		(max);
+	float min			= xml_doc.ReadAttribFlt(path, index, "min", 0.0f);
+	pWnd->SetMinValue		(min);
+	float value			= xml_doc.ReadAttribFlt(path, index, "value", 0.0f);
+	pWnd->SetValue		(value);
+	return				true;
+}
+
+bool CUIXmlInit::InitComboBoxCustom(CUIXml& xml_doc, const char* path, int index, CUIComboBoxCustom* pWnd)
+{
+	pWnd->SetListLength(xml_doc.ReadAttribInt(path, index, "list_length", 4));
+	pWnd->SetitemHeight(xml_doc.ReadAttribFlt(path, index, "item_height", 1));
+
+	string512 _path;
+	strconcat(sizeof(_path),_path, path, ":text_box");
+	InitWindow(xml_doc,_path,index,pWnd);
+	InitTexture(xml_doc,_path,index,pWnd);
+
+	strconcat(sizeof(_path),_path, path, ":text_box:button");
+	InitButton(xml_doc,_path,index,pWnd->m_pExpandButton);
+	pWnd->m_pExpandButton->SetWndPos(Fvector2().set(pWnd->GetWidth()-pWnd->m_pExpandButton->GetWidth()-2,pWnd->GetHeight()/2-pWnd->m_pExpandButton->GetWidth()/2));
+
+	pWnd->m_pTextBox->SetWndRect(Frect().set(0,0,pWnd->m_pExpandButton->GetWndPos().x-2,pWnd->m_fItemHeight));
+
+	strconcat(sizeof(_path),_path, path, ":list");
+	InitWindow(xml_doc,_path,index,pWnd->m_pItemsList);
+	InitTexture(xml_doc,_path,index,pWnd->m_pItemsList);
+	pWnd->m_pItemsList->SetWidth(pWnd->m_pTextBox->GetWidth());
+
+	return true;
 }
 
 bool CUIXmlInit::InitComboBox(CUIXml& xml_doc, const char* path, int index, CUIComboBox* pWnd){

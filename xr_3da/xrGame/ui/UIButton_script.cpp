@@ -67,6 +67,15 @@ void CUIButton::script_register(lua_State *L)
 		class_<CUITrackBar, CUIWindow>("CUITrackBar")
 		.def(							constructor<>())
 		.def("GetCheck",				&CUITrackBar::GetCheck)
-		.def("SetCheck",				&CUITrackBar::SetCheck)
+		.def("SetCheck",				&CUITrackBar::SetCheck),
+
+		class_<CUITrackBarCustom, CUITrackBar>("CUITrackBarCustom")
+		.def(							constructor<>())
+		.def("SetValue",				&CUITrackBarCustom::SetValue)
+		.def("GetValue",				&CUITrackBarCustom::GetValue)
+		.def("SetStep",					&CUITrackBarCustom::SetStep)		
+		.def("SetMaxValue",				&CUITrackBarCustom::SetMaxValue)
+		.def("SetMinValue",				&CUITrackBarCustom::SetMinValue)
+		.def("ShowDynamicValue",		&CUITrackBarCustom::ShowDynamicValue)
 	];
 }

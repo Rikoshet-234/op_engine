@@ -173,6 +173,15 @@ CUIComboBox* CScriptXmlInit::InitComboBox(LPCSTR path, CUIWindow* parent){
 	return pWnd;
 }
 
+CUIComboBoxCustom* CScriptXmlInit::InitComboBoxCustom(LPCSTR path, CUIWindow* parent){
+	CUIComboBoxCustom* pWnd = xr_new<CUIComboBoxCustom>();
+	CUIXmlInit::InitComboBoxCustom(m_xml, path, 0, pWnd);
+	pWnd->SetAutoDelete(true);
+	_attach_child(pWnd, parent);
+//.	if(parent) parent->AttachChild(pWnd);
+	return pWnd;
+}
+
 CUIButton* CScriptXmlInit::InitButton(LPCSTR path, CUIWindow* parent){
 	CUIButton* pWnd = xr_new<CUIButton>();
 	CUIXmlInit::InitButton(m_xml, path, 0, pWnd);
@@ -268,6 +277,15 @@ CUITrackBar* CScriptXmlInit::InitTrackBar(LPCSTR path, CUIWindow* parent){
 	return							pWnd;	
 }
 
+CUITrackBarCustom* CScriptXmlInit::InitTrackBarCustom(LPCSTR path, CUIWindow* parent)
+{
+	CUITrackBarCustom* pWnd				= xr_new<CUITrackBarCustom>();
+	CUIXmlInit::InitTrackBarCustom		(m_xml, path, 0, pWnd);
+	pWnd->SetAutoDelete				(true);
+	_attach_child					(pWnd, parent);
+	return							pWnd;
+}
+
 CUIProgressBar* CScriptXmlInit::InitProgressBar(LPCSTR path, CUIWindow* parent)
 {
 	CUIProgressBar* pWnd			= xr_new<CUIProgressBar>();
@@ -336,6 +354,7 @@ void CScriptXmlInit::script_register(lua_State *L){
 		.def("InitSpinFlt",				&CScriptXmlInit::InitSpinFlt)
 		.def("InitSpinText",			&CScriptXmlInit::InitSpinText)
 		.def("InitComboBox",			&CScriptXmlInit::InitComboBox)		
+		.def("InitComboBoxCustom",		&CScriptXmlInit::InitComboBoxCustom)		
 		.def("InitButton",				&CScriptXmlInit::InitButton)
 		.def("Init3tButton",			&CScriptXmlInit::Init3tButton)
 		.def("InitList",				&CScriptXmlInit::InitList)
@@ -344,6 +363,7 @@ void CScriptXmlInit::script_register(lua_State *L){
 		.def("InitMapList",				&CScriptXmlInit::InitMapList)
 		.def("InitMapInfo",				&CScriptXmlInit::InitMapInfo)
 		.def("InitTrackBar",			&CScriptXmlInit::InitTrackBar)
+		.def("InitTrackBarCustom",		&CScriptXmlInit::InitTrackBarCustom)
 		.def("InitKeyBinding",			&CScriptXmlInit::InitKeyBinding)
 		.def("InitMMShniaga",			&CScriptXmlInit::InitMMShniaga)
 		.def("InitScrollView",			&CScriptXmlInit::InitScrollView)

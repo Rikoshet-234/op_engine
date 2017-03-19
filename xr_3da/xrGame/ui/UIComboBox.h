@@ -14,6 +14,7 @@
 #include "UIListBox.h"
 #include "UIInteractiveBackground.h"
 #include "UIOptionsItem.h"
+#include "UICheckButton.h"
 
 class CUIListBoxItem;
 
@@ -38,7 +39,7 @@ public:
 
 	// methods
 	CUIListBox*			GetListWnd				();
-			void		SetListLength			(int length);
+	virtual void		SetListLength			(int length);
 			void		SetVertScroll			(bool bVScroll = true){m_list.SetFixedScrollBar(bVScroll);};
 //.	virtual void		AddItem					(LPCSTR str, bool bSelected);
 	CUIListBoxItem*		AddItem_				(LPCSTR str, int _data);
@@ -70,6 +71,7 @@ protected:
 	CUIFrameWindow		m_frameWnd;
 
 	u32					m_textColor[2];
+	float				m_fItemHeight;
 public:
 	CUIListBox			m_list;
 	void				SetTextColor			(u32 color)			{m_textColor[0] = color;};
@@ -82,3 +84,56 @@ protected:
 add_to_type_list(CUIComboBox)
 #undef script_type_list
 #define script_type_list save_type_list(CUIComboBox)
+
+class CUIComboBoxCustom: public CUIStatic
+{
+	friend class CUIXmlInit;
+	typedef enum{
+		LIST_EXPANDED, 
+		LIST_FONDED    
+	} E_COMBO_STATE;
+
+	CUIStatic* m_pTextBox;
+	CUIStatic* m_pItemsList;
+	CUIButton* m_pExpandButton;
+
+	int m_iListItemsSize;
+	float m_fItemHeight;
+	float m_fBackup;
+	CUIWindow* m_pOwner;
+	void RecalcListHeight();
+public:
+	CUIComboBoxCustom();
+	virtual	~CUIComboBoxCustom();
+	void Init(float x, float y, float width,float height) override;
+	void Init();
+	void SendMessage(CUIWindow *pWnd, s16 msg, void* pData = nullptr) override;
+	//CUIListBoxItem* AddItem(LPCSTR str, int _data);
+	//void SetCurrentValue() override;
+	//void SaveValue() override;
+	void SetListLength(int length);
+	void SetitemHeight(float height);
+	void SetOwner(CUIWindow* owner);
+
+protected:	
+	DECLARE_SCRIPT_REGISTER_FUNCTION
+};
+
+add_to_type_list(CUIComboBoxCustom)
+#undef script_type_list
+#define script_type_list save_type_list(CUIComboBoxCustom)
+
+//class CUIComboBoxCustom: public CUIComboBox 
+//{
+//public:
+//	CUIListBoxItem* AddItem(LPCSTR str, int _data);
+//	void SetCurrentValue() override;
+//	void SaveValue() override;
+//	void SetListLength(int length) override;
+//	void Init(float x, float y, float width, float height) override;	
+//	DECLARE_SCRIPT_REGISTER_FUNCTION
+//};
+//
+//add_to_type_list(CUIComboBoxCustom)
+//#undef script_type_list
+//#define script_type_list save_type_list(CUIComboBoxCustom)
