@@ -97,22 +97,6 @@ BOOL CWeaponMagazined::net_Spawn		(CSE_Abstract* DC)
 	return inherited::net_Spawn(DC);
 }
 
-bool CWeaponMagazined::PlayAnimation(MotionSVec animation,BOOL mixMode,LPCSTR debugText,CHudItem* callback) 
-{
-	if(animation.size()>0)
-	{
-		m_pHUD->animPlay(random_anim(animation), mixMode, callback,GetState());
-#ifdef SHOW_ANIM_WEAPON_PLAYS
-		if (debugText!=nullptr)	Msg("Done %s",debugText);
-#endif
-		return true;
-	}
-#ifdef SHOW_ANIM_WEAPON_PLAYS
-	if (debugText!=nullptr)	Msg("Fail %s",debugText);
-#endif
-	return false;
-}
-
 void CWeaponMagazined::Load	(LPCSTR section)
 {
 	inherited::Load		(section);
