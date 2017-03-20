@@ -216,7 +216,7 @@ public:
 	virtual void	PlayAnimShoot();
 	virtual void	PlayReloadSound		();
 	virtual bool			TryPlayAnimIdle	();
-	bool			PlayAnimation(MotionSVec animation,BOOL mixMode,LPCSTR debugText=nullptr,CHudItem* callback=nullptr);
+	
 
 };
 

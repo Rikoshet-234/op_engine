@@ -184,10 +184,12 @@ void CWeaponKnife::OnAnimationEnd(u32 state)
 			if(m_attackStart) 
 			{
 				m_attackStart = false;
+				MotionID mID;
 				if(GetState()==eFire)
-					m_pHUD->animPlay(random_anim(mhud_attack_e), TRUE, this, GetState());
+					mID=random_anim(mhud_attack_e);
 				else
-					m_pHUD->animPlay(random_anim(mhud_attack2_e), TRUE, this, GetState());
+					mID=random_anim(mhud_attack2_e);
+				m_pHUD->animPlay(mID, TRUE, this, GetState());
 
 				Fvector	p1, d; 
 				p1.set(get_LastFP()); 
@@ -216,11 +218,12 @@ void CWeaponKnife::state_Attacking	(float)
 void CWeaponKnife::switch2_Attacking	(u32 state)
 {
 	if(m_bPending)	return;
-
+	MotionID mID;
 	if(state==eFire)
-		m_pHUD->animPlay(random_anim(mhud_attack),		TRUE, this, state);
+		mID=random_anim(mhud_attack);
 	else //eFire2
-		m_pHUD->animPlay(random_anim(mhud_attack2),		TRUE, this, state);
+		mID=random_anim(mhud_attack2);
+	m_pHUD->animPlay(mID,TRUE, this, state);
 
 	m_attackStart	= true;
 	m_bPending		= true;
@@ -230,9 +233,13 @@ void CWeaponKnife::switch2_Idle	()
 {
 	VERIFY(GetState()==eIdle);
 	if (ParentIsActor() && g_actor->get_state_wishful()&mcAnyMove)
+	{
 		onMovementChanged(mcAnyMove);
+	}
 	else
+	{
 		m_pHUD->animPlay(random_anim(mhud_idle), TRUE, this, GetState());
+	}
 	m_bPending = false;
 }
 
@@ -339,26 +346,53 @@ void CWeaponKnife::GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, 
 	icon_sect_name	= *cNameSect();
 }
 
+void CWeaponKnife::net_Export(NET_Packet& P)
+{
+	iAmmoElapsed=0;
+	inherited::net_Export(P);
+}
+
+void CWeaponKnife::save(NET_Packet& output_packet)
+{
+	iAmmoElapsed=0;
+	inherited::save	(output_packet);
+}
+
+#include "OPFuncs/utils.h"
 void CWeaponKnife::onMovementChanged	(ACTOR_DEFS::EMoveCommand cmd)
 {
 	if (GetState()!=eIdle)
 		return;
 	CEntity::SEntityState st;
 	g_actor->g_State(st);
-	if (st.bSprint && st.fVelocity > 1) 
+	if (st.bSprint) 
 	{
+		MotionID mID;
 		if (mhud_idle_sprint.size()>0)
-			m_pHUD->animPlay(random_anim(mhud_idle_sprint), TRUE, this,  eIdle);
+		{
+			mID=random_anim(mhud_idle_sprint);
+		}
 		else
-			m_pHUD->animPlay(random_anim(mhud_idle), TRUE, this, eIdle);
+		{
+			mID=random_anim(mhud_idle);
+		}
+		m_pHUD->animPlay(mID, TRUE, this, eIdle);
 	}
 	else if (!st.bCrouch && g_actor->AnyMove())
 	{
+		MotionID mID;
 		if (mhud_idle_moving.size()>0)
-			m_pHUD->animPlay(random_anim(mhud_idle_moving), TRUE, this,  eIdle);
+		{
+			mID=random_anim(mhud_idle_moving);
+		}
 		else
-			m_pHUD->animPlay(random_anim(mhud_idle), TRUE, this, eIdle);
+		{
+			mID=random_anim(mhud_idle);
+		}
+		m_pHUD->animPlay(mID, TRUE, this,  eIdle);
 	}
 	else
+	{
 		SwitchState(GetState() );
+	}
 }
