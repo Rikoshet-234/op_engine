@@ -103,7 +103,7 @@ public:
 
 //	void					animGet				(MotionSVec& lst, LPCSTR prefix);
 	void					signal_HideComplete	();
-
+	bool			PlayAnimation(MotionSVec animation,BOOL mixMode,LPCSTR debugText=nullptr,CHudItem* callback=nullptr);
 //////////////////////////////////////////////////////////////////////////
 //  InventoryItem methods
 //////////////////////////////////////////////////////////////////////////

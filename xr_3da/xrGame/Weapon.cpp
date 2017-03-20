@@ -501,7 +501,6 @@ BOOL CWeapon::net_Spawn		(CSE_Abstract* DC)
 	//Msg("[%s]: Magazine size [%d] Ammo Elapsed [%d]",E->name_replace(),iMagazineSize,iAmmoElapsed);
 	if (iAmmoElapsed>iMagazineSize)
 	{
-		
 		Msg("~ WARNING CWeapon::net_Spawn invalid ammoElapsed for [%s] [%i] [%i], try to recovery.",E->name_replace(),iAmmoElapsed,iMagazineSize);
 		iAmmoElapsed=iMagazineSize;
 		if (m_fCondition>1.0f && iMagazineSize>0)
@@ -1734,4 +1733,20 @@ void CWeapon::ZoomDec()
 
 	m_fZoomFactor	+=delta;
 	clamp(m_fZoomFactor,m_fScopeZoomFactor, min_zoom_factor);
+}
+
+bool CWeapon::PlayAnimation(MotionSVec animation,BOOL mixMode,LPCSTR debugText,CHudItem* callback) 
+{
+	if(animation.size()>0)
+	{
+		m_pHUD->animPlay(random_anim(animation), mixMode, callback,GetState());
+#ifdef SHOW_ANIM_WEAPON_PLAYS
+		if (debugText!=nullptr)	Msg("Done %s",debugText);
+#endif
+		return true;
+	}
+#ifdef SHOW_ANIM_WEAPON_PLAYS
+	if (debugText!=nullptr)	Msg("Fail %s",debugText);
+#endif
+	return false;
 }

@@ -38,7 +38,6 @@ protected:
 	void				state_Attacking				(float dt);
 
 	virtual void		KnifeStrike					(const Fvector& pos, const Fvector& dir);
-
 	float				fWallmarkSize;
 	u16					knife_material_idx;
 
@@ -72,6 +71,9 @@ public:
 	virtual void	onMovementChanged	(ACTOR_DEFS::EMoveCommand cmd);
 	virtual void		StartIdleAnim					();
 	virtual void		GetBriefInfo					(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count);
+
+	void			net_Export			(NET_Packet& P) override;
+	void			save				(NET_Packet &output_packet) override;
 
 	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
