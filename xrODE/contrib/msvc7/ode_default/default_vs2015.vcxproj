@@ -117,7 +117,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">
     <OutDir>$(BinOutputDir)\</OutDir>
     <IntDir>$(IntermediateOutputDir)\</IntDir>
-    <IgnoreImportLibrary>true</IgnoreImportLibrary>
+    <IgnoreImportLibrary>false</IgnoreImportLibrary>
     <LinkIncremental>false</LinkIncremental>
     <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
   </PropertyGroup>

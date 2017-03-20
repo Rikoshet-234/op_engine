@@ -1,20 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug_C++11|Win32">
-      <Configuration>Debug_C++11</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Mixed|Win32">
-      <Configuration>Mixed</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|Win32">
+      <Configuration>RelWithDebInfo</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
@@ -24,12 +20,13 @@
     <ProjectName>xrSound</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
@@ -40,30 +37,20 @@
     <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_C++11|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v140</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
-  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
-    <Import Project="..\GlobalProperties.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
     <Import Project="..\GlobalProperties.props" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
     <Import Project="..\GlobalProperties.props" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug_C++11|Win32'" Label="PropertySheets">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
     <Import Project="..\GlobalProperties.props" />
@@ -80,14 +67,6 @@
     <IncludePath>$(SolutionDir)\SDK\eax\Include;$(SolutionDir)\SDK\Xiph\Include;$(SolutionDir)\SDK\dx9sdk\dx9sdk\include;$(SolutionDir)\SDK\OpenAL\Include;$(SolutionDir)\xrCore;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)\SDK\eax;$(LibrariesOutputDir)\;$(SolutionDir)\SDK\OpenAL\libs;$(SolutionDir)\SDK\eax\Include;$(SolutionDir)\SDK\Xiph\Libs;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_C++11|Win32'">
-    <OutDir>$(BinOutputDir)\</OutDir>
-    <IntDir>$(IntermediateOutputDir)\</IntDir>
-    <IgnoreImportLibrary>true</IgnoreImportLibrary>
-    <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)\SDK\fmt;$(SolutionDir)\SDK\eax\Include;$(SolutionDir)\SDK\Xiph\Include;$(SolutionDir)\SDK\dx9sdk\dx9sdk\include;$(SolutionDir)\SDK\OpenAL\Include;$(SolutionDir)\xrCore;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\SDK\eax;$(LibrariesOutputDir);$(SolutionDir)\SDK\OpenAL\libs;$(SolutionDir)\SDK\eax\Include;$(SolutionDir)\SDK\Xiph\Libs;$(LibraryPath)</LibraryPath>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(BinOutputDir)\</OutDir>
     <IntDir>$(IntermediateOutputDir)\</IntDir>
@@ -95,10 +74,12 @@
     <IncludePath>$(SolutionDir)\SDK\eax\Include;$(SolutionDir)\SDK\Xiph\Include;$(SolutionDir)\SDK\dx9sdk\dx9sdk\include;$(SolutionDir)\SDK\OpenAL\Include;$(SolutionDir)\xrCore;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSDK_IncludePath);$(UniversalCRT_IncludePath);</IncludePath>
     <LibraryPath>$(SolutionDir)\SDK\eax;$(LibrariesOutputDir)\;$(SolutionDir)\SDK\OpenAL\libs;$(SolutionDir)\SDK\eax\Include;$(SolutionDir)\SDK\Xiph\Libs;$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSDK_LibraryPath_x86);$(UniversalCRT_LibraryPath_x86);</LibraryPath>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">
     <OutDir>$(BinOutputDir)\</OutDir>
     <IntDir>$(IntermediateOutputDir)\</IntDir>
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(SolutionDir)\SDK\eax\Include;$(SolutionDir)\SDK\Xiph\Include;$(SolutionDir)\SDK\dx9sdk\dx9sdk\include;$(SolutionDir)\SDK\OpenAL\Include;$(SolutionDir)\xrCore;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSDK_IncludePath);$(UniversalCRT_IncludePath);</IncludePath>
+    <LibraryPath>$(SolutionDir)\SDK\eax;$(LibrariesOutputDir)\;$(SolutionDir)\SDK\OpenAL\libs;$(SolutionDir)\SDK\eax\Include;$(SolutionDir)\SDK\Xiph\Libs;$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSDK_LibraryPath_x86);$(UniversalCRT_LibraryPath_x86);</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -142,51 +123,6 @@
       <TargetMachine>MachineX86</TargetMachine>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <TreatLinkerWarningAsErrors>false</TreatLinkerWarningAsErrors>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_C++11|Win32'">
-    <ClCompile>
-      <Optimization>Disabled</Optimization>
-      <IntrinsicFunctions>false</IntrinsicFunctions>
-      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
-      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
-      <PreprocessorDefinitions>WIN32;DEBUG;_WINDOWS;_USRDLL;XRSOUND_EXPORTS;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <StringPooling>false</StringPooling>
-      <MinimalRebuild>true</MinimalRebuild>
-      <ExceptionHandling>Sync</ExceptionHandling>
-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <SmallerTypeCheck>true</SmallerTypeCheck>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <FloatingPointModel>Fast</FloatingPointModel>
-      <ForceConformanceInForLoopScope>false</ForceConformanceInForLoopScope>
-      <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName).pch</PrecompiledHeaderOutputFile>
-      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
-      <ObjectFileName>$(IntDir)</ObjectFileName>
-      <ProgramDataBaseFileName>$(IntDir)</ProgramDataBaseFileName>
-      <BrowseInformation>
-      </BrowseInformation>
-      <WarningLevel>Level4</WarningLevel>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <DisableSpecificWarnings>4995;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-    </ClCompile>
-    <Link>
-      <AdditionalOptions>/NODEFAULTLIB:LIBCMTD %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>vorbisfile_static_d.lib;ogg_static_d.lib;OpenAL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <GenerateMapFile>false</GenerateMapFile>
-      <MapFileName>
-      </MapFileName>
-      <MapExports>false</MapExports>
-      <SubSystem>Windows</SubSystem>
-      <LargeAddressAware>true</LargeAddressAware>
-      <ImportLibrary>$(LibrariesOutputDir)\$(ProjectName).lib</ImportLibrary>
-      <TargetMachine>MachineX86</TargetMachine>
-      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -234,41 +170,53 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">
     <ClCompile>
-      <Optimization>Full</Optimization>
+      <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <OmitFramePointers>false</OmitFramePointers>
+      <OmitFramePointers>true</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
-      <PreprocessorDefinitions>MIXED;WIN32;DEBUG;_WINDOWS;_USRDLL;XRSOUND_EXPORTS;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <PreprocessorDefinitions>_SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS;WIN32;NDEBUG;_WINDOWS;_USRDLL;XRSOUND_EXPORTS;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
+      <ExceptionHandling>
+      </ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
       <FunctionLevelLinking>false</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
       <ForceConformanceInForLoopScope>false</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName).pch</PrecompiledHeaderOutputFile>
-      <AssemblerOutput />
+      <AssemblerOutput>
+      </AssemblerOutput>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <ProgramDataBaseFileName>$(IntDir)</ProgramDataBaseFileName>
-      <BrowseInformation />
+      <BrowseInformation>
+      </BrowseInformation>
       <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4577;</DisableSpecificWarnings>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>vorbisfile_static.lib;ogg_static.lib;OpenAL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>vorbisfile_static.lib;ogg_static.lib;OpenAL32.lib;legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(OutDir)$(ProjectName).pdb</ProgramDatabaseFile>
       <GenerateMapFile>false</GenerateMapFile>
-      <MapFileName>$(OutDir)$(ProjectName).map</MapFileName>
-      <SubSystem>Windows</SubSystem>
+      <MapFileName>
+      </MapFileName>
+      <SubSystem>NotSet</SubSystem>
       <LargeAddressAware>true</LargeAddressAware>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <ImportLibrary>$(LibrariesOutputDir)\$(ProjectName).lib</ImportLibrary>
-      <TargetMachine>NotSet</TargetMachine>
+      <TargetMachine>MachineX86</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -295,19 +243,16 @@
     <ClCompile Include="guids.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_C++11|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
-      </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">
       </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="sound.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_C++11|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="SoundRender_Core.cpp" />
     <ClCompile Include="SoundRender_Core_Processor.cpp" />
@@ -319,10 +264,7 @@
     <ClCompile Include="SoundRender_Emitter.cpp" />
     <ClCompile Include="SoundRender_Emitter_FSM.cpp" />
     <ClCompile Include="SoundRender_Emitter_StartStop.cpp" />
-    <ClCompile Include="SoundRender_Emitter_streamer.cpp">
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">Full</Optimization>
-      <InlineFunctionExpansion Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">AnySuitable</InlineFunctionExpansion>
-    </ClCompile>
+    <ClCompile Include="SoundRender_Emitter_streamer.cpp" />
     <ClCompile Include="SoundRender_Source.cpp" />
     <ClCompile Include="SoundRender_Source_loader.cpp" />
     <ClCompile Include="SoundRender_Target.cpp" />
@@ -331,21 +273,18 @@
     <ClCompile Include="SoundRender_Environment.cpp" />
     <ClCompile Include="MusicStream.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_C++11|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="xr_cda.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_C++11|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="xr_streamsnd.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_C++11|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="SoundRender_Cache.cpp" />
   </ItemGroup>

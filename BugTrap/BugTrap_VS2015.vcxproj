@@ -1,16 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug_C++11|Win32">
-      <Configuration>Debug_C++11</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|Win32">
+      <Configuration>RelWithDebInfo</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
@@ -27,12 +27,12 @@
     <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_C++11|Win32'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
@@ -44,11 +44,11 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\GlobalProperties.props" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\GlobalProperties.props" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug_C++11|Win32'" Label="PropertySheets">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\GlobalProperties.props" />
   </ImportGroup>
@@ -61,12 +61,13 @@
     <IntDir>$(IntermediateOutputDir)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_C++11|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(BinOutputDir)\</OutDir>
     <IntDir>$(IntermediateOutputDir)\</IntDir>
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">
     <OutDir>$(BinOutputDir)\</OutDir>
     <IntDir>$(IntermediateOutputDir)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
@@ -75,7 +76,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_NEW_;WIN32;DEBUG;_WINDOWS;_USRDLL;BUGTRAP_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;DEBUG;_WINDOWS;_USRDLL;BUGTRAP_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling />
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -106,48 +107,12 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_C++11|Win32'">
-    <ClCompile>
-      <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;DEBUG;_WINDOWS;_USRDLL;BUGTRAP_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <MinimalRebuild>true</MinimalRebuild>
-      <ExceptionHandling>
-      </ExceptionHandling>
-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <BufferSecurityCheck>true</BufferSecurityCheck>
-      <FunctionLevelLinking>false</FunctionLevelLinking>
-      <RuntimeTypeInfo>false</RuntimeTypeInfo>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
-      <WarningLevel>Level4</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-    </ClCompile>
-    <ResourceCompile>
-      <Culture>0x0409</Culture>
-      <ResourceOutputFileName>$(IntDir)$(TargetName).res</ResourceOutputFileName>
-    </ResourceCompile>
-    <Link>
-      <AdditionalDependencies>ws2_32.lib;comctl32.lib;shlwapi.lib;version.lib;wininet.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)$(ProjectName).dll</OutputFile>
-      <ModuleDefinitionFile>BugTrap.def</ModuleDefinitionFile>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
-      <GenerateMapFile>false</GenerateMapFile>
-      <MapFileName>
-      </MapFileName>
-      <MapExports>false</MapExports>
-      <SubSystem>Windows</SubSystem>
-      <ImportLibrary>$(LibrariesOutputDir)\$(ProjectName).lib</ImportLibrary>
-      <TargetMachine>MachineX86</TargetMachine>
-    </Link>
-  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <Optimization>MinSpace</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <OmitFramePointers>true</OmitFramePointers>
-      <PreprocessorDefinitions>_NEW_;WIN32;NDEBUG;_WINDOWS;_USRDLL;BUGTRAP_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;BUGTRAP_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling />
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -171,6 +136,46 @@
       <ProgramDatabaseFile>$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
       <GenerateMapFile>false</GenerateMapFile>
       <MapFileName />
+      <MapExports>false</MapExports>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <ImportLibrary>$(LibrariesOutputDir)\$(ProjectName).lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">
+    <ClCompile>
+      <Optimization>MinSpace</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <OmitFramePointers>true</OmitFramePointers>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;BUGTRAP_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+      <ResourceOutputFileName>$(IntDir)$(TargetName).res</ResourceOutputFileName>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>ws2_32.lib;comctl32.lib;shlwapi.lib;version.lib;wininet.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(ProjectName).dll</OutputFile>
+      <ModuleDefinitionFile>BugTrap.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
+      <GenerateMapFile>false</GenerateMapFile>
+      <MapFileName>
+      </MapFileName>
       <MapExports>false</MapExports>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -227,8 +232,8 @@
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_C++11|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="FileStream.cpp" />
     <ClCompile Include="InputStream.cpp" />

@@ -16,6 +16,11 @@
     //! non-member operator new or delete functions may not be declared inline
     //! jarni: VS2015 doesn't line inline new, can't do it not inlined because it doesn't see it sometimes.
     #pragma warning(disable:4595)
+    //! error C2084: function 'void *operator new(std::size_t,void *) throw()' already has a body
+    //! jarni: VS2015 already has placement new implementation
+    #ifndef _NEW_
+    #define _NEW_
+    #endif
 #endif //! _MSC_VER >= 1900
 
 #include "StdAfx.h"

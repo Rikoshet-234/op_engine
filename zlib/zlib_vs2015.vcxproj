@@ -1,16 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug_C++11|Win32">
-      <Configuration>Debug_C++11</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|Win32">
+      <Configuration>RelWithDebInfo</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
@@ -28,12 +28,13 @@
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_C++11|Win32'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
@@ -45,11 +46,11 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\GlobalProperties.props" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\GlobalProperties.props" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug_C++11|Win32'" Label="PropertySheets">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\GlobalProperties.props" />
   </ImportGroup>
@@ -61,11 +62,12 @@
     <OutDir>$(LibrariesOutputDir)\</OutDir>
     <IntDir>$(IntermediateOutputDir)\</IntDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_C++11|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(LibrariesOutputDir)\</OutDir>
     <IntDir>$(IntermediateOutputDir)\</IntDir>
+    <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">
     <OutDir>$(LibrariesOutputDir)\</OutDir>
     <IntDir>$(IntermediateOutputDir)\</IntDir>
     <TargetName>$(ProjectName)</TargetName>
@@ -86,24 +88,21 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Lib>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_C++11|Win32'">
-    <ClCompile>
-      <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;DEBUG;_LIB;_SECURE_SCL=0;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <MinimalRebuild>true</MinimalRebuild>
-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-    </ClCompile>
-  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_SECURE_SCL=0;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_SECURE_SCL=0;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
@@ -115,8 +114,8 @@
     <ClCompile Include="deflate.c" />
     <ClCompile Include="example.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_C++11|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="gzio.c" />
     <ClCompile Include="infback.c" />
@@ -125,13 +124,13 @@
     <ClCompile Include="inftrees.c" />
     <ClCompile Include="minigzip.c">
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug_C++11|Win32'">4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <ClCompile Include="trees.c">
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4267;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug_C++11|Win32'">4267;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4267;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">4267;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <ClCompile Include="uncompr.c" />
     <ClCompile Include="zutil.c" />
