@@ -12,119 +12,119 @@ struct CCloner {
 	template <typename T>
 	struct CHelper {
 		template <bool a>
-		IC	static void clone(const T &_1, T &_2)
+		IC	static void clone(const T &from, T &to)
 		{
-			_2				= _1;
+			to				= from;
 		}
 
 		template <>
-		IC	static void clone<true>(const T &_1, T &_2)
+		IC	static void clone<true>(const T &from, T &to)
 		{
-			_2				= xr_new<object_type_traits::remove_pointer<T>::type>(*_1);
-			CCloner::clone	(*_1,*_2);
+			to				= xr_new<object_type_traits::remove_pointer<T>::type>(*from);
+			CCloner::clone	(*from,*to);
 		}
 	};
 
-	IC	static void clone(LPCSTR _1, LPCSTR &_2)
+	IC	static void clone(LPCSTR from, LPCSTR &to)
 	{
-		_2							= _1;
+		to							= from;
 	}
 
-	IC	static void clone(LPSTR  _1, LPSTR &_2)
+	IC	static void clone(LPSTR  from, LPSTR &to)
 	{
-		_2							= xr_strdup(_1);
+		to							= xr_strdup(from);
 	}
 
-	IC	static void clone(const shared_str &_1, shared_str &_2)
+	IC	static void clone(const shared_str &from, shared_str &to)
 	{
-		_2							= _1;
+		to							= from;
 	}
 
 	template <typename T1, typename T2>
-	IC	static void clone(const std::pair<T1,T2> &_1, std::pair<T1,T2> &_2)
+	IC	static void clone(const std::pair<T1,T2> &from, std::pair<T1,T2> &to)
 	{
-		clone(const_cast<object_type_traits::remove_const<T1>::type&>(_1.first),const_cast<object_type_traits::remove_const<T1>::type&>(_2.first));
-		clone(_1.second,_2.second);
+		clone(const_cast<object_type_traits::remove_const<T1>::type&>(from.first),const_cast<object_type_traits::remove_const<T1>::type&>(to.first));
+		clone(from.second,to.second);
 	}
 
 	template <typename T, int size>
-	IC	static void clone(const svector<T,size> &_1, svector<T,size> &_2)
+	IC	static void clone(const svector<T,size> &from, svector<T,size> &to)
 	{
-		_2.resize						(_1.size());
-		svector<T,size>::iterator		J = _2.begin();
-		svector<T,size>::const_iterator	I = _1.begin(); 
-		svector<T,size>::const_iterator	E = _1.end();
+		to.resize						(from.size());
+		svector<T,size>::iterator		J = to.begin();
+		svector<T,size>::const_iterator	I = from.begin(); 
+		svector<T,size>::const_iterator	E = from.end();
 		for ( ; I != E; ++I, ++J)
 			clone						(*I,*J);
 	}
 
 	template <typename T1, typename T2>
-	IC	static void clone(const std::queue<T1,T2> &__1, std::queue<T1,T2> &__2)
+	IC	static void clone(const std::queue<T1,T2> &_from_, std::queue<T1,T2> &_to_)
 	{
-		std::queue<T1,T2>			_1 = __1;
-		std::queue<T1,T2>			_2;
+		std::queue<T1,T2>			from = _from_;
+		std::queue<T1,T2>			to;
 		
-		for ( ; !_1.empty(); _1.pop())
-			_2.push					(_1.front());
+		for ( ; !from.empty(); from.pop())
+			to.push				(from.front());
 
-		while (!__2.empty())
-			__2.pop();
+		while (!_to_.empty())
+			_to_.pop();
 
-		for ( ; !_2.empty(); _2.pop()) {
+		for ( ; !to.empty(); to.pop()) {
 			std::queue<T1,T2>::value_type	t;
-			CCloner::clone			(_2.front(),t);
-			__2.push				(t);
+			CCloner::clone			(to.front(),t);
+			_to.push				(t);
 		}
 	}
 
 	template <template <typename _1, typename _2> class T1, typename T2, typename T3>
-	IC	static void clone(const T1<T2,T3> &__1, T1<T2,T3> &__2, bool)
+	IC	static void clone(const T1<T2,T3> &_from, T1<T2,T3> &_to, bool)
 	{
-		T1<T2,T3>					_1 = __1;
-		T1<T2,T3>					_2;
+		T1<T2,T3>					from = _from;
+		T1<T2,T3>					to;
 
-		for ( ; !_1.empty(); _1.pop())
-			_2.push					(_1.top());
+		for ( ; !from.empty(); from.pop())
+			to.push					(from.top());
 
-		while (!__2.empty())
-			__2.pop();
+		while (!_to.empty())
+			_to.pop();
 
-		for ( ; !_2.empty(); _2.pop()) {
+		for ( ; !to.empty(); to.pop()) {
 			T1<T2,T3>::value_type	t;
-			CCloner::clone			(_2.top(),t);
-			__2.push				(t);
+			CCloner::clone			(to.top(),t);
+			_to.push				(t);
 		}
 	}
 
 	template <template <typename _1, typename _2, typename _3> class T1, typename T2, typename T3, typename T4>
-	IC	static void clone(const T1<T2,T3,T4> &__1, T1<T2,T3,T4> &__2, bool)
+	IC	static void clone(const T1<T2,T3,T4> &_from, T1<T2,T3,T4> &_to, bool)
 	{
-		T1<T2,T3,T4>				_1 = __1;
-		T1<T2,T3,T4>				_2;
+		T1<T2,T3,T4>				from = _from;
+		T1<T2,T3,T4>				to;
 
-		for ( ; !_1.empty(); _1.pop())
-			_2.push					(_1.top());
+		for ( ; !from.empty(); from.pop())
+			to.push					(from.top());
 
-		while (!__2.empty())
-			__2.pop();
+		while (!_to.empty())
+			_to.pop();
 
-		for ( ; !_2.empty(); _2.pop()) {
+		for ( ; !to.empty(); to.pop()) {
 			T1<T2,T3,T4>::value_type	t;
-			CCloner::clone			(_2.top(),t);
-			__2.push				(t);
+			CCloner::clone			(to.top(),t);
+			_to.push				(t);
 		}
 	}
 
 	template <typename T1, typename T2>
-	IC	static void clone(const xr_stack<T1,T2> &_1, xr_stack<T1,T2> &_2)
+	IC	static void clone(const xr_stack<T1,T2> &from, xr_stack<T1,T2> &to)
 	{
-		return					(clone(_1,_2,true));
+		return					(clone(from,to,true));
 	}
 
 	template <typename T1, typename T2, typename T3>
-	IC	static void clone(const std::priority_queue<T1,T2,T3> &_1, std::priority_queue<T1,T2,T3> &_2)
+	IC	static void clone(const std::priority_queue<T1,T2,T3> &from, std::priority_queue<T1,T2,T3> &to)
 	{
-		return					(clone(_1,_2,true));
+		return					(clone(from,to,true));
 	}
 
 	struct CHelper3 {
@@ -141,15 +141,15 @@ struct CCloner {
 		}
 
 		template <typename T>
-		IC	static void clone(const T &_1, T &_2)
+		IC	static void clone(const T &from, T &to)
 		{
-			_2.clear			();
-			T::const_iterator	I = _1.begin();
-			T::const_iterator	E = _1.end();
+			to.clear			();
+			T::const_iterator	I = from.begin();
+			T::const_iterator	E = from.end();
 			for ( ; I != E; ++I) {
 				T::value_type	t;
 				CCloner::clone	(*I,t);
-				add				(_2,t);
+				add				(to,t);
 			}
 		}
 	};
@@ -157,22 +157,22 @@ struct CCloner {
 	template <typename T>
 	struct CHelper4 {
 		template <bool a>
-		IC	static void clone(const T &_1, T &_2)
+		IC	static void clone(const T &from, T &to)
 		{
-			CHelper<T>::clone<object_type_traits::is_pointer<T>::value>(_1,_2);
+			CHelper<T>::clone<object_type_traits::is_pointer<T>::value>(from,to);
 		}
 
 		template <>
-		IC	static void clone<true>(const T &_1, T &_2)
+		IC	static void clone<true>(const T &from, T &to)
 		{
-			CHelper3::clone(_1,_2);
+			CHelper3::clone(from,to);
 		}
 	};
 
 	template <typename T>
-	IC	static void clone(const T &_1, T &_2)
+	IC	static void clone(const T &from, T &to)
 	{
-		CHelper4<T>::clone<object_type_traits::is_stl_container<T>::value>(_1,_2);
+		CHelper4<T>::clone<object_type_traits::is_stl_container<T>::value>(from,to);
 	}
 };
 

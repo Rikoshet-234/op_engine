@@ -44,6 +44,10 @@
 #include <stdio.h>
 #include "../minizip/zip.h"
 
+#if _MSC_VER >= 1900
+#include <versionhelpers.h>
+#endif
+
 struct _IMAGELIST { }; // unresolved typeref token
 
 //#define DEBUG_WITH_BOUNDSCHECKER

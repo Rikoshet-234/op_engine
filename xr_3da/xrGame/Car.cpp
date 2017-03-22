@@ -945,15 +945,15 @@ void CCar::Init()
 			const CInifile::Item& item	= *I;
 			u16 index				= pKinematics->LL_BoneID(*item.first); 
 			R_ASSERT3(index != BI_NONE, "Wrong bone name", *item.first);
-			xr_map   <u16,SWheel>::iterator i=m_wheels_map.find(index);
+			xr_map   <u16,SWheel>::iterator iw=m_wheels_map.find(index);
 			
-			if(i!=m_wheels_map.end())
-					i->second.CDamagableHealthItem::Init(float(atof(*item.second)),2);
+			if(iw!=m_wheels_map.end())
+					iw->second.CDamagableHealthItem::Init(float(atof(*item.second)),2);
 			else 
 			{
-				xr_map   <u16,SDoor>::iterator i=m_doors.find(index);
-				R_ASSERT3(i!=m_doors.end(),"only wheel and doors bones allowed for damage defs",*item.first);
-				i->second.CDamagableHealthItem::Init(float(atof(*item.second)),1);
+				xr_map   <u16,SDoor>::iterator id=m_doors.find(index);
+				R_ASSERT3(id!=m_doors.end(),"only wheel and doors bones allowed for damage defs",*item.first);
+				id->second.CDamagableHealthItem::Init(float(atof(*item.second)),1);
 			}
 
 		}
@@ -1689,10 +1689,10 @@ void CCar::OnEvent(NET_Packet& P, u16 type)
 			else 
 			{
 				if (!O || !O->H_Parent() || (this != O->H_Parent())) return;
-				NET_Packet P;
-				u_EventGen(P,GE_OWNERSHIP_REJECT,ID());
-				P.w_u16(u16(O->ID()));
-				u_EventSend(P);
+				NET_Packet p;
+				u_EventGen(p,GE_OWNERSHIP_REJECT,ID());
+				p.w_u16(u16(O->ID()));
+				u_EventSend(p);
 			}
 		}break;
 	case GE_OWNERSHIP_REJECT:

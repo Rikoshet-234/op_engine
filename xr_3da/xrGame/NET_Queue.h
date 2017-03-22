@@ -45,10 +45,10 @@ public:
 			P.r				(&*data.begin(),size);
 		}
 	}
-	void				export		(NET_Packet& P)
+	void				export_		(NET_Packet& P)
 	{
-		u16	ID			=	M_EVENT;
-		P.w_begin		(ID			);
+		u16	id			=	M_EVENT;
+		P.w_begin		(id			);
 		P.w_u32			(timestamp	);
 		P.w_u16			(type		);
 		P.w_u16			(destination);

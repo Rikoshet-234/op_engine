@@ -248,9 +248,9 @@ CSoundPlayer::CSoundCollection::CSoundCollection	(const CSoundCollectionParams &
 		_GetItem						(*params.m_sound_prefix,j,temp);
 		strconcat						(sizeof(s),S,*params.m_sound_player_prefix,temp);
 		if (FS.exist(fn,"$game_sounds$",S,".ogg")) {
-			ref_sound					*temp = add(params.m_type,S);
-			if (temp)
-				m_sounds.push_back		(temp);
+			ref_sound					*temp2 = add(params.m_type,S);
+			if (temp2)
+				m_sounds.push_back		(temp2);
 		}
 		for (u32 i=0; i<params.m_max_count; ++i){
 			string256					name;

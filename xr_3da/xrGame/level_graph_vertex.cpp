@@ -238,10 +238,10 @@ u32	 CLevelGraph::check_position_in_direction_slow	(u32 start_vertex_id, const F
 	dest					= finish_position;
 	dir.sub					(dest,start);
 	u32						dest_xz = vertex_position(v3d(dest)).xz();
-	Fvector2				temp;
-	unpack_xz				(vertex(start_vertex_id),temp.x,temp.y);
+	Fvector2				temp_top;
+	unpack_xz				(vertex(start_vertex_id), temp_top.x, temp_top.y);
 
-	float					cur_sqr = _sqr(temp.x - dest.x) + _sqr(temp.y - dest.y);
+	float					cur_sqr = _sqr(temp_top.x - dest.x) + _sqr(temp_top.y - dest.y);
 	for (;;) {
 		const_iterator		I,E;
 		begin				(cur_vertex_id,I,E);
@@ -251,8 +251,8 @@ u32	 CLevelGraph::check_position_in_direction_slow	(u32 start_vertex_id, const F
 			if ((next_vertex_id == prev_vertex_id) || !valid_vertex_id(next_vertex_id))
 				continue;
 			CVertex			*v = vertex(next_vertex_id);
-			unpack_xz		(v,temp.x,temp.y);
-			box.min			= box.max = temp;
+			unpack_xz		(v, temp_top.x, temp_top.y);
+			box.min			= box.max = temp_top;
 			box.grow		(identity);
 			if (box.pick_exact(start,dir)) {
 
@@ -293,10 +293,10 @@ bool CLevelGraph::check_vertex_in_direction_slow	(u32 start_vertex_id, const Fve
 	start					= start_position;
 	dest.set				(finish_position.x,finish_position.z);
 	dir.sub					(dest,start);
-	Fvector2				temp;
-	unpack_xz				(vertex(start_vertex_id),temp.x,temp.y);
+	Fvector2				temp_top;
+	unpack_xz				(vertex(start_vertex_id), temp_top.x, temp_top.y);
 
-	float					cur_sqr = _sqr(temp.x - dest.x) + _sqr(temp.y - dest.y);
+	float					cur_sqr = _sqr(temp_top.x - dest.x) + _sqr(temp_top.y - dest.y);
 	for (;;) {
 		const_iterator		I,E;
 		begin				(cur_vertex_id,I,E);
@@ -305,8 +305,8 @@ bool CLevelGraph::check_vertex_in_direction_slow	(u32 start_vertex_id, const Fve
 			u32				next_vertex_id = value(cur_vertex_id,I);
 			if ((next_vertex_id == prev_vertex_id) || !valid_vertex_id(next_vertex_id))
 				continue;
-			unpack_xz		(vertex(next_vertex_id),temp.x,temp.y);
-			box.min			= box.max = temp;
+			unpack_xz		(vertex(next_vertex_id), temp_top.x, temp_top.y);
+			box.min			= box.max = temp_top;
 			box.grow		(identity);
 			if (box.pick_exact(start,dir)) {
 				if (next_vertex_id == finish_vertex_id) {
@@ -359,9 +359,9 @@ bool CLevelGraph::create_straight_path(u32 start_vertex_id, const Fvector2 &star
 	dest					= finish_point;
 	dir.sub					(dest,start);
 	u32						dest_xz = vertex_position(v3d(dest)).xz();
-	Fvector2				temp;
+	Fvector2				temp_top;
 	Fvector					pos3d;
-	unpack_xz				(vertex(start_vertex_id),temp.x,temp.y);
+	unpack_xz				(vertex(start_vertex_id), temp_top.x, temp_top.y);
 
 	if (bClearPath) {
 		tpaOutputPoints.clear	();
@@ -374,7 +374,7 @@ bool CLevelGraph::create_straight_path(u32 start_vertex_id, const Fvector2 &star
 		tpaOutputNodes.push_back(start_vertex_id);
 	}
 
-	float					cur_sqr = _sqr(temp.x - dest.x) + _sqr(temp.y - dest.y);
+	float					cur_sqr = _sqr(temp_top.x - dest.x) + _sqr(temp_top.y - dest.y);
 	for (;;) {
 		const_iterator		I,E;
 		begin				(cur_vertex_id,I,E);
@@ -384,8 +384,8 @@ bool CLevelGraph::create_straight_path(u32 start_vertex_id, const Fvector2 &star
 			if ((next_vertex_id == prev_vertex_id) || !valid_vertex_id(next_vertex_id))
 				continue;
 			CVertex			*v = vertex(next_vertex_id);
-			unpack_xz		(v,temp.x,temp.y);
-			box.min			= box.max = temp;
+			unpack_xz		(v, temp_top.x, temp_top.y);
+			box.min			= box.max = temp_top;
 			box.grow		(identity);
 			if (box.pick_exact(start,dir)) {
 				Fvector2		temp;
@@ -489,18 +489,18 @@ bool CLevelGraph::neighbour_in_direction	(const Fvector &direction, u32 start_ve
 	dest					= dir;
 	dest.mul				(header().cell_size()*4.f);
 	dest.add				(start);
-	Fvector2				temp;
-	unpack_xz				(vertex(start_vertex_id),temp.x,temp.y);
+	Fvector2				temp_top;
+	unpack_xz				(vertex(start_vertex_id), temp_top.x, temp_top.y);
 
-	float					cur_sqr = _sqr(temp.x - dest.x) + _sqr(temp.y - dest.y);
+	float					cur_sqr = _sqr(temp_top.x - dest.x) + _sqr(temp_top.y - dest.y);
 	const_iterator			I,E;
 	begin					(cur_vertex_id,I,E);
 	for ( ; I != E; ++I) {
 		u32					next_vertex_id = value(cur_vertex_id,I);
 		if ((next_vertex_id == prev_vertex_id) || !is_accessible(next_vertex_id))
 			continue;
-		unpack_xz			(vertex(next_vertex_id),temp.x,temp.y);
-		box.min				= box.max = temp;
+		unpack_xz			(vertex(next_vertex_id), temp_top.x, temp_top.y);
+		box.min				= box.max = temp_top;
 		box.grow			(identity);
 		if (box.pick_exact(start,dir)) {
 			Fvector2		temp;

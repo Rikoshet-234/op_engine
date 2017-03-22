@@ -339,3 +339,6 @@ prepare_builds.cmd
 # build files
 xr_build
 lapi.txt
+
+# VS2015 local configuration file
+GlobalProperties.props

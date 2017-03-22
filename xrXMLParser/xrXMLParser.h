@@ -7,7 +7,9 @@
 	#define XRXMLPARSER_API __declspec(dllexport)
 #else
 	#define XRXMLPARSER_API __declspec(dllimport)
+#if _MSC_VER < 1900
 	#pragma comment			(lib,"xrXMLParser.lib")
+#endif
 #endif
 
 

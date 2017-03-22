@@ -761,7 +761,9 @@ LONG WINAPI UnhandledFilter	(_EXCEPTION_POINTERS *pExceptionInfo)
 #else
 	typedef int		(__cdecl * _PNH)( size_t );
 	_CRTIMP int		__cdecl _set_new_mode( int );
+#if  _MSC_VER < 1900
 	_CRTIMP _PNH	__cdecl _set_new_handler( _PNH );
+#endif
 
 #ifndef USE_BUG_TRAP
 	void _terminate		()

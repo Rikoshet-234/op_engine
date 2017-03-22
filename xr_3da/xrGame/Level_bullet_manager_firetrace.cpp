@@ -77,7 +77,7 @@ BOOL CBulletManager::test_callback(const collide::ray_defs& rd, CObject* object,
 							}
 #	else
 							float					game_difficulty_hit_probability = actor->HitProbability();
-							CAI_Stalker				*stalker = smart_cast<CAI_Stalker*>(initiator);
+							stalker                 = smart_cast<CAI_Stalker*>(initiator);//! jarni: reuse variable
 							if (stalker)
 								hpf					= stalker->SpecificCharacter().hit_probability_factor();
 
@@ -456,7 +456,7 @@ std::pair<float, float>  CBulletManager::ObjectHit	(SBullet* bullet, const Fvect
 		//уменьшить скорость в зависимости от простреливаемости
 		bullet->speed *= (1-mtl->fShootFactor)*scale;
 		//сколько энергии в процентах потеряла пуля при столкновении
-		float energy_lost = 1.f - bullet->speed/old_speed;
+		energy_lost = 1.f - bullet->speed/old_speed;//! jarni: reuse variable
 		//импульс переданный объекту равен прямопропорционален потерянной энергии
 		impulse = bullet->hit_impulse*speed_factor*energy_lost;
 

@@ -159,7 +159,7 @@ namespace OPFuncs
 		std::string secName=monster.cNameSect().c_str();
 		std::string objName=monster.Name_script();
 		string2048 strFmr;
-		sprintf_s(strFmr,"ObjName [%s] SectionName [%s] IngameName [%s]",objName,secName,usName);
+		sprintf_s(strFmr,"ObjName [%s] SectionName [%s] IngameName [%s]",objName.c_str(),secName.c_str(),usName.c_str());
 		return strFmr;
 	}
 

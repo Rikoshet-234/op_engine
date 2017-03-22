@@ -11,10 +11,10 @@
 
 using namespace luabind;
 
-Fvector CPatrolPathParams__point(const CPatrolPathParams *self, u32 index)
+Fvector CPatrolPathParams__point(const CPatrolPathParams *pself, u32 index)
 {
-	THROW	(self);
-	return	(self->point(index));
+	THROW	(pself);
+	return	(pself->point(index));
 }
 
 #pragma optimize("s",on)

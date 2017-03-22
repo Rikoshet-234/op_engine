@@ -118,8 +118,8 @@ BOOL CTheoraStream::ParseHeaders		()
 		if(ogg_sync_pageout(&o_sync_state,&o_page)>0){
 			ogg_stream_pagein	(&o_stream_state,&o_page);
 		}else{
-			int ret=ReadData(); // someone needs more data
-			if(ret==0) FATAL	("End of file while searching for codec headers.");
+			int ret2=ReadData(); // someone needs more data
+			if(ret2==0) FATAL	("End of file while searching for codec headers.");
 		}
 	}
 

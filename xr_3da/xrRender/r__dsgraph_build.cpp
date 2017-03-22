@@ -280,8 +280,6 @@ void CRender::add_leafs_Dynamic	(IRender_Visual *pVisual)
 	if (0==pVisual)				return;
 
 	// Visual is 100% visible - simply add it
-	xr_vector<IRender_Visual*>::iterator I,E;	// it may be useful for 'hierrarhy' visual
-
 	switch (pVisual->Type) {
 	case MT_PARTICLE_GROUP:
 		{
@@ -299,8 +297,8 @@ void CRender::add_leafs_Dynamic	(IRender_Visual *pVisual)
 		{
 			// Add all children, doesn't perform any tests
 			FHierrarhyVisual* pV = (FHierrarhyVisual*)pVisual;
-			I = pV->children.begin	();
-			E = pV->children.end	();
+			auto I = pV->children.begin	();
+			auto E = pV->children.end	();
 			for (; I!=E; I++)	add_leafs_Dynamic	(*I);
 		}
 		return;
@@ -323,8 +321,8 @@ void CRender::add_leafs_Dynamic	(IRender_Visual *pVisual)
 			} else {
 				pV->CalculateBones			(TRUE);
 				pV->CalculateWallmarks		();		//. bug?
-				I = pV->children.begin		();
-				E = pV->children.end		();
+				auto I = pV->children.begin		();
+				auto E = pV->children.end		();
 				for (; I!=E; I++)	add_leafs_Dynamic	(*I);
 			}
 		}
@@ -346,8 +344,6 @@ void CRender::add_leafs_Static(IRender_Visual *pVisual)
 	if (!HOM.visible(pVisual->vis))		return;
 
 	// Visual is 100% visible - simply add it
-	xr_vector<IRender_Visual*>::iterator I,E;	// it may be usefull for 'hierrarhy' visuals
-
 	switch (pVisual->Type) {
 	case MT_PARTICLE_GROUP:
 		{
@@ -365,8 +361,8 @@ void CRender::add_leafs_Static(IRender_Visual *pVisual)
 		{
 			// Add all children, doesn't perform any tests
 			FHierrarhyVisual* pV	= (FHierrarhyVisual*)pVisual;
-			I = pV->children.begin	();
-			E = pV->children.end	();
+			auto I = pV->children.begin	();
+			auto E = pV->children.end	();
 			for (; I!=E; I++)		add_leafs_Static (*I);
 		}
 		return;
@@ -376,8 +372,8 @@ void CRender::add_leafs_Static(IRender_Visual *pVisual)
 			// Add all children, doesn't perform any tests
 			CKinematics * pV		= (CKinematics*)pVisual;
 			pV->CalculateBones		(TRUE);
-			I = pV->children.begin	();
-			E = pV->children.end	();
+			auto I = pV->children.begin	();
+			auto E = pV->children.end	();
 			for (; I!=E; I++)		add_leafs_Static	(*I);
 		}
 		return;
@@ -397,8 +393,8 @@ void CRender::add_leafs_Static(IRender_Visual *pVisual)
 			if (ssa>r_ssaLOD_B)
 			{
 				// Add all children, doesn't perform any tests
-				I = pV->children.begin	();
-				E = pV->children.end	();
+				auto I = pV->children.begin	();
+				auto E = pV->children.end	();
 				for (; I!=E; I++)	add_leafs_Static (*I);
 			}
 		}
@@ -433,8 +429,6 @@ BOOL CRender::add_Dynamic(IRender_Visual *pVisual, u32 planes)
 	if (fcvNone==VIS) return FALSE	;
 
 	// If we get here visual is visible or partially visible
-	xr_vector<IRender_Visual*>::iterator I,E;	// it may be usefull for 'hierrarhy' visuals
-
 	switch (pVisual->Type) {
 	case MT_PARTICLE_GROUP:
 		{
@@ -461,8 +455,8 @@ BOOL CRender::add_Dynamic(IRender_Visual *pVisual, u32 planes)
 		{
 			// Add all children
 			FHierrarhyVisual* pV = (FHierrarhyVisual*)pVisual;
-			I = pV->children.begin	();
-			E = pV->children.end	();
+			auto I = pV->children.begin	();
+			auto E = pV->children.end	();
 			if (fcvPartial==VIS) 
 			{
 				for (; I!=E; I++)	add_Dynamic			(*I,planes);
@@ -479,9 +473,9 @@ BOOL CRender::add_Dynamic(IRender_Visual *pVisual, u32 planes)
 			BOOL	_use_lod			= FALSE	;
 			if (pV->m_lod)				
 			{
-				Fvector							Tpos;	float		D;
-				val_pTransform->transform_tiny	(Tpos, pV->vis.sphere.P);
-				float		ssa		=	CalcSSA	(D,Tpos,pV->vis.sphere.R/2.f);	// assume dynamics never consume full sphere
+				Fvector							Tpos2;	float		D;
+				val_pTransform->transform_tiny	(Tpos2, pV->vis.sphere.P);
+				float		ssa		=	CalcSSA	(D,Tpos2,pV->vis.sphere.R/2.f);	// assume dynamics never consume full sphere
 				if (ssa<r_ssaLOD_A)	_use_lod	= TRUE		;
 			}
 			if (_use_lod)
@@ -491,8 +485,8 @@ BOOL CRender::add_Dynamic(IRender_Visual *pVisual, u32 planes)
 			{
 				pV->CalculateBones			(TRUE);
 				pV->CalculateWallmarks		();		//. bug?
-				I = pV->children.begin		();
-				E = pV->children.end		();
+				auto I = pV->children.begin		();
+				auto E = pV->children.end		();
 				for (; I!=E; I++)	add_leafs_Dynamic	(*I);
 			}
 			/*
@@ -526,8 +520,6 @@ void CRender::add_Static(IRender_Visual *pVisual, u32 planes)
 	if (!HOM.visible(vis))	return;
 
 	// If we get here visual is visible or partially visible
-	xr_vector<IRender_Visual*>::iterator I,E;	// it may be usefull for 'hierrarhy' visuals
-
 	switch (pVisual->Type) {
 	case MT_PARTICLE_GROUP:
 		{
@@ -551,8 +543,8 @@ void CRender::add_Static(IRender_Visual *pVisual, u32 planes)
 		{
 			// Add all children
 			FHierrarhyVisual* pV = (FHierrarhyVisual*)pVisual;
-			I = pV->children.begin	();
-			E = pV->children.end		();
+			auto I = pV->children.begin	();
+			auto E = pV->children.end		();
 			if (fcvPartial==VIS) {
 				for (; I!=E; I++)	add_Static			(*I,planes);
 			} else {
@@ -566,8 +558,8 @@ void CRender::add_Static(IRender_Visual *pVisual, u32 planes)
 			// Add all children, doesn't perform any tests
 			CKinematics * pV		= (CKinematics*)pVisual;
 			pV->CalculateBones		(TRUE);
-			I = pV->children.begin	();
-			E = pV->children.end	();
+			auto I = pV->children.begin	();
+			auto E = pV->children.end	();
 			if (fcvPartial==VIS) {
 				for (; I!=E; I++)	add_Static			(*I,planes);
 			} else {
@@ -591,8 +583,8 @@ void CRender::add_Static(IRender_Visual *pVisual, u32 planes)
 			if (ssa>r_ssaLOD_B)
 			{
 				// Add all children, perform tests
-				I = pV->children.begin	();
-				E = pV->children.end	();
+				auto I = pV->children.begin	();
+				auto E = pV->children.end	();
 				for (; I!=E; I++)	add_leafs_Static	(*I);
 			}
 		}

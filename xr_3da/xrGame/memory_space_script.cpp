@@ -31,26 +31,26 @@ CScriptGameObject *get_memory_object(const MemorySpace::CMemoryObject<T> &memory
 	return			(memory_object.m_object->lua_game_object());
 }
 
-CScriptGameObject *CDangerObject_object(const CDangerObject *self)
+CScriptGameObject *CDangerObject_object(const CDangerObject *pself)
 {
-	VERIFY			(self);
-	return			(self->object() ? self->object()->lua_game_object() : 0);
+	VERIFY			(pself);
+	return			(pself->object() ? pself->object()->lua_game_object() : 0);
 }
 
-CScriptGameObject *CDangerObject_dependent_object(const CDangerObject *self)
+CScriptGameObject *CDangerObject_dependent_object(const CDangerObject *pself)
 {
-	VERIFY				(self);
-	if (!self->dependent_object())
+	VERIFY				(pself);
+	if (!pself->dependent_object())
 		return			(0);
 
-	const CGameObject	*game_object = smart_cast<const CGameObject*>(self->dependent_object());
+	const CGameObject	*game_object = smart_cast<const CGameObject*>(pself->dependent_object());
 	return				(game_object ? game_object->lua_game_object() : 0);
 }
 
-Fvector CDangerObject__position	(const CDangerObject *self)
+Fvector CDangerObject__position	(const CDangerObject *pself)
 {
-	THROW				(self);
-	return				(self->position());
+	THROW				(pself);
+	return				(pself->position());
 }
 
 #pragma optimize("s",on)

@@ -91,8 +91,8 @@ void CPHShell::Activate(const Fmatrix &transform,const Fvector& lin_vel,const Fv
 	}
 	
 	{
-		JOINT_I i=joints.begin(),e=joints.end();
-		for(;i!=e;++i) (*i)->Activate();
+		JOINT_I ji=joints.begin(),e=joints.end();
+		for(;ji!=e;++ji) (*ji)->Activate();
 	}	
 
 	if(PKinematics())

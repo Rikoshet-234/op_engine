@@ -990,6 +990,9 @@ void CSymEngine::GetOsInfo(COsInfo& rOsInfo)
 
 	OSVERSIONINFO osvi;
 	osvi.dwOSVersionInfoSize = sizeof(osvi);
+#if _MSC_VER >= 1900
+#pragma warning(disable:4996)
+#endif
 	GetVersionEx(&osvi);
 
 	rOsInfo.m_pszWinVersion = szUnknown;
@@ -2718,7 +2721,7 @@ BOOL CSymEngine::GetNextStackTraceEntry(CStackTraceEntry& rEntry)
 	WORD wExceptionSegment; // wExceptionSegment = m_swContext.m_stFrame.AddrPC.Segment;
 	__asm { mov word ptr [wExceptionSegment], cs }
 	_stprintf_s(rEntry.m_szAddress, countof(rEntry.m_szAddress),
-	            _T("%04lX:%08lX"), wExceptionSegment, dwExceptionAddress);
+	            _T("%04lX:%08llX"), wExceptionSegment, dwExceptionAddress);
 
 	BYTE arrSymBuffer[512];
 	ZeroMemory(arrSymBuffer, sizeof(arrSymBuffer));

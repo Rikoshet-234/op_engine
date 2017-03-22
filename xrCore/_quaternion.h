@@ -147,21 +147,21 @@ public:
 	typedef Self&			SelfRef;
 	typedef const Self&		SelfCRef;
 private:
-	IC T _asin_(T x)
+	IC T _asin_(T x_)
 	{
 		const T c1 = 0.892399f;
 		const T c3 = 1.693204f;
 		const T c5 =-3.853735f;
 		const T c7 = 2.838933f;
 		
-		const T x2 = x * x;
-		const T d = x * (c1 + x2 * (c3 + x2 * (c5 + x2 * c7)));
+		const T x2 = x_ * x_;
+		const T d = x_ * (c1 + x2 * (c3 + x2 * (c5 + x2 * c7)));
 		
 		return d;
 	}
-	IC T _acos_(T x)
+	IC T _acos_(T x_)
 	{
-		return PI_DIV_2 - _asin_(x);
+		return PI_DIV_2 - _asin_(x_);
 	}
 public:
 	T x,y,z,w;
@@ -335,12 +335,12 @@ public:
 	{
 		T OneOverSinTheta;
 
-		T HalfTheta  = acosf( w );
+		T HalfTheta  = acosf(static_cast<float>(w) );
 		if (HalfTheta>QZERO_TOLERANCE) 	{
 			OneOverSinTheta = 1.0f / _sin( HalfTheta );
-			axis.x	= OneOverSinTheta * x;
-			axis.y	= OneOverSinTheta * y;
-			axis.z	= OneOverSinTheta * z;
+			axis.x	= static_cast<float>(OneOverSinTheta * x);
+			axis.y	= static_cast<float>(OneOverSinTheta * y);
+			axis.z	= static_cast<float>(OneOverSinTheta * z);
 			angle	= 2.0f * HalfTheta;
 			return	true;
 		} else 	{
@@ -418,7 +418,7 @@ public:
 	{
 		T n	 = Q.x*Q.x+Q.y*Q.y+Q.z*Q.z;
 		T r  = _sqrt(n);
-		T t  = (r>EPS_S)?atan2f(r,Q.w)/r: 0.f;
+		T t  = (r>EPS_S)?atan2f(static_cast<float>(r), static_cast<float>(Q.w))/r: 0.f;
 		x = t*Q.x;
 		y = t*Q.y;
 		z = t*Q.z;
@@ -428,7 +428,7 @@ public:
 	IC	SelfRef	exp(SelfCRef Q)
 	{
 		T r  = _sqrt(Q.x*Q.x+Q.y*Q.y+Q.z*Q.z);
-		T et = expf(Q.w);
+		T et = expf(static_cast<float>(Q.w));
 		T s  = (r>=EPS_S)? et*_sin(r)/r: 0.f;
 		x = s*Q.x;
 		y = s*Q.y;
@@ -437,6 +437,9 @@ public:
 		return *this;
 	}
 };
+
+template struct _quaternion<float>;
+template struct _quaternion<double>;
 
 typedef _quaternion<float>	Fquaternion;
 typedef _quaternion<double>	Dquaternion;

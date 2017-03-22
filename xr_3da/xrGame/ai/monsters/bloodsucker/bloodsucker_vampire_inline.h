@@ -106,12 +106,12 @@ bool CStateBloodsuckerVampireAbstract::check_start_conditions()
 	if (object->berserk_always) return false;
 	
 	// является ли враг актером
-	const CEntityAlive *enemy = object->EnemyMan.get_enemy();
-	if (enemy->CLS_ID != CLSID_OBJECT_ACTOR)		return false;
+	const CEntityAlive *cp_enemy = object->EnemyMan.get_enemy();
+	if (cp_enemy->CLS_ID != CLSID_OBJECT_ACTOR)		return false;
 	if (!object->EnemyMan.see_enemy_now())			return false;
 	if (object->CControlledActor::is_controlling())	return false;
 
-	const CActor *actor = smart_cast<const CActor *>(enemy);
+	const CActor *actor = smart_cast<const CActor *>(cp_enemy);
 	VERIFY(actor);
 	if (actor->input_external_handler_installed()) return false;
 
