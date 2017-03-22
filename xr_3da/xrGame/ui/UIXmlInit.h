@@ -3,6 +3,7 @@
 #include "xrUIXmlParser.h"
 
 
+class CUISpinTextCustom;
 class IUIMultiTextureOwner;
 class IUISingleTextureOwner;
 class IUITextControl;
@@ -55,6 +56,7 @@ public:
 	static bool InitStatic				(CUIXml& xml_doc, const char* path, int index, CUIStatic* pWnd);
 	static bool	InitCheck				(CUIXml& xml_doc, const char* path, int index, CUICheckButton* pWnd);
 	static bool InitSpin				(CUIXml& xml_doc, const char* path, int index, CUICustomSpin* pWnd);
+	static bool InitSpinCustom			(CUIXml& xml_doc, const char* path, int index, CUICustomSpin* pWnd);
 	static bool InitText				(CUIXml& xml_doc, const char* path, int index, CUIStatic* pWnd);
 	static bool InitText				(CUIXml& xml_doc, const char* path, int index, IUITextControl* pWnd);
 	static bool InitButton				(CUIXml& xml_doc, const char* path, int index, CUIButton* pWnd);

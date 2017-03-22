@@ -252,6 +252,24 @@ bool CUIXmlInit::InitSpin(CUIXml& xml_doc, const char* path, int index, CUICusto
 	return true;
 }
 
+bool CUIXmlInit::InitSpinCustom(CUIXml& xml_doc, const char* path, int index, CUICustomSpin* pWnd){
+	InitWindow(xml_doc, path, index, pWnd);
+	string256				_buf;
+	u32						color;
+	strconcat				(sizeof(_buf),_buf,path,":text_color:e");
+	if (xml_doc.NavigateToNode(_buf,index)){
+		color				= GetColor(xml_doc,_buf,index,0x00);
+		pWnd->SetTextColor	(color);	
+	}
+	strconcat				(sizeof(_buf),_buf,path,":text_color:d");
+	if (xml_doc.NavigateToNode(_buf,index)){
+		color				= GetColor(xml_doc,_buf,index,0x00);
+		pWnd->SetTextColorD	(color);
+	}
+
+	return true;
+}
+
 bool CUIXmlInit::InitText(CUIXml& xml_doc, LPCSTR path, int index, CUIStatic* pWnd){
 	InitText(xml_doc,path,index,(IUITextControl*)pWnd);
 	shared_str al = xml_doc.ReadAttrib(path, index, "vert_align", "");
@@ -1375,10 +1393,10 @@ bool CUIXmlInit::InitComboBoxCustom(CUIXml& xml_doc, const char* path, int index
 	pWnd->m_pTextBox->SetWndRect(Frect().set(0,0,pWnd->m_pExpandButton->GetWndPos().x-2,pWnd->m_fItemHeight));
 
 	strconcat(sizeof(_path),_path, path, ":list");
-	InitWindow(xml_doc,_path,index,pWnd->m_pItemsList);
-	InitTexture(xml_doc,_path,index,pWnd->m_pItemsList);
-	pWnd->m_pItemsList->SetWidth(pWnd->m_pTextBox->GetWidth());
-
+	InitWindow(xml_doc,_path,index,pWnd->m_pItemsWnd);
+	InitTexture(xml_doc,_path,index,pWnd->m_pItemsWnd);
+	pWnd->m_pItemsWnd->SetWidth(pWnd->m_pTextBox->GetWidth());
+	pWnd->m_pItemList->SetWndRect(pWnd->m_pItemsWnd->GetWndRect());
 	return true;
 }
 

@@ -4,9 +4,11 @@
 // author:		Serge Vynnychenko
 //
 
+#pragma once
 #include "UICustomSpin.h"
 
-class CUISpinText : public CUICustomSpin{
+class CUISpinText : public CUICustomSpin
+{
 public:
 	CUISpinText();
 	// CUIOptionsItem
@@ -25,7 +27,7 @@ protected:
 	virtual bool	CanPressDown	();
 	virtual void	IncVal			(){};
 	virtual void	DecVal			(){};
-			void	SetItem();
+	virtual void	SetItem();
 			struct SInfo{
 				shared_str	_orig;
 				shared_str	_transl;
@@ -34,6 +36,26 @@ protected:
 	typedef xr_vector< SInfo >		Items;
 	typedef Items::iterator			Items_it;
 
-    Items	m_list;
+	Items	m_list;
 	int		m_curItem;
+};
+
+class CUISpinTextCustom:public CUISpinText
+{
+private:
+	int m_backupIndex;
+public:
+	CUISpinTextCustom();
+	void SetCurrentValue() override;;
+	void SaveValue() override;;
+	bool IsChanged() override;
+protected:
+	void	SetItem() override;
+public:
+	int GetSelectedId();
+	void SetSelectedId(int id);
+	LPCSTR GetSelectedText();
+	void SetSelectedText(LPCSTR text);
+	void AddItem(const char* text, int id);
+	void SetFont(CGameFont* pFont) override;
 };

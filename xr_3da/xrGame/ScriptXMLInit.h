@@ -9,6 +9,7 @@ class CUIStatic;
 class CUICheckButton;
 class CUISpinNum;
 class CUISpinText;
+class CUISpinTextCustom;
 class CUISpinFlt;
 class CUIComboBox;
 class CUIComboBoxCustom;
@@ -34,6 +35,7 @@ class CUIScrollView;
 class CUIProgressBar;
 class CUIListItemIconed;
 
+
 class CScriptXmlInit {
 public:
 	DECLARE_SCRIPT_REGISTER_FUNCTION
@@ -58,6 +60,7 @@ public:
 	CUISpinNum*			InitSpinNum(LPCSTR path, CUIWindow* parent);
 	CUISpinFlt*			InitSpinFlt(LPCSTR path, CUIWindow* parent);
 	CUISpinText*		InitSpinText(LPCSTR path, CUIWindow* parent);
+	CUISpinTextCustom*	InitSpinTextCustom(LPCSTR path, CUIWindow* parent);
 	CUIComboBox*		InitComboBox(LPCSTR path, CUIWindow* parent);
 	CUIComboBoxCustom*	InitComboBoxCustom(LPCSTR path, CUIWindow* parent);
 	CUIButton*			InitButton(LPCSTR path, CUIWindow* parent);

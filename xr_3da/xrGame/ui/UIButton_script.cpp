@@ -55,6 +55,15 @@ void CUIButton::script_register(lua_State *L)
 		.def("Init",				&CUICustomSpin::Init)
 		.def("GetText",				&CUICustomSpin::GetText),
 
+		class_<CUISpinTextCustom, CUICustomSpin>("CUISpinTextCustom")
+		.def(							constructor<>())
+		.def("AddItem",					&CUISpinTextCustom::AddItem)
+		.def("GetSelectedId",			&CUISpinTextCustom::GetSelectedId)
+		.def("SetSelectedId",			&CUISpinTextCustom::SetSelectedId)
+		.def("GetSelectedText",			&CUISpinTextCustom::GetSelectedText)
+		.def("SetSelectedText",			static_cast<void(CUISpinTextCustom::*)(LPCSTR)>(&CUISpinTextCustom::SetSelectedText))
+		,
+
 		class_<CUISpinNum, CUICustomSpin>("CUISpinNum")
 		.def(							constructor<>()),
 

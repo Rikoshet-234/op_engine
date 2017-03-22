@@ -94,8 +94,9 @@ class CUIComboBoxCustom: public CUIStatic
 	} E_COMBO_STATE;
 
 	CUIStatic* m_pTextBox;
-	CUIStatic* m_pItemsList;
+	CUIStatic* m_pItemsWnd;
 	CUIButton* m_pExpandButton;
+	CUIListBox* m_pItemList;
 
 	int m_iListItemsSize;
 	float m_fItemHeight;

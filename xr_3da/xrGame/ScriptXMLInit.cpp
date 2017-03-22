@@ -164,6 +164,15 @@ CUISpinText* CScriptXmlInit::InitSpinText(LPCSTR path, CUIWindow* parent){
 	return pWnd;
 }
 
+CUISpinTextCustom* CScriptXmlInit::InitSpinTextCustom(LPCSTR path, CUIWindow* parent)
+{
+	CUISpinTextCustom* pWnd = xr_new<CUISpinTextCustom>();
+	CUIXmlInit::InitSpinCustom(m_xml, path, 0, pWnd);
+	pWnd->SetAutoDelete(true);
+	if(parent) parent->AttachChild(pWnd);
+	return pWnd;
+}
+
 CUIComboBox* CScriptXmlInit::InitComboBox(LPCSTR path, CUIWindow* parent){
 	CUIComboBox* pWnd = xr_new<CUIComboBox>();
 	CUIXmlInit::InitComboBox(m_xml, path, 0, pWnd);
@@ -353,6 +362,7 @@ void CScriptXmlInit::script_register(lua_State *L){
 		.def("InitSpinNum",				&CScriptXmlInit::InitSpinNum)
 		.def("InitSpinFlt",				&CScriptXmlInit::InitSpinFlt)
 		.def("InitSpinText",			&CScriptXmlInit::InitSpinText)
+		.def("InitSpinTextCustom",		&CScriptXmlInit::InitSpinTextCustom)
 		.def("InitComboBox",			&CScriptXmlInit::InitComboBox)		
 		.def("InitComboBoxCustom",		&CScriptXmlInit::InitComboBoxCustom)		
 		.def("InitButton",				&CScriptXmlInit::InitButton)

@@ -18,13 +18,13 @@
 
 CUIComboBox::CUIComboBox()
 {
-	AttachChild			(&m_frameLine);
-	AttachChild			(&m_text);
+	CUIWindow::AttachChild			(&m_frameLine);
+	CUIWindow::AttachChild			(&m_text);
 
 //.	AttachChild			(&m_btn);
 
-	AttachChild			(&m_frameWnd);
-	AttachChild			(&m_list);
+	CUIWindow::AttachChild			(&m_frameWnd);
+	CUIWindow::AttachChild			(&m_list);
 	m_fItemHeight=0;
 	m_iListHeight		= 0;
 	m_bInited			= false;
@@ -183,7 +183,6 @@ void CUIComboBox::ShowList(bool bShow)
 		m_frameWnd.Show		(true);
 
 		m_eState			= LIST_EXPANDED;
-
 		GetParent()->SetCapture(this, true);
 	}
 	else
@@ -300,7 +299,7 @@ void CUIComboBox::Undo()
 
 void CUIComboBoxCustom::RecalcListHeight()
 {
-	m_pItemsList->SetHeight(m_iListItemsSize*m_fItemHeight);
+	m_pItemsWnd->SetHeight(m_iListItemsSize*m_fItemHeight);
 }
 
 CUIComboBoxCustom::CUIComboBoxCustom()
@@ -308,23 +307,32 @@ CUIComboBoxCustom::CUIComboBoxCustom()
 	m_iListItemsSize=4;
 	m_fItemHeight=1;
 	m_pOwner=this;
+
 	m_pTextBox=xr_new<CUIStatic>();
 	m_pTextBox->SetAutoDelete(true);
 	CUIWindow::AttachChild(m_pTextBox);
+
 	m_pExpandButton=xr_new<CUIButton>();
 	m_pExpandButton->SetAutoDelete(true);
 	CUIWindow::AttachChild(m_pExpandButton);
-	m_pItemsList=xr_new<CUIStatic>();
-	m_pItemsList->SetAutoDelete(false);
-	m_pItemsList->Show(false);
-	m_pOwner->AttachChild(m_pItemsList);
+
+	m_pItemsWnd=xr_new<CUIStatic>();
+	m_pItemsWnd->SetAutoDelete(true);
+	CUIWindow::AttachChild(m_pItemsWnd);
+
+	m_pItemsWnd->Show(false);
+
+	m_pItemList=xr_new<CUIListBox>();
+	m_pItemsWnd->SetAutoDelete(true);
+	//m_pItemsWnd->AttachChild(m_pItemList);
 }
 
 CUIComboBoxCustom::~CUIComboBoxCustom()
 {
 	xr_free(m_pTextBox);
 	xr_free(m_pExpandButton);
-	xr_free(m_pItemsList);
+	xr_free(m_pItemList);
+	xr_free(m_pItemsWnd);	
 }
 
 void CUIComboBoxCustom::Init(float x, float y, float width, float height)
@@ -345,26 +353,28 @@ void CUIComboBoxCustom::SendMessageA(CUIWindow* pWnd, s16 msg, void* pData)
 		case BUTTON_CLICKED:
 			{
 				if (pWnd == m_pExpandButton)
-					if (!m_pItemsList->GetVisible())
+					if (!m_pItemsWnd->GetVisible())
 					{
 						m_fBackup=GetHeight();
-						m_pItemsList->SetWndPos(Fvector2().set(0.f,m_fItemHeight+2));
-						m_pItemsList->SetWndSize(Fvector2().set(300.f,200.f));
-						//SetHeight(m_pTextBox->GetHeight() + m_pItemsList->GetHeight()+5);
+						m_pItemsWnd->SetWndPos(Fvector2().set(0.f,m_fItemHeight+5));
+						m_pItemsWnd->SetWndSize(Fvector2().set(300.f,200.f));
+						SetHeight(m_pTextBox->GetHeight() + m_pItemsWnd->GetHeight()+5);
 						//m_pOwner->BringToTop(this);
 						//m_pOwner->SetCapture(this, true);
 						//GetParent()->GetParent()->GetParent()->SetCapture(this, true);
-						GetParent()->GetParent()->GetParent()->AttachChild(m_pItemsList);
-						GetParent()->GetParent()->GetParent()->BringToTop(m_pItemsList);
-						m_pItemsList->Show(true);
+						//GetParent()->GetParent()->GetParent()->AttachChild(m_pItemsWnd);
+						//GetParent()->GetParent()->GetParent()->BringToTop(m_pItemsWnd);
+						GetParent()->SetCapture(this, true);
+						//GetParent()->AttachChild(m_pItemsWnd);
+						//GetParent()->BringToTop(m_pItemsWnd);
+						m_pItemsWnd->Show(true);
 						//GetParent()->GetParent()->GetParent()->BringToTop(m_pItemsList);
 					}
 					else
 					{
-						GetParent()->GetParent()->GetParent()->DetachChild(m_pItemsList);
-						//SetHeight(m_fBackup);
-						m_pItemsList->Show(false);
-						//m_pOwner->SetCapture(this, false);
+						SetHeight(m_fBackup);
+						GetParent()->SetCapture(this, false);
+						m_pItemsWnd->Show(false);
 					}
 			}	
 			break;
@@ -402,14 +412,14 @@ void CUIComboBoxCustom::SetOwner(CUIWindow* owner)
 		CUIScrollView* new_owner = smart_cast<CUIScrollView*>(owner);
 		CUIScrollView* current_owner = smart_cast<CUIScrollView*>(m_pOwner);	
 		if (current_owner)
-			current_owner->RemoveWindow(m_pItemsList);
+			current_owner->RemoveWindow(m_pItemsWnd);
 		else
-			m_pOwner->DetachChild(m_pItemsList);
+			m_pOwner->DetachChild(m_pItemsWnd);
 		m_pOwner=owner;
 		if(new_owner)
-			new_owner->AddWindow(m_pItemsList, true);
+			new_owner->AddWindow(m_pItemsWnd, true);
 		else
-			m_pOwner->AttachChild(m_pItemsList);
+			m_pOwner->AttachChild(m_pItemsWnd);
 	}
 }
 
