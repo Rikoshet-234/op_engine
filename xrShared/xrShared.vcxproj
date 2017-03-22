@@ -28,7 +28,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_C++11|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120_CTP_Nov2012</PlatformToolset>
+    <PlatformToolset>v110</PlatformToolset>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -39,6 +39,7 @@
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <Import Project="..\GlobalProperties_2012.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -52,25 +53,25 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>y:\bin_Debug\</OutDir>
-    <IntDir>x:\intermediate\$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir>$(BinOutputDir)\</OutDir>
+    <IntDir>$(IntermediateOutputDir)\</IntDir>
     <IncludePath>S:\SDK\boost_1_30_0;S:\SDK\luabind\luabind;S:\SDK\fmt;S:\xrCore;S:\xrLua\src;$(IncludePath)</IncludePath>
-    <LibraryPath>x:\libraries_Debug\;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(LibrariesOutputDir)\;$(LibraryPath)</LibraryPath>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_C++11|Win32'">
-    <OutDir>y:\bin_$(Configuration)\</OutDir>
-    <IntDir>x:\intermediate\$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir>$(BinOutputDir)\</OutDir>
+    <IntDir>$(IntermediateOutputDir)\</IntDir>
     <IncludePath>S:\SDK\fmt;S:\xrCore;S:\xrLua\src;$(IncludePath)</IncludePath>
-    <LibraryPath>X:\libraries;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(LibrariesOutputDir)\;$(LibraryPath)</LibraryPath>
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>y:\bin_Release\</OutDir>
-    <IntDir>x:\intermediate\$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir>$(BinOutputDir)\</OutDir>
+    <IntDir>$(IntermediateOutputDir)\</IntDir>
     <TargetExt>.dll</TargetExt>
     <IncludePath>S:\SDK\boost_1_30_0;S:\SDK\luabind\luabind;S:\xrCore;S:\xrLua\src;$(IncludePath)</IncludePath>
-    <LibraryPath>x:\libraries_Release\;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(LibrariesOutputDir)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -96,7 +97,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ImportLibrary>x:\libraries_Debug\$(ProjectName).lib</ImportLibrary>
+      <ImportLibrary>$(LibrariesOutputDir)\$(ProjectName).lib</ImportLibrary>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>
       </ModuleDefinitionFile>
@@ -128,7 +129,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ImportLibrary>x:\libraries_$(Configuration)\$(ProjectName).lib</ImportLibrary>
+      <ImportLibrary>$(LibrariesOutputDir)\$(ProjectName).lib</ImportLibrary>
       <AdditionalDependencies>xrLua.lib;xrCore.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>xrShared.def</ModuleDefinitionFile>
     </Link>
@@ -150,7 +151,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <TreatLinkerWarningAsErrors>false</TreatLinkerWarningAsErrors>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
-      <ImportLibrary>x:\libraries_Release\$(ProjectName).lib</ImportLibrary>
+      <ImportLibrary>$(LibrariesOutputDir)\$(ProjectName).lib</ImportLibrary>
       <ModuleDefinitionFile>
       </ModuleDefinitionFile>
     </Link>

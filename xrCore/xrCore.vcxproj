@@ -56,6 +56,7 @@
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <Import Project="..\GlobalProperties_2012.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'" Label="PropertySheets">
@@ -83,37 +84,37 @@
     <_ProjectFileVersion>11.0.61030.0</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>y:\bin_Debug\</OutDir>
-    <IntDir>x:\intermediate\$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir>$(BinOutputDir)\</OutDir>
+    <IntDir>$(IntermediateOutputDir)\</IntDir>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>S:\SDK\boost_1_30_0;S:\SDK\fmt;S:\xrLua\src;S:\SDK\dx9sdk\dx9sdk\include;$(IncludePath)</IncludePath>
-    <LibraryPath>x:\libraries_Debug\;S:\SDK\dx9sdk\dx9sdk\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(LibrariesOutputDir)\;S:\SDK\dx9sdk\dx9sdk\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>y:\bin_Release\</OutDir>
-    <IntDir>x:\intermediate\$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir>$(BinOutputDir)\</OutDir>
+    <IntDir>$(IntermediateOutputDir)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>S:\xrLua\src;S:\SDK\dx9sdk\dx9sdk\include;$(IncludePath)</IncludePath>
-    <LibraryPath>S:\SDK\dx9sdk\dx9sdk\lib;x:\libraries_Release\;$(LibraryPath)</LibraryPath>
+    <LibraryPath>S:\SDK\dx9sdk\dx9sdk\lib;$(LibrariesOutputDir)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">
-    <OutDir>y:\bin_Release\</OutDir>
-    <IntDir>x:\intermediate\$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir>$(BinOutputDir)\</OutDir>
+    <IntDir>$(IntermediateOutputDir)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>S:\xrLua\src;S:\SDK\dx9sdk\dx9sdk\include;$(IncludePath)</IncludePath>
-    <LibraryPath>S:\SDK\dx9sdk\dx9sdk\lib;x:\libraries_Release\;$(LibraryPath)</LibraryPath>
+    <LibraryPath>S:\SDK\dx9sdk\dx9sdk\lib;$(LibrariesOutputDir)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
-    <OutDir>y:\bin_$(Configuration)\</OutDir>
-    <IntDir>x:\intermediate\$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir>$(BinOutputDir)\</OutDir>
+    <IntDir>$(IntermediateOutputDir)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>S:\SDK\fmt;S:\xrLua\src;S:\SDK\dx9sdk\dx9sdk\include;$(IncludePath)</IncludePath>
     <LibraryPath>S:\SDK\fmt\_build\bin\Release;S:\SDK\dx9sdk\dx9sdk\lib;X:\libraries;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_C++11|Win32'">
-    <OutDir>y:\bin_$(Configuration)\</OutDir>
-    <IntDir>x:\intermediate\$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir>$(BinOutputDir)\</OutDir>
+    <IntDir>$(IntermediateOutputDir)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>S:\SDK\fmt;S:\xrLua\src;S:\SDK\dx9sdk\dx9sdk\include;$(IncludePath)</IncludePath>
     <LibraryPath>S:\SDK\fmt\_build\bin\Release;S:\SDK\dx9sdk\dx9sdk\lib;X:\libraries;$(LibraryPath)</LibraryPath>
@@ -153,7 +154,7 @@
       <MapExports>false</MapExports>
       <SubSystem>Windows</SubSystem>
       <LargeAddressAware>true</LargeAddressAware>
-      <ImportLibrary>x:\libraries_Debug\$(ProjectName).lib</ImportLibrary>
+      <ImportLibrary>$(LibrariesOutputDir)\$(ProjectName).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
       <ModuleDefinitionFile>
       </ModuleDefinitionFile>
@@ -203,7 +204,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
-      <ImportLibrary>x:\libraries_Release\$(ProjectName).lib</ImportLibrary>
+      <ImportLibrary>$(LibrariesOutputDir)\$(ProjectName).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>
@@ -252,7 +253,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
-      <ImportLibrary>x:\libraries_Release\$(ProjectName).lib</ImportLibrary>
+      <ImportLibrary>$(LibrariesOutputDir)\$(ProjectName).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>
@@ -292,10 +293,10 @@
       <MapFileName>$(OutDir)$(ProjectName).map</MapFileName>
       <SubSystem>Windows</SubSystem>
       <LargeAddressAware>true</LargeAddressAware>
-      <ImportLibrary>x:\libraries_$(Configuration)\$(ProjectName).lib</ImportLibrary>
+      <ImportLibrary>$(LibrariesOutputDir)\$(ProjectName).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
       <AdditionalDependencies>fmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>S:\SDK\fmt\_build\fmt\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>xrCore.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
@@ -334,7 +335,7 @@
       <MapFileName>$(OutDir)$(ProjectName).map</MapFileName>
       <SubSystem>Windows</SubSystem>
       <LargeAddressAware>true</LargeAddressAware>
-      <ImportLibrary>x:\libraries_$(Configuration)\$(ProjectName).lib</ImportLibrary>
+      <ImportLibrary>$(LibrariesOutputDir)\$(ProjectName).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
       <AdditionalDependencies>fmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>xrCore.def</ModuleDefinitionFile>

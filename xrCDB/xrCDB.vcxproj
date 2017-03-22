@@ -59,6 +59,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <Import Project="..\GlobalProperties_2012.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
@@ -86,39 +87,39 @@
     <_ProjectFileVersion>11.0.61030.0</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>y:\bin_Release\</OutDir>
-    <IntDir>x:\intermediate\$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir>$(BinOutputDir)\</OutDir>
+    <IntDir>$(IntermediateOutputDir)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>S:\xrCore;$(IncludePath)</IncludePath>
-    <LibraryPath>X:\libraries_Release;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(LibrariesOutputDir)\_Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">
-    <OutDir>y:\bin_Release\</OutDir>
-    <IntDir>x:\intermediate\$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir>$(BinOutputDir)\</OutDir>
+    <IntDir>$(IntermediateOutputDir)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>S:\xrCore;$(IncludePath)</IncludePath>
-    <LibraryPath>X:\libraries_Release;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(LibrariesOutputDir)\_Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
-    <OutDir>y:\bin_$(Configuration)\</OutDir>
-    <IntDir>x:\intermediate\$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir>$(BinOutputDir)\</OutDir>
+    <IntDir>$(IntermediateOutputDir)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>y:\bin_Debug\</OutDir>
-    <IntDir>x:\intermediate\$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir>$(BinOutputDir)\</OutDir>
+    <IntDir>$(IntermediateOutputDir)\</IntDir>
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>S:\SDK\fmt;S:\xrCore;$(IncludePath)</IncludePath>
-    <LibraryPath>x:\libraries_Debug\;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(LibrariesOutputDir)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_C++11|Win32'">
-    <OutDir>y:\bin_$(Configuration)\</OutDir>
-    <IntDir>x:\intermediate\$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir>$(BinOutputDir)\</OutDir>
+    <IntDir>$(IntermediateOutputDir)\</IntDir>
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>S:\SDK\fmt;S:\xrCore;$(IncludePath)</IncludePath>
-    <LibraryPath>X:\libraries;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(LibrariesOutputDir)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Midl>
@@ -126,7 +127,7 @@
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>Win32</TargetEnvironment>
-      <TypeLibraryName>x:\xrCDB.tlb</TypeLibraryName>
+      <TypeLibraryName>$(LibrariesOutputDir)\xrCDB.tlb</TypeLibraryName>
     </Midl>
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
@@ -174,7 +175,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
-      <ImportLibrary>x:\libraries_Release\$(ProjectName).lib</ImportLibrary>
+      <ImportLibrary>$(LibrariesOutputDir)\$(ProjectName).lib</ImportLibrary>
       <TargetMachine>NotSet</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
@@ -184,7 +185,7 @@
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>Win32</TargetEnvironment>
-      <TypeLibraryName>x:\xrCDB.tlb</TypeLibraryName>
+      <TypeLibraryName>$(LibrariesOutputDir)\xrCDB.tlb</TypeLibraryName>
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
@@ -235,7 +236,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
-      <ImportLibrary>x:\libraries_Release\$(ProjectName).lib</ImportLibrary>
+      <ImportLibrary>$(LibrariesOutputDir)\$(ProjectName).lib</ImportLibrary>
       <TargetMachine>NotSet</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
@@ -245,7 +246,7 @@
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>Win32</TargetEnvironment>
-      <TypeLibraryName>x:\xrCDB.tlb</TypeLibraryName>
+      <TypeLibraryName>$(LibrariesOutputDir)\xrCDB.tlb</TypeLibraryName>
     </Midl>
     <ClCompile>
       <Optimization>Full</Optimization>
@@ -282,7 +283,7 @@
       <MapFileName>$(OutDir)$(ProjectName).map</MapFileName>
       <SubSystem>Windows</SubSystem>
       <LargeAddressAware>false</LargeAddressAware>
-      <ImportLibrary>x:\libraries_$(Configuration)\$(ProjectName).lib</ImportLibrary>
+      <ImportLibrary>$(LibrariesOutputDir)\$(ProjectName).lib</ImportLibrary>
       <TargetMachine>NotSet</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
@@ -292,7 +293,7 @@
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>Win32</TargetEnvironment>
-      <TypeLibraryName>x:\xrCDB.tlb</TypeLibraryName>
+      <TypeLibraryName>$(LibrariesOutputDir)\xrCDB.tlb</TypeLibraryName>
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
@@ -333,7 +334,7 @@
       <MapFileName />
       <MapExports>false</MapExports>
       <LargeAddressAware>false</LargeAddressAware>
-      <ImportLibrary>x:\libraries_Debug\$(ProjectName).lib</ImportLibrary>
+      <ImportLibrary>$(LibrariesOutputDir)\$(ProjectName).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
@@ -343,7 +344,7 @@
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>Win32</TargetEnvironment>
-      <TypeLibraryName>x:\xrCDB.tlb</TypeLibraryName>
+      <TypeLibraryName>$(LibrariesOutputDir)\xrCDB.tlb</TypeLibraryName>
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
@@ -386,7 +387,7 @@
       </MapFileName>
       <MapExports>false</MapExports>
       <LargeAddressAware>false</LargeAddressAware>
-      <ImportLibrary>x:\libraries_$(Configuration)\$(ProjectName).lib</ImportLibrary>
+      <ImportLibrary>$(LibrariesOutputDir)\$(ProjectName).lib</ImportLibrary>
       <TargetMachine>NotSet</TargetMachine>
     </Link>
   </ItemDefinitionGroup>

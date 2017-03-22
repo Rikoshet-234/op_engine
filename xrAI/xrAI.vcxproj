@@ -69,6 +69,7 @@
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <Import Project="..\GlobalProperties_2012.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release_Priquel|Win32'" Label="PropertySheets">
@@ -100,33 +101,33 @@
     <_ProjectFileVersion>11.0.61030.0</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>x:\binaries\</OutDir>
-    <IntDir>x:\intermediate\$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir>$(BinOutputDir)\</OutDir>
+    <IntDir>$(IntermediateOutputDir)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>x:\binaries\</OutDir>
-    <IntDir>x:\intermediate\$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir>$(BinOutputDir)\</OutDir>
+    <IntDir>$(IntermediateOutputDir)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
-    <OutDir>x:\binaries\</OutDir>
-    <IntDir>x:\intermediate\$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir>$(BinOutputDir)\</OutDir>
+    <IntDir>$(IntermediateOutputDir)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed_Priquel|Win32'">
-    <OutDir>x:\binaries\</OutDir>
-    <IntDir>x:\intermediate\$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir>$(BinOutputDir)\</OutDir>
+    <IntDir>$(IntermediateOutputDir)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Priquel|Win32'">
-    <OutDir>x:\binaries\</OutDir>
-    <IntDir>x:\intermediate\$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir>$(BinOutputDir)\</OutDir>
+    <IntDir>$(IntermediateOutputDir)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Priquel|Win32'">
-    <OutDir>x:\binaries\</OutDir>
-    <IntDir>x:\intermediate\$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir>$(BinOutputDir)\</OutDir>
+    <IntDir>$(IntermediateOutputDir)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -135,7 +136,7 @@
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>Win32</TargetEnvironment>
-      <TypeLibraryName>x:/xrAI.tlb</TypeLibraryName>
+      <TypeLibraryName>$(LibrariesOutputDir)\xrAI.tlb</TypeLibraryName>
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
@@ -174,7 +175,7 @@
       <StackReserveSize>0</StackReserveSize>
       <StackCommitSize>0</StackCommitSize>
       <LargeAddressAware>true</LargeAddressAware>
-      <ImportLibrary>x:\libraries\$(ProjectName).lib</ImportLibrary>
+      <ImportLibrary>$(LibrariesOutputDir)\$(ProjectName).lib</ImportLibrary>
       <TargetMachine>NotSet</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
@@ -184,7 +185,7 @@
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>Win32</TargetEnvironment>
-      <TypeLibraryName>x:/xrAI.tlb</TypeLibraryName>
+      <TypeLibraryName>$(LibrariesOutputDir)\xrAI.tlb</TypeLibraryName>
     </Midl>
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
@@ -232,7 +233,7 @@
       <StackCommitSize>0</StackCommitSize>
       <LargeAddressAware>true</LargeAddressAware>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
-      <ImportLibrary>x:\libraries\$(ProjectName).lib</ImportLibrary>
+      <ImportLibrary>$(LibrariesOutputDir)\$(ProjectName).lib</ImportLibrary>
       <TargetMachine>NotSet</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
@@ -242,7 +243,7 @@
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>Win32</TargetEnvironment>
-      <TypeLibraryName>x:/xrAI.tlb</TypeLibraryName>
+      <TypeLibraryName>$(LibrariesOutputDir)\xrAI.tlb</TypeLibraryName>
     </Midl>
     <ClCompile>
       <Optimization>Full</Optimization>
@@ -286,7 +287,7 @@
       <StackCommitSize>0</StackCommitSize>
       <LargeAddressAware>true</LargeAddressAware>
       <TerminalServerAware />
-      <ImportLibrary>x:\libraries\$(ProjectName).lib</ImportLibrary>
+      <ImportLibrary>$(LibrariesOutputDir)\$(ProjectName).lib</ImportLibrary>
       <TargetMachine>NotSet</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
@@ -296,7 +297,7 @@
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>Win32</TargetEnvironment>
-      <TypeLibraryName>x:/xrAI.tlb</TypeLibraryName>
+      <TypeLibraryName>$(LibrariesOutputDir)\xrAI.tlb</TypeLibraryName>
     </Midl>
     <ClCompile>
       <Optimization>Full</Optimization>
@@ -340,7 +341,7 @@
       <StackCommitSize>0</StackCommitSize>
       <LargeAddressAware>true</LargeAddressAware>
       <TerminalServerAware />
-      <ImportLibrary>x:\libraries\$(ProjectName).lib</ImportLibrary>
+      <ImportLibrary>$(LibrariesOutputDir)\$(ProjectName).lib</ImportLibrary>
       <TargetMachine>NotSet</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
@@ -389,7 +390,7 @@
       <StackReserveSize>0</StackReserveSize>
       <StackCommitSize>0</StackCommitSize>
       <LargeAddressAware>true</LargeAddressAware>
-      <ImportLibrary>x:\libraries\$(ProjectName).lib</ImportLibrary>
+      <ImportLibrary>$(LibrariesOutputDir)\$(ProjectName).lib</ImportLibrary>
       <TargetMachine>NotSet</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
@@ -447,7 +448,7 @@
       <StackCommitSize>0</StackCommitSize>
       <LargeAddressAware>true</LargeAddressAware>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
-      <ImportLibrary>x:\libraries\$(ProjectName).lib</ImportLibrary>
+      <ImportLibrary>$(LibrariesOutputDir)\$(ProjectName).lib</ImportLibrary>
       <TargetMachine>NotSet</TargetMachine>
     </Link>
   </ItemDefinitionGroup>

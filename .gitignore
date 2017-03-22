@@ -335,10 +335,20 @@ paket-files/
 
 
 prepare_builds.cmd 
+ball_clean.cmd
+ball_debug.cmd
+ball_release.cmd
+bcore.cmd
+bgame.cmd
+blua.cmd
+brender.cmd
 
 # build files
 xr_build
 lapi.txt
+MyLog.log
 
+# VS2012 local configuration file
+GlobalProperties_2012.props
 # VS2015 local configuration file
 GlobalProperties.props
