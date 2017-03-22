@@ -51,6 +51,7 @@ void CUIOptionsItem::SaveOptIntegerValue(int val)
 	Console->Execute	(command);
 }
 
+
 void CUIOptionsItem::GetOptFloatValue(float& val, float& min, float& max)
 {
 	Console->GetFloat(m_entry.c_str(), val, min, max);
@@ -105,3 +106,5 @@ void CUIOptionsItem::SaveValue(){
 	if (/*m_entry == "snd_freq" ||*/ m_entry == "snd_efx")
 		m_optionsManager.DoSndRestart();
 }
+
+

@@ -344,28 +344,28 @@ void DBG_PHAbstruactStartFrame(bool dr_frame)
 void capped_cylinder_ray_collision_test();
 void DBG_PHAbstructRender()
 {
-	PHABS_DBG_I i,e;
+	PHABS_DBG_I i1,e1;
 	if(!draw_frame)
 	{
-		i=dbg_draw_abstruct0.begin();
-		e=dbg_draw_abstruct0.end();
+		i1=dbg_draw_abstruct0.begin();
+		e1=dbg_draw_abstruct0.end();
 	}else
 	{
-		i=dbg_draw_abstruct1.begin();
-		e=dbg_draw_abstruct1.end();
+		i1=dbg_draw_abstruct1.begin();
+		e1=dbg_draw_abstruct1.end();
 	}
 	
-	for(;e!=i;++i)
+	for(;e1!=i1;++i1)
 	{
-		(*i)->render();
+		(*i1)->render();
 	}
 	if(dbg_ph_draw_mode!=dmCashed)
 	{
-		PHABS_DBG_I i,e;
-		i=dbg_draw_cashed.begin();e=dbg_draw_cashed.end();
-		for(;e!=i;++i)
+		PHABS_DBG_I i2,e2;
+		i2=dbg_draw_cashed.begin();e2=dbg_draw_cashed.end();
+		for(;e2!=i2;++i2)
 		{
-				(*i)->render();
+				(*i2)->render();
 		}
 		if(cash_draw_remove_time<Device.dwTimeGlobal)
 		{

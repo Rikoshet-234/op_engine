@@ -179,18 +179,18 @@ void CProfiler::show_stats			(CGameFont *game_font, bool show)
 		u64						timer_time = 0;
 		u32						call_count = 0;
 
-		PORTIONS::const_iterator	I = m_portions.begin(), J = I;
-		PORTIONS::const_iterator	E = m_portions.end();
-		for ( ; I != E; ++I) {
-			if (xr_strcmp((*I).m_timer_id,(*J).m_timer_id)) {
+		PORTIONS::const_iterator	I1 = m_portions.begin(), J = I1;
+		PORTIONS::const_iterator	E1 = m_portions.end();
+		for ( ; I1 != E1; ++I1) {
+			if (xr_strcmp((*I1).m_timer_id,(*J).m_timer_id)) {
 				setup_timer		((*J).m_timer_id,timer_time,call_count);
 				timer_time		= 0;
 				call_count		= 0;
-				J				= I;
+				J				= I1;
 			}
 
 			++call_count;
-			timer_time			+= (*I).m_time;
+			timer_time			+= (*I1).m_time;
 		}
 		setup_timer				((*J).m_timer_id,timer_time,call_count);
 

@@ -9,6 +9,7 @@
 
 #include "pch_script.h"
 #include "UIComboBox.h"
+#include "UIListBoxItem.h"
 
 using namespace luabind;
 
@@ -30,3 +31,19 @@ void CUIComboBox::script_register(lua_State *L)
 //		.def("AddItem",				(void (CUIComboBox::*)(LPCSTR)) CUIComboBox::AddItem)
 	];
 }
+
+void CUIComboBoxCustom::script_register(lua_State *L)
+{
+	module(L)
+	[
+		class_<CUIListBoxItem>("CUIListBoxItem")
+		.def(						constructor<>()),
+
+		class_<CUIComboBoxCustom, CUIStatic>("CUIComboBoxCustom")
+		.def(						constructor<>())
+		.def("SetListLength",		&CUIComboBoxCustom::SetListLength)
+		.def("SetOwner",			&CUIComboBoxCustom::SetOwner)
+		//.def("AddItem",				static_cast<CUIListBoxItem* (CUIComboBoxCustom::*)(LPCSTR, int)>(&CUIComboBoxCustom::AddItem))
+	];
+}
+

@@ -402,19 +402,19 @@ void CUITreeViewItem::MarkArticleAsRead(bool value)
 
 //////////////////////////////////////////////////////////////////////////
 
-void CUITreeViewItem::CheckParentMark(CUITreeViewItem *pOwner)
+void CUITreeViewItem::CheckParentMark(CUITreeViewItem *pOwner1)
 {
 	// Берем рута, смотрим на его чилдов, и если среди них есть хоть 1
 	// непрочитанный, то маркаем себя как непрочитанный, и  говорим провериться выше.
 	bool f = false;
-	if (pOwner && pOwner->IsRoot())
+	if (pOwner1 && pOwner1->IsRoot())
 	{
-		for (SubItems_it it = pOwner->vSubItems.begin(); it != pOwner->vSubItems.end(); ++it)
+		for (SubItems_it it = pOwner1->vSubItems.begin(); it != pOwner1->vSubItems.end(); ++it)
 		{
 			if (!(*it)->IsArticleReaded())
 			{
-				pOwner->m_bArticleRead = false;
-				pOwner->SetItemColor();
+				pOwner1->m_bArticleRead = false;
+				pOwner1->SetItemColor();
 				f = true;
 			}
 		}
@@ -422,11 +422,11 @@ void CUITreeViewItem::CheckParentMark(CUITreeViewItem *pOwner)
 		if (!f)
 		{
 			// Если мы тут, то все артиклы прочитанны, и можно маркнуть себя как прочитанная ветвь
-			pOwner->m_bArticleRead = true;
-			pOwner->SetItemColor();
+			pOwner1->m_bArticleRead = true;
+			pOwner1->SetItemColor();
 		}
 
-		pOwner->CheckParentMark(pOwner->GetOwner());
+		pOwner1->CheckParentMark(pOwner1->GetOwner());
 	}
 }
 

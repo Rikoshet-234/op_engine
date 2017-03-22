@@ -4,9 +4,9 @@
 
 using namespace luabind;
 
-void w_bool(IWriter *self,bool value)
+void w_bool(IWriter *self_obj,bool value)
 {
-	self->w_u8(value?1:0);
+	self_obj->w_u8(value?1:0);
 }
 
 

@@ -21,15 +21,15 @@ CUITrackBar::CUITrackBar()
 	m_b_is_float(true),
 	m_b_invert(false)
 {	
-	m_pFrameLine					= xr_new<CUIFrameLineWnd>();	
-	AttachChild						(m_pFrameLine);	
+	m_pFrameLine					= xr_new<CUIFrameLineWnd>();
+	CUIWindow::AttachChild						(m_pFrameLine);	
 	m_pFrameLine->SetAutoDelete		(true);
 	m_pFrameLine_d					= xr_new<CUIFrameLineWnd>(); 
 	m_pFrameLine_d->SetVisible		(false);
-	AttachChild						(m_pFrameLine_d); 
+	CUIWindow::AttachChild						(m_pFrameLine_d); 
 	m_pFrameLine_d->SetAutoDelete	(true);
 	m_pSlider						= xr_new<CUI3tButton>();			
-	AttachChild						(m_pSlider);		
+	CUIWindow::AttachChild						(m_pSlider);		
 	m_pSlider->SetAutoDelete		(true);
 //.	m_pSlider->SetOwner				(this);
 }
@@ -61,7 +61,7 @@ void CUITrackBar::Init(float x, float y, float width, float height){
 
 	strconcat			(sizeof(buf),buf,SLIDER_TEXTURE,"_e");
 	item_width			= CUITextureMaster::GetTextureWidth(buf);
-    item_height			= CUITextureMaster::GetTextureHeight(buf);
+	item_height			= CUITextureMaster::GetTextureHeight(buf);
 	m_pSlider->Init		(0, (height - item_height)/2, item_width, item_height);
 	m_pSlider->InitTexture(SLIDER_TEXTURE);
 }	
@@ -101,7 +101,6 @@ bool CUITrackBar::IsChanged()
 		return (m_i_back_up != m_i_val);
 	}
 }
-
 void CUITrackBar::SetStep(float step)
 {
 	if(m_b_is_float)
@@ -219,7 +218,7 @@ void CUITrackBar::UpdatePos()
 	float window_width			= GetWidth();		
 	float free_space			= window_width - btn_width;
 	Fvector2 pos				= m_pSlider->GetWndPos();
-    
+	
 	float __fval	= (m_b_is_float)?m_f_val:(float)m_i_val;
 	float __fmax	= (m_b_is_float)?m_f_max:(float)m_i_max;
 	float __fmin	= (m_b_is_float)?m_f_min:(float)m_i_min;
@@ -256,4 +255,73 @@ void CUITrackBar::SetCheck(bool b)
 {
 	VERIFY(!m_b_is_float);
 	m_i_val = (b)?m_i_max:m_i_min;
+}
+
+CUITrackBarCustom::CUITrackBarCustom()
+{
+	m_bShowDynamicValue=true;
+}
+
+void CUITrackBarCustom::SetMaxValue(float max)
+{
+	if (m_b_is_float)
+		m_f_max = max;
+	else
+		m_i_max = iFloor(max);
+}
+
+void CUITrackBarCustom::SetMinValue(float min)
+{
+	if (m_b_is_float)
+		m_f_min = min;
+	else
+		m_i_min = iFloor(min);
+}
+
+void CUITrackBarCustom::SaveValue()
+{
+	//ignore any saves to options!!!!!!
+	if (m_bShowDynamicValue)
+	{
+		string64 buf;
+		if (m_b_is_float)
+			sprintf_s(buf,"%f",m_f_val);
+		else
+			sprintf_s(buf,"%d",m_i_val);
+		m_pSlider->SetText(buf);
+	}
+}
+
+void CUITrackBarCustom::SetCurrentValue()
+{
+	UpdatePos();
+}
+
+void CUITrackBarCustom::SetValue(float value)
+{
+	if (m_b_is_float)
+	{
+		m_f_val = value;
+		clamp(m_f_val,m_f_min,m_f_max);
+	}
+	else
+	{
+		m_i_val = iFloor(value);
+		clamp(m_i_val,m_i_min,m_i_max);
+	}
+	UpdatePos();
+}
+
+float CUITrackBarCustom::GetValue()
+{
+	if (m_b_is_float)
+	{
+		clamp(m_f_val,m_f_min,m_f_max);
+		return m_f_val;
+	}
+	else
+	{
+		clamp(m_i_val,m_i_min,m_i_max);
+		return float(m_i_val);
+	}
 }

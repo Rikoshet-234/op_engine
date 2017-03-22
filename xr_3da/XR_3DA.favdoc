@@ -256,7 +256,7 @@
       </favorites>
     </Folder>
     <Folder>
-      <name>combobox</name>
+      <name>UIElements</name>
       <folders />
       <favorites>
         <Favorite>
@@ -316,9 +316,9 @@
           <path>xrGame\ui\UIXmlInit.cpp</path>
           <absolutePath>S:\xr_3da\xrGame\ui\UIXmlInit.cpp</absolutePath>
           <position>
-            <line>1373</line>
-            <column>6</column>
-            <lineHash>ZjR4lxO0mcqLVeVC3vsMW3xp+UFiIasHeyrNRUNVRyo=</lineHash>
+            <line>256</line>
+            <column>41</column>
+            <lineHash>kf5TkznUdw4sX2ZcfJ9fGLOb3bFf/UaLJK9j75tKMZ4=</lineHash>
           </position>
         </Favorite>
         <Favorite>
@@ -333,12 +333,54 @@
           </position>
         </Favorite>
         <Favorite>
-          <name>call.hpp</name>
-          <absolutePath>s:\SDK\luabind\luabind\luabind\detail\call.hpp</absolutePath>
+          <name>UISpinText.cpp</name>
+          <path>xrGame\ui\UISpinText.cpp</path>
+          <absolutePath>S:\xr_3da\xrGame\ui\UISpinText.cpp</absolutePath>
           <position>
-            <line>285</line>
+            <line>197</line>
             <column>1</column>
-            <lineHash>dD7oW5C6aFD10d383acAWy9d+VfiyKUVz36nXm7S3O8=</lineHash>
+            <lineHash>ECtRuXZaVqPomffPDuOOUlH5xQOzV7MwpJGD63sVVgQ=</lineHash>
+          </position>
+        </Favorite>
+        <Favorite>
+          <name>UICustomSpin.cpp</name>
+          <path>xrGame\ui\UICustomSpin.cpp</path>
+          <absolutePath>S:\xr_3da\xrGame\ui\UICustomSpin.cpp</absolutePath>
+          <position>
+            <line>23</line>
+            <column>11</column>
+            <lineHash>JNmwxFg5haA5zlMHH9H+VU5U/RqsT7ebsPameL/LYrU=</lineHash>
+          </position>
+        </Favorite>
+        <Favorite>
+          <name>UI3tButton.cpp</name>
+          <path>xrGame\ui\UI3tButton.cpp</path>
+          <absolutePath>S:\xr_3da\xrGame\ui\UI3tButton.cpp</absolutePath>
+          <position>
+            <line>25</line>
+            <column>1</column>
+            <lineHash>wcsVxn4R33byC23Fx2eGSp9gFO/ZNLlrxV31DFkqFes=</lineHash>
+          </position>
+        </Favorite>
+        <Favorite>
+          <name>UI3tButton.h</name>
+          <path>xrGame\ui\UI3tButton.h</path>
+          <absolutePath>S:\xr_3da\xrGame\ui\UI3tButton.h</absolutePath>
+          <viewKind>7651a701-06e5-11d1-8ebd-00a0c90f26ea</viewKind>
+          <position>
+            <line>51</line>
+            <column>24</column>
+            <lineHash>gR0paWCCCbveyG5xT6TzzGvhfL9cE8aSCLUQ2EY9c+Q=</lineHash>
+          </position>
+        </Favorite>
+        <Favorite>
+          <name>UIButton.cpp</name>
+          <path>xrGame\ui\UIButton.cpp</path>
+          <absolutePath>S:\xr_3da\xrGame\ui\UIButton.cpp</absolutePath>
+          <position>
+            <line>140</line>
+            <column>18</column>
+            <lineHash>LQMExXS8BUhl3skCOIfJhBdtxMBbOEyiPFNNRvb3oO0=</lineHash>
           </position>
         </Favorite>
       </favorites>

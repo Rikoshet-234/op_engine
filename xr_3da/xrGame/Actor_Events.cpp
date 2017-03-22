@@ -231,7 +231,7 @@ void CActor::OnEvent		(NET_Packet& P, u16 type)
 		}break;
 	case GE_REINIT_ADDONS:
 		{
-			u32 DeviceFrameInit=P.r_u32();
+			P.r_u32();//read reserved field
 			CInventory inv=Actor()->inventory();
 			std::for_each(inv.m_all.begin(),inv.m_all.end(),[](CInventoryItem* item)
 			{

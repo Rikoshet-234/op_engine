@@ -401,9 +401,9 @@ IC	bool	CLevelGraph::create_straight_path	(u32 start_vertex_id, const Fvector2 &
 	dest					= finish_point;
 	dir.sub					(dest,start);
 	u32						dest_xz = vertex_position(v3d(dest)).xz();
-	Fvector2				temp;
+	Fvector2				temp1;
 	Fvector					pos3d;
-	unpack_xz				(vertex(start_vertex_id),temp.x,temp.y);
+	unpack_xz				(vertex(start_vertex_id),temp1.x,temp1.y);
 
 	if (bClearPath)
 		tpaOutputPoints.clear	();
@@ -428,7 +428,7 @@ IC	bool	CLevelGraph::create_straight_path	(u32 start_vertex_id, const Fvector2 &
 	}
 
 
-	float					cur_sqr = _sqr(temp.x - dest.x) + _sqr(temp.y - dest.y);
+	float					cur_sqr = _sqr(temp1.x - dest.x) + _sqr(temp1.y - dest.y);
 	for (;;) {
 		const_iterator		I,E;
 		begin				(cur_vertex_id,I,E);
@@ -438,8 +438,8 @@ IC	bool	CLevelGraph::create_straight_path	(u32 start_vertex_id, const Fvector2 &
 			if ((next_vertex_id == prev_vertex_id) || !valid_vertex_id(next_vertex_id))
 				continue;
 			CVertex			*v = vertex(next_vertex_id);
-			unpack_xz		(v,temp.x,temp.y);
-			box.min			= box.max = temp;
+			unpack_xz		(v,temp1.x,temp1.y);
+			box.min			= box.max = temp1;
 			box.grow		(identity);
 			if (box.pick_exact(start,dir)) {
 				Fvector2		temp;

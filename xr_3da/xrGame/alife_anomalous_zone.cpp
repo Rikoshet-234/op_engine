@@ -87,7 +87,8 @@ void CSE_ALifeAnomalousZone::spawn_artefacts				()
 	for (u32 ii=0; ii<m_artefact_count; ++ii) {
 		float fProbability		= randF(1.f);
 		float fSum				= 0.f;
-		for (u16 p=0; p<n; ++p) {
+		u16 p = 0;
+		for (; p<n; ++p) {
 			fSum			+= m_weights[p].second;
 			if (fSum > fProbability)
 				break;
@@ -103,11 +104,11 @@ void CSE_ALifeAnomalousZone::spawn_artefacts				()
 			ai().alife().spawns().assign_artefact_position(this,i);
 
 			Fvector				t = i->o_Position	;
-			u32					p = i->m_tNodeID	;
+			u32					p2 = i->m_tNodeID	;
 			float				q = i->m_fDistance	;
 			alife().graph().change(i,m_tGraphID,i->m_tGraphID);
 			i->o_Position		= t;
-			i->m_tNodeID		= p;
+			i->m_tNodeID		= p2;
 			i->m_fDistance		= q;
 
 			CSE_ALifeItemArtefact *l_tpALifeItemArtefact = smart_cast<CSE_ALifeItemArtefact*>(i);

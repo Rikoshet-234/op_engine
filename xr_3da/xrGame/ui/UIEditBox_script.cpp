@@ -8,19 +8,19 @@
 using namespace luabind;
 
 #pragma optimize("s",on)
-void CUIEditBox_SetText(CUIEditBox* self,LPCSTR text)
+void CUIEditBox_SetText(CUIEditBox* self_box,LPCSTR text)
 {
-	self->SetText(text);
+	self_box->SetText(text);
 }
 
-void CUIEditBox_SetText_number(CUIEditBox* self,float number)
+void CUIEditBox_SetText_number(CUIEditBox* self_box,float number)
 {
 	ai().script_engine().script_log		(ScriptStorage::eLuaMessageTypeError,"SetText : invalid input type! use lua tostring() function for save value precision!!!");
 }
 
-void CUIEditBox_SetText_bool(CUIEditBox* self,bool value)
+void CUIEditBox_SetText_bool(CUIEditBox* self_box,bool value)
 {
-	self->SetText(value ? "true" : "false");
+	self_box->SetText(value ? "true" : "false");
 }
 
 void CUIEditBox::script_register(lua_State *L)

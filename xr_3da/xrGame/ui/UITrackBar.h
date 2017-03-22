@@ -30,11 +30,13 @@ public:
 			void	SetType					(bool b_float){m_b_is_float=b_float;};
 			bool	GetCheck				();
 			void	SetCheck				(bool b);
+
+			
 protected:
 			void 	UpdatePos				();
 			void 	UpdatePosRelativeToMouse();
 
-    CUI3tButton*		m_pSlider;
+	CUI3tButton*		m_pSlider;
 	CUIFrameLineWnd*	m_pFrameLine;
 	CUIFrameLineWnd*	m_pFrameLine_d;
 	bool				m_b_invert;
@@ -56,4 +58,21 @@ protected:
 			int					m_i_back_up;
 		};
 	};
+};
+
+class CUITrackBarCustom : public CUITrackBar
+{
+private:
+	bool m_bShowDynamicValue;
+public:
+
+	CUITrackBarCustom();
+
+	void SetMaxValue(float max);
+	void SetMinValue(float min);
+	void SaveValue() override;
+	void SetCurrentValue() override;
+	void SetValue(float value);
+	float GetValue();
+	void ShowDynamicValue(bool value) {m_bShowDynamicValue=value;}
 };

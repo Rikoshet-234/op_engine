@@ -17,10 +17,10 @@ IC	CSE_ALifeSmartZone *CALifeSmartTerrainRegistry::object							(const ALife::_O
 {
 	OBJECTS::const_iterator	I = objects().find(id);
 #ifdef DEBUG
-	if (I==objects().end())
+	/*if (I==objects().end())
 	{
 		float b=0;
-	}
+	}*/
 #endif
 	VERIFY					(I != objects().end());
 	return					((*I).second);

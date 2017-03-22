@@ -101,3 +101,18 @@ void CUIFrameLineWnd::SetColor(u32 cl)
 {
 	UIFrameLine.SetColor(cl);
 }
+
+bool CUIFrameLineWnd::OnMouseDown(int mouse_btn)
+{
+	if (mouse_btn==MOUSE_1)
+	{
+		GetMessageTarget()->SendMessage(this, WINDOW_LBUTTON_DOWN);
+		return true;
+	}
+	if (mouse_btn==MOUSE_2)
+	{
+		GetMessageTarget()->SendMessage(this, WINDOW_RBUTTON_DOWN);
+		return true;
+	}
+	return false;
+}

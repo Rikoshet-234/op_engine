@@ -58,8 +58,8 @@ void	CLocatorAPI::auth_runtime		(void*	params)
 				continue;
 
 			// test for important
-			for (s=0; s<_o->important.size(); s++) {
-				if ((f.size_real != 0) && strstr(f.name,_o->important[s].c_str())) {
+			for (u32 s2=0; s2<_o->important.size(); s2++) {
+				if ((f.size_real != 0) && strstr(f.name,_o->important[s2].c_str())) {
 					// crc for file				
 					IReader*	r	= FS.r_open	(f.name);
 					if (!r) {

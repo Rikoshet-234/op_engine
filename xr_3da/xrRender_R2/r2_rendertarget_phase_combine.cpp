@@ -241,14 +241,14 @@ void	CRenderTarget::phase_combine	()
 		L_right.crossproduct(L_up,L_dir);           L_right.normalize       ();
 		L_dir.crossproduct  (L_right,L_up);         L_dir.normalize         ();
 
-		Fvector				p0,p1,p2,p3;
+		Fvector				pf0,pf1,p2,p3;
 		float				sz	= 100.f;
-		p0.mad				(zero,L_right,sz).mad	(L_dir,sz);
-		p1.mad				(zero,L_right,sz).mad	(L_dir,-sz);
+		pf0.mad				(zero,L_right,sz).mad	(L_dir,sz);
+		pf1.mad				(zero,L_right,sz).mad	(L_dir,-sz);
 		p2.mad				(zero,L_right,-sz).mad	(L_dir,-sz);
 		p3.mad				(zero,L_right,-sz).mad	(L_dir,+sz);
-		RCache.dbg_DrawTRI	(Fidentity,p0,p1,p2,0xffffffff);
-		RCache.dbg_DrawTRI	(Fidentity,p2,p3,p0,0xffffffff);
+		RCache.dbg_DrawTRI	(Fidentity,pf0,pf1,p2,0xffffffff);
+		RCache.dbg_DrawTRI	(Fidentity,p2,p3,pf0,0xffffffff);
 	}
 
 	static	xr_vector<dbg_line_t>	saved_dbg_lines;

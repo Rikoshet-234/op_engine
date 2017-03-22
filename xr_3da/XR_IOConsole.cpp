@@ -581,8 +581,8 @@ BOOL CConsole::GetBool(LPCSTR cmd, BOOL& val)
 		if(cf){
 			val = cf->GetValue();
 		}else{
-			CCC_Integer* cf = dynamic_cast<CCC_Integer*>(C);
-			val = !!cf->GetValue();
+			CCC_Integer* cf1 = dynamic_cast<CCC_Integer*>(C);
+			val = !!cf1->GetValue();
 		}
 	}
 	return val;

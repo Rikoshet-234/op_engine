@@ -244,12 +244,12 @@ void CUIInventoryWnd::ActivatePropertiesBox()
 	{
 		UIPropertiesBox.AutoUpdateSize	();
 		UIPropertiesBox.BringAllToTop	();
-		Fvector2						cursor_pos;
+		Fvector2						cursor_pos2;
 		Frect							vis_rect;
 		GetAbsoluteRect					(vis_rect);
-		cursor_pos						= GetUICursor()->GetCursorPosition();
-		cursor_pos.sub					(vis_rect.lt);
-		UIPropertiesBox.Show			(vis_rect, cursor_pos);
+		cursor_pos2						= GetUICursor()->GetCursorPosition();
+		cursor_pos2.sub					(vis_rect.lt);
+		UIPropertiesBox.Show			(vis_rect, cursor_pos2);
 		PlaySnd							(eInvProperties);
 	}
 }

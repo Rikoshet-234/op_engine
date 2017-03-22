@@ -3,6 +3,7 @@
 #include "xrUIXmlParser.h"
 
 
+class CUISpinTextCustom;
 class IUIMultiTextureOwner;
 class IUISingleTextureOwner;
 class IUITextControl;
@@ -33,8 +34,10 @@ class CUIListBox;
 class CUIStatsPlayerList;
 class CUIDragDropListEx;
 class CUIComboBox;
+class CUIComboBoxCustom;
 class CUITabButtonMP;
 class CUITrackBar;
+class CUITrackBarCustom;
 class CUIListItemIconed;
 
 class CUIXmlInit
@@ -53,6 +56,7 @@ public:
 	static bool InitStatic				(CUIXml& xml_doc, const char* path, int index, CUIStatic* pWnd);
 	static bool	InitCheck				(CUIXml& xml_doc, const char* path, int index, CUICheckButton* pWnd);
 	static bool InitSpin				(CUIXml& xml_doc, const char* path, int index, CUICustomSpin* pWnd);
+	static bool InitSpinCustom			(CUIXml& xml_doc, const char* path, int index, CUICustomSpin* pWnd);
 	static bool InitText				(CUIXml& xml_doc, const char* path, int index, CUIStatic* pWnd);
 	static bool InitText				(CUIXml& xml_doc, const char* path, int index, IUITextControl* pWnd);
 	static bool InitButton				(CUIXml& xml_doc, const char* path, int index, CUIButton* pWnd);
@@ -80,7 +84,9 @@ public:
 	static bool InitScrollView			(CUIXml& xml_doc, const char* path, int index, CUIScrollView* pWnd);
 	static bool InitListBox				(CUIXml& xml_doc, const char* path, int index, CUIListBox* pWnd);
 	static bool	InitComboBox			(CUIXml& xml_doc, const char* path, int index, CUIComboBox* pWnd);
+	static bool	InitComboBoxCustom		(CUIXml& xml_doc, const char* path, int index, CUIComboBoxCustom* pWnd);
 	static bool	InitTrackBar			(CUIXml& xml_doc, const char* path, int index, CUITrackBar* pWnd);
+	static bool	InitTrackBarCustom		(CUIXml& xml_doc, const char* path, int index, CUITrackBarCustom* pWnd);
 	static bool	InitIconedColumns		(CUIXml& xml_doc, const char* path, int index, CUIListItemIconed* pWnd);
 	static Frect GetFRect				(CUIXml& xml_doc, const char* path, int index);
 	static u32	GetColor				(CUIXml& xml_doc, const char* path, int index, u32 def_clr);

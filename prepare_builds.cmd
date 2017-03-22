@@ -1,16 +1,16 @@
 rem %comspec% /k 
-@call "c:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\vcvars32.bat"
+@call "c:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\vcvars32.bat"
 REM @call ball_debug.cmd
 REM @set BUILD_STATUS=%ERRORLEVEL% 
 REM @if not %BUILD_STATUS%==0 goto fail
 REM @timeout /T 5 /NOBREAK 
-@call ball_release.cmd
+@msbuild s:\xr_3da.sln /p:configuration="release" /fileLoggerParameters:LogFile=MyLog.log /p:PreferredToolArchitecture=x64  /verbosity:minimal
 @set BUILD_STATUS=%ERRORLEVEL% 
 @if not %BUILD_STATUS%==0 goto fail
 @timeout /T 5 /NOBREAK 
 @set @zipper="D:\Program Files\7-Zip\7z.exe"
 @del /F /Q d:\Temp\bin_Release.7z
-@call %@zipper% a d:\Temp\bin_Release.7z y:\bin_Release\ -xr!*.ilk  
+@call %@zipper% a d:\Temp\bin_Release.7z y:\bin_vs2015_Release\ -xr!*.ilk  
 rem @del /F /Q d:\Temp\bin_Debug.7z
 rem @call %@zipper% a d:\Temp\bin_Debug.7z y:\bin_Debug\ -xr!*.ilk  
 @timeout /T 5 /NOBREAK 

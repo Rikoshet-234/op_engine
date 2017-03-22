@@ -223,7 +223,7 @@ void CWeaponKnife::switch2_Attacking	(u32 state)
 		mID=random_anim(mhud_attack);
 	else //eFire2
 		mID=random_anim(mhud_attack2);
-	m_pHUD->animPlay(mID,TRUE, this, state);
+	m_pHUD->animPlay(mID,FALSE, this, state);
 
 	m_attackStart	= true;
 	m_bPending		= true;

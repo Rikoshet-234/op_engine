@@ -18,6 +18,7 @@ public:
 	virtual void SetOrientation(bool horizontal);
 			float GetTextureHeight();
 	void SetColor(u32 cl);
+	bool OnMouseDown(int mouse_btn) override;
 
 	// Also we can display textual caption on the frame
 	CUIStatic		UITitleText;

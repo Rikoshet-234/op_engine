@@ -2,9 +2,11 @@
 #include "UISpinText.h"
 #include "UILines.h"
 #include "../string_table.h"
+#include "UIFrameLineWnd.h"
+#include "UI3tButton.h"
 
 CUISpinText::CUISpinText(){
-    m_curItem = -1;
+	m_curItem = -1;
 }
 
 void CUISpinText::AddItem_(const char* item, int id)
@@ -95,3 +97,101 @@ bool CUISpinText::CanPressDown()
 {
 	return m_curItem > 0;
 }
+
+CUISpinTextCustom::CUISpinTextCustom()
+{
+	m_backupIndex=-1;
+}
+
+void CUISpinTextCustom::SetCurrentValue()
+{
+	
+}
+
+void CUISpinTextCustom::SaveValue()
+{
+	m_backupIndex=m_curItem;
+}
+
+bool CUISpinTextCustom::IsChanged()
+{
+	return m_backupIndex!=m_curItem;
+}
+
+void CUISpinTextCustom::SetItem()
+{
+	if (m_curItem==-1)
+		m_pLines->SetText("");
+	else
+		m_pLines->SetText(CStringTable().translate(m_list[m_curItem]._orig).c_str());
+}
+
+int CUISpinTextCustom::GetSelectedId()
+{
+	return m_list[m_curItem]._id;
+}
+
+void CUISpinTextCustom::SetSelectedId(int id)
+{
+	Items_it st=std::find_if(m_list.begin(),m_list.end(),[&](SInfo info)
+	{
+		return info._id==id;
+	});
+	if (st!=m_list.end())
+	{
+		m_curItem=std::distance(m_list.begin(),st);
+		SetItem();
+	}
+	else
+	{
+		m_curItem=-1;
+		m_pLines->SetText("");
+	}
+}
+
+LPCSTR CUISpinTextCustom::GetSelectedText()
+{
+	return m_list[m_curItem]._orig.c_str();
+}
+
+void CUISpinTextCustom::SetSelectedText(LPCSTR text)
+{
+	Items_it st=std::find_if(m_list.begin(),m_list.end(),[&](SInfo info)
+	{
+		return xr_strcmp(info._orig.c_str(),text)==0;
+	});
+	if (st!=m_list.end())
+	{
+		m_curItem=std::distance(m_list.begin(),st);
+		SetItem();
+	}
+	else
+	{
+		m_curItem=-1;
+		m_pLines->SetText("");
+	}
+}
+
+void CUISpinTextCustom::AddItem(const char* text, int id)
+{
+	SInfo			_info;
+	_info._orig		= text;
+	_info._id		= id;
+
+	m_list.push_back( _info );
+	if (-1 == m_curItem)
+	{
+		m_curItem		= 0;
+		m_pLines->SetText(CStringTable().translate(m_list[m_curItem]._orig).c_str());
+	}
+}
+
+void CUISpinTextCustom::SetFont(CGameFont* pFont)
+{
+	if (pFont!=nullptr)
+	{
+		CUISpinText::SetFont(pFont);
+		m_pLines->SetFont(pFont);
+	}
+}
+

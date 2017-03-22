@@ -556,7 +556,7 @@ void CKinematicsAnimated::IBlend_Startup	()
 		blend_pool.push_back(B);
 
 	// cycles+fx clear
-	for (i=0; i<MAX_PARTS; i++)
+	for (u32 i=0; i<MAX_PARTS; i++)
 		blend_cycles[i].clear();
 	blend_fx.clear		();
 	ChannelFactorsStartup();
@@ -718,8 +718,8 @@ IC void Dequantize(CKey& K,const CBlend& BD,const CMotion& M)
 	u32				count	=	M.get_count();
 	// rotation
 	if (M.test_flag(flRKeyAbsent)){
-		const CKeyQR *		K		=	&M._keysR[0];
-		QR2Quat(*K,D->Q);
+		const CKeyQR *		Kq		=	&M._keysR[0];
+		QR2Quat(*Kq,D->Q);
 	}else{
 		const CKeyQR*		K1r		=	&M._keysR[(frame+0)%count];
 		const CKeyQR*		K2r		=	&M._keysR[(frame+1)%count];

@@ -154,28 +154,28 @@ LPCSTR get_file_age_str(CLocatorAPI* fs, LPCSTR nm)
 	return asctime( newtime );
 }
 
-void r_close(CLocatorAPI* self,IReader* reader)
+void r_close(CLocatorAPI* self_obj,IReader* reader)
 {
-	self->r_close(*&reader);
+	self_obj->r_close(*&reader);
 }
 
-IReader* r_open(CLocatorAPI* self,LPCSTR fileName)
+IReader* r_open(CLocatorAPI* self_obj,LPCSTR fileName)
 {
 	string_path			S1;
 	FS.update_path		(S1,"$game_settings$",fileName);
-	return self->r_open(S1);
+	return self_obj->r_open(S1);
 }
 
-void w_close(CLocatorAPI* self,IWriter* writer)
+void w_close(CLocatorAPI* self_obj,IWriter* writer)
 {
-	self->w_close(*&writer);
+	self_obj->w_close(*&writer);
 }
 
-IWriter* w_open(CLocatorAPI* self,LPCSTR fileName)
+IWriter* w_open(CLocatorAPI* self_obj,LPCSTR fileName)
 {
 	string_path			S1;
 	FS.update_path		(S1,"$game_settings$",fileName);
-	return self->w_open(S1);
+	return self_obj->w_open(S1);
 }
 
 #pragma optimize("s",on)

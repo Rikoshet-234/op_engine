@@ -252,6 +252,24 @@ bool CUIXmlInit::InitSpin(CUIXml& xml_doc, const char* path, int index, CUICusto
 	return true;
 }
 
+bool CUIXmlInit::InitSpinCustom(CUIXml& xml_doc, const char* path, int index, CUICustomSpin* pWnd){
+	InitWindow(xml_doc, path, index, pWnd);
+	string256				_buf;
+	u32						color;
+	strconcat				(sizeof(_buf),_buf,path,":text_color:e");
+	if (xml_doc.NavigateToNode(_buf,index)){
+		color				= GetColor(xml_doc,_buf,index,0x00);
+		pWnd->SetTextColor	(color);	
+	}
+	strconcat				(sizeof(_buf),_buf,path,":text_color:d");
+	if (xml_doc.NavigateToNode(_buf,index)){
+		color				= GetColor(xml_doc,_buf,index,0x00);
+		pWnd->SetTextColorD	(color);
+	}
+
+	return true;
+}
+
 bool CUIXmlInit::InitText(CUIXml& xml_doc, LPCSTR path, int index, CUIStatic* pWnd){
 	InitText(xml_doc,path,index,(IUITextControl*)pWnd);
 	shared_str al = xml_doc.ReadAttrib(path, index, "vert_align", "");
@@ -1330,18 +1348,56 @@ bool CUIXmlInit::InitListBox(CUIXml& xml_doc, const char* path, int index, CUILi
 bool CUIXmlInit::InitTrackBar(CUIXml& xml_doc, const char* path, int index, CUITrackBar* pWnd)
 {
 	InitWindow			(xml_doc, path, 0, pWnd);
-	
 	int is_integer		= xml_doc.ReadAttribInt(path, index, "is_integer", 0);
 	pWnd->SetType		(!is_integer);
 	InitOptionsItem		(xml_doc, path, 0, pWnd);
-
 	int invert			= xml_doc.ReadAttribInt(path, index, "invert", 0);
 	pWnd->SetInvert		(!!invert);
 	float step			= xml_doc.ReadAttribFlt(path, index, "step", 0.1f);
 	pWnd->SetStep		(step);
-	
-
 	return				true;
+}
+
+bool CUIXmlInit::InitTrackBarCustom(CUIXml& xml_doc, const char* path, int index, CUITrackBarCustom* pWnd)
+{
+	InitWindow			(xml_doc, path, 0, pWnd);
+	int is_integer		= xml_doc.ReadAttribInt(path, index, "is_integer", 0);
+	pWnd->SetType		(!is_integer);
+	int invert			= xml_doc.ReadAttribInt(path, index, "invert", 0);
+	pWnd->SetInvert		(!!invert);
+	float step			= xml_doc.ReadAttribFlt(path, index, "step", 0.1f);
+	pWnd->SetStep		(step);
+	float max			= xml_doc.ReadAttribFlt(path, index, "max", 1.0f);
+	pWnd->SetMaxValue		(max);
+	float min			= xml_doc.ReadAttribFlt(path, index, "min", 0.0f);
+	pWnd->SetMinValue		(min);
+	float value			= xml_doc.ReadAttribFlt(path, index, "value", 0.0f);
+	pWnd->SetValue		(value);
+	return				true;
+}
+
+bool CUIXmlInit::InitComboBoxCustom(CUIXml& xml_doc, const char* path, int index, CUIComboBoxCustom* pWnd)
+{
+	pWnd->SetListLength(xml_doc.ReadAttribInt(path, index, "list_length", 4));
+	pWnd->SetitemHeight(xml_doc.ReadAttribFlt(path, index, "item_height", 1));
+
+	string512 _path;
+	strconcat(sizeof(_path),_path, path, ":text_box");
+	InitWindow(xml_doc,_path,index,pWnd);
+	InitTexture(xml_doc,_path,index,pWnd);
+
+	strconcat(sizeof(_path),_path, path, ":text_box:button");
+	InitButton(xml_doc,_path,index,pWnd->m_pExpandButton);
+	pWnd->m_pExpandButton->SetWndPos(Fvector2().set(pWnd->GetWidth()-pWnd->m_pExpandButton->GetWidth()-2,pWnd->GetHeight()/2-pWnd->m_pExpandButton->GetWidth()/2));
+
+	pWnd->m_pTextBox->SetWndRect(Frect().set(0,0,pWnd->m_pExpandButton->GetWndPos().x-2,pWnd->m_fItemHeight));
+
+	strconcat(sizeof(_path),_path, path, ":list");
+	InitWindow(xml_doc,_path,index,pWnd->m_pItemsWnd);
+	InitTexture(xml_doc,_path,index,pWnd->m_pItemsWnd);
+	pWnd->m_pItemsWnd->SetWidth(pWnd->m_pTextBox->GetWidth());
+	pWnd->m_pItemList->SetWndRect(pWnd->m_pItemsWnd->GetWndRect());
+	return true;
 }
 
 bool CUIXmlInit::InitComboBox(CUIXml& xml_doc, const char* path, int index, CUIComboBox* pWnd){

@@ -11,20 +11,21 @@
 #include "UIComboBox.h"
 #include "UITextureMaster.h"
 #include "UIScrollBar.h"
+#include "UIListBoxItem.h"
 
 #define CB_HEIGHT 23.0f
 #define BTN_SIZE  23.0f
 
 CUIComboBox::CUIComboBox()
 {
-	AttachChild			(&m_frameLine);
-	AttachChild			(&m_text);
+	CUIWindow::AttachChild			(&m_frameLine);
+	CUIWindow::AttachChild			(&m_text);
 
 //.	AttachChild			(&m_btn);
 
-	AttachChild			(&m_frameWnd);
-	AttachChild			(&m_list);
-
+	CUIWindow::AttachChild			(&m_frameWnd);
+	CUIWindow::AttachChild			(&m_list);
+	m_fItemHeight=0;
 	m_iListHeight		= 0;
 	m_bInited			= false;
 	m_eState			= LIST_FONDED;
@@ -32,13 +33,6 @@ CUIComboBox::CUIComboBox()
 	m_textColor[0]		= 0xff00ff00;
 }
 
-CUIComboBox::~CUIComboBox()
-{}
-
-void CUIComboBox::SetListLength(int length){
-	R_ASSERT(0 == m_iListHeight);
-	m_iListHeight = length;
-}
 
 void CUIComboBox::Init(float x, float y, float width){
 	m_bInited = true;
@@ -63,12 +57,12 @@ void CUIComboBox::Init(float x, float y, float width){
 
 
 	// height of list equal to height of ONE element
-	float item_height					= CUITextureMaster::GetTextureHeight("ui_cb_listline_b");
-	m_list.Init							(0, CB_HEIGHT, width, item_height*m_iListHeight);
+	m_fItemHeight					= CUITextureMaster::GetTextureHeight("ui_cb_listline_b");
+	m_list.Init							(0, CB_HEIGHT, width, m_fItemHeight*m_iListHeight);
 	m_list.Init							();
 	m_list.SetTextColor					(m_textColor[0]);
 	m_list.SetSelectionTexture			("ui_cb_listline");
-	m_list.SetItemHeight				(CUITextureMaster::GetTextureHeight("ui_cb_listline_b"));
+	m_list.SetItemHeight				(m_fItemHeight);
 	// frame(texture) for list
 	m_frameWnd.Init						(0,  CB_HEIGHT, width, m_list.GetItemHeight()*m_iListHeight);
 	m_frameWnd.InitTexture				("ui_cb_listbox");
@@ -76,16 +70,23 @@ void CUIComboBox::Init(float x, float y, float width){
 	m_list.Show							(false);
 	m_frameWnd.Show						(false);
 }
-
 void CUIComboBox::Init(float x, float y, float width, float height)
 {
 	this->Init		(x, y, width);
 }
+CUIComboBox::~CUIComboBox()
+{}
+
+void CUIComboBox::SetListLength(int length){
+	R_ASSERT(0 == m_iListHeight);
+	m_iListHeight = length;
+}
+
 
 #include "uilistboxitem.h"
 CUIListBoxItem* CUIComboBox::AddItem_(LPCSTR str, int _data)
 {
-    R_ASSERT2			(m_bInited, "Can't add item to ComboBox before Initialization");
+	R_ASSERT2			(m_bInited, "Can't add item to ComboBox before Initialization");
 	CUIListBoxItem* itm = m_list.AddItem(str);
 	itm->SetData		((void*)(__int64)_data);
 	return				itm;
@@ -174,7 +175,7 @@ void CUIComboBox::OnBtnClicked()
 
 void CUIComboBox::ShowList(bool bShow)
 {
-    if (bShow)
+	if (bShow)
 	{
 		SetHeight			(m_text.GetHeight() + m_list.GetHeight());
 
@@ -182,7 +183,6 @@ void CUIComboBox::ShowList(bool bShow)
 		m_frameWnd.Show		(true);
 
 		m_eState			= LIST_EXPANDED;
-
 		GetParent()->SetCapture(this, true);
 	}
 	else
@@ -217,15 +217,15 @@ void CUIComboBox::OnFocusLost()
 {
 	CUIWindow::OnFocusLost();
 	if (m_bIsEnabled)
-        SetState(S_Enabled);
+		SetState(S_Enabled);
 
 }
 
 void CUIComboBox::OnFocusReceive()
 {
 	CUIWindow::OnFocusReceive();
-    if (m_bIsEnabled)
-        SetState(S_Highlighted);
+	if (m_bIsEnabled)
+		SetState(S_Highlighted);
 }
 
 bool CUIComboBox::OnMouse(float x, float y, EUIMessages mouse_action){
@@ -243,7 +243,7 @@ bool CUIComboBox::OnMouse(float x, float y, EUIMessages mouse_action){
 
 			if (  (!bCursorOverScb) &&  mouse_action == WINDOW_LBUTTON_DOWN)
 			{
-                ShowList(false);
+				ShowList(false);
 				return true;
 			}
 			break;
@@ -258,7 +258,7 @@ bool CUIComboBox::OnMouse(float x, float y, EUIMessages mouse_action){
 	}	
 	 
 
-        return false;
+		return false;
 }
 
 void CUIComboBox::SetState(UIState state)
@@ -297,3 +297,133 @@ void CUIComboBox::Undo()
 	SetCurrentValue		();
 }
 
+void CUIComboBoxCustom::RecalcListHeight()
+{
+	m_pItemsWnd->SetHeight(m_iListItemsSize*m_fItemHeight);
+}
+
+CUIComboBoxCustom::CUIComboBoxCustom()
+{
+	m_iListItemsSize=4;
+	m_fItemHeight=1;
+	m_pOwner=this;
+
+	m_pTextBox=xr_new<CUIStatic>();
+	m_pTextBox->SetAutoDelete(true);
+	CUIWindow::AttachChild(m_pTextBox);
+
+	m_pExpandButton=xr_new<CUIButton>();
+	m_pExpandButton->SetAutoDelete(true);
+	CUIWindow::AttachChild(m_pExpandButton);
+
+	m_pItemsWnd=xr_new<CUIStatic>();
+	m_pItemsWnd->SetAutoDelete(true);
+	CUIWindow::AttachChild(m_pItemsWnd);
+
+	m_pItemsWnd->Show(false);
+
+	m_pItemList=xr_new<CUIListBox>();
+	m_pItemsWnd->SetAutoDelete(true);
+	//m_pItemsWnd->AttachChild(m_pItemList);
+}
+
+CUIComboBoxCustom::~CUIComboBoxCustom()
+{
+	xr_free(m_pTextBox);
+	xr_free(m_pExpandButton);
+	xr_free(m_pItemList);
+	xr_free(m_pItemsWnd);	
+}
+
+void CUIComboBoxCustom::Init(float x, float y, float width, float height)
+{
+	CUIStatic::Init(x, y, width, height);
+}
+
+void CUIComboBoxCustom::Init()
+{
+	SetWndPos(m_pTextBox->GetWndPos());
+	SetWndSize(m_pTextBox->GetWndSize());
+}
+
+void CUIComboBoxCustom::SendMessageA(CUIWindow* pWnd, s16 msg, void* pData)
+{
+	CUIStatic::SendMessage	(pWnd, msg, pData);
+	switch (msg){
+		case BUTTON_CLICKED:
+			{
+				if (pWnd == m_pExpandButton)
+					if (!m_pItemsWnd->GetVisible())
+					{
+						m_fBackup=GetHeight();
+						m_pItemsWnd->SetWndPos(Fvector2().set(0.f,m_fItemHeight+5));
+						m_pItemsWnd->SetWndSize(Fvector2().set(300.f,200.f));
+						SetHeight(m_pTextBox->GetHeight() + m_pItemsWnd->GetHeight()+5);
+						//m_pOwner->BringToTop(this);
+						//m_pOwner->SetCapture(this, true);
+						//GetParent()->GetParent()->GetParent()->SetCapture(this, true);
+						//GetParent()->GetParent()->GetParent()->AttachChild(m_pItemsWnd);
+						//GetParent()->GetParent()->GetParent()->BringToTop(m_pItemsWnd);
+						GetParent()->SetCapture(this, true);
+						//GetParent()->AttachChild(m_pItemsWnd);
+						//GetParent()->BringToTop(m_pItemsWnd);
+						m_pItemsWnd->Show(true);
+						//GetParent()->GetParent()->GetParent()->BringToTop(m_pItemsList);
+					}
+					else
+					{
+						SetHeight(m_fBackup);
+						GetParent()->SetCapture(this, false);
+						m_pItemsWnd->Show(false);
+					}
+			}	
+			break;
+
+		case LIST_ITEM_CLICKED:
+			/*if (pWnd == &m_list)
+				OnListItemSelect();	*/
+			break;
+		default:
+			break;
+	}
+}
+
+void CUIComboBoxCustom::SetListLength(int length)
+{
+	m_iListItemsSize = length;
+	RecalcListHeight();
+	
+}
+
+void CUIComboBoxCustom::SetitemHeight(float height)
+{
+	m_fItemHeight=height;
+	RecalcListHeight();
+}
+
+void CUIComboBoxCustom::SetOwner(CUIWindow* owner)
+{
+	//if (owner!=m_pOwner && owner)
+	//{
+	//	m_pOwner=owner;
+	//}
+	if (owner!=m_pOwner && owner)
+	{
+		CUIScrollView* new_owner = smart_cast<CUIScrollView*>(owner);
+		CUIScrollView* current_owner = smart_cast<CUIScrollView*>(m_pOwner);	
+		if (current_owner)
+			current_owner->RemoveWindow(m_pItemsWnd);
+		else
+			m_pOwner->DetachChild(m_pItemsWnd);
+		m_pOwner=owner;
+		if(new_owner)
+			new_owner->AddWindow(m_pItemsWnd, true);
+		else
+			m_pOwner->AttachChild(m_pItemsWnd);
+	}
+}
+
+//CUIListBoxItem* CUIComboBoxCustom::AddItem(LPCSTR str, int _data)
+//{
+//	return AddItem_(str,_data);
+//}

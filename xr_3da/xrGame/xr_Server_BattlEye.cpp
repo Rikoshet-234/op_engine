@@ -153,7 +153,8 @@ void  BattlEyeServer::KickPlayer( int player, char* reason )
 	Level().Server->clients_Lock();
 
 	u32	cnt	= Level().Server->game->get_players_count();
-	for( u32 it = 0; it < cnt; ++it )	
+	u32 it;
+	for( it = 0; it < cnt; ++it )	
 	{
 		xrClientData *l_pC = (xrClientData*)Level().Server->client_Get(it);
 		if ( l_pC->ID.value()==(u32)player )
@@ -189,7 +190,7 @@ void  BattlEyeServer::KickPlayer( int player, char* reason )
 			}
 		}
 	}
-	if ( it == cnt )
+	if (it == cnt )
 	{
 		Msg( "! No such player found : %i", player );
 	}

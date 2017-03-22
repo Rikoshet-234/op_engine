@@ -164,9 +164,27 @@ CUISpinText* CScriptXmlInit::InitSpinText(LPCSTR path, CUIWindow* parent){
 	return pWnd;
 }
 
+CUISpinTextCustom* CScriptXmlInit::InitSpinTextCustom(LPCSTR path, CUIWindow* parent)
+{
+	CUISpinTextCustom* pWnd = xr_new<CUISpinTextCustom>();
+	CUIXmlInit::InitSpinCustom(m_xml, path, 0, pWnd);
+	pWnd->SetAutoDelete(true);
+	if(parent) parent->AttachChild(pWnd);
+	return pWnd;
+}
+
 CUIComboBox* CScriptXmlInit::InitComboBox(LPCSTR path, CUIWindow* parent){
 	CUIComboBox* pWnd = xr_new<CUIComboBox>();
 	CUIXmlInit::InitComboBox(m_xml, path, 0, pWnd);
+	pWnd->SetAutoDelete(true);
+	_attach_child(pWnd, parent);
+//.	if(parent) parent->AttachChild(pWnd);
+	return pWnd;
+}
+
+CUIComboBoxCustom* CScriptXmlInit::InitComboBoxCustom(LPCSTR path, CUIWindow* parent){
+	CUIComboBoxCustom* pWnd = xr_new<CUIComboBoxCustom>();
+	CUIXmlInit::InitComboBoxCustom(m_xml, path, 0, pWnd);
 	pWnd->SetAutoDelete(true);
 	_attach_child(pWnd, parent);
 //.	if(parent) parent->AttachChild(pWnd);
@@ -268,6 +286,15 @@ CUITrackBar* CScriptXmlInit::InitTrackBar(LPCSTR path, CUIWindow* parent){
 	return							pWnd;	
 }
 
+CUITrackBarCustom* CScriptXmlInit::InitTrackBarCustom(LPCSTR path, CUIWindow* parent)
+{
+	CUITrackBarCustom* pWnd				= xr_new<CUITrackBarCustom>();
+	CUIXmlInit::InitTrackBarCustom		(m_xml, path, 0, pWnd);
+	pWnd->SetAutoDelete				(true);
+	_attach_child					(pWnd, parent);
+	return							pWnd;
+}
+
 CUIProgressBar* CScriptXmlInit::InitProgressBar(LPCSTR path, CUIWindow* parent)
 {
 	CUIProgressBar* pWnd			= xr_new<CUIProgressBar>();
@@ -335,7 +362,9 @@ void CScriptXmlInit::script_register(lua_State *L){
 		.def("InitSpinNum",				&CScriptXmlInit::InitSpinNum)
 		.def("InitSpinFlt",				&CScriptXmlInit::InitSpinFlt)
 		.def("InitSpinText",			&CScriptXmlInit::InitSpinText)
+		.def("InitSpinTextCustom",		&CScriptXmlInit::InitSpinTextCustom)
 		.def("InitComboBox",			&CScriptXmlInit::InitComboBox)		
+		.def("InitComboBoxCustom",		&CScriptXmlInit::InitComboBoxCustom)		
 		.def("InitButton",				&CScriptXmlInit::InitButton)
 		.def("Init3tButton",			&CScriptXmlInit::Init3tButton)
 		.def("InitList",				&CScriptXmlInit::InitList)
@@ -344,6 +373,7 @@ void CScriptXmlInit::script_register(lua_State *L){
 		.def("InitMapList",				&CScriptXmlInit::InitMapList)
 		.def("InitMapInfo",				&CScriptXmlInit::InitMapInfo)
 		.def("InitTrackBar",			&CScriptXmlInit::InitTrackBar)
+		.def("InitTrackBarCustom",		&CScriptXmlInit::InitTrackBarCustom)
 		.def("InitKeyBinding",			&CScriptXmlInit::InitKeyBinding)
 		.def("InitMMShniaga",			&CScriptXmlInit::InitMMShniaga)
 		.def("InitScrollView",			&CScriptXmlInit::InitScrollView)

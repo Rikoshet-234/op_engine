@@ -129,7 +129,7 @@ CUICustomEdit::CUICustomEdit()
 	m_lines.SetColoringMode(false);
 	m_lines.SetCutWordsMode(true);
 	m_lines.SetUseNewLineMode(false);
-	SetText("");
+	CUICustomEdit::SetText("");
 	m_textPos.set(3,0);
 	m_bNumbersOnly = false;
 	m_bFloatNumbers = false;
@@ -138,7 +138,7 @@ CUICustomEdit::CUICustomEdit()
 	m_textColor[0]=color_argb(255,235,219,185);
 	m_textColor[1]=color_argb(255,100,100,100);
 
-	AttachChild(&m_languageIcon);
+	CUIWindow::AttachChild(&m_languageIcon);
 }
 
 CUICustomEdit::~CUICustomEdit()
@@ -198,10 +198,12 @@ void CUICustomEdit::Init(float x, float y, float width, float height)
 	m_languageIcon.SetColor(m_textColor[0]);
 	m_languageIcon.TextureAvailable(false);
 	m_languageIcon.SetText(gs_langNames[CURRENT_SELECTED_LANGUAGE].c_str());
-	m_languageIcon.SetWndPos(width - 7.f,2.0f);
-	Fvector2 wndSize;
-	wndSize.set(7.f, height-4.f);
-	m_languageIcon.SetWndSize(wndSize);
+	m_languageIcon.AdjustWidthToText();
+	m_languageIcon.AdjustHeightToText();
+	m_languageIcon.SetWndPos(GetWidth() - m_languageIcon.GetWidth()-2,GetHeight()/2-m_languageIcon.GetHeight()/2);
+	//Fvector2 wndSize;
+	//wndSize.set(7.f, height-4.f);
+	//m_languageIcon.SetWndSize(wndSize);
 }
 
 void CUICustomEdit::SetLightAnim(LPCSTR lanim)
@@ -209,7 +211,7 @@ void CUICustomEdit::SetLightAnim(LPCSTR lanim)
 	if(lanim&&xr_strlen(lanim))
 		m_lanim	= LALib.FindItem(lanim);
 	else
-		m_lanim	= NULL;
+		m_lanim	= nullptr;
 }
 
 void CUICustomEdit::SetPasswordMode(bool mode){
