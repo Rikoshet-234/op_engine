@@ -463,8 +463,7 @@ void CUIInventoryWnd::Hide()
 
 	//достать вещь в активный слот
 	CActor *pActor = smart_cast<CActor*>(Level().CurrentEntity());
-	if(pActor && m_iCurrentActiveSlot != NO_ACTIVE_SLOT && 
-		pActor->inventory().m_slots[m_iCurrentActiveSlot].m_pIItem)
+	if(pActor && m_iCurrentActiveSlot != NO_ACTIVE_SLOT && pActor->inventory().m_slots[m_iCurrentActiveSlot].m_pIItem)
 	{
 		pActor->inventory().Activate(m_iCurrentActiveSlot);
 		m_iCurrentActiveSlot = NO_ACTIVE_SLOT;
@@ -472,9 +471,7 @@ void CUIInventoryWnd::Hide()
 
 	if (!IsGameTypeSingle())
 	{
-		CActor *pActor		= smart_cast<CActor*>(Level().CurrentEntity());
 		if(!pActor)			return;
-
 		pActor->SetWeaponHideState(INV_STATE_INV_WND, false);
 	}
 }

@@ -256,9 +256,9 @@ CSoundPlayer::CSoundCollection::CSoundCollection	(const CSoundCollectionParams &
 			string256					name;
 			sprintf_s						(name,"%s%d",S,i);
 			if (FS.exist(fn,"$game_sounds$",name,".ogg")){
-				ref_sound				*temp = add(params.m_type,name);
-				if (temp)
-					m_sounds.push_back	(temp);
+				ref_sound				*temp_rs = add(params.m_type,name);
+				if (temp_rs)
+					m_sounds.push_back	(temp_rs);
 			}
 		}
 	}

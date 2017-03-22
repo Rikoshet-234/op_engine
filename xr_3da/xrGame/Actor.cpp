@@ -462,8 +462,8 @@ void	CActor::Hit							(SHit* pHDS)
 
 	if (!IsGameTypeSingle() && !g_dedicated_server)
 	{
-		game_PlayerState* ps = Game().GetPlayerByGameID(ID());
-		if (ps && ps->testFlag(GAME_PLAYER_FLAG_INVINCIBLE))
+		game_PlayerState* ps_s = Game().GetPlayerByGameID(ID());
+		if (ps_s && ps_s->testFlag(GAME_PLAYER_FLAG_INVINCIBLE))
 		{
 			bPlaySound = false;
 			if (Device.dwFrame != last_hit_frame &&
@@ -475,7 +475,7 @@ void	CActor::Hit							(SHit* pHDS)
 				CParticlesPlayer::MakeXFORM(this,HDS.bone(),HDS.dir,HDS.p_in_bone_space,pos);
 
 				// установить particles
-				CParticlesObject* ps = NULL;
+				CParticlesObject* ps = nullptr;
 
 				if (eacFirstEye == cam_active && this == Level().CurrentEntity())
 					ps = CParticlesObject::Create(invincibility_fire_shield_1st,TRUE);

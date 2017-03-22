@@ -671,8 +671,8 @@ void CIKLimb::Collide( SIKCollideData &cld, CGameObject *O, const Fmatrix &foot,
 	if( ph_dbg_draw_mask.test( phDbgDrawIKGoal ) && cld.collided && !R.O )
 	{
 		CDB::TRI	*tri	= Level( ).ObjectSpace.GetStaticTris( ) + R.element;
-		Fvector p = pos;p.add( Fvector( ).mul( pick_v, l_pick_dist ) );
-		DBG_DrawLine(pos,p,D3DCOLOR_XRGB( 255, 0, 0 ) );
+		Fvector p1 = pos;p1.add( Fvector( ).mul( pick_v, l_pick_dist ) );
+		DBG_DrawLine(pos,p1,D3DCOLOR_XRGB( 255, 0, 0 ) );
 		if( tri )
 		{
 			Fvector p = pos;p.add( Fvector( ).mul( pick_v, l_pick_dist ) );

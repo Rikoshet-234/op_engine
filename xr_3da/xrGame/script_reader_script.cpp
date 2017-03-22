@@ -24,11 +24,11 @@ LPCSTR r_stringZ(IReader *pself)
 	return			(*temp);
 }
 
-LPCSTR r_string(IReader *self)
+LPCSTR r_string(IReader *self_obj)
 {
 	static const char empty = 0;
 	shared_str		temp;
-	self->r_stringSS(temp);
+	self_obj->r_stringSS(temp);
 	if (temp.size()>0)
 		return	(temp.c_str());
 	else

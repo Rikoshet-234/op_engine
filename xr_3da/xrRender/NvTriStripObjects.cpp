@@ -1018,7 +1018,7 @@ void NvStripifier::SplitUpStripsAndOptimize(NvStripInfoVec &allStrips, NvStripIn
 		int firstIndex = 0;
 		float minCost = 10000.0f;
 		
-		for(i = 0; i < tempStrips2.size(); i++)
+		for(int i = 0; i < tempStrips2.size(); i++)
 		{
 			int numNeighbors = 0;
 			

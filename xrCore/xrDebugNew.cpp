@@ -659,7 +659,7 @@ void format_message	(LPSTR buffer, const u32 &buffer_size)
 	FormatMessage(
 		FORMAT_MESSAGE_ALLOCATE_BUFFER | 
 		FORMAT_MESSAGE_FROM_SYSTEM,
-		NULL,
+		nullptr,
 		error_code,
 		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
 		(LPSTR)&message,
@@ -667,7 +667,7 @@ void format_message	(LPSTR buffer, const u32 &buffer_size)
 		NULL
 	);
 
-	sprintf		(buffer,"[error][%8d]    : %s",error_code,message);
+	sprintf		(buffer,"[error][%8d]    : %s",error_code, (LPSTR)&message);
 	LocalFree	(message);
 }
 

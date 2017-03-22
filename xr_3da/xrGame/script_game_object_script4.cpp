@@ -291,7 +291,6 @@ luabind::object	CScriptGameObject::GetImmunitiesFromBeltTable() const
 	if (!inventory_owner) {
 		return		luabind::object();
 	}
-	luabind::object result=luabind::newtable(ai().script_engine().lua());
 	xr_vector<CInventoryItem* >::const_iterator bi=inventory_owner->inventory().m_belt.begin();
 	xr_vector<CInventoryItem* >::const_iterator ei=inventory_owner->inventory().m_belt.end();
 	xr_map<int,float> data;
@@ -314,12 +313,13 @@ luabind::object	CScriptGameObject::GetImmunitiesFromBeltTable() const
 				}
 		}
 	});
+	luabind::object result_l = luabind::newtable(ai().script_engine().lua());
 	if (data.size()>0)
 		std::for_each(data.begin(),data.end(),[&](std::pair<int,float> it)
 		{
-			result[it.first]=it.second;
+			result_l[it.first]=it.second;
 		});
-	return result;
+	return result_l;
 }
 
 #pragma endregion

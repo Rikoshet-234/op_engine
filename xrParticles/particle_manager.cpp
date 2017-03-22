@@ -241,9 +241,9 @@ ParticleAction* CParticleManager::CreateAction(PActionEnum type)
 	pa->type					= type;
 	return pa;
 }
-u32 CParticleManager::LoadActions(int alist_id, IReader& R,shared_str defName)
+u32 CParticleManager::LoadActions(int alist_id, IReader& R,shared_str iDefName)
 {
-	this->defName=defName;
+	this->defName= iDefName;
 	return LoadActions(alist_id,R);
 }
 

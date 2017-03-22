@@ -1224,15 +1224,15 @@ void CApplication::load_draw_internal()
 		static float offs			= -0.5f;
 
 #pragma region draw main load background
-		Frect						r;
-		r.set(offs ,offs,1024,768);
-		r.lt.mul					(k);						
-		r.rb.mul					(k);						
+		Frect						r1;
+		r1.set(offs ,offs,1024,768);
+		r1.lt.mul					(k);						
+		r1.rb.mul					(k);						
 		pv							= static_cast<FVF::TL*>(RCache.Vertex.Lock(4, ll_hGeom.stride(), Offset));
-		pv->set						(r.lt.x,				r.rb.y,		C, 0, 1);	pv++;
-		pv->set						(r.lt.x,				r.lt.y,		C, 0, 0);	pv++;
-		pv->set						(r.rb.x,				r.rb.y,		C, 1, 1);	pv++;
-		pv->set						(r.rb.x,				r.lt.y,		C, 1, 0);	pv++;
+		pv->set						(r1.lt.x,				r1.rb.y,		C, 0, 1);	pv++;
+		pv->set						(r1.lt.x,				r1.lt.y,		C, 0, 0);	pv++;
+		pv->set						(r1.rb.x,				r1.rb.y,		C, 1, 1);	pv++;
+		pv->set						(r1.rb.x,				r1.lt.y,		C, 1, 0);	pv++;
 		RCache.Vertex.Unlock		(4,ll_hGeom.stride());
 		RCache.set_Geometry			(ll_hGeom);
 		RCache.Render				(D3DPT_TRIANGLELIST,Offset,0,4,0,2);

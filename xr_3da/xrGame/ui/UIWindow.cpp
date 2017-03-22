@@ -197,10 +197,11 @@ void CUIWindow::Update()
 		GetAbsoluteRect		(r);
 		cursor_on_window	= !!r.in(temp);
 #ifndef NDEBUG
-		if(cursor_on_window&&g_show_wnd_rect){
-			Frect r;
-			GetAbsoluteRect(r);
-			add_rect_to_draw(r);
+		if(cursor_on_window&&g_show_wnd_rect)
+		{
+			Frect r1;
+			GetAbsoluteRect(r1);
+			add_rect_to_draw(r1);
 		}
 #endif
 		// RECEIVE and LOST focus
@@ -347,19 +348,19 @@ bool CUIWindow::OnMouse(float x, float y, EUIMessages mouse_action)
 	{
 		CUIWindow* w	= (*it);
 		if (!w) continue;
-		Frect wndRect	= w->GetWndRect();
-		if (wndRect.in(cursor_pos) )
+		Frect wndRect2	= w->GetWndRect();
+		if (wndRect2.in(cursor_pos) )
 		{
 			if(w->IsEnabled())
 			{
-				if( w->OnMouse(cursor_pos.x -wndRect.left, 
-							   cursor_pos.y -wndRect.top, mouse_action))return true;
+				if( w->OnMouse(cursor_pos.x -wndRect2.left, 
+							   cursor_pos.y -wndRect2.top, mouse_action))return true;
 			}
 		}
 		else if (w->IsEnabled() && w->CursorOverWindow())
 		{
-			if( w->OnMouse(cursor_pos.x -wndRect.left, 
-						   cursor_pos.y -wndRect.top, mouse_action))return true;
+			if( w->OnMouse(cursor_pos.x -wndRect2.left, 
+						   cursor_pos.y -wndRect2.top, mouse_action))return true;
 		}
 	}
 

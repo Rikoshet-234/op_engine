@@ -293,7 +293,7 @@ void MEMPOOL::_dump(const void* corrupted_memory_item_ptr)
 	size_t cb = 0, cbi = 0;
 	for (size_t b = 0; b < table.size(); ++b)
 	{
-		fprintf(f, "Block %2u [%p-%p]: [", b, g_blocks[b], g_blocks[b] + s_sector);
+		fprintf(f, "Block %2u [%u-%u]: [", b, g_blocks[b], g_blocks[b] + s_sector);
 #ifdef STORE_CSTACKS
 		std::vector<char*>& rstacks = table[b];
 #else

@@ -196,10 +196,10 @@ void CGameTaskManager::UpdateTasks						()
 	SGameTaskKey		*tasks = (SGameTaskKey*)_alloca(task_count*sizeof(SGameTaskKey));
 	SGameTaskKey		*I = tasks;
 	SGameTaskKey		*E = tasks + task_count;
-	GameTasks_it		i = GameTasks().begin();
+	GameTasks_it		i_it = GameTasks().begin();
 	
-	for ( ; I != E; ++I, ++i)
-		new	(I)	SGameTaskKey(*i);
+	for ( ; I != E; ++I, ++i_it)
+		new	(I)	SGameTaskKey(*i_it);
 
 	for (I = tasks; I != E; ++I)
 	{
@@ -217,7 +217,7 @@ void CGameTaskManager::UpdateTasks						()
 		}
 	}
 	
-	for ( ; I != E; ++I, ++i)
+	for ( ; I != E; ++I, ++i_it)
 		I->~SGameTaskKey	();
 
 	SGameTaskObjective* obj = ActiveObjective();
@@ -257,13 +257,13 @@ void CGameTaskManager::RemoveTask(const TASK_ID& id)
 
 void CGameTaskManager::UpdateActiveTask				()
 {
-	GameTasks_it it								= GameTasks().begin();
-	GameTasks_it it_e							= GameTasks().end();
+	GameTasks_it it_1								= GameTasks().begin();
+	GameTasks_it it_e_1							= GameTasks().end();
 	bool bHasSpotPointer						= false;
 
-	for( ;it!=it_e; ++it )
+	for( ; it_1 != it_e_1; ++it_1)
 	{
-		CGameTask* t							= (*it).game_task;
+		CGameTask* t							= (*it_1).game_task;
 
 		if( t->Objective(0).TaskState() != eTaskStateInProgress ) 
 			continue;

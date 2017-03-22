@@ -546,7 +546,7 @@ void	game_sv_Deathmatch::SM_SwitchOnNextActivePlayer()
 	}
 	else
 	{
-		it							= PossiblePlayers[::Random.randI((int)PPlayersCount)];
+		u32 it							= PossiblePlayers[::Random.randI((int)PPlayersCount)];
 		xrClientData*	C			= NULL;
 		C							= (xrClientData*)m_server->client_Get(it);
 		pNewObject					=  Level().Objects.net_Find(C->ps->GameID);
@@ -1828,8 +1828,8 @@ BOOL game_sv_Deathmatch::Is_Anomaly_InLists(CSE_Abstract* E)
 	for (u32 j=0; j<m_AnomalySetsList.size(); j++)
 	{
 		ANOMALIES* Anomalies = &(m_AnomalySetsList[j]);
-		ANOMALIES_it It = std::find(Anomalies->begin(), Anomalies->end(),E->name_replace());
-		if (It != Anomalies->end())
+		ANOMALIES_it It2 = std::find(Anomalies->begin(), Anomalies->end(),E->name_replace());
+		if (It2 != Anomalies->end())
 		{
 			return TRUE;
 		};

@@ -4,6 +4,10 @@
     //! Constructor of abstract class '...' ignores initializer for virtual base class '...'
     //! jarni: Known bug in VS2015 not fixed event in update 3
     #pragma warning(disable:4589)
+	//! winsor: from luabind
+	//! warning C4913: user defined binary operator ',' exists but no overload could convert all operands, default built-in binary operator ',' used
+	#pragma warning(disable:4913)
+
 #endif
 
 #pragma warning(disable:4995)

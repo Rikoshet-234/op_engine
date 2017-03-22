@@ -46,7 +46,7 @@ namespace PAPI{
         // action
 	    ParticleAction*		CreateAction		(PActionEnum action_id) override;
 	    u32					LoadActions			(int alist_id, IReader& R) override;
-	    u32					LoadActions			(int alist_id, IReader& R,shared_str defName) override;
+	    u32					LoadActions			(int alist_id, IReader& R,shared_str iDefName) override;
 	    bool CheckActionsList() override;
 		bool CheckActionList(int list_id);
 	    virtual void				SaveActions			(int alist_id, IWriter& W);

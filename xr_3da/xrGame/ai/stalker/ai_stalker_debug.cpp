@@ -479,13 +479,13 @@ void CAI_Stalker::OnHUDDraw				(CCustomHUD *hud)
 	if (inventory().ActiveItem()) {
 		HUD().Font().pFontStat->OutNext	("%s%sactive item",indent,indent);
 		HUD().Font().pFontStat->OutNext	("%s%s%sobject         : %s",indent,indent,indent,inventory().ActiveItem() ? *inventory().ActiveItem()->object().cName() : "");
-		CWeapon	*weapon = smart_cast<CWeapon*>(inventory().ActiveItem());
-		if (weapon) {
-			HUD().Font().pFontStat->OutNext("%s%s%sstrapped       : %s",indent,indent,indent,weapon_strapped(weapon) ? "+" : "-");
-			HUD().Font().pFontStat->OutNext("%s%s%sunstrapped     : %s",indent,indent,indent,weapon_unstrapped(weapon) ? "+" : "-");
-			HUD().Font().pFontStat->OutNext("%s%s%sammo           : %d",indent,indent,indent,weapon->GetAmmoElapsed());
-			HUD().Font().pFontStat->OutNext("%s%s%smagazine       : %d",indent,indent,indent,weapon->GetAmmoMagSize());
-			HUD().Font().pFontStat->OutNext("%s%s%stotal ammo     : %d",indent,indent,indent,weapon->GetAmmoCurrent());
+		CWeapon	*weapon2 = smart_cast<CWeapon*>(inventory().ActiveItem());
+		if (weapon2) {
+			HUD().Font().pFontStat->OutNext("%s%s%sstrapped       : %s",indent,indent,indent,weapon_strapped(weapon2) ? "+" : "-");
+			HUD().Font().pFontStat->OutNext("%s%s%sunstrapped     : %s",indent,indent,indent,weapon_unstrapped(weapon2) ? "+" : "-");
+			HUD().Font().pFontStat->OutNext("%s%s%sammo           : %d",indent,indent,indent,weapon2->GetAmmoElapsed());
+			HUD().Font().pFontStat->OutNext("%s%s%smagazine       : %d",indent,indent,indent,weapon2->GetAmmoMagSize());
+			HUD().Font().pFontStat->OutNext("%s%s%stotal ammo     : %d",indent,indent,indent,weapon2->GetAmmoCurrent());
 		}
 	}
 
@@ -856,8 +856,8 @@ void CAI_Stalker::OnRender			()
 			LevelGraph::CVertex			*v = ai().level_graph().vertex(level_vertex_id);
 			Fvector						direction;
 			float						best_value = -1.f;
-
-			for (u32 i=0, j = 0; i<36; ++i) {
+			u32 j = 0;
+			for (u32 i=0; i<36; ++i) {
 				float				value = ai().level_graph().cover_in_direction(float(10*i)/180.f*PI,v);
 				direction.setHP		(float(10*i)/180.f*PI,0);
 				direction.normalize	();
@@ -1057,8 +1057,8 @@ void CAI_Stalker::dbg_draw_visibility_rays	()
 	const CEntityAlive		*enemy = memory().enemy().selected();
 	if (enemy) {
 		if (memory().visual().visible_now(enemy)) {
-			collide::rq_results	rq_storage;
-			draw_visiblity_rays	(this,enemy,rq_storage);
+			collide::rq_results	rq_storage2;
+			draw_visiblity_rays	(this,enemy,rq_storage2);
 		}
 	}
 }

@@ -490,7 +490,7 @@ u32 xrServer::OnMessage	(NET_Packet& P, ClientID sender)			// Non-Zero means bro
 	csPlayers.Enter			();
 
 	VERIFY							(verify_entities());
-	xrClientData* CL				= ID_to_client(sender);
+	xrClientData* CL1				= ID_to_client(sender);
 
 	switch (type)
 	{
@@ -501,7 +501,7 @@ u32 xrServer::OnMessage	(NET_Packet& P, ClientID sender)			// Non-Zero means bro
 		}break;
 	case M_SPAWN:	
 		{
-			if (CL->flags.bLocal)
+			if (CL1->flags.bLocal)
 				Process_spawn		(P,sender);	
 
 			VERIFY					(verify_entities());
@@ -654,7 +654,7 @@ u32 xrServer::OnMessage	(NET_Packet& P, ClientID sender)			// Non-Zero means bro
 			P.r_stringZ				(user);
 			if(0==stricmp(user.c_str(),"logoff"))
 			{
-				CL->m_admin_rights.m_has_admin_rights	= FALSE;
+				CL1->m_admin_rights.m_has_admin_rights	= FALSE;
 				strcpy				(reason,"logged off");
 				Msg("# Remote administrator logged off.");
 			}else
@@ -662,8 +662,8 @@ u32 xrServer::OnMessage	(NET_Packet& P, ClientID sender)			// Non-Zero means bro
 				P.r_stringZ				(pass);
 				bool res = CheckAdminRights(user, pass, reason);
 				if(res){
-					CL->m_admin_rights.m_has_admin_rights	= TRUE;
-					CL->m_admin_rights.m_dwLoginTime		= Device.dwTimeGlobal;
+					CL1->m_admin_rights.m_has_admin_rights	= TRUE;
+					CL1->m_admin_rights.m_dwLoginTime		= Device.dwTimeGlobal;
 					Msg("# User [%s] logged as remote administrator.", user.c_str());
 				}else
 					Msg("# User [%s] tried to login as remote administrator. Access denied.", user.c_str());
@@ -672,7 +672,7 @@ u32 xrServer::OnMessage	(NET_Packet& P, ClientID sender)			// Non-Zero means bro
 			NET_Packet			P_answ;			
 			P_answ.w_begin		(M_REMOTE_CONTROL_CMD);
 			P_answ.w_stringZ	(reason);
-			SendTo				(CL->ID,P_answ,net_flags(TRUE,TRUE));
+			SendTo				(CL1->ID,P_answ,net_flags(TRUE,TRUE));
 		}break;
 
 	case M_REMOTE_CONTROL_CMD:

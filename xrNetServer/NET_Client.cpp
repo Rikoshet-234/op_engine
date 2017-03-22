@@ -198,18 +198,18 @@ static HRESULT WINAPI Handler (PVOID pvUserContext, DWORD dwMessageType, PVOID p
 void    
 IPureClient::_SendTo_LL( const void* data, u32 size, u32 flags, u32 timeout )
 {
-    IPureClient::SendTo_LL( const_cast<void*>(data), size, flags, timeout );
+	IPureClient::SendTo_LL( const_cast<void*>(data), size, flags, timeout );
 }
 
 //------------------------------------------------------------------------------
 
 void  IPureClient::_Recieve( const void* data, u32 data_size, u32 /*param*/ )
 {
-    MSYS_PING*    cfg = (MSYS_PING*)data;
+	MSYS_PING*    cfg = (MSYS_PING*)data;
 
 	if(     (data_size>2*sizeof(u32)) 
-	    &&  (cfg->sign1==0x12071980) 
-	    &&  (cfg->sign2==0x26111975)
+		&&  (cfg->sign1==0x12071980) 
+		&&  (cfg->sign2==0x26111975)
 	  )
 	{
 		// Internal system message
@@ -252,7 +252,7 @@ void  IPureClient::_Recieve( const void* data, u32 data_size, u32 /*param*/ )
 		{
 			if( !pClNetLog ) 
 				pClNetLog = xr_new<INetLog>("logs\\net_cl_log.log", timeServer());
-			    
+				
 			if( pClNetLog ) 
 				pClNetLog->LogData( timeServer(), const_cast<void*>(data), data_size, TRUE );
 		}
@@ -533,8 +533,8 @@ BOOL IPureClient::Connect	(LPCSTR options)
 					10,						// dwEnumCount
 					1000,					// dwRetryInterval
 					1000,					// dwTimeOut
-					NULL,					// pvUserContext
-					NULL,					// pAsyncHandle
+					nullptr,					// pvUserContext
+					nullptr,					// pAsyncHandle
 					DPNENUMHOSTS_SYNC		// dwFlags
 					);
 				if (res != S_OK)
@@ -564,8 +564,8 @@ BOOL IPureClient::Connect	(LPCSTR options)
 						Msg("! IPureClient : port %d is BUSY!", c_port);
 
 					//				const char* x = DXGetErrorString9(res);
-					string1024 tmp = "";
-					DXTRACE_ERR(tmp, res);
+					string1024 tmp2 = "";
+					DXTRACE_ERR(tmp2, res);
 #endif				
 					c_port++;
 				}
@@ -603,19 +603,19 @@ BOOL IPureClient::Connect	(LPCSTR options)
 				&dpAppDesc,				// pdnAppDesc
 				pHostAddress,			// pHostAddr
 				net_Address_device,		// pDeviceInfo
-				NULL,					// pdnSecurity
-				NULL,					// pdnCredentials
-				NULL, 0,				// pvUserConnectData/Size
-				NULL,					// pvAsyncContext
-				NULL,					// pvAsyncHandle
+				nullptr,					// pdnSecurity
+				nullptr,					// pdnCredentials
+				nullptr, 0,				// pvUserConnectData/Size
+				nullptr,					// pvAsyncContext
+				nullptr,					// pvAsyncHandle
 				DPNCONNECT_SYNC);		// dwFlags
 			//		R_CHK(res);		
 			net_csEnumeration.Leave		();
 			_RELEASE					(pHostAddress);
 #ifdef DEBUG	
 			//		const char* x = DXGetErrorString9(res);
-			string1024 tmp = "";
-			DXTRACE_ERR(tmp, res);
+			string1024 tmp2 = "";
+			DXTRACE_ERR(tmp2, res);
 #endif
 			switch (res)
 			{
@@ -658,7 +658,7 @@ void IPureClient::Disconnect()
 {
 	if( NET )	NET->Close(0);
 
-    // Clean up Host _list_
+	// Clean up Host _list_
 	net_csEnumeration.Enter			();
 	for (u32 i=0; i<net_Hosts.size(); i++) {
 		HOST_NODE&	N = net_Hosts[i];
@@ -743,7 +743,7 @@ HRESULT	IPureClient::net_Handler(u32 dwMessageType, PVOID pMessage)
 		{
 			PDPNMSG_RECEIVE	pMsg	= (PDPNMSG_RECEIVE) pMessage;
 
-   			MultipacketReciever::RecievePacket( pMsg->pReceiveData, pMsg->dwReceiveDataSize );
+			MultipacketReciever::RecievePacket( pMsg->pReceiveData, pMsg->dwReceiveDataSize );
 		}
 		break;
 	case DPN_MSGID_TERMINATE_SESSION:
@@ -847,21 +847,21 @@ void	IPureClient::timeServer_Correct(u32 sv_time, u32 cl_time)
 void	IPureClient::SendTo_LL(void* data, u32 size, u32 dwFlags, u32 dwTimeout)
 {
 	if( net_Disconnected )	
-	    return;
+		return;
 
 	if( psNET_Flags.test(NETFLAG_LOG_CL_PACKETS) ) 
 	{
 		if( !pClNetLog) 
-		    pClNetLog = xr_new<INetLog>( "logs\\net_cl_log.log", timeServer() );
+			pClNetLog = xr_new<INetLog>( "logs\\net_cl_log.log", timeServer() );
 		if( pClNetLog ) 
-		    pClNetLog->LogData( timeServer(), data, size );
+			pClNetLog->LogData( timeServer(), data, size );
 	}
 	DPN_BUFFER_DESC				desc;
 
 	desc.dwBufferSize   = size;
 	desc.pBufferData    = (BYTE*)data;
 
-    net_Statistic.dwBytesSended	+= size;
+	net_Statistic.dwBytesSended	+= size;
 	
 
 	// verify
@@ -869,7 +869,7 @@ void	IPureClient::SendTo_LL(void* data, u32 size, u32 dwFlags, u32 dwTimeout)
 	VERIFY(desc.pBufferData);
 	VERIFY(NET);
 
-    DPNHANDLE	hAsync  = 0;
+	DPNHANDLE	hAsync  = 0;
 	HRESULT		hr      = NET->Send( &desc, 1, dwTimeout, 0, &hAsync, dwFlags | DPNSEND_COALESCE );
 		
 //	Msg("- Client::SendTo_LL [%d]", size);
@@ -886,12 +886,12 @@ void	IPureClient::SendTo_LL(void* data, u32 size, u32 dwFlags, u32 dwTimeout)
 
 void	IPureClient::Send( NET_Packet& packet, u32 dwFlags, u32 dwTimeout )
 {
-    MultipacketSender::SendPacket( packet.B.data, packet.B.count, dwFlags, dwTimeout );
+	MultipacketSender::SendPacket( packet.B.data, packet.B.count, dwFlags, dwTimeout );
 }
 
 void	IPureClient::Flush_Send_Buffer		()
 {
-    MultipacketSender::FlushSendBuffer( 0 );
+	MultipacketSender::FlushSendBuffer( 0 );
 }
 
 BOOL	IPureClient::net_HasBandwidth	()
