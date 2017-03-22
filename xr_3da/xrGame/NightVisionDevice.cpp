@@ -1,4 +1,4 @@
-#include "pch_script.h"
+#include "stdafx.h"
 #include "NightVisionDevice.h"
 #include "xrServer_Objects_ALife_Items.h"
 #include "Actor.h"

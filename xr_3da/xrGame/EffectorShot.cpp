@@ -182,7 +182,7 @@ CCameraShotEffector::~CCameraShotEffector()
 {
 }
 
-BOOL CCameraShotEffector::Process	(Fvector &p, Fvector &d, Fvector &n, float& fFov, float& fFar, float& fAspect)
+BOOL CCameraShotEffector::Process	(Fvector &/*p*/, Fvector &d, Fvector &n, float& fFov, float& fFar, float& fAspect)
 {
 	if (bActive){
 		float		h,p;

@@ -12,9 +12,10 @@
 #include "xr_level_controller.h"
 #include "profiler.h"
 
+#if _MSC_VER < 1900
 #pragma comment(lib,"ode.lib")
 #pragma comment(lib,"xr_3da.lib")
-
+#endif
 /*
 #ifdef NDEBUG
 namespace std {

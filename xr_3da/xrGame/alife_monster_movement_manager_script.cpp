@@ -13,14 +13,14 @@
 
 using namespace luabind;
 
-CALifeMonsterDetailPathManager *get_detail(const CALifeMonsterMovementManager *self)
+CALifeMonsterDetailPathManager *get_detail(const CALifeMonsterMovementManager *pself)
 {
-	return	(&self->detail());
+	return	(&pself->detail());
 }
 
-CALifeMonsterPatrolPathManager *get_patrol(const CALifeMonsterMovementManager *self)
+CALifeMonsterPatrolPathManager *get_patrol(const CALifeMonsterMovementManager *pself)
 {
-	return	(&self->patrol());
+	return	(&pself->patrol());
 }
 
 #pragma optimize("s",on)

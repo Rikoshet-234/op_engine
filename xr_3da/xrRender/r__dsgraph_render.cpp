@@ -571,11 +571,11 @@ void	R_dsgraph_structure::r_dsgraph_render_R1_box	(IRender_Sector* _S, Fbox& BB,
 		default:
 			{
 				// Renderable visual
-				ShaderElement* E	= V->shader->E[sh]._get();
-				if (E) {
-					for (u32 pass=0; pass<E->passes.size(); pass++)
+				ShaderElement* E2	= V->shader->E[sh]._get();
+				if (E2) {
+					for (u32 pass=0; pass<E2->passes.size(); pass++)
 					{
-						RCache.set_Element			(E,pass);
+						RCache.set_Element			(E2,pass);
 						V->Render					(-1.f);
 					}
 				}

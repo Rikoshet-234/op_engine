@@ -391,9 +391,9 @@ namespace luabind
 			if (!ref_.is_valid() || !rhs.ref_.is_valid()) return false;
 			pushvalue();
 			rhs.pushvalue();
-			bool result = lua_equal(L_, -1, -2) != 0;
+			bool result_ = lua_equal(L_, -1, -2) != 0;
 			lua_pop(L_, 2);
-			return result;
+			return result_;
 		}
 
 		bool operator!=(const functor<Ret>& rhs) const

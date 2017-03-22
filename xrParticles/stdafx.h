@@ -16,7 +16,9 @@
 #ifdef __BORLANDC__
 #pragma comment( lib, "x:\\xrCoreB.lib"	)
 #else
+#if _MSC_VER < 1900
 #pragma comment( lib, "xrCore.lib"	)
+#endif
 #endif
 
 #endif //stdafxH

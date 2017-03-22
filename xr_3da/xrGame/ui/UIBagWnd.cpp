@@ -358,9 +358,9 @@ void	CUIBagWnd::ReloadItemsPrices	()
 			m_info[itm->m_index].price	= pSettings->r_u32(m_sectionPrice, ItemCostStr);
 
 
-		for (u32 i=1; i<=g_mp_restrictions.GetRank(); ++i)
+		for (u32 i2=1; i2<=g_mp_restrictions.GetRank(); ++i2)
 		{
-			sprintf_s						(RankStr, "rank_%d", i);
+			sprintf_s						(RankStr, "rank_%d", i2);
 			if (!pSettings->line_exist	(RankStr, ItemCostStr))	continue;
 			m_info[itm->m_index].price	= pSettings->r_u32(RankStr, ItemCostStr);
 		}

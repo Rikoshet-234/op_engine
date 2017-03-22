@@ -951,8 +951,7 @@ void NvStripifier::SplitUpStripsAndOptimize(NvStripInfoVec &allStrips, NvStripIn
 	NvStripInfoVec tempStrips;
 	
 	//split up strips into threshold-sized pieces
-	int i;
-	for(i = 0; i < allStrips.size(); i++)
+	for(int i = 0; i < allStrips.size(); i++)
 	{
 		NvStripInfo* currentStrip;
 		NvStripStartInfo startInfo(NULL, NULL, false);
@@ -1305,14 +1304,14 @@ void NvStripifier::FindAllStrips(NvStripInfoVec &allStrips,
 			
 			// build the first strip of the list
 			experiments[i][0]->Build(allEdgeInfos, allFaceInfos);
-			int experimentId = experiments[i][0]->m_experimentId;
+			int experimentId2 = experiments[i][0]->m_experimentId;
 			
 			NvStripInfo *stripIter = experiments[i][0];
 			NvStripStartInfo startInfo(NULL, NULL, false);
 			while (FindTraversal(allFaceInfos, allEdgeInfos, stripIter, startInfo)){
 				
 				// create the _new strip info
-				stripIter = xr_new<NvStripInfo> (startInfo, stripId++, experimentId);
+				stripIter = xr_new<NvStripInfo> (startInfo, stripId++, experimentId2);
 				
 				// build the next strip
 				stripIter->Build(allEdgeInfos, allFaceInfos);

@@ -50,10 +50,12 @@
 
 extern ENGINE_API CInifile *pGameIni;
 
+#if _MSC_VER < 1900
 #pragma comment( lib, "xrCore.lib"	)
 #pragma comment( lib, "xrCDB.lib"	)
 #pragma comment( lib, "xrSound.lib"	)
 #pragma comment( lib, "xrLUA.lib"	)
+#endif
 
 #pragma comment( lib, "winmm.lib"		)
 

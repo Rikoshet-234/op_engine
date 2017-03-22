@@ -1,5 +1,11 @@
 #pragma once
 
+#if _MSC_VER >= 1900
+    //! Constructor of abstract class '...' ignores initializer for virtual base class '...'
+    //! jarni: Known bug in VS2015 not fixed event in update 3
+    #pragma warning(disable:4589)
+#endif
+
 #pragma warning(disable:4995)
 #include "../stdafx.h"
 #pragma warning(default:4995)

@@ -51,7 +51,10 @@ ENGINE_API extern	Flags32		psDeviceFlags		;
 
 ENGINE_API extern	Flags32		g_uCommonFlags;
 
-ENGINE_API enum E_COMMON_FLAGS
+#if _MSC_VER < 1900
+ENGINE_API 
+#endif
+enum E_COMMON_FLAGS
 {
 	flAiUseTorchDynamicLights	= 1<<0,
 	enShowObjectHit				= 1<<1,

@@ -9,7 +9,9 @@
 	#ifdef _EDITOR
 		#pragma comment(lib,"x:\\xrParticlesB.lib")
 	#else
+#if _MSC_VER < 1900
 		#pragma comment(lib,"xrParticles.lib")
+#endif
 	#endif
 #endif
 

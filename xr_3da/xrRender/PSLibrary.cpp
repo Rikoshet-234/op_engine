@@ -102,10 +102,10 @@ void CPSLibrary::Remove(const char* nm)
 		xr_delete		(*it);
 		m_PEDs.erase	(it);
 	}else{
-		PS::PGDIt it = FindPGDIt(nm);
-		if (it!=m_PGDs.end()){
-			xr_delete	(*it);
-			m_PGDs.erase(it);
+		PS::PGDIt it2 = FindPGDIt(nm);
+		if (it2!=m_PGDs.end()){
+			xr_delete	(*it2);
+			m_PGDs.erase(it2);
 		}
 	}
 }

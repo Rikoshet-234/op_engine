@@ -411,17 +411,17 @@ void CMapLocation::UpdateSpot(CUICustomMap* map, CMapSpot* sp )
 			if(!bDone&&bbb){
 				Msg("Error. Path from actor to selected map spot does not contain level changer :(");
 				Msg("Path:");
-				xr_vector<u32>::iterator it			= map_point_path.begin();
-				xr_vector<u32>::iterator it_e		= map_point_path.end();
-				for(; it!=it_e;++it){
+				xr_vector<u32>::iterator it2		= map_point_path.begin();
+				xr_vector<u32>::iterator it2_e		= map_point_path.end();
+				for(; it2!=it2_e;++it2){
 //					Msg("%d-%s",(*it),ai().game_graph().vertex(*it));
-					Msg("[%d] level[%s]",(*it),*ai().game_graph().header().level(ai().game_graph().vertex(*it)->level_id()).name());
+					Msg("[%d] level[%s]",(*it2),*ai().game_graph().header().level(ai().game_graph().vertex(*it2)->level_id()).name());
 				}
 				Msg("Available LevelChangers:");
-				xr_vector<CLevelChanger*>::iterator lit,lit_e;
-				lit_e							= g_lchangers.end();
-				for(lit=g_lchangers.begin();lit!=lit_e; ++lit){
-					GameGraph::_GRAPH_ID gid = (*lit)->ai_location().game_vertex_id();
+				xr_vector<CLevelChanger*>::iterator lit2,lit2_e;
+				lit2_e							= g_lchangers.end();
+				for(lit2=g_lchangers.begin();lit2!=lit2_e; ++lit2){
+					GameGraph::_GRAPH_ID gid = (*lit2)->ai_location().game_vertex_id();
 					Msg("[%d]",gid);
 					Fvector p = ai().game_graph().vertex(gid)->level_point();
 					Msg("lch_name=%s pos=%f %f %f",*ai().game_graph().header().level(ai().game_graph().vertex(gid)->level_id()).name(), p.x, p.y, p.z);

@@ -25,10 +25,14 @@
  */
 static BOOL IsNT(void)
 {
+#if _MSC_VER >= 1900
+    return IsWindowsXPOrGreater();
+#else
 	OSVERSIONINFO osvi;
 	osvi.dwOSVersionInfoSize = sizeof(osvi);
 	GetVersionEx(&osvi);
 	return (osvi.dwPlatformId == VER_PLATFORM_WIN32_NT);
+#endif
 }
 
 /// BugTrap module handle.

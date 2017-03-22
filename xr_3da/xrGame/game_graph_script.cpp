@@ -17,19 +17,19 @@ const CGameGraph *get_game_graph		()
 	return				(&ai().game_graph());
 }
 
-const CGameGraph::CHeader *get_header	(const CGameGraph *self)
+const CGameGraph::CHeader *get_header	(const CGameGraph *pself)
 {
-	return				(&self->header());
+	return				(&pself->header());
 }
 
-bool get_accessible1					(const CGameGraph *self, const u32 &vertex_id)
+bool get_accessible1					(const CGameGraph *pself, const u32 &vertex_id)
 {
-	return				(self->accessible(vertex_id));
+	return				(pself->accessible(vertex_id));
 }
 
-void get_accessible2					(const CGameGraph *self, const u32 &vertex_id, bool value)
+void get_accessible2					(const CGameGraph *pself, const u32 &vertex_id, bool value)
 {
-	self->accessible	(vertex_id,value);
+	pself->accessible	(vertex_id,value);
 }
 
 Fvector CVertex__level_point			(const CGameGraph::CVertex *vertex)

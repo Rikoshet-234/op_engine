@@ -8,7 +8,9 @@
 	#define XRNETSERVER_API __declspec(dllexport)
 #else
 	#define XRNETSERVER_API __declspec(dllimport)
+#if _MSC_VER < 1900
 	#pragma comment(lib,"xrNetServer")
+#endif
 #endif
 
 #include "net_compressor.h"

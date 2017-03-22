@@ -1526,7 +1526,7 @@ void	CActor::OnRender_Network()
 		};
 
 		//drawing speed vectors
-		for (int i=0; i<2; i++)
+		for (i=0; i<2; i++)
 		{
 			c = float(i);
 			for (u32 k=0; k<3; k++)
@@ -1741,14 +1741,14 @@ void	CActor::Check_for_AutoPickUp()
 	Fbox APU_Box;
 	APU_Box.set(Fvector().sub(bc, m_AutoPickUp_AABB), Fvector().add(bc, m_AutoPickUp_AABB));
 
-	xr_vector<ISpatial*>	ISpatialResult;
-	g_SpatialSpace->q_box   (ISpatialResult,0,STYPE_COLLIDEABLE,bc,m_AutoPickUp_AABB);
+	xr_vector<ISpatial*>	iSpatialResult;
+	g_SpatialSpace->q_box   (iSpatialResult,0,STYPE_COLLIDEABLE,bc,m_AutoPickUp_AABB);
 
 	// Determine visibility for dynamic part of scene
-	for (u32 o_it=0; o_it<ISpatialResult.size(); o_it++)
+	for (u32 o_it=0; o_it<iSpatialResult.size(); o_it++)
 	{
-		ISpatial*		spatial	= ISpatialResult[o_it];
-		CInventoryItem*	pIItem	= smart_cast<CInventoryItem*> (spatial->dcast_CObject        ());
+		ISpatial*		spatial_= iSpatialResult[o_it];
+		CInventoryItem*	pIItem	= smart_cast<CInventoryItem*> (spatial_->dcast_CObject        ());
 		if (0 == pIItem)							continue;
 		if (!pIItem->CanTake())						continue;
 		if (Level().m_feel_deny.is_object_denied(pIItem->cast_game_object()) )	continue;

@@ -114,20 +114,28 @@ extern XRCORE_API	xrMemory	Memory;
 
 XRCORE_API	char* 	xr_strdup	(const char* string);
 
+//! jarni: These new operators are replaceable: a user-provided non-member function with the same signature defined 
+//! anywhere in the program, in any source file, replaces the default version. Its declaration does not need to be visible.
+//! NOTE!!!: The behavior is undefined if more than one replacement is provided in the program for any of the replaceable 
+//! allocation function, or IF A REPLACEMENT IS DEFINED WITH THE INLINE SPECIFIER.
 #ifdef DEBUG_MEMORY_NAME
 // Global new/delete override
 #	if !(defined(__BORLANDC__) || defined(NO_XRNEW))
+#if _MSC_VER < 1900
 	IC void*	operator new		(size_t size)		{	return Memory.mem_alloc(size?size:1, "C++ NEW");	}
 	IC void		operator delete		(void *p)			{	xr_free(p);											}
 	IC void*	operator new[]		(size_t size)		{	return Memory.mem_alloc(size?size:1, "C++ NEW");	}
 	IC void		operator delete[]	(void* p)			{	xr_free(p);											}
+#endif
 #	endif
 #else // DEBUG_MEMORY_NAME
 #	if !(defined(__BORLANDC__) || defined(NO_XRNEW))
+#if _MSC_VER < 1900
 	IC void*	operator new		(size_t size)		{	return Memory.mem_alloc(size?size:1);				}
 	IC void		operator delete		(void *p)			{	xr_free(p);											}
 	IC void*	operator new[]		(size_t size)		{	return Memory.mem_alloc(size?size:1);				}
 	IC void		operator delete[]	(void* p)			{	xr_free(p);											}
+#endif
 #	endif
 #endif // DEBUG_MEMORY_MANAGER
 
