@@ -342,6 +342,7 @@ bcore.cmd
 bgame.cmd
 blua.cmd
 brender.cmd
+publish_build.cmd
 
 # build files
 xr_build
