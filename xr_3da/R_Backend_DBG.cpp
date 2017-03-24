@@ -15,39 +15,39 @@ void CBackend::dbg_DIP(D3DPRIMITIVETYPE pt, ref_geom geom, u32 baseV, u32 startV
 
 #ifdef DEBUG
 
-void CBackend::dbg_Draw			(D3DPRIMITIVETYPE T, FVF::L* pVerts, int vcnt, u16* pIdx, int pcnt)
+void CBackend::dbg_Draw			(D3DPRIMITIVETYPE Tp, FVF::L* pVerts, int vcnt, u16* pIdx, int pcnt)
 {
 	OnFrameEnd					();
 	CHK_DX(HW.pDevice->SetFVF	(FVF::F_L));
-	CHK_DX(HW.pDevice->DrawIndexedPrimitiveUP(T, 0, vcnt, pcnt,
+	CHK_DX(HW.pDevice->DrawIndexedPrimitiveUP(Tp, 0, vcnt, pcnt,
 		pIdx, D3DFMT_INDEX16,
 		pVerts, sizeof(FVF::L)
 		));
 }
-void CBackend::dbg_Draw			(D3DPRIMITIVETYPE T, FVF::L* pVerts, int pcnt)
+void CBackend::dbg_Draw			(D3DPRIMITIVETYPE Tp, FVF::L* pVerts, int pcnt)
 {
 	OnFrameEnd					();
 	CHK_DX(HW.pDevice->SetFVF	(FVF::F_L));
-	CHK_DX(HW.pDevice->DrawPrimitiveUP(T, pcnt, pVerts, sizeof(FVF::L)	));
+	CHK_DX(HW.pDevice->DrawPrimitiveUP(Tp, pcnt, pVerts, sizeof(FVF::L)	));
 }
 
 #define RGBA_GETALPHA(rgb)      ((rgb) >> 24)
-void CBackend::dbg_DrawOBB		(Fmatrix& T, Fvector& half_dim, u32 C)
+void CBackend::dbg_DrawOBB		(Fmatrix& Tp, Fvector& half_dim, u32 Cu)
 {
 	Fmatrix mL2W_Transform,mScaleTransform;
 
 	mScaleTransform.scale(half_dim);
-	mL2W_Transform.mul_43(T,mScaleTransform);
+	mL2W_Transform.mul_43(Tp,mScaleTransform);
 
 	FVF::L  aabb[8];
-	aabb[0].set( -1, -1, -1, C ); // 0
-	aabb[1].set( -1, +1, -1, C ); // 1
-	aabb[2].set( +1, +1, -1, C ); // 2
-	aabb[3].set( +1, -1, -1, C ); // 3
-	aabb[4].set( -1, -1, +1, C ); // 4
-	aabb[5].set( -1, +1, +1, C ); // 5
-	aabb[6].set( +1, +1, +1, C ); // 6
-	aabb[7].set( +1, -1, +1, C ); // 7
+	aabb[0].set( -1, -1, -1, Cu); // 0
+	aabb[1].set( -1, +1, -1, Cu ); // 1
+	aabb[2].set( +1, +1, -1, Cu); // 2
+	aabb[3].set( +1, -1, -1, Cu); // 3
+	aabb[4].set( -1, -1, +1, Cu); // 4
+	aabb[5].set( -1, +1, +1, Cu); // 5
+	aabb[6].set( +1, +1, +1, Cu); // 6
+	aabb[7].set( +1, -1, +1, Cu); // 7
 
 	u16		aabb_id[12*2] = {
 		0,1,  1,2,  2,3,  3,0,  4,5,  5,6,  6,7,  7,4,  1,5,  2,6,  3,7,  0,4
@@ -55,26 +55,26 @@ void CBackend::dbg_DrawOBB		(Fmatrix& T, Fvector& half_dim, u32 C)
 	set_xform_world	(mL2W_Transform);
 	dbg_Draw(D3DPT_LINELIST,aabb,8,aabb_id,12);
 }
-void CBackend::dbg_DrawTRI	(Fmatrix& T, Fvector& p1, Fvector& p2, Fvector& p3, u32 C)
+void CBackend::dbg_DrawTRI	(Fmatrix& Tm, Fvector& p1, Fvector& p2, Fvector& p3, u32 Cu)
 {
 	FVF::L	tri[3];
-	tri[0].p = p1; tri[0].color = C;
-	tri[1].p = p2; tri[1].color = C;
-	tri[2].p = p3; tri[2].color = C;
+	tri[0].p = p1; tri[0].color = Cu;
+	tri[1].p = p2; tri[1].color = Cu;
+	tri[2].p = p3; tri[2].color = Cu;
 
-	set_xform_world	(T);
+	set_xform_world	(Tm);
 	dbg_Draw(D3DPT_TRIANGLESTRIP,tri,1);
 }
-void CBackend::dbg_DrawLINE(Fmatrix& T, Fvector& p1, Fvector& p2, u32 C)
+void CBackend::dbg_DrawLINE(Fmatrix& Tm, Fvector& p1, Fvector& p2, u32 Cu)
 {
 	FVF::L	line[2];
-	line[0].p = p1; line[0].color = C;
-	line[1].p = p2; line[1].color = C;
+	line[0].p = p1; line[0].color = Cu;
+	line[1].p = p2; line[1].color = Cu;
 
-	set_xform_world	(T);
+	set_xform_world	(Tm);
 	dbg_Draw(D3DPT_LINELIST,line,1);
 }
-void CBackend::dbg_DrawEllipse(Fmatrix& T, u32 C)
+void CBackend::dbg_DrawEllipse(Fmatrix& Tm, u32 Cu)
 {
 	float gVertices[] =
 	{
@@ -150,10 +150,10 @@ void CBackend::dbg_DrawEllipse(Fmatrix& T, u32 C)
 	FVF::L  verts[vcnt];
 	for (int i=0; i<vcnt; i++) {
 		int k=i*3;
-		verts[i].set(gVertices[k],gVertices[k+1],gVertices[k+2],C);
+		verts[i].set(gVertices[k],gVertices[k+1],gVertices[k+2],Cu);
 	}
 
-	set_xform_world				(T);
+	set_xform_world				(Tm);
 	HW.pDevice->SetRenderState	(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
 	dbg_Draw(D3DPT_TRIANGLELIST,verts,vcnt,gFaces,224);
 	HW.pDevice->SetRenderState	(D3DRS_FILLMODE, D3DFILL_SOLID);
