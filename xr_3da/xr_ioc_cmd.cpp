@@ -308,8 +308,15 @@ class CCC_Start : public IConsole_Command
 	void	parse		(LPSTR dest, LPCSTR args, LPCSTR name)
 	{
 		dest[0]	= 0;
-		if (strstr(args,name))
-			sscanf(strstr(args,name)+xr_strlen(name),"(%[^)])",dest);
+        if (strstr(args, name))
+        {
+            LPCSTR begin = strstr(args, name) + xr_strlen(name);
+            ++begin;
+            LPCSTR end = begin;
+            while (*end && *end != ')') ++end;
+            memcpy(dest, begin, end - begin);
+            dest[end - begin] = 0;
+        }
 	}
 public:
 	CCC_Start(LPCSTR N) : IConsole_Command(N) {};
