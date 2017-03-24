@@ -320,7 +320,7 @@ void CStats::Show()
 	// PERF ALERT
 	if (!g_bDisableRedText)
 	{
-		CGameFont&	F = *((CGameFont*)pFont);
+		F = *((CGameFont*)pFont);
 		F.SetColor						(color_rgba(255,16,16,255));
 		F.OutSet						(300,300);
 		F.SetHeightI						(f_base_size*2);
@@ -344,7 +344,7 @@ void CStats::Show()
 	// Show errors
 	if (!g_bDisableRedText && errors.size())
 	{
-		CGameFont&	F = *((CGameFont*)pFont);
+		F = *((CGameFont*)pFont);
 		F.SetColor	(color_rgba(255,16,16,191));
 		F.OutSet	(200,0);
 		F.SetHeightI	(f_base_size);
