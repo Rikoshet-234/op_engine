@@ -347,8 +347,8 @@ brender.cmd
 xr_build
 lapi.txt
 MyLog.log
-
 # VS2012 local configuration file
 GlobalProperties_2012.props
 # VS2015 local configuration file
 GlobalProperties.props
+
