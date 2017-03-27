@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <BinOutputDir>y:\bin_vs2012_$(Configuration)</BinOutputDir>
+    <LibrariesOutputDir>x:\libraries\$(PlatformTarget)_$(PlatformToolset)\$(Configuration)</LibrariesOutputDir>
+    <IntermediateOutputDir>x:\intermediate\$(PlatformTarget)_$(PlatformToolset)\$(Configuration)\$(ProjectName)</IntermediateOutputDir>
+    <BinariesOutputDir>x:\binaries\$(PlatformTarget)_$(PlatformToolset)\$(Configuration)</BinariesOutputDir>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup />
+  <ItemGroup>
+    <BuildMacro Include="BinOutputDir">
+      <Value>$(BinOutputDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="LibrariesOutputDir">
+      <Value>$(LibrariesOutputDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="IntermediateOutputDir">
+      <Value>$(IntermediateOutputDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="BinariesOutputDir">
+      <Value>$(BinariesOutputDir)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>
