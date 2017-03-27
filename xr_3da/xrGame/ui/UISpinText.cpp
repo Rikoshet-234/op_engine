@@ -5,6 +5,9 @@
 #include "UIFrameLineWnd.h"
 #include "UI3tButton.h"
 
+
+
+
 CUISpinText::CUISpinText(){
 	m_curItem = -1;
 }
@@ -101,6 +104,12 @@ bool CUISpinText::CanPressDown()
 CUISpinTextCustom::CUISpinTextCustom()
 {
 	m_backupIndex=-1;
+
+}
+
+CUISpinTextCustom::~CUISpinTextCustom()
+{
+	m_pButtonsSpinClickCallback.clear();
 }
 
 void CUISpinTextCustom::SetCurrentValue()
@@ -118,12 +127,34 @@ bool CUISpinTextCustom::IsChanged()
 	return m_backupIndex!=m_curItem;
 }
 
+void CUISpinTextCustom::SetSpinButtonCallback(const luabind::functor<void> &functor)
+{
+	if (functor.is_valid())
+		m_pButtonsSpinClickCallback.set(functor);
+	else
+		m_pButtonsSpinClickCallback.clear();
+}
+
 void CUISpinTextCustom::SetItem()
 {
 	if (m_curItem==-1)
 		m_pLines->SetText("");
 	else
 		m_pLines->SetText(CStringTable().translate(m_list[m_curItem]._orig).c_str());
+}
+
+int CUISpinTextCustom::GetIdByIndex(int index)
+{
+	if (index > static_cast<int>(m_list.size())-1 || index < 0)
+		return -1;
+	return m_list[index]._id;
+}
+
+LPCSTR CUISpinTextCustom::GetTextByIndex(int index)
+{
+	if (index > static_cast<int>(m_list.size()) - 1 || index < 0)
+		return "";
+	return m_list[index]._orig.c_str();
 }
 
 int CUISpinTextCustom::GetSelectedId()
@@ -193,5 +224,21 @@ void CUISpinTextCustom::SetFont(CGameFont* pFont)
 		CUISpinText::SetFont(pFont);
 		m_pLines->SetFont(pFont);
 	}
+}
+
+void CUISpinTextCustom::OnBtnUpClick()
+{
+	int old_index = m_curItem;
+	CUISpinText::OnBtnUpClick();
+	int new_index = m_curItem;
+	m_pButtonsSpinClickCallback(old_index, new_index);
+}
+
+void CUISpinTextCustom::OnBtnDownClick()
+{
+	int old_index = m_curItem;
+	CUISpinText::OnBtnDownClick();
+	int new_index = m_curItem;
+	m_pButtonsSpinClickCallback(old_index, new_index);
 }
 

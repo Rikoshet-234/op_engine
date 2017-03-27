@@ -7,6 +7,8 @@
 #pragma once
 #include "UICustomSpin.h"
 
+
+
 class CUISpinText : public CUICustomSpin
 {
 public:
@@ -40,22 +42,34 @@ protected:
 	int		m_curItem;
 };
 
+#include <luabind/luabind.hpp>
+#include <luabind/object.hpp>
+#include <luabind/functor.hpp>
+#include <luabind/operator.hpp>
+#include "../script_callback_ex.h"
 class CUISpinTextCustom:public CUISpinText
 {
 private:
 	int m_backupIndex;
+	CScriptCallbackEx<void> m_pButtonsSpinClickCallback;
 public:
 	CUISpinTextCustom();
-	void SetCurrentValue() override;;
-	void SaveValue() override;;
+	~CUISpinTextCustom();
+	void SetCurrentValue() override;
+	void SaveValue() override;
 	bool IsChanged() override;
+	void SetSpinButtonCallback(const luabind::functor<void> &functor);
 protected:
 	void	SetItem() override;
 public:
+	int GetIdByIndex(int index);
+	LPCSTR GetTextByIndex(int index);
 	int GetSelectedId();
 	void SetSelectedId(int id);
 	LPCSTR GetSelectedText();
 	void SetSelectedText(LPCSTR text);
 	void AddItem(const char* text, int id);
 	void SetFont(CGameFont* pFont) override;
+	void OnBtnUpClick() override;
+	void OnBtnDownClick() override;
 };
