@@ -622,6 +622,7 @@ public:
 			luabind::object		GetImmunitiesFromBeltTable() const;
 			bool				InventoryMoveItem(CScriptGameObject* item,u32 to,bool force) const;
 			CNightVisionDevice*	GetCurrentPNV();
+			bool get_useful_for_npc() const;
 			
 	DECLARE_SCRIPT_REGISTER_FUNCTION
 };

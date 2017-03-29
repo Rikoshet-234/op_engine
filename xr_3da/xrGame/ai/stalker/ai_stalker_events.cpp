@@ -15,7 +15,6 @@
 #include "../../../../xrNetServer/net_utils.h"
 #include "../../level.h"
 #include "../../ai_monster_space.h"
-#include "OPFuncs/ExpandedCmdParams.h"
 #include "../../OPFuncs/utils.h"
 
 using namespace StalkerSpace;
@@ -98,16 +97,18 @@ void CAI_Stalker::feel_touch_new				(CObject* O)
 	// Now, test for game specific logical objects to minimize traffic
 	CInventoryItem		*I	= smart_cast<CInventoryItem*>	(O);
 	
-	if (I) Msg("FEEL_TOUCH::NEW : [%s] [%s] [%s] ", cName().c_str() ,O->cName().c_str(),OPFuncs::boolToStr(I->useful_for_NPC()));
-	
-	if (!wounded() && !critically_wounded() && I && I->useful_for_NPC() && can_take(I)) {
 #ifndef SILENCE
-		Msg("Taking item %s (%d)!",*I->cName(),I->ID());
+	if (I) Msg("FEEL_TOUCH::NEW : [%s] [%s] [%s] ", cName().c_str() ,O->cName().c_str(),OPFuncs::boolToStr(I->useful_for_NPC()));
+#endif	
+	if (!wounded() && !critically_wounded() && I && I->useful_for_NPC() && can_take(I))
+	{
+#ifndef SILENCE
+		Msg("Taking item %s (%d)!", *O->cName(), O->ID());
 #endif
 		NET_Packet		P;
-		u_EventGen		(P,GE_OWNERSHIP_TAKE,ID());
-		P.w_u16			(u16(I->object().ID()));
-		u_EventSend		(P);
+		u_EventGen(P, GE_OWNERSHIP_TAKE, ID());
+		P.w_u16(u16(I->object().ID()));
+		u_EventSend(P);
 	}
 }
 

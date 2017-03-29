@@ -22,6 +22,7 @@
 #include "restriction_space.h"
 #include "profiler.h"
 #include "mt_config.h"
+#include "OPFuncs/utils.h"
 
 using namespace ALife;
 
@@ -236,7 +237,7 @@ void CALifeUpdateManager::new_game			(LPCSTR save_name)
 	unload								();
 	reload								(m_section);
 	spawns().load						(save_name);
-
+	OPFuncs::runAlifeCallback("after_spawns_load_callback");
 #ifdef PRIQUEL
 	graph().on_load						();
 #endif // PRIQUEL
@@ -248,9 +249,11 @@ void CALifeUpdateManager::new_game			(LPCSTR save_name)
 	can_register_objects				(false);
 	spawn_new_objects					();
 	can_register_objects				(true);
+	OPFuncs::runAlifeCallback("after_objs_load_callback");
 
 	CALifeObjectRegistry::OBJECT_REGISTRY::iterator	I = objects().objects().begin();
 	CALifeObjectRegistry::OBJECT_REGISTRY::iterator	E = objects().objects().end();
+	OPFuncs::runAlifeCallback("before_onregs_callback");
 	for ( ; I != E; ++I)
 		(*I).second->on_register		();
 

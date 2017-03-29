@@ -28,6 +28,7 @@
 #include "script_game_object.h"
 #include "OPFuncs/lua_functions.h"
 #include "../ISpatial.h"
+#include "OPFuncs/utils.h"
 
 #ifdef DEBUG
 #	include "debug_renderer.h"
@@ -462,14 +463,13 @@ BOOL CInventoryItem::net_Spawn(CSE_Abstract* DC)
 	m_flags.set(FInInterpolate, FALSE);
 	//	m_bInInterpolation				= false;
 	//	m_bInterpolate					= false;
-
-	m_flags.set(Fuseful_for_NPC, TRUE);
+	if (!m_bUsefulFromConfig)
+		m_flags.set(Fuseful_for_NPC, TRUE);
 	CSE_Abstract					*e = (CSE_Abstract*)(DC);
 	CSE_ALifeObject					*alife_object = smart_cast<CSE_ALifeObject*>(e);
-	if (alife_object)
+	if (alife_object && !m_bUsefulFromConfig)
 	{
-		if (!m_bUsefulFromConfig)
-			m_flags.set(Fuseful_for_NPC, alife_object->m_flags.test(CSE_ALifeObject::flUsefulForAI));
+		m_flags.set(Fuseful_for_NPC, alife_object->m_flags.test(CSE_ALifeObject::flUsefulForAI));
 	}
 
 	CSE_ALifeInventoryItem			*pSE_InventoryItem = smart_cast<CSE_ALifeInventoryItem*>(e);
