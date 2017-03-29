@@ -13,7 +13,7 @@
 #ifdef DEBUG
 	#define ENGINE_BUILD_TYPE "debug"
 #else
-	#define	ENGINE_BUILD_TYPE "release"
+	#define	ENGINE_BUILD_TYPE ""//"release"
 #endif
 
 #define PATCH_DESCRIPTION " patch"

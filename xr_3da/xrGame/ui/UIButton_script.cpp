@@ -1,4 +1,4 @@
-#include "pch_script.h"
+#include "../pch_script.h"
 #include "UIButton.h"
 #include "UI3tButton.h"
 #include "UICheckButton.h"
@@ -6,6 +6,8 @@
 #include "UISpinNum.h"
 #include "UISpinText.h"
 #include "UITrackBar.h"
+#include "UIWndCallback.h"
+#include "UIScriptWnd.h"
 
 using namespace luabind;
 
@@ -61,6 +63,9 @@ void CUIButton::script_register(lua_State *L)
 		.def("GetSelectedId",			&CUISpinTextCustom::GetSelectedId)
 		.def("SetSelectedId",			&CUISpinTextCustom::SetSelectedId)
 		.def("GetSelectedText",			&CUISpinTextCustom::GetSelectedText)
+		.def("GetIdByIndex",			&CUISpinTextCustom::GetIdByIndex)
+		.def("GetTextByIndex",			&CUISpinTextCustom::GetTextByIndex)
+		.def("SetSpinButtonCallback",	static_cast<void(CUISpinTextCustom::*)(const luabind::functor<void>&)>(&CUISpinTextCustom::SetSpinButtonCallback))
 		.def("SetSelectedText",			static_cast<void(CUISpinTextCustom::*)(LPCSTR)>(&CUISpinTextCustom::SetSelectedText))
 		,
 
