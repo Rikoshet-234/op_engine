@@ -22,6 +22,8 @@
 #include "saved_game_wrapper.h"
 #include "string_table.h"
 #include "../igame_persistent.h"
+#include "OPFuncs/ExpandedCmdParams.h"
+#include "OPFuncs/utils.h"
 
 using namespace ALife;
 
@@ -88,6 +90,8 @@ void CALifeStorageManager::save	(LPCSTR save_name, bool update_name)
 
 #include "../xrCore/OPFuncs/global_timers.h"
 
+
+
 void CALifeStorageManager::load	(void *buffer, const u32 &buffer_size, LPCSTR file_name)
 {
 	IReader						source(buffer,buffer_size);
@@ -95,12 +99,12 @@ void CALifeStorageManager::load	(void *buffer, const u32 &buffer_size, LPCSTR fi
 	time_manager().load			(source);
 	keyvals().load				(source);
 	spawns().load				(source,file_name);
-
+	OPFuncs::runAlifeCallback("after_spawns_load_callback");
 #ifdef PRIQUEL
 	graph().on_load				();
 #endif // PRIQUEL
 	objects().load				(source);
-
+	OPFuncs::runAlifeCallback("after_objs_load_callback");
 	VERIFY						(can_register_objects());
 	can_register_objects		(false);
 	CALifeObjectRegistry::OBJECT_REGISTRY::iterator	B = objects().objects().begin();
@@ -113,13 +117,14 @@ void CALifeStorageManager::load	(void *buffer, const u32 &buffer_size, LPCSTR fi
 		register_object			((*I).second,false);
 	} 
 	registry().load				(source);
-
+	OPFuncs::runAlifeCallback("after_regs_load_callback");	
 	can_register_objects		(true);
 	
 	Msg("* Start objects on_register'ed...");
 	//TS_ENABLE("spawn");
 	CTimer t;
 	t.Start();
+	OPFuncs::runAlifeCallback("before_onregs_callback");
 	int i = 0;
 	for (I = B; I != E; ++I, ++i)
 	{

@@ -333,6 +333,7 @@ bool CUIInventoryWnd::ToBelt(CUICellItem* itm, bool b_use_cursor_pos)
 
 		SendEvent_Item2Belt					(iitem);
 		UIOutfitInfo.UpdateImmuneView();
+		InventoryUtilities::UpdateWeight(UIBagWnd, true);
 		return								true;
 	}
 	return									false;

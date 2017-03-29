@@ -27,7 +27,7 @@
 #include "script_engine.h"
 #include "script_game_object.h"
 #include "OPFuncs/lua_functions.h"
-
+#include "../ISpatial.h"
 
 #ifdef DEBUG
 #	include "debug_renderer.h"
@@ -151,6 +151,7 @@ CInventoryItem::CInventoryItem()
 	m_eItemPlace		= eItemPlaceUndefined;
 	m_Description		= "";
 	scriptDescriptionFunctorName="";
+	m_bUsefulFromConfig = false;
 }
 
 CInventoryItem::~CInventoryItem() 
@@ -174,65 +175,70 @@ CInventoryItem::~CInventoryItem()
 	}
 }
 
-void CInventoryItem::Load(LPCSTR section) 
+void CInventoryItem::Load(LPCSTR section)
 {
-	CHitImmunity::LoadImmunities	(pSettings->r_string(section,"immunities_sect"),pSettings);
+	CHitImmunity::LoadImmunities(pSettings->r_string(section, "immunities_sect"), pSettings);
 
-	ISpatial*			self				=	smart_cast<ISpatial*> (this);
-	if (self)			self->spatial.type	|=	STYPE_VISIBLEFORAI;	
+	ISpatial*			self = smart_cast<ISpatial*> (this);
+	if (self)			self->spatial.type |= STYPE_VISIBLEFORAI;
 
-	m_name				= CStringTable().translate( pSettings->r_string(section, "inv_name") );
-	if (pSettings->line_exist(section,"inv_name_short"))
-		m_nameShort			= CStringTable().translate( pSettings->r_string(section, "inv_name_short"));
+	m_name = CStringTable().translate(pSettings->r_string(section, "inv_name"));
+	if (pSettings->line_exist(section, "inv_name_short"))
+		m_nameShort = CStringTable().translate(pSettings->r_string(section, "inv_name_short"));
 	else
-		m_nameShort="";
+		m_nameShort = "";
 
-//.	NameComplex			();
-	m_weight			= pSettings->r_float(section, "inv_weight");
-	R_ASSERT			(m_weight>=0.f);
+	//.	NameComplex			();
+	m_weight = pSettings->r_float(section, "inv_weight");
+	R_ASSERT(m_weight >= 0.f);
 
-	m_cost				= pSettings->r_u32(section, "cost");
+	m_cost = pSettings->r_u32(section, "cost");
 
-	m_slot				= READ_IF_EXISTS(pSettings,r_u32,section,"slot", NO_ACTIVE_SLOT);
+	m_slot = READ_IF_EXISTS(pSettings, r_u32, section, "slot", NO_ACTIVE_SLOT);
 
 
 	// Description
-	if ( pSettings->line_exist(section, "description") )
+	if (pSettings->line_exist(section, "description"))
 	{
-		descriptionVar=pSettings->r_string(section, "description");
+		descriptionVar = pSettings->r_string(section, "description");
 		if (descriptionVar.empty())
 		{
-			Msg("! ERROR invalid description value for [%s]",section);
-			descriptionVar="INVALID_DESCRIPTION";
+			Msg("! ERROR invalid description value for [%s]", section);
+			descriptionVar = "INVALID_DESCRIPTION";
 		}
 		m_Description = CStringTable().translate(descriptionVar.c_str());
 	}
 
-	m_flags.set(Fbelt,			READ_IF_EXISTS(pSettings, r_bool, section, "belt",				FALSE));
-	m_flags.set(FRuckDefault,	READ_IF_EXISTS(pSettings, r_bool, section, "default_to_ruck",	TRUE));
+	m_flags.set(Fbelt, READ_IF_EXISTS(pSettings, r_bool, section, "belt", FALSE));
+	m_flags.set(FRuckDefault, READ_IF_EXISTS(pSettings, r_bool, section, "default_to_ruck", TRUE));
 
-	m_flags.set(FCanTake,		READ_IF_EXISTS(pSettings, r_bool, section, "can_take",			TRUE));
-	m_flags.set(FCanTrade,		READ_IF_EXISTS(pSettings, r_bool, section, "can_trade",			TRUE));
-	m_flags.set(FIsQuestItem,	READ_IF_EXISTS(pSettings, r_bool, section, "quest_item",		FALSE));
+	m_flags.set(FCanTake, READ_IF_EXISTS(pSettings, r_bool, section, "can_take", TRUE));
+	m_flags.set(FCanTrade, READ_IF_EXISTS(pSettings, r_bool, section, "can_trade", TRUE));
+	m_flags.set(FIsQuestItem, READ_IF_EXISTS(pSettings, r_bool, section, "quest_item", FALSE));
+	if (pSettings->line_exist(section, "useful_for_npc"))
+	{
+		m_flags.set(Fuseful_for_NPC, pSettings->r_bool(section, "useful_for_npc"));
+		m_bUsefulFromConfig = true;
+	}
 
 
 
 	//время убирания объекта с уровня
-	m_dwItemRemoveTime			= READ_IF_EXISTS(pSettings, r_u32, section,"item_remove_time",			ITEM_REMOVE_TIME);
+	m_dwItemRemoveTime = READ_IF_EXISTS(pSettings, r_u32, section, "item_remove_time", ITEM_REMOVE_TIME);
 
-	m_flags.set					(FAllowSprint,READ_IF_EXISTS	(pSettings, r_bool, section,"sprint_allowed",			TRUE));
-	m_fControlInertionFactor	= READ_IF_EXISTS(pSettings, r_float,section,"control_inertion_factor",	1.0f);
-	m_icon_name					= READ_IF_EXISTS(pSettings, r_string,section,"icon_name",				NULL);
-	m_iconInfo.Load(section,true);
-	if (pSettings->line_exist(section,SCRIPT_DESCRIPTION_LINE))
+	m_flags.set(FAllowSprint, READ_IF_EXISTS(pSettings, r_bool, section, "sprint_allowed", TRUE));
+	m_fControlInertionFactor = READ_IF_EXISTS(pSettings, r_float, section, "control_inertion_factor", 1.0f);
+	m_icon_name = READ_IF_EXISTS(pSettings, r_string, section, "icon_name", NULL);
+	m_iconInfo.Load(section, true);
+	if (pSettings->line_exist(section, SCRIPT_DESCRIPTION_LINE))
 	{
-		scriptDescriptionFunctorName=pSettings->r_string(section,SCRIPT_DESCRIPTION_LINE);
+		scriptDescriptionFunctorName = pSettings->r_string(section, SCRIPT_DESCRIPTION_LINE);
 		if (!scriptDescriptionFunctorName.empty())
 		{
-			bool result	= ai().script_engine().functor(scriptDescriptionFunctorName.c_str(),scriptDescriptionFunctor);
+			bool result = ai().script_engine().functor(scriptDescriptionFunctorName.c_str(), scriptDescriptionFunctor);
 			if (!result)
 			{
-				Msg("! ERROR script_description function [%s] not valid for [%s]",scriptDescriptionFunctorName.c_str(),section);
+				Msg("! ERROR script_description function [%s] not valid for [%s]", scriptDescriptionFunctorName.c_str(), section);
 			}
 		}
 	}
@@ -449,19 +455,21 @@ bool CInventoryItem::Detach(const char* item_section_name, bool b_spawn_item)
 }
 #include "../xrCore/FTimerStat.h"
 /////////// network ///////////////////////////////
-BOOL CInventoryItem::net_Spawn			(CSE_Abstract* DC)
+BOOL CInventoryItem::net_Spawn(CSE_Abstract* DC)
 {
 	TSP_SCOPED(_, "CInventoryItem::net_Spawn", "spawn");
-	m_flags.set						(FInInterpolation, FALSE);
-	m_flags.set						(FInInterpolate,	FALSE);
-//	m_bInInterpolation				= false;
-//	m_bInterpolate					= false;
+	m_flags.set(FInInterpolation, FALSE);
+	m_flags.set(FInInterpolate, FALSE);
+	//	m_bInInterpolation				= false;
+	//	m_bInterpolate					= false;
 
-	m_flags.set						(Fuseful_for_NPC, TRUE);
-	CSE_Abstract					*e	= (CSE_Abstract*)(DC);
+	m_flags.set(Fuseful_for_NPC, TRUE);
+	CSE_Abstract					*e = (CSE_Abstract*)(DC);
 	CSE_ALifeObject					*alife_object = smart_cast<CSE_ALifeObject*>(e);
-	if (alife_object)	{
-		m_flags.set(Fuseful_for_NPC, alife_object->m_flags.test(CSE_ALifeObject::flUsefulForAI));
+	if (alife_object)
+	{
+		if (!m_bUsefulFromConfig)
+			m_flags.set(Fuseful_for_NPC, alife_object->m_flags.test(CSE_ALifeObject::flUsefulForAI));
 	}
 
 	CSE_ALifeInventoryItem			*pSE_InventoryItem = smart_cast<CSE_ALifeInventoryItem*>(e);
@@ -472,7 +480,7 @@ BOOL CInventoryItem::net_Spawn			(CSE_Abstract* DC)
 	if (GameID() != GAME_SINGLE)
 		object().processing_activate();
 
-	m_dwItemIndependencyTime		= 0;
+	m_dwItemIndependencyTime = 0;
 
 	return							TRUE;
 }

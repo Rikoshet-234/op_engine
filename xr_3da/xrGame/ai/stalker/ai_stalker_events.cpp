@@ -15,6 +15,8 @@
 #include "../../../../xrNetServer/net_utils.h"
 #include "../../level.h"
 #include "../../ai_monster_space.h"
+#include "OPFuncs/ExpandedCmdParams.h"
+#include "../../OPFuncs/utils.h"
 
 using namespace StalkerSpace;
 using namespace MonsterSpace;
@@ -90,14 +92,14 @@ void CAI_Stalker::OnEvent		(NET_Packet& P, u16 type)
 
 void CAI_Stalker::feel_touch_new				(CObject* O)
 {
-//	Msg					("FEEL_TOUCH::NEW : %s",*O->cName());
 	if (!g_Alive())		return;
 	if (Remote())		return;
-	if ((O->spatial.type | STYPE_VISIBLEFORAI) != O->spatial.type) return;
-
+	if ((O->spatial.type | STYPE_VISIBLEFORAI) != O->spatial.type)	return;
 	// Now, test for game specific logical objects to minimize traffic
 	CInventoryItem		*I	= smart_cast<CInventoryItem*>	(O);
-
+	
+	if (I) Msg("FEEL_TOUCH::NEW : [%s] [%s] [%s] ", cName().c_str() ,O->cName().c_str(),OPFuncs::boolToStr(I->useful_for_NPC()));
+	
 	if (!wounded() && !critically_wounded() && I && I->useful_for_NPC() && can_take(I)) {
 #ifndef SILENCE
 		Msg("Taking item %s (%d)!",*I->cName(),I->ID());

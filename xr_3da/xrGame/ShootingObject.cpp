@@ -257,6 +257,10 @@ void CShootingObject::LoadFlameParticles (LPCSTR section, LPCSTR prefix)
 	if(pSettings->line_exist(section, full_name))
 		m_sShotParticles = pSettings->r_string (section, full_name);
 
+	if (m_sFlameParticles.size()>0 && m_sSmokeParticles.size()==0)
+		m_sSmokeParticles=m_sFlameParticles;
+	if (m_sFlameParticles.size()==0 && m_sSmokeParticles.size()>0)
+		m_sFlameParticles=m_sSmokeParticles;
 
 	//текущие партиклы
 	m_sFlameParticlesCurrent = m_sFlameParticles;

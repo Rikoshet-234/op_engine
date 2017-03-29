@@ -12,6 +12,8 @@
 #include "../Actor.h"
 #include "../../xrNetServer/NET_utils.h"
 #include "../Inventory.h"
+#include "../script_engine.h"
+#include "../ai_space.h"
 
 #include <locale>
 #include <iostream>
@@ -206,4 +208,18 @@ namespace OPFuncs
 		return("");
 	}
 
+	void runAlifeCallback(LPCSTR callbackName)
+	{
+		LPCSTR _callback = READ_IF_EXISTS(pSettings, r_string, "alife", callbackName, nullptr);
+		if (!_callback || xr_strlen(_callback) == 0)
+			return;
+		luabind::functor<void>		functor;
+		bool functor_exists= ai().script_engine().functor(_callback, functor);
+		if (!functor_exists)
+		{
+			Msg("! ERROR callback [%s] set to non exists functor [%s]",callbackName,_callback);
+			return;
+		}
+		functor();
+	}
 }

@@ -54,6 +54,7 @@ private:
 	std::string scriptDescriptionFunctorName;
 	std::string descriptionVar;
 	luabind::functor<LPCSTR> scriptDescriptionFunctor;
+	bool m_bUsefulFromConfig;
 protected:
 	enum EIIFlags{				FdropManual			=(1<<0),
 								FCanTake			=(1<<1),

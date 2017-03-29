@@ -147,6 +147,10 @@ void CWeaponMagazined::Load	(LPCSTR section)
 			m_sSilencerFlameParticles = pSettings->r_string(section, "silencer_flame_particles");
 		if(pSettings->line_exist(section, "silencer_smoke_particles"))
 			m_sSilencerSmokeParticles = pSettings->r_string(section, "silencer_smoke_particles");
+		if (m_sSilencerFlameParticles && !m_sSilencerSmokeParticles)
+			m_sSilencerSmokeParticles=m_sSilencerFlameParticles;
+		if (!m_sSilencerFlameParticles && m_sSilencerSmokeParticles)
+			m_sSilencerFlameParticles=m_sSilencerSmokeParticles;
 		HUD_SOUND::LoadSound(section,"snd_silncer_shot", sndSilencerShot, m_eSoundShot);
 	}
 	//  [7/20/2005]
