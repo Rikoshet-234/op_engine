@@ -31,6 +31,7 @@ namespace OPFuncs
 	//check string is contains only 'english' symbols,numbers and '_'
 	bool isCorrectString(std::string str);
 	std::string getFileNameFromPath(std::string fullPath);
+	void runAlifeCallback(LPCSTR callbackName);
 }
 
 #endif

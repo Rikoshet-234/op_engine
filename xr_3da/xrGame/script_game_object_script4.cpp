@@ -412,6 +412,17 @@ CNightVisionDevice* CScriptGameObject::GetCurrentPNV()
 	return nvd;
 }
 
+bool CScriptGameObject::get_useful_for_npc() const
+{
+	CInventoryItem	*item = smart_cast<CInventoryItem*>(&object());
+	if (!item)
+	{
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CScriptGameObject::get_useful_for_npc non-CInventoryItem object !!!");
+		return false;
+	}
+	return item->useful_for_NPC();
+}
+
 class_<CScriptGameObject> &script_register_game_object3(class_<CScriptGameObject> &instance)
 {
 	instance
@@ -465,6 +476,7 @@ class_<CScriptGameObject> &script_register_game_object3(class_<CScriptGameObject
 		.def("iterate_box_obj",				&CScriptGameObject::IterateInventoryBoxObject)
 		.def("iterate_box_obj",				&CScriptGameObject::IterateInventoryBoxId)
 		.def("get_current_pnv",				&CScriptGameObject::GetCurrentPNV)
+		.def("useful_for_npc",				&CScriptGameObject::get_useful_for_npc)
 		
 	;
 

@@ -185,12 +185,15 @@ void CWeaponKnife::OnAnimationEnd(u32 state)
 			{
 				m_attackStart = false;
 				MotionID mID;
-				if(GetState()==eFire)
-					mID=random_anim(mhud_attack_e);
+				if (GetState() == eFire)
+				{
+					mID = random_anim(mhud_attack_e);
+				}
 				else
-					mID=random_anim(mhud_attack2_e);
+				{
+					mID = random_anim(mhud_attack2_e);
+				}
 				m_pHUD->animPlay(mID, TRUE, this, GetState());
-
 				Fvector	p1, d; 
 				p1.set(get_LastFP()); 
 				d.set(get_LastFD());
@@ -219,10 +222,14 @@ void CWeaponKnife::switch2_Attacking	(u32 state)
 {
 	if(m_bPending)	return;
 	MotionID mID;
-	if(state==eFire)
-		mID=random_anim(mhud_attack);
+	if (state == eFire)
+	{
+		mID = random_anim(mhud_attack);
+	}
 	else //eFire2
-		mID=random_anim(mhud_attack2);
+	{
+		mID = random_anim(mhud_attack2);
+	}
 	m_pHUD->animPlay(mID,FALSE, this, state);
 
 	m_attackStart	= true;
@@ -378,7 +385,7 @@ void CWeaponKnife::onMovementChanged	(ACTOR_DEFS::EMoveCommand cmd)
 		}
 		m_pHUD->animPlay(mID, TRUE, this, eIdle);
 	}
-	else if (!st.bCrouch && g_actor->AnyMove())
+	else if (/*!st.bCrouch && */g_actor->AnyMove())
 	{
 		MotionID mID;
 		if (mhud_idle_moving.size()>0)
