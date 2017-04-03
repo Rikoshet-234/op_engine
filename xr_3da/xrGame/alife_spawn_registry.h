@@ -74,6 +74,7 @@ public:
 	IC		const SPAWN_GRAPH				&spawns						() const;
 	IC		void							assign_artefact_position	(CSE_ALifeAnomalousZone	*anomaly, CSE_ALifeDynamicObject *object) const;
 	IC		const ALife::_SPAWN_ID			&spawn_id					(const ALife::_SPAWN_STORY_ID &spawn_story_id) const;
+	SPAWN_STORY_IDS& spawn_story_ids() {return m_spawn_story_ids;}
 };
 
 #include "alife_spawn_registry_inline.h"

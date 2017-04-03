@@ -14,6 +14,7 @@
 #include "alife_schedule_registry.h"
 #include "alife_spawn_registry.h"
 #include "alife_object_registry.h"
+#include "alife_story_registry.h"
 #include "ef_storage.h"
 #include "xrserver.h"
 #include "level.h"
@@ -542,4 +543,43 @@ void CALifeUpdateManager::remove_all_restrictions	(ALife::_OBJECT_ID id, const R
 		}
 		default : NODEFAULT;
 	}
+}
+
+void CALifeUpdateManager::assign_story_id(ALife::_OBJECT_ID id, ALife::_STORY_ID sid)
+{
+	CSE_ALifeDynamicObject					*object = objects().object(id, true);
+	if (!object || sid == INVALID_STORY_ID) {
+		Msg("! ERROR assign_story_id: cannot assign story id [%d] entity with id [%d]", sid, id);
+		return;
+	}
+	if (!story_objects().object(sid, true))
+	{
+		if (object->m_bOnline)
+			switch_offline(object);
+		story_objects().add(sid, object);
+		object->m_story_id = sid;
+	}
+	else
+		Msg("! ERROR assign_story_id: specified story id [%d] is already using", sid);
+
+}
+
+void CALifeUpdateManager::assign_spawn_story_id(ALife::_OBJECT_ID oid, ALife::_SPAWN_STORY_ID ssid)
+{
+	CSE_ALifeDynamicObject					*object = objects().object(oid, true);
+	if (!object || ssid == INVALID_SPAWN_STORY_ID) {
+		Msg("! ERROR assign_spawn_story_id: cannot assign spawn story id [%d] entity with id [%d]", ssid, oid);
+		return;
+	}
+	CALifeSpawnRegistry::SPAWN_STORY_IDS::const_iterator obj_id_it = spawns().spawn_story_ids().find(ssid);
+	if (obj_id_it== spawns().spawn_story_ids().end())
+	{
+		if (object->m_bOnline)
+			switch_offline(object);
+		spawns().spawn_story_ids().insert(std::make_pair(ssid, object->ID));
+		object->m_spawn_story_id = ssid;
+	}
+	else
+		Msg("! ERROR assign_story_id: specified spawn story id [%d] is already using", ssid);
+
 }

@@ -45,12 +45,6 @@ void IRender_Visual::Load		(const char* N, IReader *data, u32 )
 	// header
 	VERIFY		(data);
 	ogf_header	hdr;
-	 /*if (N)
-		 if (std::string(N).find("wpn_f_1")!=std::string::npos)
-		 {
-			 if (std::string(N).find("grenadier")!=std::string::npos)
-				 int a=0;
-		 }*/
 
 	if (data->r_chunk_safe(OGF_HEADER,&hdr,sizeof(hdr)))
 	{
@@ -65,7 +59,6 @@ void IRender_Visual::Load		(const char* N, IReader *data, u32 )
 
 	// Shader
 	bool error=false;
-	//if (data->find_chunk(OGF_TEXTURE)) {
 	if (data->find_chunk_safe(OGF_TEXTURE,error)) {
 		if (error)
 		{
