@@ -4,6 +4,8 @@
 #include "GameTaskDefs.h"
 #include "script_export_space.h"
 
+u16	storyId2GameId(ALife::_STORY_ID);
+
 class CGameTaskManager;
 class CMapLocation;
 class CGameTask;
@@ -53,6 +55,7 @@ public:
 	shared_str				map_hint;
 	shared_str				map_location;
 	u16						object_id;
+	ALife::_STORY_ID		story_object_id;
 	shared_str				article_key;
 	CMapLocation*			LinkedMapLocation	();
 	ETaskState				TaskState			()	{return task_state;};
@@ -105,17 +108,17 @@ DEFINE_VECTOR(SGameTaskObjective, OBJECTIVE_VECTOR, OBJECTIVE_VECTOR_IT);
 class CGameTask
 {
 private:
-							CGameTask				(const CGameTask&){}; //disable copy ctor
+	CGameTask(const CGameTask&) {}; //disable copy ctor
 protected:
-	void					Load					(const TASK_ID& id);
+	void					Load(const TASK_ID& id);
 public:
-							CGameTask				(const TASK_ID& id);
-							CGameTask				();
+	CGameTask(const TASK_ID& id);
+	CGameTask();
 
-	bool					HasLinkedMapLocations	();
-	bool					HasInProgressObjective	();
+	bool					HasLinkedMapLocations();
+	bool					HasInProgressObjective();
 
-	SGameTaskObjective&		Objective				(int objectice_id)	{return m_Objectives[objectice_id];};
+	SGameTaskObjective&		Objective(int objectice_id) { return m_Objectives[objectice_id]; };
 
 	TASK_ID					m_ID;
 	shared_str				m_Title;
@@ -127,17 +130,17 @@ public:
 	bool					m_removeCompleted;
 	bool					m_isCycle;
 
-// for scripting access
-	void					Load_script				(LPCSTR _id);
-	void					SetTitle_script			(LPCSTR _title);
-	LPCSTR					GetTitle_script			()							{return *m_Title;};
-	void					SetPriority_script		(int _prio);
-	int						GetPriority_script		()							{return m_priority;};
-	void					AddObjective_script		(SGameTaskObjective* O);
-	SGameTaskObjective*		GetObjective_script		(int objective_id)			{return &(Objective(objective_id));}
-	LPCSTR					GetID_script			()							{return *m_ID;}
-	void					SetID_script			(LPCSTR _id)				{m_ID = _id;}
-	int						GetObjectiveSize_script	()							{return m_Objectives.size();}
+	// for scripting access
+	void					Load_script(LPCSTR _id);
+	void					SetTitle_script(LPCSTR _title);
+	LPCSTR					GetTitle_script() { return *m_Title; };
+	void					SetPriority_script(int _prio);
+	int						GetPriority_script() { return m_priority; };
+	void					AddObjective_script(SGameTaskObjective* O);
+	SGameTaskObjective*		GetObjective_script(int objective_id) { return &(Objective(objective_id)); }
+	LPCSTR					GetID_script() { return *m_ID; }
+	void					SetID_script(LPCSTR _id) { m_ID = _id; }
+	int						GetObjectiveSize_script() { return m_Objectives.size(); }
 
 	DECLARE_SCRIPT_REGISTER_FUNCTION
 };

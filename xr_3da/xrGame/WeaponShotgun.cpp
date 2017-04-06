@@ -238,6 +238,10 @@ void CWeaponShotgun::OnAnimationEnd(u32 state)
 
 void CWeaponShotgun::Reload() 
 {
+	if (m_bRequredDemandCheck && g_uCommonFlags.is(E_COMMON_FLAGS::gpDemandReload))
+	{
+		return;
+	}
 	if(m_bTriStateReload){
 		TriStateReload();
 	}else

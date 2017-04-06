@@ -67,6 +67,7 @@ protected:
 	// General
 	//кадр момента пересчета UpdateSounds
 	u32				dwUpdateSounds_Frame;
+	bool			m_bRequredDemandCheck;
 protected:
 	void ZoomInc	() override;
 	void ZoomDec	() override;

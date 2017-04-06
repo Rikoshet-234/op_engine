@@ -12,24 +12,27 @@ struct SAuraSound {
 };
 
 
-class CPPEffectorControllerAura : public CPPEffectorCustom {
+class CPPEffectorControllerAura : public CPPEffectorCustom
+{
 	typedef CPPEffectorCustom inherited;
 
-	enum {eStateFadeIn, eStateFadeOut, eStatePermanent} m_effector_state;
+	enum { eStateFadeIn, eStateFadeOut, eStatePermanent } m_effector_state;
 
 	u32				m_time_state_started;
 	u32				m_time_to_fade;
-	
+
 	ref_sound		m_snd_left;
 	ref_sound		m_snd_right;
 
 public:
-					CPPEffectorControllerAura	(const SPPInfo &ppi, u32 time_to_fade, const ref_sound &snd_left, const ref_sound &snd_right);
-	virtual BOOL	update						();
-	void			switch_off					();
+	CPPEffectorControllerAura(const SPPInfo &ppi, u32 time_to_fade, const ref_sound &snd_left, const ref_sound &snd_right);
+	~CPPEffectorControllerAura() override;
+	virtual BOOL	update();
+	void			switch_off();
 };
 
-class CControllerAura : public CPPEffectorCustomController<CPPEffectorControllerAura>{
+class CControllerAura : public CPPEffectorCustomController<CPPEffectorControllerAura>
+{
 	typedef CPPEffectorCustomController<CPPEffectorControllerAura> inherited;
 
 	CController			*m_object;

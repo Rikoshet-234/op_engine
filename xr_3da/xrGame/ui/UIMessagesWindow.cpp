@@ -111,6 +111,11 @@ void CUIMessagesWindow::SetChatOwner(game_cl_GameState* owner)
 		m_pChatWnd->SetOwner(owner);
 }
 
+void CUIMessagesWindow::reset_ui() const
+{
+	m_pGameLog->Clear();
+}
+
 void CUIMessagesWindow::Update()
 {
 	CUIWindow::Update();

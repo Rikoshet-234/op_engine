@@ -148,7 +148,7 @@ void CHUDManager::Load()
 		return;
 	}
 	pUI					= xr_new<CUI> (this);
-	pUI->Load			(NULL);
+	pUI->Load			(nullptr);
 	OnDisconnected		();
 }
 //--------------------------------------------------------------------

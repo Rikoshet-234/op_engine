@@ -269,15 +269,19 @@ void CCameraManager::Update(const Fvector& P, const Fvector& D, const Fvector& N
 		pp_affected = pp_identity;
 		for(int i = m_EffectorsPP.size()-1; i >= 0; i--) {
 			CEffectorPP* eff	= m_EffectorsPP[i];
-			SPPInfo l_PPInf		= pp_zero;
-			if((eff->Valid())&&eff->Process(l_PPInf)) 
+			if (eff)
 			{
-				++_count;
-				pp_affected			+= l_PPInf;
-				pp_affected			-= pp_identity;
-				pp_affected.validate("in cycle");
-			}else 
-				RemovePPEffector(eff->Type());
+				SPPInfo l_PPInf = pp_zero;
+				if (eff->Valid() && eff->Process(l_PPInf))
+				{
+					++_count;
+					pp_affected += l_PPInf;
+					pp_affected -= pp_identity;
+					pp_affected.validate("in cycle");
+				}
+				else
+					RemovePPEffector(eff->Type());
+			}
 		}
 		if (0==_count)	pp_affected				= pp_identity;
 		else			pp_affected.normalize	();

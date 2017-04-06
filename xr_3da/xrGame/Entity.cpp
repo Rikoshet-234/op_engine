@@ -348,8 +348,12 @@ void CEntity::on_after_change_team	()
 void CEntity::ChangeTeam(int team, int squad, int group)
 {
 	if ((team == g_Team()) && (squad == g_Squad()) && (group == g_Group())) return;
-
-	VERIFY2					(g_Alive(), "Try to change team of a dead object");
+	if (!g_Alive())
+	{
+		Msg("! WARNING: Try to change team of a dead object [%s]!",this->cName().c_str());
+		return;
+	}
+	
 	
 	if(IsGameTypeSingle())
 	{

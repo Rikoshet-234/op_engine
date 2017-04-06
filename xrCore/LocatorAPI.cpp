@@ -381,7 +381,6 @@ void CLocatorAPI::ProcessArchive(LPCSTR _path, LPCSTR base_path)
 #endif // PROTECTED_BUILD
 		strconcat		(sizeof(full),full,base,name);
 		size_t vfs		= archives.size()-1;
-
 		Register		(full,(u32)vfs,crc,ptr,size_real,size_compr,0);
 	}
 	hdr->close			();
@@ -422,7 +421,8 @@ IC bool pred_str_ff(const _finddata_t& x, const _finddata_t& y)
 
 bool ignore_name(const char* _name)
 {
-	// ignore processing ".svn" folders
+	if (strstr(_name, ".git"))
+		return true;
 	return ( _name[0]=='.' && _name[1]=='s' && _name[2]=='v' && _name[3]=='n' && _name[4]==0);
 }
 

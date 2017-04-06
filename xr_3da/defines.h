@@ -69,7 +69,8 @@ enum E_COMMON_FLAGS
 	gpDeferredReload			= 1<<10,
 	gpFixedReload				= 1<<11,
 	gpStickyScope				= 1<<12,
-	gpOpenScope					= 1<<13
+	gpOpenScope					= 1<<13,
+	gpDemandReload				= 1<<14
 };
 
 ENGINE_API extern	float			lpLoadScreenTextOffsetX;

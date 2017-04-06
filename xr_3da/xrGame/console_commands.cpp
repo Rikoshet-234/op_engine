@@ -1633,6 +1633,7 @@ void CCC_RegisterCommands()
 	CMD3(CCC_Mask,				"ui_allow_operations_tsb",		&g_uCommonFlags,uiAllowOpTradeSB);
 	CMD3(CCC_Mask,				"winv_reload_enable",			&g_uCommonFlags,invReloadWeapon);
 	CMD3(CCC_Mask,				"gp_deffered_reload",			&g_uCommonFlags,gpDeferredReload);
+	CMD3(CCC_Mask,				"gp_demand_reload", &g_uCommonFlags, gpDemandReload);
 	CMD3(CCC_Mask,				"gp_fixed_reload",				&g_uCommonFlags,gpFixedReload);
 	CMD3(CCC_Mask,				"gp_sticky_scope",				&g_uCommonFlags,gpStickyScope);
 	CMD3(CCC_ChangeScopeVisual,	"gp_open_scope",				&g_uCommonFlags,gpOpenScope);
