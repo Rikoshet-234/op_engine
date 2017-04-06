@@ -381,6 +381,16 @@ bool dont_has_info								(const CALifeSimulator *pself, const ALife::_OBJECT_ID
 //	THROW								(pself);
 //}
 
+void CALifeSimulator__assign_story_id(CALifeSimulator *alife, ALife::_OBJECT_ID id, ALife::_STORY_ID sid)
+{
+	alife->assign_story_id(id, sid);
+}
+
+void CALifeSimulator__assign_spawn_story_id(CALifeSimulator *alife, ALife::_OBJECT_ID id, ALife::_SPAWN_STORY_ID sid)
+{
+	alife->assign_spawn_story_id(id, sid);
+}
+
 #pragma optimize("s",on)
 void CALifeSimulator::script_register			(lua_State *L)
 {
@@ -418,6 +428,8 @@ void CALifeSimulator::script_register			(lua_State *L)
 			.def("dont_has_info",			&dont_has_info)
 			.def("switch_distance",			&CALifeSimulator::switch_distance)
 			.def("switch_distance",			&CALifeSimulator::set_switch_distance)
+			.def("assign_story_id",			&CALifeSimulator__assign_story_id)
+			.def("assign_spawn_story_id",	&CALifeSimulator__assign_spawn_story_id)
 
 		,def("alife",						&alife)
 	];

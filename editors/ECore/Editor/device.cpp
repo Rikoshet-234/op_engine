@@ -213,7 +213,8 @@ void CRenderDevice::_Create(IReader* F)
 	// signal another objects
     UI->OnDeviceCreate			();           
 //.	seqDevCreate.Process		(rp_DeviceCreate);
-
+	
+	#pragma warning("redesign for new config file format!!!!")
 	pSystemFont					= xr_new<CGameFont>("hud_font_small");
 //	pSystemFont					= xr_new<CGameFont>("hud_font_medium");
 }

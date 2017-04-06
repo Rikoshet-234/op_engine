@@ -565,7 +565,7 @@ public:
 
 			CScriptGameObject	*item_in_slot						(u32 slot_id) const;
 
-			u32					active_slot							();
+			int					active_slot							();
 			void				activate_slot						(u32 slot_id);
 
 #ifdef DEBUG

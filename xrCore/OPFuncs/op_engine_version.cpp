@@ -8,12 +8,12 @@
 //! Keep this defines here so you don't have to rebuild cpps when you change version
 #define ENGINE_DESCRIPTION "OP 2.1 Engine"
 #define ENGINE_MINOR "0"
-#define ENGINE_MAJOR "57с"
+#define ENGINE_MAJOR "57d"
 
 #ifdef DEBUG
 	#define ENGINE_BUILD_TYPE "debug"
 #else
-	#define	ENGINE_BUILD_TYPE ""//"release"
+	#define	ENGINE_BUILD_TYPE "release"
 #endif
 
 #define PATCH_DESCRIPTION " patch"
@@ -29,12 +29,16 @@ namespace OPFuncs
 		if (engineVersion[0] == 0)
 		{
 #ifdef PATCH_INFO_PRESENT
-			sprintf_s(engineVersion,"%s ver %s.%s %s ver %s.%s %s"
+			/*sprintf_s(engineVersion,"%s ver %s.%s %s ver %s.%s %s"
 				,ENGINE_DESCRIPTION, ENGINE_MINOR, ENGINE_MAJOR
 				,PATCH_DESCRIPTION, PATCH_MINOR, PATCH_MAJOR
-				,ENGINE_BUILD_TYPE);
+				,ENGINE_BUILD_TYPE);*/
+			sprintf_s(engineVersion,"%s ver %s.%s %s ver %s.%s"
+				,ENGINE_DESCRIPTION, ENGINE_MINOR, ENGINE_MAJOR
+				,PATCH_DESCRIPTION, PATCH_MINOR, PATCH_MAJOR);
 #else
-			sprintf_s(engineVersion,"%s ver %s.%s %s",ENGINE_DESCRIPTION,ENGINE_MINOR,ENGINE_MAJOR,ENGINE_BUILD_TYPE);
+			//sprintf_s(engineVersion,"%s ver %s.%s %s",ENGINE_DESCRIPTION,ENGINE_MINOR,ENGINE_MAJOR,ENGINE_BUILD_TYPE);
+			sprintf_s(engineVersion,"%s ver %s.%s",ENGINE_DESCRIPTION,ENGINE_MINOR,ENGINE_MAJOR);
 #endif
 		}
 		return engineVersion;

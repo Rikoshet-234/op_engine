@@ -872,7 +872,7 @@ void CScriptGameObject::GiveTaskToActor(CGameTask* t, u32 dt, bool bCheckExistin
 	Actor()->GameTaskManager().GiveGameTaskToActor(t, dt, bCheckExisting);
 }
 
-u32	CScriptGameObject::active_slot()
+int	CScriptGameObject::active_slot()
 {
 	CInventoryOwner	*inventory_owner = smart_cast<CInventoryOwner*>(&object());
 	if (!inventory_owner) {

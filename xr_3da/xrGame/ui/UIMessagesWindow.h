@@ -31,7 +31,7 @@ public:
 	void				AddChatMessage					(shared_str msg, shared_str author);
 	void				SetChatOwner					(game_cl_GameState* owner);
 	CUIChatWnd*			GetChatWnd						() {return m_pChatWnd;}
-
+	void				reset_ui() const;
 	virtual void		Update();
 
 

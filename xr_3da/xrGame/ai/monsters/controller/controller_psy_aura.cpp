@@ -6,8 +6,7 @@
 #include "../../../CameraEffector.h"
 #include "../../../ActorEffector.h"
 
-CPPEffectorControllerAura::CPPEffectorControllerAura(const SPPInfo &ppi, u32 time_to_fade, const ref_sound &snd_left, const ref_sound &snd_right)
-: inherited(ppi)
+CPPEffectorControllerAura::CPPEffectorControllerAura(const SPPInfo &ppi, u32 time_to_fade, const ref_sound &snd_left, const ref_sound &snd_right): inherited(ppi)
 {
 	m_time_to_fade			= time_to_fade;
 	m_effector_state		= eStateFadeIn;
@@ -17,45 +16,57 @@ CPPEffectorControllerAura::CPPEffectorControllerAura(const SPPInfo &ppi, u32 tim
 	m_snd_right.clone		(snd_right,st_Effect,sg_SourceType);	
 
 	m_snd_left.play_at_pos	(Actor(), Fvector().set(-1.f, 0.f, 1.f), sm_Looped | sm_2D);
-	m_snd_right.play_at_pos	(Actor(), Fvector().set(-1.f, 0.f, 1.f), sm_Looped | sm_2D);
+	m_snd_right.play_at_pos	(Actor(), Fvector().set(1.f, 0.f, 1.f), sm_Looped | sm_2D);
 
 }
 
 void CPPEffectorControllerAura::switch_off()
 {
+	if (m_snd_left._feedback()) 
+		m_snd_left.stop();
+	if (m_snd_right._feedback()) 
+		m_snd_right.stop();
 	m_effector_state		= eStateFadeOut;		
 	m_time_state_started	= Device.dwTimeGlobal;
 }
 
+
+CPPEffectorControllerAura::~CPPEffectorControllerAura()
+{
+	switch_off();
+}
 
 BOOL CPPEffectorControllerAura::update()
 {
 	// update factor
 	if (m_effector_state == eStatePermanent) {
 		m_factor = 1.f;
-	} else {
+	}
+	else {
 		m_factor = float(Device.dwTimeGlobal - m_time_state_started) / float(m_time_to_fade);
 		if (m_effector_state == eStateFadeOut) m_factor = 1 - m_factor;
 
 		if (m_factor > 1) {
-			m_effector_state	= eStatePermanent;
-			m_factor			= 1.f;
-		} else if (m_factor < 0) {
+			m_effector_state = eStatePermanent;
+			m_factor = 1.f;
+		}
+		else if (m_factor < 0) {
 			if (m_snd_left._feedback())		m_snd_left.stop();
 			if (m_snd_right._feedback())	m_snd_right.stop();
-		
+
 			return FALSE;
 		}
 	}
 
 	// start new or play again?
-	if (!m_snd_left._feedback() && !m_snd_right._feedback()) {
-		m_snd_left.play_at_pos	(Actor(), Fvector().set(-1.f, 0.f, 1.f), sm_Looped | sm_2D);
-		m_snd_right.play_at_pos	(Actor(), Fvector().set(-1.f, 0.f, 1.f), sm_Looped | sm_2D);
-	} 
+	if (!m_snd_left._feedback() && !m_snd_right._feedback())
+	{
+		m_snd_left.play_at_pos(Actor(), Fvector().set(-1.f, 0.f, 1.f), sm_Looped | sm_2D);
+		m_snd_right.play_at_pos(Actor(), Fvector().set(1.f, 0.f, 1.f), sm_Looped | sm_2D);
+	}
 
-	if (m_snd_left._feedback())		m_snd_left.set_volume	(m_factor);
-	if (m_snd_right._feedback())	m_snd_right.set_volume	(m_factor);
+	if (m_snd_left._feedback())		m_snd_left.set_volume(m_factor);
+	if (m_snd_right._feedback())	m_snd_right.set_volume(m_factor);
 
 	return TRUE;
 }
@@ -83,16 +94,17 @@ void CControllerAura::update_schedule()
 		if (m_time_fake_aura == 0) {
 			m_time_fake_aura = time() + 5000 + Random.randI(FAKE_AURA_DELAY);
 			
-			if (active()) {
-				m_effector->switch_off	();
-				m_effector				= 0;
+			if (active()) 
+			{
+				m_effector->switch_off();
+				m_effector = nullptr;
 			}
 		} else {
 			if (active()) {
 				// check to stop
 				if (m_time_fake_aura < time())  {
-					m_effector->switch_off	();
-					m_effector				= 0;
+					m_effector->switch_off();
+					m_effector = nullptr;
 					m_time_fake_aura		= time() + 5000 + Random.randI(FAKE_AURA_DELAY);
 				}
 			} else {
@@ -105,26 +117,26 @@ void CControllerAura::update_schedule()
 				}
 			}
 		}
-	} else {
+	} 
+	else 
+	{
 		m_time_fake_aura = 0;
 
 		bool need_be_active		= (dist_to_actor < aura_radius);
 
-		if (active()) {
-			if (!need_be_active) {
-				m_effector->switch_off	();
-				m_effector				= 0;
-				
+		if (active()) 
+		{
+			if (!need_be_active) 
+			{
+				m_effector->switch_off();
+				m_effector = nullptr;
 				m_hit_state				= eNone;
-
-			} else {
-			}
+			} 
 		} else {
 			if (need_be_active) {
 				// create effector
 				m_effector = xr_new<CPPEffectorControllerAura>	(m_state, 5000, aura_sound.left, aura_sound.right);
 				Actor()->Cameras().AddPPEffector				(m_effector);
-				
 				m_hit_state			= eEffectoring;
 				m_time_started		= time();
 			} else {
@@ -167,10 +179,11 @@ void CControllerAura::update_frame()
 
 void CControllerAura::on_death()
 {
-	if (active()) {
-		m_effector->switch_off	();
-		m_effector				= 0;
-		m_hit_state				= eNone;
+	if (active())
+	{
+		m_effector->switch_off();
+		m_effector = nullptr;
+		m_hit_state = eNone;
 	}
 }
 

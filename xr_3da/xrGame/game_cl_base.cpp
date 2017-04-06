@@ -412,6 +412,7 @@ void game_cl_GameState::reset_ui()
 	m_game_ui_custom->reset_ui					();
 
 	HUD().GetUI()->UIMainIngameWnd->reset_ui	();
+	HUD().GetUI()->m_pMessagesWnd->reset_ui();
 
 	if (HUD().GetUI()->MainInputReceiver())
 		HUD().GetUI()->StartStopMenu			(HUD().GetUI()->MainInputReceiver(),true);

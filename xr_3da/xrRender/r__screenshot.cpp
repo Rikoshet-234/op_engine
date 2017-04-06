@@ -41,15 +41,15 @@ void CRender::Screenshot		(IRender_interface::ScreenshotMode mode, LPCSTR name)
 	// Create temp-surface
 	IDirect3DSurface9*	pFB;
 	D3DLOCKED_RECT		D;
-	HRESULT				hr;
-	hr					= HW.pDevice->CreateOffscreenPlainSurface(Device.dwWidth,Device.dwHeight,D3DFMT_A8R8G8B8,D3DPOOL_SYSTEMMEM,&pFB,NULL);
-	if(hr!=D3D_OK)		return;
+	HRESULT				hr1;
+	hr1					= HW.pDevice->CreateOffscreenPlainSurface(Device.dwWidth,Device.dwHeight,D3DFMT_A8R8G8B8,D3DPOOL_SYSTEMMEM,&pFB,NULL);
+	if(hr1!=D3D_OK)		return;
 
-	hr					= HW.pDevice->GetFrontBufferData(0,pFB);
-	if(hr!=D3D_OK)		return;
+	hr1					= HW.pDevice->GetFrontBufferData(0,pFB);
+	if(hr1!=D3D_OK)		return;
 
-	hr					= pFB->LockRect(&D,0,D3DLOCK_NOSYSLOCK);
-	if(hr!=D3D_OK)		return;
+	hr1					= pFB->LockRect(&D,0,D3DLOCK_NOSYSLOCK);
+	if(hr1!=D3D_OK)		return;
 
 	// Image processing (gamma-correct)
 	u32* pPixel		= (u32*)D.pBits;
@@ -69,8 +69,8 @@ void CRender::Screenshot		(IRender_interface::ScreenshotMode mode, LPCSTR name)
 			G.blue	[color_get_B(p)]
 			);
 	}
-	hr					= pFB->UnlockRect();
-	if(hr!=D3D_OK)		goto _end_;
+	hr1					= pFB->UnlockRect();
+	if(hr1!=D3D_OK)		goto _end_;
 
 	// Save
 	switch (mode)	{
@@ -78,23 +78,23 @@ void CRender::Screenshot		(IRender_interface::ScreenshotMode mode, LPCSTR name)
 			{
 				// texture
 				IDirect3DTexture9*	texture	= NULL;
-				hr					= D3DXCreateTexture(HW.pDevice,GAMESAVE_SIZE,GAMESAVE_SIZE,1,0,D3DFMT_DXT1,D3DPOOL_SCRATCH,&texture);
-				if(hr!=D3D_OK)		goto _end_;
+				hr1					= D3DXCreateTexture(HW.pDevice,GAMESAVE_SIZE,GAMESAVE_SIZE,1,0,D3DFMT_DXT1,D3DPOOL_SCRATCH,&texture);
+				if(hr1!=D3D_OK)		goto _end_;
 				if(NULL==texture)	goto _end_;
 
 				// resize&convert to surface
 				IDirect3DSurface9*	surface = 0;
-				hr					= texture->GetSurfaceLevel(0,&surface);
-				if(hr!=D3D_OK)		goto _end_;
+				hr1					= texture->GetSurfaceLevel(0,&surface);
+				if(hr1!=D3D_OK)		goto _end_;
 				VERIFY				(surface);
-				hr					= D3DXLoadSurfaceFromSurface(surface,0,0,pFB,0,0,D3DX_DEFAULT,0);
+				hr1					= D3DXLoadSurfaceFromSurface(surface,0,0,pFB,0,0,D3DX_DEFAULT,0);
 				_RELEASE			(surface);
-				if(hr!=D3D_OK)		goto _end_;
+				if(hr1!=D3D_OK)		goto _end_;
 
 				// save (logical & physical)
 				ID3DXBuffer*		saved	= 0;
-				hr					= D3DXSaveTextureToFileInMemory (&saved,D3DXIFF_DDS,texture,0);
-				if(hr!=D3D_OK)		goto _end_;
+				hr1					= D3DXSaveTextureToFileInMemory (&saved,D3DXIFF_DDS,texture,0);
+				if(hr1!=D3D_OK)		goto _end_;
 				
 				IWriter*			fs		= FS.w_open	(name); 
 				if (fs)				{

@@ -77,53 +77,53 @@ CGameTask* CGameTaskManager::GiveGameTaskToActor(const TASK_ID& id, u32 timeToCo
 
 CGameTask*	CGameTaskManager::GiveGameTaskToActor(CGameTask* t, u32 timeToComplete, bool bCheckExisting)
 {
-	if(bCheckExisting && HasGameTask(t->m_ID)) return NULL;
-	m_flags.set					(eChanged, TRUE);
+	if (bCheckExisting && HasGameTask(t->m_ID)) return NULL;
+	m_flags.set(eChanged, TRUE);
 
-	GameTasks().push_back				(SGameTaskKey(t->m_ID) );
-	GameTasks().back().game_task			= t;
-	t->m_ReceiveTime				= Level().GetGameTime();
-	t->m_TimeToComplete				= t->m_ReceiveTime + timeToComplete;
+	GameTasks().push_back(SGameTaskKey(t->m_ID));
+	GameTasks().back().game_task = t;
+	t->m_ReceiveTime = Level().GetGameTime();
+	t->m_TimeToComplete = t->m_ReceiveTime + timeToComplete;
 
-	
-	std::sort						(GameTasks().begin(), GameTasks().end(), task_prio_pred);
+
+	std::sort(GameTasks().begin(), GameTasks().end(), task_prio_pred);
 
 	ARTICLE_VECTOR& article_vector = Actor()->encyclopedia_registry->registry().objects();
 
 
 	SGameTaskObjective	*obj = NULL;
-	for (u32 i = 0; i < t->m_Objectives.size(); ++i){
+	for (u32 i = 0; i < t->m_Objectives.size(); ++i) {
 		obj = &t->m_Objectives[i];
-		if(obj->article_id.size()){
-		FindArticleByIDPred pred(obj->article_id);
-		if( std::find_if(article_vector.begin(), article_vector.end(), pred) == article_vector.end() ){
-			CEncyclopediaArticle article;
-			article.Load(obj->article_id);
-			article_vector.push_back(ARTICLE_DATA(obj->article_id, Level().GetGameTime(), article.data()->articleType));
+		if (obj->article_id.size()) {
+			FindArticleByIDPred pred(obj->article_id);
+			if (std::find_if(article_vector.begin(), article_vector.end(), pred) == article_vector.end()) {
+				CEncyclopediaArticle article;
+				article.Load(obj->article_id);
+				article_vector.push_back(ARTICLE_DATA(obj->article_id, Level().GetGameTime(), article.data()->articleType));
 			}
 		}
 
-		if(obj->object_id!=u16(-1) && obj->map_location.size() && obj->def_location_enabled){
-			CMapLocation* ml =	Level().MapManager().AddMapLocation(obj->map_location, obj->object_id);
-			if(obj->map_hint.size())	ml->SetHint(obj->map_hint);
-			ml->DisablePointer			();
-			ml->SetSerializable			(true);
+		if (obj->object_id != u16(-1) && obj->map_location.size() && obj->def_location_enabled) {
+			CMapLocation* ml = Level().MapManager().AddMapLocation(obj->map_location, obj->object_id);
+			if (obj->map_hint.size())	ml->SetHint(obj->map_hint);
+			ml->DisablePointer();
+			ml->SetSerializable(true);
 		}
 	}
 	CGameTask* _at = ActiveTask();
-	if	( (NULL==_at) || (_at->m_priority > t->m_priority) )
+	if ((NULL == _at) || (_at->m_priority > t->m_priority))
 	{
 		SetActiveTask(t->m_ID, 1);
 	}
 
 
 	//установить флажок необходимости прочтения тасков в PDA
-	if(HUD().GetUI()){
+	if (HUD().GetUI()) {
 		CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-		if(pGameSP) 
-			pGameSP->PdaMenu->PdaContentsChanged	(pda_section::quests);
+		if (pGameSP)
+			pGameSP->PdaMenu->PdaContentsChanged(pda_section::quests);
 	}
-	if(true /*t->m_ID!="user_task"*/)
+	if (true /*t->m_ID!="user_task"*/)
 		t->Objective(0).ChangeStateCallback();
 
 	return t;

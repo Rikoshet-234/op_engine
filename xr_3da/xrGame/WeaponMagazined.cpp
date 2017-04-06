@@ -24,17 +24,17 @@
 
 CWeaponMagazined::CWeaponMagazined(LPCSTR name, ESoundTypes eSoundType) : CWeapon(name)
 {
-	m_eSoundShow		= ESoundTypes(SOUND_TYPE_ITEM_TAKING | eSoundType);
-	m_eSoundHide		= ESoundTypes(SOUND_TYPE_ITEM_HIDING | eSoundType);
-	m_eSoundShot		= ESoundTypes(SOUND_TYPE_WEAPON_SHOOTING | eSoundType);
-	m_eSoundEmptyClick	= ESoundTypes(SOUND_TYPE_WEAPON_EMPTY_CLICKING | eSoundType);
-	m_eSoundReload		= ESoundTypes(SOUND_TYPE_WEAPON_RECHARGING | eSoundType);
-	m_eSoundZoomIn		= ESoundTypes(SOUND_TYPE_ITEM_USING | eSoundType);
-	m_eSoundZoomOut		= ESoundTypes(SOUND_TYPE_ITEM_USING | eSoundType);
-	m_eSoundChangeFireMode	= ESoundTypes(SOUND_TYPE_ITEM_USING | eSoundType);
-	
-	m_eSoundZoomInc		= ESoundTypes(SOUND_TYPE_ITEM_USING | eSoundType);
-	m_eSoundZoomDec		= ESoundTypes(SOUND_TYPE_ITEM_USING | eSoundType);
+	m_eSoundShow = ESoundTypes(SOUND_TYPE_ITEM_TAKING | eSoundType);
+	m_eSoundHide = ESoundTypes(SOUND_TYPE_ITEM_HIDING | eSoundType);
+	m_eSoundShot = ESoundTypes(SOUND_TYPE_WEAPON_SHOOTING | eSoundType);
+	m_eSoundEmptyClick = ESoundTypes(SOUND_TYPE_WEAPON_EMPTY_CLICKING | eSoundType);
+	m_eSoundReload = ESoundTypes(SOUND_TYPE_WEAPON_RECHARGING | eSoundType);
+	m_eSoundZoomIn = ESoundTypes(SOUND_TYPE_ITEM_USING | eSoundType);
+	m_eSoundZoomOut = ESoundTypes(SOUND_TYPE_ITEM_USING | eSoundType);
+	m_eSoundChangeFireMode = ESoundTypes(SOUND_TYPE_ITEM_USING | eSoundType);
+
+	m_eSoundZoomInc = ESoundTypes(SOUND_TYPE_ITEM_USING | eSoundType);
+	m_eSoundZoomDec = ESoundTypes(SOUND_TYPE_ITEM_USING | eSoundType);
 
 	m_pSndShotCurrent = nullptr;
 	m_sSilencerFlameParticles = m_sSilencerSmokeParticles = nullptr;
@@ -43,9 +43,9 @@ CWeaponMagazined::CWeaponMagazined(LPCSTR name, ESoundTypes eSoundType) : CWeapo
 	m_iShotNum = 0;
 	m_iQueueSize = WEAPON_ININITE_QUEUE;
 	m_bLockType = false;
-	m_iCurFireMode=0;
-	m_bforceReloadAfterIdle=false;
-
+	m_iCurFireMode = 0;
+	m_bforceReloadAfterIdle = false;
+	m_bRequredDemandCheck = true;
 }
 
 CWeaponMagazined::~CWeaponMagazined()
@@ -218,7 +218,7 @@ void CWeaponMagazined::FireEnd()
 	inherited::FireEnd();
 
 	CActor	*actor = smart_cast<CActor*>(H_Parent());
-	if(!iAmmoElapsed && actor && GetState()!=eReload) 
+	if(!iAmmoElapsed && actor && GetState()!=eReload)
 		Reload();
 }
 
@@ -233,6 +233,8 @@ bool CWeaponMagazined::TryReload()
 {
 	if(m_pCurrentInventory) 
 	{
+		if (m_bRequredDemandCheck && g_uCommonFlags.is(E_COMMON_FLAGS::gpDemandReload))
+			return false;
 		int ammoIndex=m_ammoType;
 		if (static_cast<int>(m_ammoType)!=m_iPropousedAmmoType && m_iPropousedAmmoType!=-1)
 			ammoIndex=m_iPropousedAmmoType;
@@ -825,8 +827,12 @@ bool CWeaponMagazined::Action(s32 cmd, u32 flags)
 	case kWPN_RELOAD:
 		{
 			if(flags&CMD_START) 
-				if(iAmmoElapsed < iMagazineSize || IsMisfire() || m_ammoType!=static_cast<u32>(m_iPropousedAmmoType)) 
+				if (iAmmoElapsed < iMagazineSize || IsMisfire() || m_ammoType != static_cast<u32>(m_iPropousedAmmoType))
+				{
+					m_bRequredDemandCheck = false;
 					Reload();
+					m_bRequredDemandCheck = true;
+				}
 		} 
 		return true;
 	case kWPN_FIREMODE_PREV:
