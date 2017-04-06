@@ -431,7 +431,7 @@ void CStats::OnDeviceCreate			()
 
 //	if (!strstr(Core.Params, "-dedicated"))
 #ifndef DEDICATED_SERVER
-	#pragma error("redesign for new config file format!!!!")
+	#pragma warning("redesign for new config file format!!!!")
 	pFont	= xr_new<CGameFont>		("stat_font", CGameFont::fsDeviceIndependent);
 #endif
 	
