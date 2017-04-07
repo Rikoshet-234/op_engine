@@ -356,7 +356,7 @@ ETaskState SGameTaskObjective::UpdateState()
 	if (story_object_id != INVALID_STORY_ID && object_id == u16(-1) && map_location.size() > 0 && def_location_enabled) //если таску надо местку
 	{
 		object_id = storyId2GameId(story_object_id); 
-		if (object_id != (-1) && !Level().MapManager().HasMapLocation(map_location, object_id)) //если объект таска уже заспавнился и метки на этот id еще нет
+		if (object_id != u16(-1) && !Level().MapManager().HasMapLocation(map_location, object_id)) //если объект таска уже заспавнился и метки на этот id еще нет
 		{
 			Msg("~ Fix unmapped story_object_id [%d] for [%s:%d]", story_object_id, parent->m_ID.c_str(), idx);
 			CMapLocation* ml = Level().MapManager().AddMapLocation(map_location, object_id);
