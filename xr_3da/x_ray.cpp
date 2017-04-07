@@ -6,6 +6,7 @@
 //	AlexMX		- Alexander Maksimchuk
 //-----------------------------------------------------------------------------
 #include "stdafx.h"
+#include <process.h>
 #include "igame_level.h"
 #include "igame_persistent.h"
 
@@ -19,7 +20,7 @@
 #include "ispatial.h"
 #include "CopyProtection.h"
 #include "Text_Console.h"
-#include <process.h>
+#include "xr_ioc_cmd.h"
 #include "../xrCore/OPFuncs/op_engine_version.h"
 #include "../xrCore/FTimerStat.h"
 
@@ -50,16 +51,6 @@ static int days_in_month[12] = {
 static int start_day	= 31;	// 31
 static int start_month	= 1;	// January
 static int start_year	= 1999;	// 1999
-
-/*
-#ifdef NDEBUG
-namespace std {
-	void terminate()
-	{
-		abort();
-	}
-}
-#endif // #ifdef NDEBUG*/
 
 void compute_build_id	()
 {
@@ -137,7 +128,29 @@ void InitSettings	()
 	FS.update_path				(fname,"$game_config$","game.ltx");
 	pGameIni					= xr_new<CInifile>	(fname,TRUE);
 	CHECK_OR_EXIT				(!pGameIni->sections().empty(),make_string("Cannot find file %s.\nReinstalling application may fix this problem.",fname));
+
+	if (!pSettings->section_exist("font_profiles"))
+	{
+		Msg("! ERROR Cannot find required section [%s].", "font_profiles");
+		FATAL("Invalid required configuration! See log for detail.");
+	}
+	if (!pSettings->line_exist("font_profiles", "default"))
+	{
+		Msg("! ERROR Cannot find required font profile[%s]", "default");
+		FATAL("Invalid required configuration! See log for detail.");
+	}
+	
+	CInifile::Sect& sect = pSettings->r_section("font_profiles");
+	for (CInifile::SectCIt I = sect.Data.begin(); I != sect.Data.end(); ++I)
+	{
+		const CInifile::Item& item = *I;
+		vid_font_profile_tokens.push_back(xr_token());
+		xr_token* last = &vid_font_profile_tokens.back();
+		last->name = xr_strdup(item.first.c_str());
+		last->id = vid_font_profile_tokens.size()-1;
+	}
 }
+
 void InitConsole	()
 {
 #ifdef DEDICATED_SERVER

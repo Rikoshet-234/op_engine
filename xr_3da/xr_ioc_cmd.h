@@ -6,6 +6,8 @@
 #define CMD3(cls,p1,p2,p3)			{ static cls x##cls(p1,p2,p3);		Console->AddCommand(&x##cls);}
 #define CMD4(cls,p1,p2,p3,p4)		{ static cls x##cls(p1,p2,p3,p4);	Console->AddCommand(&x##cls);}
 
+ENGINE_API extern	xr_vector<xr_token>	vid_font_profile_tokens;
+
 class ENGINE_API	IConsole_Command
 {
 public		:
@@ -33,6 +35,7 @@ public		:
 	};
 
 	LPCSTR			Name()			{ return cName;	}
+
 	void			InvalidSyntax() {
 		TInfo I; Info(I);
 		Msg("~ Invalid syntax in call to '%s'",cName);
@@ -140,7 +143,7 @@ public		:
 	{
 		xr_token* tok = tokens;
 		while (tok->name) {
-			if (stricmp(tok->name,args)==0) {
+			if (_stricmp(tok->name,args)==0) {
 				*value=tok->id;
 				break;
 			}
@@ -302,27 +305,27 @@ public:
 	}
 };
 
-class ENGINE_API CCC_UserParam:public IConsole_Command
+class ENGINE_API CCC_UserParam :public IConsole_Command
 {
 protected:
 	xr_string			value;
 public:
-	CCC_UserParam(LPCSTR N, xr_string V):IConsole_Command(N),value(V)
+	CCC_UserParam(LPCSTR N, xr_string V) :IConsole_Command(N), value(V)
 	{
-		bEmptyArgsHandled=true;
+		bEmptyArgsHandled = true;
 	}
-	xr_string GetValue() const {return value;}
-	void SetValue(LPCSTR inval)  { value=xr_strdup(inval);}
+	xr_string GetValue() const { return value; }
+	void SetValue(LPCSTR inval) { value = xr_strdup(inval); }
 
 	void Save(IWriter* F) override
 	{
-		if (value.length()>0)
-			F->w_printf("%s %s\r\n",cName,value.c_str()); 
+		if (value.length() > 0)
+			F->w_printf("%s %s\r\n", cName, value.c_str());
 	};
 
 	void Execute(LPCSTR args) override
 	{
-		if (xr_strlen(args)==0)
+		if (xr_strlen(args) == 0)
 		{
 			TStatus S;
 			Status(S);
@@ -335,15 +338,14 @@ public:
 	void Status(TStatus& S) override
 	{
 		string256 buf;
-		sprintf_s(buf,"Value of user-defined param [%s] is [%s]",cName,value.c_str());
-		strcpy_s(S,buf);
+		sprintf_s(buf, "Value of user-defined param [%s] is [%s]", cName, value.c_str());
+		strcpy_s(S, buf);
 
 	};
 
 	void Info(TInfo& I) override
 	{
-		string256 buf;
-		sprintf_s(buf,"%s any_value_string --- user-defined param for store any value in string ",cName);
+		sprintf_s(I, "%s any_value_string --- user-defined param for store any value in string ", cName);
 	};
 };
 

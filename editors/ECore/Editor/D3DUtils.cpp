@@ -221,7 +221,6 @@ void CDrawUtilities::OnDeviceCreate()
 	vs_L.create		(FVF::F_L,RCache.Vertex.Buffer(),RCache.Index.Buffer());
     vs_TL.create	(FVF::F_TL,RCache.Vertex.Buffer(),RCache.Index.Buffer());
     vs_LIT.create	(FVF::F_LIT,RCache.Vertex.Buffer(),RCache.Index.Buffer());
-	#pragma warning("redesign for new config file format!!!!")
 	m_Font						= xr_new<CGameFont>("hud_font_small");
 }
 

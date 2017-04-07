@@ -29,6 +29,7 @@ public:
 	enum			{ MAX_LEN = 1024 };
 private:
 	std::vector<shared_str> userDefinedNames;
+	xr_vector<shared_str> m_sEnteredCommands;
 	u32				last_mm_timer;
 	float			cur_time;
 	float			rep_time;

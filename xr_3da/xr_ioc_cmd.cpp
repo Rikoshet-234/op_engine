@@ -308,15 +308,15 @@ class CCC_Start : public IConsole_Command
 	void	parse		(LPSTR dest, LPCSTR args, LPCSTR name)
 	{
 		dest[0]	= 0;
-        if (strstr(args, name))
-        {
-            LPCSTR begin = strstr(args, name) + xr_strlen(name);
-            ++begin;
-            LPCSTR end = begin;
-            while (*end && *end != ')') ++end;
-            memcpy(dest, begin, end - begin);
-            dest[end - begin] = 0;
-        }
+		if (strstr(args, name))
+		{
+			LPCSTR begin = strstr(args, name) + xr_strlen(name);
+			++begin;
+			LPCSTR end = begin;
+			while (*end && *end != ')') ++end;
+			memcpy(dest, begin, end - begin);
+			dest[end - begin] = 0;
+		}
 	}
 public:
 	CCC_Start(LPCSTR N) : IConsole_Command(N) {};
@@ -465,7 +465,65 @@ public:
 	virtual void	Save	(IWriter *F)	{};
 };
 
+class CCC_VectorToken : public IConsole_Command
+{
+protected:
+	u32* value;
+	xr_vector<xr_token>* tokens;
+public:
+	CCC_VectorToken(LPCSTR N, u32* V, xr_vector<xr_token>* T) :IConsole_Command(N), value(V), tokens(T) {};
 
+	void Info(TInfo& I) override
+	{
+		string256 buf; 
+		std::fill(std::begin(buf), std::end(buf) ,'\0');
+		std::for_each(tokens->begin(), tokens->end(), [&](xr_token token)
+		{
+			bool bufEmpty = xr_strlen(buf) == 0;
+			sprintf_s(buf, "%s%s%s", bufEmpty ? "" : buf, bufEmpty ? "" : "/", token.name);
+		});
+		strcpy_s(I, buf);
+	};
+
+	void Execute(LPCSTR args) override
+	{
+		auto finder = std::find_if(tokens->begin(), tokens->end(), [&](xr_token token)
+		{
+			return xr_strcmp(token.name, args) == 0;
+		});
+		if (finder != tokens->end())
+			*value = (*finder).id;
+		else
+		{
+			InvalidSyntax();
+			*value = 0;
+		}
+	}
+
+	void Save(IWriter* F) override
+	{
+		TStatus	S;
+		Status(S);
+		if (xr_strcmp(S, "?")==0)
+		{
+			InvalidSyntax();
+			return;
+		}
+		F->w_printf("%s %s\r\n", cName, S);
+	};
+
+	void Status(TStatus& S) override
+	{
+		auto finder = std::find_if(tokens->begin(), tokens->end(), [&](xr_token token)
+		{
+			return token.id == static_cast<int>(*value);
+		});
+		if (finder != tokens->end())
+			strcpy_s(S, (*finder).name);
+		else
+			strcpy_s(S, "?");
+	}
+};
 
 ENGINE_API BOOL r2_sun_static = TRUE;
 
@@ -499,6 +557,7 @@ public:
 //-----------------------------------------------------------------------
 ENGINE_API float	psHUD_FOV=0.45f;
 
+xr_vector<xr_token>	vid_font_profile_tokens;
 extern int			psSkeletonUpdate;
 extern int			rsDVB_Size;
 extern int			rsDIB_Size;
@@ -518,6 +577,8 @@ ENGINE_API int			ps_r__Supersample			= 1;
 void CCC_Register()
 {
 	// General
+	CMD3(CCC_VectorToken, "font_profile", &psCurrentFontProfileIndex, &vid_font_profile_tokens);
+
 	CMD1(CCC_Help,		"help"					);
 	CMD1(CCC_Quit,		"quit"					);
 	CMD1(CCC_Quit,		"qqq"					);

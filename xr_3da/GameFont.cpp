@@ -3,7 +3,7 @@
 
 #include "GameFont.h"
 #ifndef _EDITOR
-    #include "Render.h"
+	#include "Render.h"
 #endif
 #ifdef _EDITOR
 unsigned short int mbhMulti2Wide
@@ -13,6 +13,16 @@ unsigned short int mbhMulti2Wide
 extern ENGINE_API BOOL g_bRendering; 
 ENGINE_API Fvector2		g_current_font_scale={1.0f,1.0f};
 
+extern	xr_vector<xr_token>	vid_font_profile_tokens;
+
+ENGINE_API LPCSTR GetFontFromProfile(LPCSTR section)
+{
+	LPCSTR fontProfileShort = vid_font_profile_tokens[psCurrentFontProfileIndex].name;
+	string512 fontProfileFull;
+	sprintf_s(fontProfileFull, "font_profile_%s", fontProfileShort);
+	return pSettings->r_string(fontProfileFull, section);
+}
+
 CGameFont::CGameFont(LPCSTR section, u32 flags)
 {
 	fCurrentHeight				= 0.0f;
@@ -20,7 +30,9 @@ CGameFont::CGameFont(LPCSTR section, u32 flags)
 	fYStep						= 0.0f;
 	uFlags						= flags;
 	nNumChars					= 0x100;
-	TCMap						= NULL;
+	TCMap						= nullptr;
+	
+	section = GetFontFromProfile(section);
 	Initialize	(pSettings->r_string(section,"shader"),pSettings->r_string(section,"texture"));
 	if (pSettings->line_exist(section,"size")){
 		float sz = pSettings->r_float(section,"size");
@@ -327,8 +339,7 @@ u16 CGameFont::SplitByWidth( u16 * puBuffer , u16 uBufferSize , float fTargetWid
 	return nLines;
 }
 
-void CGameFont::MasterOut(
-	BOOL bCheckDevice , BOOL bUseCoords , BOOL bScaleCoords , BOOL bUseSkip , 
+void CGameFont::MasterOut(BOOL bCheckDevice , BOOL bUseCoords , BOOL bScaleCoords , BOOL bUseSkip , 
 	float _x , float _y , float _skip , LPCSTR fmt , va_list p )
 {
 	if ( bCheckDevice && ( ! Device.b_is_Active ) )

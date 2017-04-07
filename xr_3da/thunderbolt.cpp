@@ -42,7 +42,7 @@ SThunderboltDesc::SThunderboltDesc(CInifile* pIni, LPCSTR sect)
 	
 	string_path dmo_path;
 	strcpy(dmo_path, m_name);
-	size_t dmo_path_len = strlen(dmo_path);
+	size_t dmo_path_len = xr_strlen(dmo_path);
 	dmo_path[dmo_path_len] = 'o';
 	dmo_path[dmo_path_len+1] = 0;
 	FO = FS.r_open("$game_meshes$",dmo_path);
