@@ -50,6 +50,71 @@ public		:
 	}
 };
 
+class ENGINE_API CCC_VectorToken : public IConsole_Command
+{
+protected:
+	u32* value;
+	xr_vector<xr_token>* tokens;
+public:
+	CCC_VectorToken(LPCSTR N, u32* V, xr_vector<xr_token>* T) :IConsole_Command(N), value(V), tokens(T) {};
+
+	void Info(TInfo& I) override
+	{
+		string256 buf;
+		std::fill(std::begin(buf), std::end(buf), '\0');
+		std::for_each(tokens->begin(), tokens->end(), [&](xr_token token)
+		{
+			bool bufEmpty = xr_strlen(buf) == 0;
+			sprintf_s(buf, "%s%s%s", bufEmpty ? "" : buf, bufEmpty ? "" : "/", token.name);
+		});
+		strcpy_s(I, buf);
+	};
+
+	void Execute(LPCSTR args) override
+	{
+		auto finder = std::find_if(tokens->begin(), tokens->end(), [&](xr_token token)
+		{
+			return xr_strcmp(token.name, args) == 0;
+		});
+		if (finder != tokens->end())
+			*value = (*finder).id;
+		else
+		{
+			InvalidSyntax();
+			*value = 0;
+		}
+	}
+
+	void Save(IWriter* F) override
+	{
+		TStatus	S;
+		Status(S);
+		if (xr_strcmp(S, "?") == 0)
+		{
+			InvalidSyntax();
+			return;
+		}
+		F->w_printf("%s %s\r\n", cName, S);
+	};
+
+	void Status(TStatus& S) override
+	{
+		auto finder = std::find_if(tokens->begin(), tokens->end(), [&](xr_token token)
+		{
+			return token.id == static_cast<int>(*value);
+		});
+		if (finder != tokens->end())
+			strcpy_s(S, (*finder).name);
+		else
+			strcpy_s(S, "?");
+	}
+
+	xr_token* GetToken() const
+	{
+		return &*tokens->begin();
+	}
+};
+
 class ENGINE_API CCC_Bool:public IConsole_Command
 {
 protected:

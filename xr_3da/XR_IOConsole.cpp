@@ -656,15 +656,21 @@ char * CConsole::GetToken(LPCSTR cmd)
 	return GetString(cmd);
 }
 
+
 xr_token* CConsole::GetXRToken(LPCSTR cmd)
 {
 	vecCMD_IT I = Commands.find(cmd);
 	if (I!=Commands.end()) {
 		IConsole_Command* C = I->second;
 		CCC_Token* cf = dynamic_cast<CCC_Token*>(C);
-		return cf->GetToken();
+		if (cf)
+			return cf->GetToken();
+		CCC_VectorToken* cfv = dynamic_cast<CCC_VectorToken*>(C);
+		if (cfv)
+			return cfv->GetToken();
+
 	}
-	return NULL;
+	return nullptr;
 }
 
 /*

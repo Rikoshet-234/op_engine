@@ -119,7 +119,7 @@ void CSpaceRestrictionHolder::register_restrictor				(CSpaceRestrictor *space_re
 	shared_str					space_restrictors = space_restrictor->cName();
 	if (restrictor_type != RestrictionSpace::eDefaultRestrictorTypeNone) 
 	{
-		TSP_SCOPED(_, "CSpaceRestrictionHolder::register_restrictor_1", "spawn");
+		TSP_SCOPED(__, "CSpaceRestrictionHolder::register_restrictor_1", "spawn");
 		shared_str				*temp = 0, temp1;
 		if (restrictor_type == RestrictionSpace::eDefaultRestrictorTypeOut)
 			temp			= &m_default_out_restrictions;
@@ -138,7 +138,7 @@ void CSpaceRestrictionHolder::register_restrictor				(CSpaceRestrictor *space_re
 		
 		if (xr_strcmp(*temp,temp1))
 		{
-			TSP_SCOPED(_,"CSpaceRestrictionHolder::register_restrictor_1_3", "spawn");
+			TSP_SCOPED(__,"CSpaceRestrictionHolder::register_restrictor_1_3", "spawn");
 			on_default_restrictions_changed	();
 		}
 	}

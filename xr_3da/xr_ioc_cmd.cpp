@@ -16,6 +16,7 @@
 #include "xr_object.h"
 #include "../build_defines.h"
 
+
 xr_token							snd_freq_token							[ ]={
 	{ "22khz",						sf_22K										},
 	{ "44khz",						sf_44K										},
@@ -368,7 +369,7 @@ class CCC_VidMode : public CCC_Token
 {
 	u32		_dummy;
 public :
-					CCC_VidMode(LPCSTR N) : CCC_Token(N, &_dummy, NULL) { bEmptyArgsHandled = FALSE; };
+					CCC_VidMode(LPCSTR N) : CCC_Token(N, &_dummy, nullptr) { bEmptyArgsHandled = false; };
 	virtual void	Execute(LPCSTR args){
 		u32 _w, _h;
 		int cnt = sscanf		(args,"%dx%d",&_w,&_h);
@@ -396,8 +397,10 @@ public :
 class CCC_SND_Restart : public IConsole_Command
 {
 public:
-	CCC_SND_Restart(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
-	virtual void Execute(LPCSTR args) {
+	CCC_SND_Restart(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+
+	void Execute(LPCSTR args) override
+	{
 		Sound->_restart();
 	}
 };
@@ -465,65 +468,7 @@ public:
 	virtual void	Save	(IWriter *F)	{};
 };
 
-class CCC_VectorToken : public IConsole_Command
-{
-protected:
-	u32* value;
-	xr_vector<xr_token>* tokens;
-public:
-	CCC_VectorToken(LPCSTR N, u32* V, xr_vector<xr_token>* T) :IConsole_Command(N), value(V), tokens(T) {};
 
-	void Info(TInfo& I) override
-	{
-		string256 buf; 
-		std::fill(std::begin(buf), std::end(buf) ,'\0');
-		std::for_each(tokens->begin(), tokens->end(), [&](xr_token token)
-		{
-			bool bufEmpty = xr_strlen(buf) == 0;
-			sprintf_s(buf, "%s%s%s", bufEmpty ? "" : buf, bufEmpty ? "" : "/", token.name);
-		});
-		strcpy_s(I, buf);
-	};
-
-	void Execute(LPCSTR args) override
-	{
-		auto finder = std::find_if(tokens->begin(), tokens->end(), [&](xr_token token)
-		{
-			return xr_strcmp(token.name, args) == 0;
-		});
-		if (finder != tokens->end())
-			*value = (*finder).id;
-		else
-		{
-			InvalidSyntax();
-			*value = 0;
-		}
-	}
-
-	void Save(IWriter* F) override
-	{
-		TStatus	S;
-		Status(S);
-		if (xr_strcmp(S, "?")==0)
-		{
-			InvalidSyntax();
-			return;
-		}
-		F->w_printf("%s %s\r\n", cName, S);
-	};
-
-	void Status(TStatus& S) override
-	{
-		auto finder = std::find_if(tokens->begin(), tokens->end(), [&](xr_token token)
-		{
-			return token.id == static_cast<int>(*value);
-		});
-		if (finder != tokens->end())
-			strcpy_s(S, (*finder).name);
-		else
-			strcpy_s(S, "?");
-	}
-};
 
 ENGINE_API BOOL r2_sun_static = TRUE;
 
