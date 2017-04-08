@@ -238,7 +238,7 @@ IRender_Visual* CModelPool::Create(const char* name, IReader* data)
 	POOL_IT	it			=	Pool.find	(low_name);
 	if (it!=Pool.end())
 	{
-		TSP_SCOPED(_, "Model->Spawn()", g_ts_spawn);
+		TSP_SCOPED(__, "Model->Spawn()", g_ts_spawn);
 		// 1. Instance found
         IRender_Visual*		Model	= it->second;
 		Model->Spawn		();

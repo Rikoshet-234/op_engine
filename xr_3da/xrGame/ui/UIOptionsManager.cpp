@@ -10,6 +10,7 @@
 CUIOptionsManager::CUIOptionsManager(){
 	m_b_vid_restart = false;
 	m_b_vid_restart = false;
+	m_bFontRestart = false;
 }
 
 void CUIOptionsManager::RegisterItem(CUIOptionsItem* item, const char* group){
@@ -82,7 +83,7 @@ void CUIOptionsManager::SaveValues(const char* group){
 
 	for (u32 i = 0; i < (*it).second.size(); i++){
 		if ((*it).second[i]->IsChanged())
-            (*it).second[i]->SaveValue();
+			(*it).second[i]->SaveValue();
 	}
 }
 
@@ -105,7 +106,7 @@ void CUIOptionsManager::UndoGroup(const char* group){
 
 	for (u32 i = 0; i < (*it).second.size(); i++){
 		if ((*it).second[i]->IsChanged())
-            (*it).second[i]->Undo();
+			(*it).second[i]->Undo();
 	}
 }
 
@@ -114,17 +115,24 @@ void CUIOptionsManager::OptionsPostAccept(){
 		Console->Execute("vid_restart");
 	if (m_b_snd_restart)
 		Console->Execute("snd_restart");
+	if(m_bFontRestart)
+		Console->Execute("fonts_reload");
 
 	m_b_vid_restart = false;
 	m_b_snd_restart = false;
+	m_bFontRestart = false;
 }
 
 void CUIOptionsManager::DoVidRestart(){
 	m_b_vid_restart = true;
 }
 
+void CUIOptionsManager::DoFontRestart() {
+	m_bFontRestart = true;
+}
+
 void CUIOptionsManager::DoSndRestart(){
-    m_b_snd_restart = true;
+	m_b_snd_restart = true;
 }
 
 

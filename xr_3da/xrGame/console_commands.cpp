@@ -58,6 +58,7 @@
 #include "../xrCore/OPFuncs/global_timers.h"
 
 #include <tlhelp32.h>
+#include "ui/UIDebugFonts.h"
 
 string_path		g_last_saved_game;
 
@@ -1570,13 +1571,22 @@ public:
 };
 #endif // DEBUG
 
+class CCC_FontsReload : public IConsole_Command
+{
+public:
+	CCC_FontsReload(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
 
+	void Execute(LPCSTR args) override
+	{
+		UI()->Font()->InitializeFonts();
+	}
+};
 
 void CCC_RegisterCommands()
 {
 	// options
 	g_OptConCom.Init();
-	
+	CMD1(CCC_FontsReload, "fonts_reload");
 	CMD1(CCC_MemStats,			"stat_memory"			);
 	// game
 	psActorFlags.set(AF_ALWAYSRUN, true);

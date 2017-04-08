@@ -82,7 +82,7 @@ LPCSTR CFontManager::GetFontTexName (LPCSTR section)
 
 void CFontManager::InitializeFont(CGameFont*& F, LPCSTR section, u32 flags)
 {
-	LPCSTR font_tex_name = GetFontTexName(section);
+	LPCSTR font_tex_name = GetFontTexName(GetFontFromProfile(section));
 	R_ASSERT(font_tex_name);
 
 	if(!F)

@@ -22,6 +22,7 @@
 
 ENGINE_API CConsole*	Console		=	NULL;
 const char *			ioc_prompt	=	">>> ";
+static u32 const cmd_history_max = 64;
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -158,7 +159,7 @@ void CConsole::OnRender	()
 	VERIFY	(HW.pDevice);
 
 	//*** Shadow
-	D3DRECT R = { 0,0,Device.dwWidth,Device.dwHeight};
+	D3DRECT R = { 0,0,static_cast<LONG>(Device.dwWidth),static_cast<LONG>(Device.dwHeight)};
 	if		(bGame) R.y2 /= 2;
 
 	CHK_DX	(HW.pDevice->Clear(1,&R,D3DCLEAR_TARGET,D3DCOLOR_XRGB(32,32,32),1,0));
@@ -256,10 +257,14 @@ void CConsole::OnPressKey(int dik, BOOL bHold)
 		break;
 	case DIK_UP:
 		cmd_delta--;
+		if (cmd_delta < 0)
+			cmd_delta = m_sEnteredCommands.size() - 1;
 		SelectCommand();
 		break;
 	case DIK_DOWN:
 		cmd_delta++;
+		if (cmd_delta >= static_cast<int>(m_sEnteredCommands.size()))
+			cmd_delta = 0;
 		SelectCommand();
 		break;
 	case DIK_BACK:
@@ -442,7 +447,6 @@ void CConsole::ExecuteCommand()
 	int		i,j,len;
 
 	scroll_delta	= 0;
-	cmd_delta		= 0;
 	old_cmd_delta	= 0;
 
 	len = xr_strlen(editor);
@@ -466,8 +470,16 @@ outloop:
 	if (converted[0]==' ')	strcpy_s(editor,&(converted[1]));
 	else					strcpy_s(editor,converted);
 	if (editor[0]==0)		return;
-	if (RecordCommands)		Log("~",editor);
-	
+	if (RecordCommands)
+	{
+		Log("~", editor);
+		m_sEnteredCommands.push_back(editor);
+		if (m_sEnteredCommands.size() > cmd_history_max)
+		{
+			m_sEnteredCommands.erase(m_sEnteredCommands.begin());
+		}
+		cmd_delta = m_sEnteredCommands.size();
+	}
 	// split into cmd/params
 	editor[j++  ]	=	' ';
 	editor[len=j]	=	0;
@@ -536,25 +548,13 @@ void CConsole::Hide()
 
 void CConsole::SelectCommand()
 {
-	int		p,k;
-	BOOL	found=false;
-	for (p=LogFile->size()-1, k=0; p>=0; p--) {
-		if (0==*(*LogFile)[p])		continue;
-		if ((*LogFile)[p][0]=='~') {
-			k--;
-			if (k==cmd_delta) {
-				strcpy_s(editor,&(*(*LogFile)[p])[2]);
-				found=true;
-			}
-		}
+	if (m_sEnteredCommands.empty())
+	{
+		cmd_delta = 0;
+		return;
 	}
-	if (!found) {
-		if (cmd_delta>old_cmd_delta) editor[0]=0;
-		cmd_delta=old_cmd_delta;
-
-	} else {
-		old_cmd_delta=cmd_delta;
-	}
+	xr_vector<shared_str>::iterator	it_rb = m_sEnteredCommands.begin() + cmd_delta;
+	strcpy_s(editor, (*it_rb).c_str());
 }
 
 void CConsole::Execute		(LPCSTR cmd)
@@ -656,15 +656,21 @@ char * CConsole::GetToken(LPCSTR cmd)
 	return GetString(cmd);
 }
 
+
 xr_token* CConsole::GetXRToken(LPCSTR cmd)
 {
 	vecCMD_IT I = Commands.find(cmd);
 	if (I!=Commands.end()) {
 		IConsole_Command* C = I->second;
 		CCC_Token* cf = dynamic_cast<CCC_Token*>(C);
-		return cf->GetToken();
+		if (cf)
+			return cf->GetToken();
+		CCC_VectorToken* cfv = dynamic_cast<CCC_VectorToken*>(C);
+		if (cfv)
+			return cfv->GetToken();
+
 	}
-	return NULL;
+	return nullptr;
 }
 
 /*

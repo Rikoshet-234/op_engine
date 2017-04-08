@@ -20,6 +20,7 @@ public:
 	void OptionsPostAccept();
 	void DoVidRestart();
 	void DoSndRestart();
+	void DoFontRestart();
 
 	void SendMessage2Group(const char* group, const char* message);
 
@@ -31,11 +32,12 @@ protected:
 
 	typedef	xr_string									group_name;
 	typedef xr_vector<CUIOptionsItem*>					items_list;
-    typedef xr_map<group_name, items_list>				groups;
+	typedef xr_map<group_name, items_list>				groups;
 	typedef xr_map<group_name, items_list>::iterator	groups_it;
 
 	groups	m_groups;
 
 	bool	m_b_vid_restart;
 	bool	m_b_snd_restart;
+	bool	m_bFontRestart;
 };

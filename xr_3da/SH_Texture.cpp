@@ -253,7 +253,7 @@ void CTexture::Load		()
 			flags.seqCycles	= TRUE;
 			_fs->r_string	(buffer,sizeof(buffer));
 		}
-		f32 fps	= atof(buffer);
+		f32 fps	= (float)atof(buffer);
 		seqMSPF		= (u32)(1000/fps);
 		while (!_fs->eof())
 		{

@@ -80,7 +80,10 @@ void CUIOptionsItem::SaveOptBoolValue(bool val)
 
 char* CUIOptionsItem::GetOptTokenValue()
 {
-	return Console->GetToken(m_entry.c_str());
+	char* tokenValue= Console->GetToken(m_entry.c_str());
+	if (m_entry == "font_profile")
+		return const_cast<LPSTR>(pSettings->r_string("font_profiles", tokenValue));
+	return tokenValue;
 }
 
 xr_token* CUIOptionsItem::GetOptToken()
@@ -92,16 +95,19 @@ void CUIOptionsItem::SaveOptTokenValue(const char* val){
 	SaveOptStringValue(val);
 }
 
-void CUIOptionsItem::SaveValue(){
-	if (	m_entry == "vid_mode"		|| 
-			m_entry == "_preset"		|| 
-			m_entry == "rs_fullscreen" 	||	
-			m_entry == "rs_fullscreen"	||
-			m_entry == "r__supersample"	|| 
-			m_entry == "rs_refresh_60hz"||
-			m_entry == "rs_no_v_sync"	||
-			m_entry == "texture_lod")
-	m_optionsManager.DoVidRestart();
+void CUIOptionsItem::SaveValue() {
+	if (m_entry == "vid_mode" ||
+		m_entry == "_preset" ||
+		m_entry == "rs_fullscreen" ||
+		m_entry == "rs_fullscreen" ||
+		m_entry == "r__supersample" ||
+		m_entry == "rs_refresh_60hz" ||
+		m_entry == "rs_no_v_sync" ||
+		m_entry == "texture_lod")
+		m_optionsManager.DoVidRestart();
+
+	if (m_entry == "font_profile")
+		m_optionsManager.DoFontRestart();
 
 	if (/*m_entry == "snd_freq" ||*/ m_entry == "snd_efx")
 		m_optionsManager.DoSndRestart();

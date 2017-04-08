@@ -4,6 +4,9 @@
 
 #include "MbHelpers.h"
 
+ENGINE_API LPCSTR GetFontFromProfile(LPCSTR section);
+
+
 class ENGINE_API CGameFont
 #ifndef M_BORLAND
 	: public pureRender

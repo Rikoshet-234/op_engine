@@ -16,6 +16,7 @@
 #include "xr_object.h"
 #include "../build_defines.h"
 
+
 xr_token							snd_freq_token							[ ]={
 	{ "22khz",						sf_22K										},
 	{ "44khz",						sf_44K										},
@@ -308,15 +309,15 @@ class CCC_Start : public IConsole_Command
 	void	parse		(LPSTR dest, LPCSTR args, LPCSTR name)
 	{
 		dest[0]	= 0;
-        if (strstr(args, name))
-        {
-            LPCSTR begin = strstr(args, name) + xr_strlen(name);
-            ++begin;
-            LPCSTR end = begin;
-            while (*end && *end != ')') ++end;
-            memcpy(dest, begin, end - begin);
-            dest[end - begin] = 0;
-        }
+		if (strstr(args, name))
+		{
+			LPCSTR begin = strstr(args, name) + xr_strlen(name);
+			++begin;
+			LPCSTR end = begin;
+			while (*end && *end != ')') ++end;
+			memcpy(dest, begin, end - begin);
+			dest[end - begin] = 0;
+		}
 	}
 public:
 	CCC_Start(LPCSTR N) : IConsole_Command(N) {};
@@ -368,7 +369,7 @@ class CCC_VidMode : public CCC_Token
 {
 	u32		_dummy;
 public :
-					CCC_VidMode(LPCSTR N) : CCC_Token(N, &_dummy, NULL) { bEmptyArgsHandled = FALSE; };
+					CCC_VidMode(LPCSTR N) : CCC_Token(N, &_dummy, nullptr) { bEmptyArgsHandled = false; };
 	virtual void	Execute(LPCSTR args){
 		u32 _w, _h;
 		int cnt = sscanf		(args,"%dx%d",&_w,&_h);
@@ -396,8 +397,10 @@ public :
 class CCC_SND_Restart : public IConsole_Command
 {
 public:
-	CCC_SND_Restart(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
-	virtual void Execute(LPCSTR args) {
+	CCC_SND_Restart(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+
+	void Execute(LPCSTR args) override
+	{
 		Sound->_restart();
 	}
 };
@@ -499,6 +502,7 @@ public:
 //-----------------------------------------------------------------------
 ENGINE_API float	psHUD_FOV=0.45f;
 
+xr_vector<xr_token>	vid_font_profile_tokens;
 extern int			psSkeletonUpdate;
 extern int			rsDVB_Size;
 extern int			rsDIB_Size;
@@ -518,6 +522,8 @@ ENGINE_API int			ps_r__Supersample			= 1;
 void CCC_Register()
 {
 	// General
+	CMD3(CCC_VectorToken, "font_profile", &psCurrentFontProfileIndex, &vid_font_profile_tokens);
+
 	CMD1(CCC_Help,		"help"					);
 	CMD1(CCC_Quit,		"quit"					);
 	CMD1(CCC_Quit,		"qqq"					);
