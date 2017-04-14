@@ -579,11 +579,11 @@ void CGamePersistent::OnRenderPPUI_PP()
 }
 #include "string_table.h"
 #include "../x_ray.h"
-void CGamePersistent::LoadTitle(LPCSTR str)
+void CGamePersistent::LoadTitle(LPCSTR user, LPCSTR dev)
 {
-	string512			buff;
-	sprintf_s				(buff, "%s...", CStringTable().translate(str).c_str());
-	pApp->LoadTitleInt	(buff);
+	string512 buff;
+	sprintf_s(buff, "%s...", CStringTable().translate(user).c_str());
+	pApp->LoadTitleInt(buff, dev);
 }
 
 bool CGamePersistent::CanBePaused()

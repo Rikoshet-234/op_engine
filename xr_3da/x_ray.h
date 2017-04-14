@@ -49,7 +49,7 @@ public:
 	// Loading
 	void					LoadBegin			();
 	void					LoadEnd				();
-	void					LoadTitleInt		(LPCSTR str);
+	void					LoadTitleInt		(LPCSTR user, LPCSTR dev);
 	void					SetLoadLogo			(ref_shader NewLoadLogo);
 	void					LoadSwitch			();
 	void					LoadDraw			();

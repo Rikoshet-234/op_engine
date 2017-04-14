@@ -604,6 +604,7 @@ u32 xrServer::OnMessage	(NET_Packet& P, ClientID sender)			// Non-Zero means bro
 		}break;
 	case M_RELOAD_GAME:
 		{
+			__asm int 3;
 			SendBroadcast			(BroadcastCID,P,net_flags(TRUE,TRUE));
 			VERIFY					(verify_entities());
 		}break;

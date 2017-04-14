@@ -77,11 +77,29 @@ void	CResourceManager::reset_end				()
 	::Render->reset_end		();
 }
 
-template<class C>	void mdump(C c)
+template<typename T>
+struct Size
 {
-	if (0==c.size())	return;
-	for (typename C::iterator I=c.begin(); I!=c.end(); ++I)
-		Msg	("*        : %3d: %s",I->second->dwReference, I->second->cName.c_str());
+	static u32 size(const T) { return 0; }
+};
+
+template<>
+struct Size<CTexture*>
+{
+	static u32 size(const CTexture* texture) { return texture->flags.MemoryUsage; }
+};
+
+template<class C>	u32 mdump(C c)
+{
+	if (0 == c.size())	return 0;
+	u32 sum = 0;
+	for (C::iterator I = c.begin(); I != c.end(); I++)
+	{
+		u32 size = Size<C::mapped_type>::size(I->second);
+		sum += size;
+		Msg("*        : %3d (%5u K): %s", I->second->dwReference, size / 1024, I->second->cName.c_str());
+	}
+	return sum;
 }
 
 CResourceManager::~CResourceManager		()
@@ -92,7 +110,7 @@ CResourceManager::~CResourceManager		()
 
 void CResourceManager::Dump(bool bBrief)
 {
-	Msg		("* RM_Dump: textures  : %d",		m_textures.size());		if(!bBrief) mdump(m_textures);
+	Msg		("* RM_Dump: textures  : %d",		m_textures.size());		if(!bBrief) Msg("* RM_Dump: textures  : %u K", mdump(m_textures)/1024);
 	Msg		("* RM_Dump: rtargets  : %d",		m_rtargets.size());		if(!bBrief) mdump(m_rtargets);
 	Msg		("* RM_Dump: rtargetsc : %d",		m_rtargets_c.size());	if(!bBrief) mdump(m_rtargets_c);
 	Msg		("* RM_Dump: vs        : %d",		m_vs.size());			if(!bBrief) mdump(m_vs);

@@ -65,7 +65,7 @@ BOOL IGame_Level::Load			(u32 dwNum)
 	pLevel						= xr_new<CInifile>	( temp );
 	
 	// Open
-	g_pGamePersistent->LoadTitle	("st_opening_stream");
+	g_pGamePersistent->LoadTitle	("st_opening_stream", "Reading level info...");
 	IReader* LL_Stream			= FS.r_open	("$level$","level");
 	IReader	&fs					= *LL_Stream;
 
@@ -75,7 +75,7 @@ BOOL IGame_Level::Load			(u32 dwNum)
 	R_ASSERT2					(XRCL_PRODUCTION_VERSION==H.XRLC_version,"Incompatible level version.");
 
 	// CForms
-	g_pGamePersistent->LoadTitle	("st_loading_cform");
+	g_pGamePersistent->LoadTitle	("st_loading_cform", "Loading object space...");
 	
 	CTimer t;
 	t.Start();

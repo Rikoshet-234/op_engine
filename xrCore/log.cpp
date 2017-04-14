@@ -38,6 +38,12 @@ void FlushLog			()
 	FlushLog		(logFName);
 }
 
+void ClearLogHistory()
+{
+	if (LogFile)
+		LogFile->clear();
+}
+
 void AddOne				(const char *split) 
 {
 	if(!LogFile)		
