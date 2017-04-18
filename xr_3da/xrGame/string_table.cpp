@@ -11,7 +11,7 @@
 #include <string>
 #include <algorithm>
 
-STRING_TABLE_DATA* CStringTable::pData = NULL;
+STRING_TABLE_DATA* CStringTable::pData = nullptr;
 BOOL CStringTable::m_bWriteErrorsToLog = FALSE;
 
 EGameLanguages g_GameLanguage = EGameLanguages::eglRussian;

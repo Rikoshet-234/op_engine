@@ -69,7 +69,7 @@ namespace OPFuncs {
 		char *end;
 		T  l;
 		errno = 0;
-		l = strtol(s, &end,0);
+		l = static_cast<T>(strtol(s, &end,0));
 		if ((errno == ERANGE && l == LONG_MAX) || l > INT_MAX) {
 			return STR2INT_ERROR::OVERRANGE;
 		}

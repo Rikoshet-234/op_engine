@@ -352,7 +352,9 @@
     <ClCompile Include="OPFuncs\global_timers.cpp" />
     <ClCompile Include="FTimer.cpp" />
     <ClCompile Include="OPFuncs\ExpandedCmdParams.cpp" />
-    <ClCompile Include="OPFuncs\op_engine_version.cpp" />
+    <ClCompile Include="OPFuncs\op_engine_version.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">../stdafx.h</PrecompiledHeaderFile>
+    </ClCompile>
     <ClCompile Include="OPFuncs\utils.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
