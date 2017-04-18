@@ -1095,6 +1095,25 @@ public		:
 	void	Info	(TInfo& I) override	{	strcpy_s(I,"affinity value [hex|dec], i.e. g_affinity 0x3"); }
 };
 
+class CCC_GameLanguage : public CCC_Token {
+public:
+	CCC_GameLanguage(LPCSTR N) : CCC_Token(N, (u32*)&g_GameLanguage, g_language_token) {};
+	void Execute(LPCSTR args) override
+	{
+		CCC_Token::Execute(args);
+	}
+
+	void Info(TInfo& I) override
+	{
+		sprintf_s(I, sizeof(I), "Game language: %s", g_language_token[g_GameLanguage].name);
+	}
+
+	void Status(TStatus& S) override
+	{
+		sprintf_s(S, sizeof(S), "%s", g_language_token[g_GameLanguage].name);
+	}
+};
+
 #ifdef DEBUG
 class CCC_RadioGroupMask2;
 class CCC_RadioMask :public CCC_Mask
@@ -1598,6 +1617,7 @@ void CCC_RegisterCommands()
 	CMD1(CCC_LoadLastSave,		"load_last_save"		);		// load last saved game from ...
 	CMD1(CCC_FlushLog,			"flush"					);		// flush log
 	CMD1(CCC_ClearLog,			"clear_log"					);
+	CMD1(CCC_GameLanguage,		"g_lang");
 	// hud
 	psHUD_Flags.set(HUD_CROSSHAIR,		true);
 	psHUD_Flags.set(HUD_WEAPON,			true);

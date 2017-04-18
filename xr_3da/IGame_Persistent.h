@@ -107,7 +107,7 @@ public:
 #else
 	{}
 #endif
-	virtual	void					LoadTitle			(LPCSTR str){}
+	virtual	void					LoadTitle			(LPCSTR user, LPCSTR dev){}
 	virtual bool					CanBePaused			()		{ return true;}
 };
 

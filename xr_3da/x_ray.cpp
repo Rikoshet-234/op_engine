@@ -949,8 +949,10 @@ extern	ENGINE_API BOOL			g_appLoaded = FALSE;
 void CApplication::LoadBegin	()
 {
 	ll_dwReference++;
-	if (1==ll_dwReference)	{
-
+	if (1==ll_dwReference)
+	{
+		Msg("Begin load");
+		ClearLogHistory();
 		g_appLoaded			= FALSE;
 
 #ifndef DEDICATED_SERVER
@@ -1008,17 +1010,17 @@ void CApplication::LoadDraw		()
 	CheckCopyProtection			();
 }
 
-void CApplication::LoadTitleInt(LPCSTR str)
+void CApplication::LoadTitleInt(LPCSTR user, LPCSTR dev)
 {
 	load_stage++;
 
 	VERIFY						(ll_dwReference);
-	VERIFY						(str && xr_strlen(str)<256);
-	strcpy_s						(app_title, str);
+	VERIFY						(user && xr_strlen(user)<256);
+	strcpy_s					(app_title, user);
 	Msg							("* phase time: %d ms",phase_timer.GetElapsed_ms());	phase_timer.Start();
 	Msg							("* phase cmem: %d K", Memory.mem_usage()/1024);
 //.	Console->Execute			("stat_memory");
-	Log							(app_title);
+	Log							(dev);
 	
 	if (g_pGamePersistent->GameType()==1 && strstr(Core.Params,"alife"))
 		max_load_stage			= 17;

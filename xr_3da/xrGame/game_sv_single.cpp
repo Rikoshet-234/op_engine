@@ -329,7 +329,7 @@ void game_sv_Single::restart_simulator			(LPCSTR saved_game_name)
 
 	pApp->LoadBegin			();
 	m_alife_simulator		= xr_new<CALifeSimulator>(&server(),&options);
-	g_pGamePersistent->LoadTitle		("st_client_synchronising");
+	g_pGamePersistent->LoadTitle("st_client_synchronising", "Restart sim...");
 	Device.PreCache			(30);
 	pApp->LoadEnd			();
 }

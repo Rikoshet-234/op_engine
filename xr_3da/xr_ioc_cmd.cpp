@@ -111,6 +111,7 @@ public:
 	CCC_TexturesStat(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = TRUE; };
 	virtual void Execute(LPCSTR args) {
 		Device.Resources->_DumpMemoryUsage();
+		FlushLog();
 	}
 };
 //-----------------------------------------------------------------------
@@ -202,7 +203,8 @@ class CCC_DumpResources : public IConsole_Command
 public:
 	CCC_DumpResources(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
 	virtual void Execute(LPCSTR args) {
-		Device.Resources->Dump(args!=NULL);
+		Device.Resources->Dump(args!=NULL&&*args);
+		FlushLog();
 	}
 };
 
@@ -537,7 +539,7 @@ void CCC_Register()
 	CMD4(CCC_Float,		"ls_text_offset_y",		&lpLoadScreenTextOffsetY,0.0f,	768.0f);
 	CMD2(CCC_Bool,		"ls_show_progress",		&lpLoadScreenEnableProgressBar);
 
-#ifdef DEBUG
+#if 1//defined DEBUG
 //	CMD1(CCC_Crash,		"crash"					);
 
 	CMD1(CCC_MotionsStat,	"stat_motions"		);
