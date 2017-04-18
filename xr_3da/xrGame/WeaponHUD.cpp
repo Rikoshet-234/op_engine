@@ -182,7 +182,8 @@ void CWeaponHUD::DestroySharedContainer	()
 void CWeaponHUD::CleanSharedContainer	()
 {
 	VERIFY(g_pWeaponHUDContainer);
-	g_pWeaponHUDContainer->clean(false);
+	// true - do not leave items in cache
+	g_pWeaponHUDContainer->clean(true);
 }
 
 MotionID random_anim(MotionSVec& v)

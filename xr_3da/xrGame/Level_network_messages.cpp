@@ -214,6 +214,8 @@ void CLevel::ClientReceive()
 				Game().OnGameMessage(*P);
 			}break;
 		case M_RELOAD_GAME:
+			__asm int 3;
+			break;
 		case M_LOAD_GAME:
 		case M_CHANGE_LEVEL:
 			{

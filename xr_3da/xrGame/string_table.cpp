@@ -14,6 +14,15 @@
 STRING_TABLE_DATA* CStringTable::pData = NULL;
 BOOL CStringTable::m_bWriteErrorsToLog = FALSE;
 
+EGameLanguages g_GameLanguage = EGameLanguages::eglRussian;
+
+xr_token	g_language_token[] = {
+	{ "rus",		eglRussian },
+	{ "eng",		eglEnglish },
+	{ "ukr",		eglUkrainian },
+	{ 0,							0 }
+};
+
 //winsor
 const std::string CStringTable::idDelimiter="#|";
 const size_t CStringTable::fixedSize=4000;
@@ -38,7 +47,11 @@ bool CStringTable::IDExist(const STRING_ID& str_id) const
 void CStringTable::Init		()
 {
 	if(NULL != pData) return;
-	
+
+	m_currentLanguage = g_GameLanguage;
+	m_currentLanguageTag = "string:";
+	m_currentLanguageTag.append(m_currentLanguage==eglRussian?"text":g_language_token[m_currentLanguage].name);
+
 	pData				= xr_new<STRING_TABLE_DATA>();
 	
 	//имя языка, если не задано (NULL), то первый <text> в <string> в XML
@@ -61,38 +74,36 @@ void CStringTable::Init		()
 
 void CStringTable::Load	(LPCSTR xml_file)
 {
-	//TSS_SCOPED(mmLoad, "g_mmLoad", "spawn");
-
 	CUIXml						uiXml;
 	string_path					xml_file_full;
 	strconcat					(sizeof(xml_file_full),xml_file_full, xml_file, ".xml");
 	string_path					_s;
-	strconcat					(sizeof(_s),_s, STRING_TABLE_PATH, "\\", *(pData->m_sLanguage) );
-
+	if (pData->m_sLanguage.size())
+		strconcat					(sizeof(_s),_s, STRING_TABLE_PATH, "\\", *(pData->m_sLanguage) );
+	else
+		strconcat					(sizeof(_s),_s, STRING_TABLE_PATH, "", "");
 	bool xml_result				= uiXml.Init(CONFIG_PATH, _s, xml_file_full);
 	if(!xml_result)
 		Debug.fatal(DEBUG_INFO,"string table xml file not found %s, for language %s", xml_file_full, *(pData->m_sLanguage));
 
 	//общий список всех записей таблицы в файле
 	int string_num = uiXml.GetNodesNum		(uiXml.GetRoot(), "string");
-	//TSS_BEGIN("g_mmForOuter", "spawn");
 	for(int i=0; i<string_num; ++i)
 	{
 		LPCSTR string_name = uiXml.ReadAttrib(uiXml.GetRoot(), "string", i, "id", NULL);
 
 		//VERIFY3					(pData->m_StringTable.find(string_name) == pData->m_StringTable.end(), "duplicate string table id", string_name);
-		//TSS_BEGIN("g_mmFOFind", "spawn");
 		if (!(pData->m_StringTable.find(string_name) == pData->m_StringTable.end()))
 		{
 			Msg("! WARNING: duplicate string table id %s. Ignoring.", string_name);
 		};
-		//TSS_END("g_mmFOFind", "spawn");
-		//TSS_BEGIN("g_mmFORead", "spawn");
-		LPCSTR string_text		= uiXml.Read(uiXml.GetRoot(), "string:text", i,  NULL);
-		//TSS_END("g_mmFORead", "spawn");
+
+		LPCSTR string_text		= uiXml.Read(uiXml.GetRoot(), m_currentLanguageTag.c_str(), i,  NULL);
+		if (!string_text)// Fallback to default
+			string_text = uiXml.Read(uiXml.GetRoot(), "string:text", i, NULL);
+
 		if (lstrlen(string_text)>fixedSize) //winsor
 		{
-			//TSS_SCOPED(mmFOIf, "g_mmFOIf", "spawn");
 			//split long text into more lines	
 			//Msg("Text in '%s' too long,splitted.",string_name);
 			std::string string_value(string_text);
@@ -111,7 +122,6 @@ void CStringTable::Load	(LPCSTR xml_file)
 		}
 		else
 		{
-			//TSS_SCOPED(mmFOElse, "g_mmFOElse", "spawn");
 			if(m_bWriteErrorsToLog && string_text)
 				Msg("[string table] '%s' no translation in '%s'", string_name, *(pData->m_sLanguage));
 			if (!string_text)
@@ -124,7 +134,6 @@ void CStringTable::Load	(LPCSTR xml_file)
 			pData->m_StringTable[string_name] = str_val;
 		}
 	}
-	//TSS_END("g_mmForOuter", "spawn");
 }
 
 void CStringTable::ReparseKeyBindings()

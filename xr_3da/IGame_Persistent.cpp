@@ -107,30 +107,34 @@ void IGame_Persistent::Disconnect	()
 
 	if(g_hud)
 		g_hud->OnDisconnected			();
+
+	// Kill object - save memory
+	ObjectPool.clear();
+	Render->models_Clear(TRUE);
 #endif
 }
 
 void IGame_Persistent::OnGameStart()
 {
 #ifndef _EDITOR
-	LoadTitle								("st_prefetching_objects");
+	LoadTitle("st_prefetching_objects", "Prefetching objects...");
 	if (strstr(Core.Params,"-noprefetch"))	return;
 
 	// prefetch game objects & models
-	float	p_time		=			1000.f*Device.GetTimerGlobal()->GetElapsed_sec();
-	u32	mem_0			=			Memory.mem_usage()	;
+	u32 mem_0 = Memory.mem_usage();
 
-	Log				("Loading objects...");
-	ObjectPool.prefetch					();
-	Log				("Loading models...");
-	Render->models_Prefetch				();
-	Device.Resources->DeferredUpload	();
+	CTimer timer;
+	timer.Start();
+	ObjectPool.prefetch();
+	Msg("* Objects loaded in %u ms", timer.GetElapsed_ms());
+	
+	timer.Start();
+	Render->models_Prefetch();
+	Device.Resources->DeferredUpload();
+	Msg("* Models loaded in %u ms", timer.GetElapsed_ms());
+	u32 p_mem = Memory.mem_usage() - mem_0;
 
-	p_time				=			1000.f*Device.GetTimerGlobal()->GetElapsed_sec() - p_time;
-	u32		p_mem		=			Memory.mem_usage() - mem_0	;
-
-	Msg					("* [prefetch] time:    %d ms",	iFloor(p_time));
-	Msg					("* [prefetch] memory:  %dKb",	p_mem/1024);
+	Msg("* Prefetch memory:  %dKb", p_mem/1024);
 #endif
 }
 
