@@ -37,6 +37,49 @@
         </Favorite>
       </favorites>
     </Folder>
+    <Folder>
+      <name>string_table</name>
+      <folders />
+      <favorites>
+        <Favorite>
+          <name>string_table.cpp</name>
+          <path>xr_3da\xrGame\string_table.cpp</path>
+          <absolutePath>S:\xr_3da\xrGame\string_table.cpp</absolutePath>
+          <position>
+            <line>215</line>
+            <column>1</column>
+            <lineHash>ECtRuXZaVqPomffPDuOOUlH5xQOzV7MwpJGD63sVVgQ=</lineHash>
+          </position>
+        </Favorite>
+        <Favorite>
+          <name>string_table.h</name>
+          <path>xr_3da\xrGame\string_table.h</path>
+          <absolutePath>S:\xr_3da\xrGame\string_table.h</absolutePath>
+          <viewKind>7651a701-06e5-11d1-8ebd-00a0c90f26ea</viewKind>
+          <position>
+            <line>51</line>
+            <column>14</column>
+            <lineHash>holEgoAm2dWQnCEKoM2LPlMcY9Agur0fBavIxCV8ttU=</lineHash>
+          </position>
+        </Favorite>
+      </favorites>
+    </Folder>
+    <Folder>
+      <name>V92 models bug</name>
+      <folders />
+      <favorites>
+        <Favorite>
+          <name>SkeletonAnimated.cpp</name>
+          <path>xr_3da\SkeletonAnimated.cpp</path>
+          <absolutePath>S:\xr_3da\SkeletonAnimated.cpp</absolutePath>
+          <position>
+            <line>119</line>
+            <column>55</column>
+            <lineHash>scVg75/aEanGE1SiN+ioIaou31PNC1i8kfM7nTiLzs8=</lineHash>
+          </position>
+        </Favorite>
+      </favorites>
+    </Folder>
   </folders>
   <favorites />
 </Favorites>
