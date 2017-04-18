@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<Favorites xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <folders>
+    <Folder>
+      <name>Texture clear trouble...</name>
+      <folders />
+      <favorites>
+        <Favorite>
+          <name>SH_Texture.cpp</name>
+          <path>xr_3da\SH_Texture.cpp</path>
+          <absolutePath>S:\xr_3da\SH_Texture.cpp</absolutePath>
+          <position>
+            <line>293</line>
+            <column>19</column>
+            <lineHash>T7kRfGbpX2Q3P1sLLL8qxE/VRVkUEtBnMoQ5+VoSOWo=</lineHash>
+          </position>
+        </Favorite>
+        <Favorite>
+          <name>Level.cpp</name>
+          <path>xr_3da\xrGame\Level.cpp</path>
+          <absolutePath>S:\xr_3da\xrGame\Level.cpp</absolutePath>
+          <position>
+            <line>197</line>
+            <column>1</column>
+            <lineHash>lXttveH+1Za+1YfPaAwpRQWoEM34nYgYVT1SzGFjIgk=</lineHash>
+          </position>
+        </Favorite>
+        <Favorite>
+          <name>ResourceManager.cpp</name>
+          <path>xr_3da\ResourceManager.cpp</path>
+          <absolutePath>S:\xr_3da\ResourceManager.cpp</absolutePath>
+          <position>
+            <line>270</line>
+            <column>38</column>
+            <lineHash>2/tB3useZxRU86/Dh4W0ojO8WhlvOC2IHmlOy4pghlk=</lineHash>
+          </position>
+        </Favorite>
+      </favorites>
+    </Folder>
+  </folders>
+  <favorites />
+</Favorites>
