@@ -6,9 +6,9 @@
 
 class CUIOptionsItem;
 
-class CUIOptionsManager{
+class CUIOptionsManager {
 	friend class CUIOptionsItem;
-public:	
+public:
 	CUIOptionsManager();
 
 	void SeveBackupValues(const char* group);
@@ -21,10 +21,11 @@ public:
 	void DoVidRestart();
 	void DoSndRestart();
 	void DoFontRestart();
+	void DoLangRestart();
 
 	void SendMessage2Group(const char* group, const char* message);
 
-protected:	
+protected:
 	void RegisterItem(CUIOptionsItem* item, const char* group);
 	void UnRegisterGroup(const char* group);
 	void UnRegisterItem(CUIOptionsItem* item);
@@ -40,4 +41,5 @@ protected:
 	bool	m_b_vid_restart;
 	bool	m_b_snd_restart;
 	bool	m_bFontRestart;
+	bool m_bLangRestart;
 };

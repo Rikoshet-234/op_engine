@@ -524,46 +524,40 @@ void free_vid_mode_list()
 
 void	fill_vid_mode_list			(CHW* _hw)
 {
-	if(vid_mode_token != NULL)		return;
-	xr_vector<LPCSTR>	_tmp;
+	if(vid_mode_token != nullptr)		return;
 	u32 cnt = _hw->pD3D->GetAdapterModeCount	(_hw->DevAdapter, _hw->Caps.fTarget);
 
 	u32 i;
+	xr_vector<D3DDISPLAYMODE> modes;
 	for(i=0; i<cnt;++i)
 	{
 		D3DDISPLAYMODE	Mode;
-		string32		str;
-
 		_hw->pD3D->EnumAdapterModes(_hw->DevAdapter, _hw->Caps.fTarget, i, &Mode);
 		if(Mode.Width < 800)		continue;
-
-		sprintf_s						(str,sizeof(str),"%dx%d", Mode.Width, Mode.Height);
-	
-		if(_tmp.end() != std::find_if(_tmp.begin(), _tmp.end(), _uniq_mode(str)))
-			continue;
-
-		_tmp.push_back				(NULL);
-		_tmp.back()					= xr_strdup(str);
+		modes.push_back(Mode);
 	}
-
-	u32 _cnt						= _tmp.size()+1;
-
-	vid_mode_token					= xr_alloc<xr_token>(_cnt);
-
-	vid_mode_token[_cnt-1].id			= -1;
-	vid_mode_token[_cnt-1].name		= NULL;
-
-#ifdef DEBUG
-	Msg("Available video modes[%d]:",_tmp.size());
-#endif // DEBUG
-	for(i=0; i<_tmp.size();++i)
+	std::sort(modes.begin(), modes.end(), [](D3DDISPLAYMODE mode1, D3DDISPLAYMODE mode2)
 	{
-		vid_mode_token[i].id		= i;
-		vid_mode_token[i].name		= _tmp[i];
-#ifdef DEBUG
-		Msg							("[%s]",_tmp[i]);
-#endif // DEBUG
-	}
+		return mode1.Width > mode2.Width;
+	});
+	modes.erase(std::unique(modes.begin(), modes.end(), [](D3DDISPLAYMODE mode1, D3DDISPLAYMODE mode2)
+	{
+		return mode1.Height == mode2.Height && mode1.Width == mode2.Width;
+	}),modes.end());
+	u32 _cnt = modes.size() + 1;
+	vid_mode_token = xr_alloc<xr_token>(_cnt);
+	vid_mode_token[_cnt - 1].id = -1;
+	vid_mode_token[_cnt - 1].name = nullptr;
+	i = 0;
+	std::for_each(modes.begin(), modes.end(), [&](D3DDISPLAYMODE mode)
+	{
+		string32 str;
+		sprintf_s(str, sizeof(str), "%dx%d", mode.Width, mode.Height);
+		vid_mode_token[i].id = i;
+		vid_mode_token[i].name = xr_strdup(str);
+		Log(vid_mode_token[i].name);
+		i++;
+	});
 }
 #endif
 

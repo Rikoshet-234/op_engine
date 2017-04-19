@@ -505,6 +505,7 @@ public:
 ENGINE_API float	psHUD_FOV=0.45f;
 
 xr_vector<xr_token>	vid_font_profile_tokens;
+xr_vector<xr_token>	languages_tokens;
 extern int			psSkeletonUpdate;
 extern int			rsDVB_Size;
 extern int			rsDIB_Size;
@@ -525,6 +526,7 @@ void CCC_Register()
 {
 	// General
 	CMD3(CCC_VectorToken, "font_profile", &psCurrentFontProfileIndex, &vid_font_profile_tokens);
+	CMD3(CCC_VectorToken, "g_lang", &psCurrentLanguageIndex, &languages_tokens);
 
 	CMD1(CCC_Help,		"help"					);
 	CMD1(CCC_Quit,		"quit"					);

@@ -117,11 +117,14 @@ void CUIComboBox::SetCurrentValue()
 	xr_token* tok		= GetOptToken();
 
 	bool fp_init = m_entry == "font_profile";
+	bool lang_init = m_entry == "g_lang";
 	while (tok->name)
 	{		
 		LPCSTR txt = tok->name;
 		if (fp_init)
 			txt = *CStringTable().translate(pSettings->r_string("font_profiles", txt));
+		else if (lang_init)
+			txt = *CStringTable().translate(pSettings->r_string("languages", txt));
 		if (xr_strlen(txt)>0)
 			AddItem_(txt, tok->id);
 		tok++;
