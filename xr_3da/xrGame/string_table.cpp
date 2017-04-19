@@ -1,28 +1,20 @@
-#include "stdafx.h"
+#include "pch_script.h"
 #include "string_table.h"
-
-#include "ui/xrUIXmlParser.h"
-#include "xr_level_controller.h"
-#include "../xrCore/OPFuncs/utils.h"
-
 #include <vector>
 #include <sstream>
 #include <iterator>
 #include <string>
-#include <algorithm>
+#include <regex>
+
+#include "ui/xrUIXmlParser.h"
+#include "xr_level_controller.h"
+#include "../xrCore/OPFuncs/utils.h"
+#include "ai_space.h"
+#include "script_engine.h"
+#include "OPFuncs/utils.h"
 
 STRING_TABLE_DATA* CStringTable::pData = nullptr;
 BOOL CStringTable::m_bWriteErrorsToLog = FALSE;
-
-EGameLanguages g_GameLanguage = EGameLanguages::eglRussian;
-
-xr_token	g_language_token[] = {
-	{ "rus",		eglRussian },
-	{ "eng",		eglEnglish },
-	{ "ukr",		eglUkrainian },
-	{ 0,							0 }
-};
-
 //winsor
 const std::string CStringTable::idDelimiter="#|";
 const size_t CStringTable::fixedSize=4000;
@@ -43,14 +35,13 @@ bool CStringTable::IDExist(const STRING_ID& str_id) const
 	return pData->m_StringTable[str_id]!=nullptr;
 }
 
+extern ENGINE_API xr_vector<xr_token>	languages_tokens;
 
 void CStringTable::Init		()
 {
-	if(NULL != pData) return;
-
-	m_currentLanguage = g_GameLanguage;
+	if(nullptr != pData) return;
 	m_currentLanguageTag = "string:";
-	m_currentLanguageTag.append(m_currentLanguage==eglRussian?"text":g_language_token[m_currentLanguage].name);
+	m_currentLanguageTag.append(languages_tokens[psCurrentLanguageIndex].name);
 
 	pData				= xr_new<STRING_TABLE_DATA>();
 	
@@ -90,17 +81,18 @@ void CStringTable::Load	(LPCSTR xml_file)
 	int string_num = uiXml.GetNodesNum		(uiXml.GetRoot(), "string");
 	for(int i=0; i<string_num; ++i)
 	{
-		LPCSTR string_name = uiXml.ReadAttrib(uiXml.GetRoot(), "string", i, "id", NULL);
+		LPCSTR string_name = uiXml.ReadAttrib(uiXml.GetRoot(), "string", i, "id", nullptr);
 
 		//VERIFY3					(pData->m_StringTable.find(string_name) == pData->m_StringTable.end(), "duplicate string table id", string_name);
 		if (!(pData->m_StringTable.find(string_name) == pData->m_StringTable.end()))
 		{
 			Msg("! WARNING: duplicate string table id %s. Ignoring.", string_name);
+			continue;
 		};
 
-		LPCSTR string_text		= uiXml.Read(uiXml.GetRoot(), m_currentLanguageTag.c_str(), i,  NULL);
+		LPCSTR string_text		= uiXml.Read(uiXml.GetRoot(), m_currentLanguageTag.c_str(), i, nullptr);
 		if (!string_text)// Fallback to default
-			string_text = uiXml.Read(uiXml.GetRoot(), "string:text", i, NULL);
+			string_text = uiXml.Read(uiXml.GetRoot(), "string:text", i, nullptr);
 
 		if (lstrlen(string_text)>fixedSize) //winsor
 		{
@@ -194,41 +186,111 @@ STRING_VALUE CStringTable::ParseLine(LPCSTR str, LPCSTR skey, bool bFirst)
 	return STRING_VALUE(res.c_str());
 }
 
-STRING_VALUE CStringTable::translate (const STRING_ID& str_id,bool trim) const
+STRING_VALUE CStringTable::translate(const STRING_ID& str_id, bool trim) const
 {
-	VERIFY					(pData);
+	VERIFY(pData);
 
-	STRING_VALUE res =  pData->m_StringTable[str_id];
-	if(!res)
+	STRING_VALUE res = pData->m_StringTable[str_id];
+	if (!res)
 	{
-		if(m_bWriteErrorsToLog && *str_id != NULL && xr_strlen(*str_id)>0)
+		if (m_bWriteErrorsToLog && *str_id != nullptr && xr_strlen(*str_id) > 0)
 			Msg("[string table] '%s' has no entry", *str_id);
 
-		if (str_id==nullptr)
+		if (str_id == nullptr)
 			return str_id;
 		std::string resStr(str_id.c_str());
-		if (trim && (resStr.front()=='"' && resStr.back()=='"')) 
+		if (trim && (resStr.front() == '"' && resStr.back() == '"'))
 			OPFuncs::trimq(resStr);
-		return resStr.c_str();
-		//return str_id;
-	}
-
-	bool splited=false;
-	std::string value(res.c_str());
-	std::string unitedValue;
-	size_t delimiterPos=0;
-	while ((delimiterPos=value.find(idDelimiter))!=std::string::npos)
-	{
-		std::string parsedId=value.substr(0,delimiterPos);
-		value.erase(0,delimiterPos+idDelimiter.length());
-		splited=true;
-		unitedValue+=translate(parsedId.c_str()).c_str();
-	};
-	if (splited)
-	{
-		//Msg("%s united from parts",str_id);
-		return unitedValue.c_str();
+		res = resStr.c_str();
 	}
 	else
-		return pData->m_StringTable[str_id];
+	{
+		bool splited = false;
+		std::string value(res.c_str());
+		std::string unitedValue;
+		size_t delimiterPos = 0;
+		while ((delimiterPos = value.find(idDelimiter)) != std::string::npos)
+		{
+			std::string parsedId = value.substr(0, delimiterPos);
+			value.erase(0, delimiterPos + idDelimiter.length());
+			splited = true;
+			unitedValue += translate(parsedId.c_str()).c_str();
+		};
+		if (splited)
+		{
+			//Msg("%s united from parts",str_id);
+			res = unitedValue.c_str();
+		}
+		else
+			res = pData->m_StringTable[str_id];
+	}
+#pragma region try to find and call script function
+	static std::regex regExp("#{2}([a-zA-Z_\\.0-9]+)#{2}", std::regex_constants::icase | std::regex_constants::optimize);
+	std::string spc(res.c_str());
+	std::smatch singleMatch;
+	while (true) //надо мен€ть по месту, не мен€€ оригинал. если делать for - то только одна итераци€ проходит
+	{
+		std::sregex_iterator start = std::sregex_iterator(spc.begin(), spc.end(), regExp);
+		if (start != std::sregex_iterator())//до тех пор пока есть хоть одно совпадение
+		{
+			auto funcName = (*start).str(1);
+			if (!funcName.empty())
+			{
+				luabind::functor<luabind::object> textFunc;
+				bool result = ai().script_engine().functor(funcName.c_str(), textFunc);
+				if (!result)
+				{
+					Msg("! ERROR function [%s] not exist for string_id[%s]", funcName.c_str(), str_id.c_str());
+					return res;//если первой же функции нет - то не будем дальше и пробовать. 
+				}
+				try
+				{
+					luabind::object funcResult = textFunc(str_id.c_str());
+					if (!funcResult.is_valid())
+					{
+						Msg("! ERROR function [%s] did not return the expected value for string_id[%s]", funcName.c_str(), str_id.c_str());
+						return res;//аналогично с результатом
+					}
+					LPCSTR str_res;
+					switch(funcResult.type())
+					{
+						case LUA_TBOOLEAN:
+							str_res = OPFuncs::boolToStr(luabind::object_cast<bool>(funcResult));
+							break;
+						case LUA_TNUMBER:
+							{
+								std::ostringstream ss;
+								ss << luabind::object_cast<float>(funcResult);
+								str_res = ss.str().c_str();
+							}
+							break;
+						case LUA_TSTRING:
+							str_res = luabind::object_cast<LPCSTR>(funcResult);
+							break;
+						case LUA_TNIL:
+						case LUA_TTABLE:
+						case LUA_TLIGHTUSERDATA:
+						case LUA_TFUNCTION:
+						case LUA_TUSERDATA:
+						case LUA_TTHREAD:
+						default: 
+							Msg("! ERROR function [%s] did not return the expected value for string_id[%s]", funcName.c_str(), str_id.c_str());
+							return res;//неподдерживаемые типы результатов
+					}
+					OPFuncs::replaceAll(spc, (*start).str(), str_res);
+				}
+				catch (...)
+				{
+					Msg("! ERROR function [%s] did not return the expected value for string_id[%s]!", funcName.c_str(), str_id.c_str());
+					return res;
+				}
+			}
+			
+		}
+		else
+			break;
+	}
+#pragma todo("результат - shared_str. может приводить к дубл€м? проверить!!!")
+	return spc.c_str();
+#pragma endregion
 }

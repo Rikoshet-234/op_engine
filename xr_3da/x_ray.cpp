@@ -139,7 +139,7 @@ void InitSettings	()
 		Msg("! ERROR Cannot find required font profile[%s]", "default");
 		FATAL("Invalid required configuration! See log for detail.");
 	}
-	
+#pragma region load font profiles	
 	CInifile::Sect& sect = pSettings->r_section("font_profiles");
 	for (CInifile::SectCIt I = sect.Data.begin(); I != sect.Data.end(); ++I)
 	{
@@ -149,6 +149,46 @@ void InitSettings	()
 		last->name = xr_strdup(item.first.c_str());
 		last->id = vid_font_profile_tokens.size()-1;
 	}
+#pragma endregion 
+#pragma region load language definitions
+	if (!pSettings->section_exist("languages"))
+	{
+		Msg("! ERROR Cannot find required section [%s]", "languages");
+		FATAL("Invalid required configuration! See log for detail.");
+	}
+	if (!pSettings->line_exist("languages", "default"))
+	{
+		Msg("! ERROR Cannot find required default language[%s]", "default");
+		FATAL("Invalid required configuration! See log for detail.");
+	}
+	CInifile::Sect& langSect = pSettings->r_section("languages");
+	LPCSTR defaultLang=pSettings->r_string("languages","default");
+	for (CInifile::SectCIt I = langSect.Data.begin(); I != langSect.Data.end(); ++I)
+	{
+		const CInifile::Item& item = *I;
+		if (xr_strcmp(item.first.c_str(),"default")==0)
+		{
+			continue;
+		}
+		languages_tokens.push_back(xr_token());
+		xr_token* last = &languages_tokens.back();
+		last->name = xr_strdup(item.first.c_str());
+		last->id = languages_tokens.size() - 1;
+	}
+	xr_vector<xr_token>::iterator defLangIter;//default lang move to 0 index
+	if (psCurrentLanguageIndex==(u32)-1 && (defLangIter=std::find_if(languages_tokens.begin(), languages_tokens.end(),[&](xr_token token)
+	{
+		return xr_strcmp(token.name, defaultLang) == 0;
+	}))!= languages_tokens.end())
+	{
+		psCurrentLanguageIndex = std::distance(languages_tokens.begin(),defLangIter);
+	}
+	else
+	{
+		Msg("! ERROR Cannot find configured default language[%s]!", defaultLang);
+		FATAL("Invalid required configuration! See log for detail.");
+	}
+#pragma endregion 
 }
 
 void InitConsole	()

@@ -81,15 +81,7 @@ net_updateData* CInventoryItem::NetSync()
 	return m_net_updateData;
 }
 
-void replaceAll(std::string& str, const std::string& from, const std::string& to) {
-	if(from.empty())
-		return;
-	size_t start_pos = 0;
-	while((start_pos = str.find(from, start_pos)) != std::string::npos) {
-		str.replace(start_pos, from.length(), to);
-		start_pos += to.length(); 
-	}
-}
+
 
 #include <cctype>
 #include <algorithm>
@@ -97,11 +89,10 @@ void replaceAll(std::string& str, const std::string& from, const std::string& to
 std::string CInventoryItem::ParseDescription() const
 {
 	std::string desc(m_Description.c_str());
-	std::regex regExp("%([a-zA-Z\\.0-9]+)%");
+	static std::regex regExp("%([a-zA-Z\\.0-9]+)%");
 	for(std::sregex_iterator it = std::sregex_iterator(desc.begin(), desc.end(), regExp); it != std::sregex_iterator();++it )
 	{
 		std::string funcName=(*it).str(1);
-		Log(funcName.c_str());
 		//bool isNameCorrect=std::find_if(funcName.begin(),funcName.end(),[](char c) { return std::isalpha(c) || c=='.'; })!=funcName.end();
 		if (!funcName.empty() /*&& isNameCorrect*/)
 		{
@@ -120,7 +111,7 @@ std::string CInventoryItem::ParseDescription() const
 					Msg("! ERROR function [%s] not return correct value! Ignoring.",funcName.c_str());
 					break;
 				}
-				replaceAll(desc,(*it).str(),funcResult);
+				OPFuncs::replaceAll(desc,(*it).str(),funcResult);
 			}
 			catch (...)
 			{

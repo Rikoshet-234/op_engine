@@ -83,6 +83,8 @@ char* CUIOptionsItem::GetOptTokenValue()
 	char* tokenValue= Console->GetToken(m_entry.c_str());
 	if (m_entry == "font_profile")
 		return const_cast<LPSTR>(pSettings->r_string("font_profiles", tokenValue));
+	else if (m_entry == "g_lang")
+		return const_cast<LPSTR>(pSettings->r_string("languages", tokenValue));
 	return tokenValue;
 }
 
@@ -108,6 +110,8 @@ void CUIOptionsItem::SaveValue() {
 
 	if (m_entry == "font_profile")
 		m_optionsManager.DoFontRestart();
+	if (m_entry == "g_lang")
+		m_optionsManager.DoLangRestart();
 
 	if (/*m_entry == "snd_freq" ||*/ m_entry == "snd_efx")
 		m_optionsManager.DoSndRestart();

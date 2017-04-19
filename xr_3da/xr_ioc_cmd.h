@@ -7,6 +7,7 @@
 #define CMD4(cls,p1,p2,p3,p4)		{ static cls x##cls(p1,p2,p3,p4);	Console->AddCommand(&x##cls);}
 
 ENGINE_API extern	xr_vector<xr_token>	vid_font_profile_tokens;
+ENGINE_API extern	xr_vector<xr_token>	languages_tokens;
 
 class ENGINE_API	IConsole_Command
 {

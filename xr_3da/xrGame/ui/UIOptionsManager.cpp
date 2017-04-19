@@ -6,6 +6,7 @@
 #include "UIOptionsManager.h"
 #include "UIOptionsItem.h"
 #include "../../xr_ioconsole.h"
+#include "../string_table.h"
 
 CUIOptionsManager::CUIOptionsManager(){
 	m_b_vid_restart = false;
@@ -118,6 +119,9 @@ void CUIOptionsManager::OptionsPostAccept(){
 	if(m_bFontRestart)
 		Console->Execute("fonts_reload");
 
+	if (m_bLangRestart)
+		Console->Execute("lang_reload");
+
 	m_b_vid_restart = false;
 	m_b_snd_restart = false;
 	m_bFontRestart = false;
@@ -129,6 +133,11 @@ void CUIOptionsManager::DoVidRestart(){
 
 void CUIOptionsManager::DoFontRestart() {
 	m_bFontRestart = true;
+}
+
+void CUIOptionsManager::DoLangRestart() 
+{
+	m_bLangRestart = true;
 }
 
 void CUIOptionsManager::DoSndRestart(){

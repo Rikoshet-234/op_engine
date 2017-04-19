@@ -17,13 +17,6 @@ struct STRING_TABLE_DATA
 	STRING_TABLE_MAP		m_string_key_binding;
 };
 
-enum EGameLanguages
-{
-	eglRussian = 0,
-	eglEnglish = 1,
-	eglUkrainian = 2,
-};
-
 class CStringTable 
 {
 public:
@@ -46,10 +39,8 @@ private:
 	//winsor
 	static const size_t fixedSize;
 	static const std::string idDelimiter;
-
-	EGameLanguages m_currentLanguage;
 	std::string m_currentLanguageTag;
 };
 
-extern EGameLanguages g_GameLanguage;
-xr_token		g_language_token[];
+
+
