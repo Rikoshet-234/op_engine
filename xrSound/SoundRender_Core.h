@@ -53,6 +53,8 @@ protected:
 	CSoundRender_Environment			s_user_environment;
 
 	int									m_iPauseCounter;
+
+	xr_string							m_localization;
 public:
 	// Cache
 	CSoundRender_Cache					cache;
@@ -68,6 +70,7 @@ public:
 	virtual void  						_initialize				( u64 window )=0;
 	virtual void						_clear					( )=0;
 	virtual void						_restart				( );
+	virtual void						_localization			( LPCSTR localization );
 
 	// Sound interface
 			void						verify_refsound			( ref_sound& S);
