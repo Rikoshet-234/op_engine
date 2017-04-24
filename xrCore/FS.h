@@ -294,6 +294,9 @@ public:
 };
 
 class CTempReader;
+#ifdef V92_DEBUG
+#include "log.h"
+#endif
 
 class XRCORE_API IReader : public IReaderBase<IReader> {
 protected:
@@ -343,7 +346,11 @@ public:
 													{
 														string64 str;
 														sprintf_s(str,"Invalid position FS.seek() Pos:%d Size:%d",Pos,Size);
+#ifdef V92_DEBUG
+														Msg("! ERROR %s %d %s %s ", DEBUG_INFO,str);
+#else
 														Debug.fatal(DEBUG_INFO,str);
+#endif
 													}
 													//VERIFY((Pos<=Size) && (Pos>=0));
 												};
@@ -355,7 +362,11 @@ public:
 													{
 														string64 str;
 														sprintf_s(str,"Invalid position FS.advance() Pos:%d Size:%d",Pos,Size);
-														Debug.fatal(DEBUG_INFO,str);
+#ifdef V92_DEBUG
+														Msg("! ERROR %s %d %s %s ", DEBUG_INFO, str);
+#else
+														Debug.fatal(DEBUG_INFO, str);
+#endif
 													}
 													//VERIFY2((Pos<=Size) && (Pos>=0),str);
 												};

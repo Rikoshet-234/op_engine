@@ -10,6 +10,7 @@
 #include "x_ray.h"
 #include "GameFont.h"
 #include "../build_defines.h"
+#include "OPFuncs/ExpandedCmdParams.h"
 
 void CObject::MakeMeCrow_internal	()
 {
@@ -41,12 +42,17 @@ void CObject::cNameVisual_set	(shared_str N)
 		
 		NameVisual				= N;
 		TSP_BEGIN("Render->model_Create", g_ts_spawn);
+#ifdef V92_DEBUG
+		Msg("* Try to load mesh model [%s]", NameVisual.c_str());
+#endif
 		renderable.visual		= Render->model_Create	(*N);
 		TSP_END("Render->model_Create", g_ts_spawn);
 		
 		CKinematics* old_k	= old_v?old_v->dcast_PKinematics():NULL;
 		CKinematics* new_k	= renderable.visual->dcast_PKinematics();
-
+#ifdef V92_DEBUG
+		Msg("* End loading mesh model [%s]", NameVisual.c_str());
+#endif
 		if(old_k && new_k){
 			new_k->Update_Callback			= old_k->Update_Callback;
 			new_k->Update_Callback_Param	= old_k->Update_Callback_Param;
