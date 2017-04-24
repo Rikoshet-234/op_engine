@@ -4,7 +4,7 @@
 #include "SoundRender_CoreA.h"
 #include "SoundRender_CoreD.h"
 
-void CSound_manager_interface::_create		(u64 window)
+void CSound_manager_interface::_create		(u64 window, LPCSTR localization)
 {
 	if (strstr( Core.Params,"-dsound"))
 	{
@@ -21,6 +21,7 @@ void CSound_manager_interface::_create		(u64 window)
 		return;
 	}
 	Sound->_initialize	(window);
+	Sound->_localization(localization);
 }
 
 void CSound_manager_interface::_destroy	()
