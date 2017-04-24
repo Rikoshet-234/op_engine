@@ -334,7 +334,6 @@ paket-files/
 *.sln.iml
 
 
-prepare_builds.cmd 
 ball_clean.cmd
 ball_debug.cmd
 ball_release.cmd
@@ -343,6 +342,7 @@ bgame.cmd
 blua.cmd
 brender.cmd
 publish_build.cmd
+publish_build_beta.cmd
 
 # build files
 xr_build

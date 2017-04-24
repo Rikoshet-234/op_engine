@@ -374,7 +374,8 @@ void CInventoryItem::OnEvent (NET_Packet& P, u16 type)
 		{
 			string64			i_name;
 			P.r_stringZ			(i_name);
-			Detach(i_name, true);
+			bool force_spawn = P.r_u8() == 1 ? true : false;
+			Detach(i_name, force_spawn);
 			CActor* pActor = smart_cast<CActor*>(object().H_Parent());
 			if (pActor && pActor->inventory().ActiveItem() == this)
 			{

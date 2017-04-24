@@ -22,7 +22,7 @@
 #include "Actor_Flags.h"
 #include "Inventory.h"
 #include "inventory_item.h"
-#include "car.h"
+#include "Weapon.h"
 #include "ui/UICarBodyWnd.h"
 #include "inventory_slots_script_enum.h"
 #include "item_place_change_enum.h"
@@ -31,6 +31,8 @@
 #include "ui/UITradeWnd.h"
 #include "UIGameSP.h"
 #include "NightVisionDevice.h"
+#include "OPFuncs/utils.h"
+#include "xrServer_Objects_ALife_Items.h"
 
 using namespace luabind;
 
@@ -43,8 +45,6 @@ void CInventoryItem::script_register(lua_State *L)
 			.def("GetGameObject",		&CInventoryItem::GetGameObject)
 		];
 }
-
-
 
 u32 CScriptGameObject::GetSlot() const
 {
@@ -423,62 +423,179 @@ bool CScriptGameObject::get_useful_for_npc() const
 	return item->useful_for_NPC();
 }
 
+#pragma region weapon manipulation
+bool CScriptGameObject::has_scope() const
+{
+	CWeapon		*weapon = smart_cast<CWeapon*>(&object());
+	if (!weapon) {
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "call [has_scope] for non-CWeapon object !!!");
+		return false;
+	}
+	return weapon->IsScopeAttached();
+}
+bool CScriptGameObject::has_silencer() const
+{
+	CWeapon		*weapon = smart_cast<CWeapon*>(&object());
+	if (!weapon) {
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "call [has_silencer] for non-CWeapon object !!!");
+		return false;
+	}
+	return weapon->IsSilencerAttached();
+}
+bool CScriptGameObject::has_grenadelauncher() const
+{
+	CWeapon		*weapon = smart_cast<CWeapon*>(&object());
+	if (!weapon) {
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "call [has_grenadelauncher] for non-CWeapon object !!!");
+		return false;
+	}
+	return weapon->IsGrenadeLauncherAttached();
+}
+
+LPCSTR detach_local(CGameObject* object, CSE_ALifeItemWeapon::EWeaponAddonState addonType, luabind::object const &param)
+{
+	CWeapon		*weapon = smart_cast<CWeapon*>(object);
+	if (!weapon) {
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "call [detach_local] for non-CWeapon object!");
+		return nullptr;
+	}
+	if (!param.is_valid())
+	{
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "invalid input param [force_spawn] for [detach_local]!");
+		return nullptr;
+	}
+	bool force_spawn = true;
+	if (param.type() == LUA_TBOOLEAN)
+		force_spawn = luabind::object_cast<bool>(param);
+	shared_str addon_name;
+	bool allowDetach = false;
+	switch (addonType)
+	{
+		case CSE_ALifeItemWeapon::eWeaponAddonScope: 
+			addon_name = weapon->GetScopeName().c_str();
+			allowDetach = weapon->ScopeAttachable() && weapon->IsScopeAttached();
+			break;
+		case CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher: 
+			addon_name = weapon->GetGrenadeLauncherName().c_str();
+			allowDetach = weapon->GrenadeLauncherAttachable() && weapon->IsGrenadeLauncherAttached();
+			break;
+		case CSE_ALifeItemWeapon::eWeaponAddonSilencer: 
+			{
+				addon_name = weapon->GetSilencerName().c_str();
+				allowDetach = weapon->SilencerAttachable() && weapon->IsSilencerAttached();
+			}
+			break;
+		default: ;
+	}
+	if (allowDetach)
+		OPFuncs::DetachAddon(weapon, addon_name.c_str(), force_spawn);
+	return  addon_name.size()>0 ? addon_name.c_str() : nullptr;
+}
+
+LPCSTR CScriptGameObject::detach_scope(luabind::object const &param)
+{
+	return detach_local(&object(), CSE_ALifeItemWeapon::EWeaponAddonState::eWeaponAddonScope, param);
+}
+
+LPCSTR CScriptGameObject::detach_silencer(luabind::object const &param)
+{
+	return detach_local(&object(), CSE_ALifeItemWeapon::EWeaponAddonState::eWeaponAddonSilencer, param);
+}
+
+LPCSTR CScriptGameObject::detach_grenadelauncher(luabind::object const &param)
+{
+	return detach_local(&object(), CSE_ALifeItemWeapon::EWeaponAddonState::eWeaponAddonGrenadeLauncher, param);
+}
+
+LPCSTR CScriptGameObject::GetCurrentAmmoSection()
+{
+	CWeapon		*weapon = smart_cast<CWeapon*>(&object());
+	if (weapon) 
+		return weapon->m_ammoTypes[weapon->m_ammoType].c_str();
+	ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "call [current_ammo_section] for non-CWeapon object!");
+	return nullptr;
+}
+
+void CScriptGameObject::FullUnloadWeapon()
+{
+	CWeapon		*weapon = smart_cast<CWeapon*>(&object());
+	if (weapon)
+	{
+		CWeaponMagazined		*weaponM = smart_cast<CWeaponMagazined*>(weapon);
+		if (weaponM) {
+			OPFuncs::UnloadWeapon(weaponM);
+			return;
+		}
+	}
+	ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "call [full_unload_weapon] for non-CWeaponMagazined object!");
+}
+#pragma endregion
+
 class_<CScriptGameObject> &script_register_game_object3(class_<CScriptGameObject> &instance)
 {
 	instance
-		.def("get_slot",					&CScriptGameObject::GetSlot)
-		.def("get_inventory_wnd",			&get_inventory_wnd)
-		.def("get_carbody_wnd",				&get_carbody_wnd)
-		.def("get_trade_wnd",				&get_trade_wnd)
-		.def("invulnerable",				static_cast<bool (CScriptGameObject::*)		() const>	(&CScriptGameObject::invulnerable))
-		.def("invulnerable",				static_cast<void (CScriptGameObject::*)		(bool)>		(&CScriptGameObject::invulnerable))
-		.def("max_weight",					&CScriptGameObject::GetActorMaxWeight)
-		.def("total_weight",				&CScriptGameObject::GetTotalWeight)
-		.def("item_weight",					&CScriptGameObject::Weight)
-		.def("is_crouch",					&CScriptGameObject::actor_is_crouch)
-		.def("set_crouch",					&CScriptGameObject::actor_set_crouch)
-		.def("get_visual_name",				&CScriptGameObject::GetVisualName)
-		.def("get_immunities_from_belt",	&CScriptGameObject::GetImmunitiesFromBeltTable)
-		.def("get_immunities",				&CScriptGameObject::GetImmunitiesTable)
+		.def("get_slot", &CScriptGameObject::GetSlot)
+		.def("get_inventory_wnd", &get_inventory_wnd)
+		.def("get_carbody_wnd", &get_carbody_wnd)
+		.def("get_trade_wnd", &get_trade_wnd)
+		.def("invulnerable", static_cast<bool (CScriptGameObject::*)		() const>	(&CScriptGameObject::invulnerable))
+		.def("invulnerable", static_cast<void (CScriptGameObject::*)		(bool)>		(&CScriptGameObject::invulnerable))
+		.def("max_weight", &CScriptGameObject::GetActorMaxWeight)
+		.def("total_weight", &CScriptGameObject::GetTotalWeight)
+		.def("item_weight", &CScriptGameObject::Weight)
+		.def("is_crouch", &CScriptGameObject::actor_is_crouch)
+		.def("set_crouch", &CScriptGameObject::actor_set_crouch)
+		.def("get_visual_name", &CScriptGameObject::GetVisualName)
+		.def("get_immunities_from_belt", &CScriptGameObject::GetImmunitiesFromBeltTable)
+		.def("get_immunities", &CScriptGameObject::GetImmunitiesTable)
 
-		.def("set_callback_ex",				static_cast<void (CScriptGameObject::*)		(GameObject::ECallbackType, const luabind::functor<bool>&)>								(&CScriptGameObject::SetCallbackEx))
-		.def("set_callback_ex",				static_cast<void (CScriptGameObject::*)		(GameObject::ECallbackType, const luabind::functor<bool>&, const luabind::object&)>		(&CScriptGameObject::SetCallbackEx))
-		.def("set_callback_ex",				static_cast<void (CScriptGameObject::*)		(GameObject::ECallbackType)>															(&CScriptGameObject::SetCallbackEx))
-	
-		.def("inventory_move_item",			&CScriptGameObject::InventoryMoveItem)
-	
-		.def("is_game_object",				&CScriptGameObject::IsGameObject)
-		.def("is_car",						&CScriptGameObject::IsCar)
-		.def("is_helicopter",				&CScriptGameObject::IsHeli)
-		.def("is_entity_alive",				&CScriptGameObject::IsEntityAlive)
-		.def("is_artefact",					&CScriptGameObject::IsArtefact)
-		.def("is_actor",					&CScriptGameObject::IsActor)
-		.def("is_weapon",					&CScriptGameObject::IsWeapon)
-		.def("is_medkit",					&CScriptGameObject::IsMedkit)
-		.def("is_eatable",					&CScriptGameObject::IsEatableItem)
-		.def("is_antirad",					&CScriptGameObject::IsAntirad)
-		.def("is_outfit",					&CScriptGameObject::IsCustomOutfit)
-		.def("is_scope",					&CScriptGameObject::IsScope)
-		.def("is_silencer",					&CScriptGameObject::IsSilencer)
-		.def("is_grenade_launcher",			&CScriptGameObject::IsGrenadeLauncher)
-		.def("is_weapon_magazined",			&CScriptGameObject::IsWeaponMagazined)
-		.def("is_stalker",					&CScriptGameObject::IsStalker)
-		.def("is_monster",					&CScriptGameObject::IsMonster)
-		.def("is_trader",					&CScriptGameObject::IsTrader)
-		.def("is_ammo",						&CScriptGameObject::IsAmmo)
-		.def("is_missile",					&CScriptGameObject::IsMissile)
-		.def("is_grenade",					&CScriptGameObject::IsGrenade)
-		.def("is_bottle",					&CScriptGameObject::IsBottleItem)
-		.def("is_torch",					&CScriptGameObject::IsTorch)
-		.def("is_weaponGL",					&CScriptGameObject::IsWeaponGL)
-		.def("is_inventory_box",			&CScriptGameObject::IsInventoryBox)
-		.def("is_pnv",						&CScriptGameObject::IsPNV)
-		.def("iterate_box_obj",				&CScriptGameObject::IterateInventoryBoxObject)
-		.def("iterate_box_obj",				&CScriptGameObject::IterateInventoryBoxId)
-		.def("get_current_pnv",				&CScriptGameObject::GetCurrentPNV)
-		.def("useful_for_npc",				&CScriptGameObject::get_useful_for_npc)
-		
-	;
+		.def("set_callback_ex", static_cast<void (CScriptGameObject::*)		(GameObject::ECallbackType, const luabind::functor<bool>&)>								(&CScriptGameObject::SetCallbackEx))
+		.def("set_callback_ex", static_cast<void (CScriptGameObject::*)		(GameObject::ECallbackType, const luabind::functor<bool>&, const luabind::object&)>		(&CScriptGameObject::SetCallbackEx))
+		.def("set_callback_ex", static_cast<void (CScriptGameObject::*)		(GameObject::ECallbackType)>															(&CScriptGameObject::SetCallbackEx))
+
+		.def("inventory_move_item", &CScriptGameObject::InventoryMoveItem)
+
+		.def("is_game_object", &CScriptGameObject::IsGameObject)
+		.def("is_car", &CScriptGameObject::IsCar)
+		.def("is_helicopter", &CScriptGameObject::IsHeli)
+		.def("is_entity_alive", &CScriptGameObject::IsEntityAlive)
+		.def("is_artefact", &CScriptGameObject::IsArtefact)
+		.def("is_actor", &CScriptGameObject::IsActor)
+		.def("is_weapon", &CScriptGameObject::IsWeapon)
+		.def("is_medkit", &CScriptGameObject::IsMedkit)
+		.def("is_eatable", &CScriptGameObject::IsEatableItem)
+		.def("is_antirad", &CScriptGameObject::IsAntirad)
+		.def("is_outfit", &CScriptGameObject::IsCustomOutfit)
+		.def("is_scope", &CScriptGameObject::IsScope)
+		.def("is_silencer", &CScriptGameObject::IsSilencer)
+		.def("is_grenade_launcher", &CScriptGameObject::IsGrenadeLauncher)
+		.def("is_weapon_magazined", &CScriptGameObject::IsWeaponMagazined)
+		.def("is_stalker", &CScriptGameObject::IsStalker)
+		.def("is_monster", &CScriptGameObject::IsMonster)
+		.def("is_trader", &CScriptGameObject::IsTrader)
+		.def("is_ammo", &CScriptGameObject::IsAmmo)
+		.def("is_missile", &CScriptGameObject::IsMissile)
+		.def("is_grenade", &CScriptGameObject::IsGrenade)
+		.def("is_bottle", &CScriptGameObject::IsBottleItem)
+		.def("is_torch", &CScriptGameObject::IsTorch)
+		.def("is_weaponGL", &CScriptGameObject::IsWeaponGL)
+		.def("is_inventory_box", &CScriptGameObject::IsInventoryBox)
+		.def("is_pnv", &CScriptGameObject::IsPNV)
+		.def("iterate_box_obj", &CScriptGameObject::IterateInventoryBoxObject)
+		.def("iterate_box_obj", &CScriptGameObject::IterateInventoryBoxId)
+		.def("get_current_pnv", &CScriptGameObject::GetCurrentPNV)
+		.def("useful_for_npc", &CScriptGameObject::get_useful_for_npc)
+
+		.def("has_scope", &CScriptGameObject::has_scope)
+		.def("has_silencer", &CScriptGameObject::has_silencer)
+		.def("has_grenadelauncher", &CScriptGameObject::has_grenadelauncher)
+
+		.def("full_unload_weapon", &CScriptGameObject::FullUnloadWeapon)
+		.def("current_ammo_section", &CScriptGameObject::GetCurrentAmmoSection)
+		.def("detach_scope", &CScriptGameObject::detach_scope)
+		.def("detach_silencer", &CScriptGameObject::detach_silencer)
+		.def("detach_grenadelauncher", &CScriptGameObject::detach_grenadelauncher)
+		;
 
 	return	(instance);
 }

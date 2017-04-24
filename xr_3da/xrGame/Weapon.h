@@ -517,4 +517,6 @@ private:
 
 public:
 	const float				&hit_probability			() const;
+
 };
+

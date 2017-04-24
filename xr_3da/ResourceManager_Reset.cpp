@@ -3,7 +3,7 @@
 
 #include "ResourceManager.h"
 #ifndef _EDITOR
-    #include	"Render.h"
+	#include	"Render.h"
 #endif
 
 void	CResourceManager::reset_begin			()
@@ -16,9 +16,9 @@ void	CResourceManager::reset_begin			()
 		_RELEASE(v_states[_it]->state);
 
 	// destroy RTs
-	for (map_RTIt rt_it=m_rtargets.begin(); rt_it!=m_rtargets.end(); rt_it++)
+	for (map_RTIt rt_it=m_rtargets.begin(); rt_it!=m_rtargets.end(); ++rt_it)
 		rt_it->second->reset_begin();
-	for (map_RTCIt rtc_it=m_rtargets_c.begin(); rtc_it!=m_rtargets_c.end(); rtc_it++)
+	for (map_RTCIt rtc_it=m_rtargets_c.begin(); rtc_it!=m_rtargets_c.end(); ++rtc_it)
 		rtc_it->second->reset_begin();
 
 	// destroy DStreams
@@ -54,7 +54,7 @@ void	CResourceManager::reset_end				()
 		// RT
 #pragma todo("container is created in stack!")
 		xr_vector<CRT*>		rt;
-		for (map_RTIt rt_it=m_rtargets.begin(); rt_it!=m_rtargets.end(); rt_it++)	rt.push_back(rt_it->second);
+		for (map_RTIt rt_it=m_rtargets.begin(); rt_it!=m_rtargets.end(); ++rt_it)	rt.push_back(rt_it->second);
 		std::sort(rt.begin(),rt.end(),cmp_rt);
 		for (u32 _it=0; _it<rt.size(); _it++)	rt[_it]->reset_end	();
 	}
@@ -62,7 +62,7 @@ void	CResourceManager::reset_end				()
 		// RTc
 #pragma todo("container is created in stack!")
 		xr_vector<CRTC*>	rt;
-		for (map_RTCIt rt_it=m_rtargets_c.begin(); rt_it!=m_rtargets_c.end(); rt_it++)	rt.push_back(rt_it->second);
+		for (map_RTCIt rt_it=m_rtargets_c.begin(); rt_it!=m_rtargets_c.end(); ++rt_it)	rt.push_back(rt_it->second);
 		std::sort(rt.begin(),rt.end(),cmp_rtc);
 		for (u32 _it=0; _it<rt.size(); _it++)	rt[_it]->reset_end	();
 	}
@@ -93,9 +93,9 @@ template<class C>	u32 mdump(C c)
 {
 	if (0 == c.size())	return 0;
 	u32 sum = 0;
-	for (C::iterator I = c.begin(); I != c.end(); I++)
+	for (typename C::iterator I = c.begin(); I != c.end(); ++I)
 	{
-		u32 size = Size<C::mapped_type>::size(I->second);
+		u32 size = Size<typename C::mapped_type>::size(I->second);
 		sum += size;
 		Msg("*        : %3d (%5u K): %s", I->second->dwReference, size / 1024, I->second->cName.c_str());
 	}

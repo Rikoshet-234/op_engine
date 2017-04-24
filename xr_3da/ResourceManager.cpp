@@ -11,27 +11,27 @@
 
 #include "ResourceManager.h"
 #include "tss.h"
-#include "blenders\blender.h"
-#include "blenders\blender_recorder.h"
+#include "blenders/blender.h"
+#include "blenders/blender_recorder.h"
 
 
 void fix_texture_name(LPSTR fn)
 {
 	LPSTR _ext = strext(fn);
 	if(  _ext					&&
-	  (0==stricmp(_ext,".tga")	||
-		0==stricmp(_ext,".dds")	||
-		0==stricmp(_ext,".bmp")	||
-		0==stricmp(_ext,".ogm")	) )
+	  (0==_stricmp(_ext,".tga")	||
+		0==_stricmp(_ext,".dds")	||
+		0==_stricmp(_ext,".bmp")	||
+		0==_stricmp(_ext,".ogm")	) )
 		*_ext = 0;
 }
 //--------------------------------------------------------------------------------------------------------------
 template <class T>
 BOOL	reclaim		(xr_vector<T*>& vec, const T* ptr)
 {
-	xr_vector<T*>::iterator it	= vec.begin	();
-	xr_vector<T*>::iterator end	= vec.end	();
-	for (; it!=end; it++)
+	typename xr_vector<T*>::iterator it	= vec.begin	();
+	typename xr_vector<T*>::iterator end	= vec.end	();
+	for (; it!=end; ++it)
 		if (*it == ptr)	{ vec.erase	(it); return TRUE; }
 		return FALSE;
 }
@@ -57,11 +57,11 @@ IBlender* CResourceManager::_GetBlender		(LPCSTR Name)
 
 IBlender* CResourceManager::_FindBlender		(LPCSTR Name)
 {
-	if (!(Name && Name[0])) return 0;
+	if (!(Name && Name[0])) return nullptr;
 
 	LPSTR N = LPSTR(Name);
 	map_Blender::iterator I = m_blenders.find	(N);
-	if (I==m_blenders.end())	return 0;
+	if (I==m_blenders.end())	return nullptr;
 	else						return I->second;
 }
 
@@ -86,7 +86,7 @@ void	CResourceManager::_ParseList(sh_list& dest, LPCSTR names)
 	if (0==names) 		names 	= "$null";
 
 	ZeroMemory			(&dest, sizeof(dest));
-	char*	P			= (char*) names;
+	char*	P			= const_cast<char*>(names);
 	svector<char,128>	N;
 
 	while (*P)
@@ -94,7 +94,7 @@ void	CResourceManager::_ParseList(sh_list& dest, LPCSTR names)
 		if (*P == ',') {
 			// flush
 			N.push_back	(0);
-			strlwr		(N.begin());
+			_strlwr		(N.begin());
 
 			fix_texture_name( N.begin() );
 //. andy			if (strext(N.begin())) *strext(N.begin())=0;
@@ -109,7 +109,7 @@ void	CResourceManager::_ParseList(sh_list& dest, LPCSTR names)
 	{
 		// flush
 		N.push_back	(0);
-		strlwr		(N.begin());
+		_strlwr		(N.begin());
 
 		fix_texture_name( N.begin() );
 //. andy		if (strext(N.begin())) *strext(N.begin())=0;
@@ -119,7 +119,7 @@ void	CResourceManager::_ParseList(sh_list& dest, LPCSTR names)
 
 ShaderElement* CResourceManager::_CreateElement			(ShaderElement& S)
 {
-	if (S.passes.empty())		return	0;
+	if (S.passes.empty())		return	nullptr;
 
 	// Search equal in shaders array
 	for (u32 it=0; it<v_elements.size(); it++)
@@ -309,7 +309,7 @@ void	CResourceManager::_GetMemoryUsage(u32& m_base, u32& c_base, u32& m_lmaps, u
 
 	map_Texture::iterator I = m_textures.begin	();
 	map_Texture::iterator E = m_textures.end	();
-	for (; I!=E; I++)
+	for (; I!=E; ++I)
 	{
 		u32 m = I->second->flags.MemoryUsage;
 		if (strstr(I->first,"lmap"))
@@ -330,7 +330,7 @@ void	CResourceManager::_DumpMemoryUsage		()
 	{
 		map_Texture::iterator I = m_textures.begin	();
 		map_Texture::iterator E = m_textures.end	();
-		for (; I!=E; I++)
+		for (; I!=E; ++I)
 		{
 			u32			m = I->second->flags.MemoryUsage;
 			shared_str	n = I->second->cName;

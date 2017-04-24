@@ -21,10 +21,16 @@ void HUD_SOUND::LoadSound(	LPCSTR section, LPCSTR line, HUD_SOUND& hud_snd, int 
 
 		LoadSound	(section, sound_line, s.snd, type, &s.volume, &s.delay);
 		sprintf_s		(sound_line,"%s%d",line,++k);
+		//if (required)
+		//	Msg("= try to load line [%s]", sound_line);
 	}//while
 
 	if (required)
-		R_ASSERT3				(!hud_snd.sounds.empty(), "there is no sounds for:", section);
+		if (hud_snd.sounds.empty())
+		{
+			Msg("! ERROR there is no sounds for section[%s] line[%s]", section, line);
+			FATAL("ENGINE CRASH: See details in log");
+		}		
 }
 
 void  HUD_SOUND::LoadSound(LPCSTR section, LPCSTR line, 

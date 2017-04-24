@@ -69,16 +69,18 @@ namespace OPFuncs
 		}
 	}
 
-	void DetachAddon(CInventoryItem* item, const char* addon_name)
+	void DetachAddon(CInventoryItem* item, const char* addon_name, bool force_spawn)
 	{
 		if (OnClient())
 		{
 			NET_Packet								P;
 			item->object().u_EventGen(P, GE_ADDON_DETACH, item->object().ID());
 			P.w_stringZ(addon_name);
+			P.w_u8(force_spawn ? 1 : 0);
 			item->object().u_EventSend(P);
+			_asm int 3;
 		};
-		item->Detach(addon_name, true);
+		item->Detach(addon_name, force_spawn);
 
 		CActor *pActor = smart_cast<CActor*>(Level().CurrentEntity());
 		if (pActor && item == pActor->inventory().ActiveItem())

@@ -26,7 +26,7 @@ namespace OPFuncs
 	std::string getComplexString(std::string untranslatedString,PIItem item,std::string untranslatedString2="",std::string untranslatedString3="");
 	std::string getAddonInvName(std::string addonName);
 	void UnloadWeapon(CWeaponMagazined* weapon);
-	void DetachAddon(CInventoryItem* item,const char* addon_name);
+	void DetachAddon(CInventoryItem* item,const char* addon_name,bool force_spawn=true);
 	void AttachAddon(CInventoryItem* item_to_upgrade,CInventoryItem* addon);
 	bool IsUsedInInventory(CInventoryOwner* owner,CInventoryItem* pItem);
 	//check string is contains only 'english' symbols,numbers and '_'
