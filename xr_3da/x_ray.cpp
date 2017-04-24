@@ -227,7 +227,7 @@ void destroyInput	()
 }
 void InitSound		()
 {
-	CSound_manager_interface::_create					(u64(Device.m_hWnd));
+	CSound_manager_interface::_create					(u64(Device.m_hWnd), languages_tokens[psCurrentLanguageIndex].name);
 //	Msg				("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 //	ref_sound*	x	= 
 }

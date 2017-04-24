@@ -98,6 +98,12 @@ void CSoundRender_Core::_clear	()
 	g_target_temp_data.clear	();
 }
 
+void CSoundRender_Core::_localization(LPCSTR localization)
+{
+	m_localization = localization;
+	m_localization.append("\\");
+}
+
 void CSoundRender_Core::stop_emitters()
 {
 	for (u32 eit=0; eit<s_emitters.size(); eit++)
@@ -347,7 +353,15 @@ void	CSoundRender_Core::destroy	(ref_sound& S )
 void CSoundRender_Core::_create_data( ref_sound_data& S, LPCSTR fName, esound_type sound_type, int game_type)
 {
 	string_path			fn;
-	strcpy				(fn,fName);
+	if (0x72616863 == *(uint32_t*)fName)//! jarni: brutal hack :), 0x72616863 == "char", beginning of "characters_voice"
+	{
+		strconcat(sizeof(fn), fn, m_localization.c_str(), fName, strext(fn) ? "" : ".ogg");
+		if (!FS.exist("$game_sounds$", fn))
+			strcpy(fn, fName);
+	}
+	else
+		strcpy				(fn,fName);
+
     if (strext(fn))		*strext(fn)	= 0;
 	S.handle			= (CSound_source*)SoundRender->i_create_source(fn);
 	S.g_type			= (game_type==sg_SourceType)?S.handle->game_type():game_type;

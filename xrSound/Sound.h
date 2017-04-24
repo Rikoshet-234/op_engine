@@ -267,6 +267,7 @@ class XRSOUND_API	CSound_manager_interface
 {
 	virtual void	  				_initialize				( u64 window )																			= 0;
 	virtual void					_clear					( )																						= 0;
+	virtual void	  				_localization			(LPCSTR localization)																	= 0;
 
 protected:
 	friend class 					ref_sound_data;
@@ -276,7 +277,7 @@ public:
 	virtual							~CSound_manager_interface(){}
 	//@{
 	/// General
-	static void						_create					( u64 window );
+	static void						_create					( u64 window, LPCSTR localization );
 	static void						_destroy				( );
 
 	virtual void					_restart				( )																						= 0;
