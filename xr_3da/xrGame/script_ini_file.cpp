@@ -77,42 +77,86 @@ LPCSTR CScriptIniFile::r_string_wb	(LPCSTR S, LPCSTR L)
 
 u32	 CScriptIniFile::line_count			(LPCSTR S)
 {
-	THROW3		(inherited::section_exist(S),"Cannot find section",S);
+	if (!inherited::section_exist(S))
+	{
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "Cannot find section [%s]",S);
+		FATAL("ENGINE CRASH. See log for detail!");
+	}
 	return		(inherited::line_count(S));
 }
 
 LPCSTR CScriptIniFile::r_string			(LPCSTR S, LPCSTR L)
 {
-	THROW3		(inherited::section_exist(S),"Cannot find section",S);
-	THROW3		(inherited::line_exist(S,L),"Cannot find line",L);
+	if (!inherited::section_exist(S))
+	{
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "Cannot find section [%s]", S);
+		FATAL("ENGINE CRASH. See log for detail!");
+	}
+	if (!inherited::line_exist(S, L))
+	{
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "Cannot find line [%s] for section [%s]",L, S);
+		FATAL("ENGINE CRASH. See log for detail!");
+	}
 	return		(inherited::r_string(S,L));
 }
 
 u32	 CScriptIniFile::r_u32				(LPCSTR S, LPCSTR L)
 {
-	THROW3		(inherited::section_exist(S),"Cannot find section",S);
-	THROW3		(inherited::line_exist(S,L),"Cannot find line",L);
+	if (!inherited::section_exist(S))
+	{
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "Cannot find section [%s]", S);
+		FATAL("ENGINE CRASH. See log for detail!");
+	}
+	if (!inherited::line_exist(S, L))
+	{
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "Cannot find line [%s] for section [%s]", L, S);
+		FATAL("ENGINE CRASH. See log for detail!");
+	}
 	return		(inherited::r_u32(S,L));
 }
 
 int	 CScriptIniFile::r_s32				(LPCSTR S, LPCSTR L)
 {
-	THROW3		(inherited::section_exist(S),"Cannot find section",S);
-	THROW3		(inherited::line_exist(S,L),"Cannot find line",L);
+	if (!inherited::section_exist(S))
+	{
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "Cannot find section [%s]", S);
+		FATAL("ENGINE CRASH. See log for detail!");
+	}
+	if (!inherited::line_exist(S, L))
+	{
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "Cannot find line [%s] for section [%s]", L, S);
+		FATAL("ENGINE CRASH. See log for detail!");
+	}
 	return		(inherited::r_s32(S,L));
 }
 
 float CScriptIniFile::r_float			(LPCSTR S, LPCSTR L)
 {
-	THROW3		(inherited::section_exist(S),"Cannot find section",S);
-	THROW3		(inherited::line_exist(S,L),"Cannot find line",L);
+	if (!inherited::section_exist(S))
+	{
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "Cannot find section [%s]", S);
+		FATAL("ENGINE CRASH. See log for detail!");
+	}
+	if (!inherited::line_exist(S, L))
+	{
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "Cannot find line [%s] for section [%s]", L, S);
+		FATAL("ENGINE CRASH. See log for detail!");
+	}
 	return		(inherited::r_float(S,L));
 }
 
 Fvector CScriptIniFile::r_fvector3		(LPCSTR S, LPCSTR L)
 {
-	THROW3		(inherited::section_exist(S),"Cannot find section",S);
-	THROW3		(inherited::line_exist(S,L),"Cannot find line",L);
+	if (!inherited::section_exist(S))
+	{
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "Cannot find section [%s]", S);
+		FATAL("ENGINE CRASH. See log for detail!");
+	}
+	if (!inherited::line_exist(S, L))
+	{
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "Cannot find line [%s] for section [%s]", L, S);
+		FATAL("ENGINE CRASH. See log for detail!");
+	}
 	return		(inherited::r_fvector3(S,L));
 }
 

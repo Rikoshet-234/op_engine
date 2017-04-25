@@ -208,6 +208,8 @@ bool CInventory::DropItem(CGameObject *pObj)
 		Msg("CInventory::DropItem pIItem->m_pCurrentInventory!=this");
 		Msg("this = [%d]", GetOwner()->object_id());
 		Msg("pIItem->m_pCurrentInventory = [%d]", pIItem->m_pCurrentInventory->GetOwner()->object_id());
+		Msg("Obj section = [%s]", pIItem->object().cNameSect().c_str());
+		Msg("Obj ID = [%d]", pIItem->object().ID());
 	}
 
 	R_ASSERT							(pIItem->m_pCurrentInventory);
