@@ -136,23 +136,23 @@ public:
 		u32		_engine_lua		= engine_lua_memory_usage();
 		u32		_render			= ::Render->memory_usage();
 #endif // SEVERAL_ALLOCATORS
-		int		_eco_strings	= (int)g_pStringContainer->stat_economy			();
-		int		_eco_smem		= (int)g_pSharedMemoryContainer->stat_economy	();
+		u32		_eco_strings	= g_pStringContainer->stat_economy			();
+		u32		_eco_smem		= g_pSharedMemoryContainer->stat_economy	();
 		u32		m_base=0,c_base=0,m_lmaps=0,c_lmaps=0;
 		
 		if (Device.Resources)	Device.Resources->_GetMemoryUsage	(m_base,c_base,m_lmaps,c_lmaps);
 		
 		log_vminfo	();
 		
-		Msg		("* [ D3D ]: textures[%d K]", (m_base+m_lmaps)/1024);
+		Msg		("* [ D3D ]: textures[%u K]", (m_base+m_lmaps)/1024);
 
 #ifndef SEVERAL_ALLOCATORS
-		Msg		("* [x-ray]: crt heap[%d K], process heap[%d K]",_crt_heap/1024,_process_heap/1024);
+		Msg		("* [x-ray]: crt heap[%u K], process heap[%u K]",_crt_heap/1024,_process_heap/1024);
 #else // SEVERAL_ALLOCATORS
-		Msg		("* [x-ray]: crt heap[%d K], process heap[%d K], game lua[%d K], engine lua[%d K], render[%d K]",_crt_heap/1024,_process_heap/1024,_game_lua/1024,_engine_lua/1024,_render/1024);
+		Msg		("* [x-ray]: crt heap[%u K], process heap[%u K], game lua[%u K], engine lua[%u K], render[%u K]",_crt_heap/1024,_process_heap/1024,_game_lua/1024,_engine_lua/1024,_render/1024);
 #endif // SEVERAL_ALLOCATORS
 
-		Msg		("* [x-ray]: economy: strings[%d K], smem[%d K]",_eco_strings/1024,_eco_smem);
+		Msg		("* [x-ray]: economy: strings[%u K], smem[%u K]",_eco_strings/1024,_eco_smem);
 		
 		static int s_cnt = 0;
 		s_cnt++;
