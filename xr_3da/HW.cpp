@@ -538,7 +538,7 @@ void	fill_vid_mode_list			(CHW* _hw)
 	}
 	std::sort(modes.begin(), modes.end(), [](D3DDISPLAYMODE mode1, D3DDISPLAYMODE mode2)
 	{
-		return mode1.Width > mode2.Width;
+		return mode1.Width > mode2.Width || ((mode1.Width == mode2.Width) && (mode1.Height > mode2.Height));
 	});
 	modes.erase(std::unique(modes.begin(), modes.end(), [](D3DDISPLAYMODE mode1, D3DDISPLAYMODE mode2)
 	{
@@ -555,7 +555,6 @@ void	fill_vid_mode_list			(CHW* _hw)
 		sprintf_s(str, sizeof(str), "%dx%d", mode.Width, mode.Height);
 		vid_mode_token[i].id = i;
 		vid_mode_token[i].name = xr_strdup(str);
-		Log(vid_mode_token[i].name);
 		i++;
 	});
 }
