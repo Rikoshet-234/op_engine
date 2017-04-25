@@ -23,6 +23,7 @@
 #include "xr_ioc_cmd.h"
 #include "../xrCore/OPFuncs/op_engine_version.h"
 #include "../xrCore/FTimerStat.h"
+#include "../xrSound/soundrender_source.h"
 
 //---------------------------------------------------------------------
 ENGINE_API CInifile* pGameIni		= nullptr;
@@ -101,7 +102,8 @@ ENGINE_API	CApplication*	pApp			= nullptr;
 static		HWND			logoWindow		= nullptr;
 
 			int				doLauncher		();
-			void			doBenchmark		(LPCSTR name);
+			void			doBenchmark(LPCSTR name);
+			void			doOggsCheck();
 ENGINE_API	bool			g_bBenchmark	= false;
 string512	g_sBenchmarkName;
 
@@ -161,19 +163,21 @@ void InitSettings	()
 		Msg("! ERROR Cannot find required default language[%s]", "default");
 		FATAL("Invalid required configuration! See log for detail.");
 	}
-	CInifile::Sect& langSect = pSettings->r_section("languages");
 	LPCSTR defaultLang=pSettings->r_string("languages","default");
-	for (CInifile::SectCIt I = langSect.Data.begin(); I != langSect.Data.end(); ++I)
+	for (int idx = 0; idx<static_cast<int>(pSettings->line_count("languages")); idx++) 
 	{
-		const CInifile::Item& item = *I;
-		if (xr_strcmp(item.first.c_str(),"default")==0)
+		LPCSTR langId, textId;
+		if (pSettings->r_line("languages", idx, &langId, &textId))
 		{
-			continue;
+			if (xr_strcmp(langId, "default") == 0)
+			{
+				continue;
+			}
+			languages_tokens.push_back(xr_token());
+			xr_token* last = &languages_tokens.back();
+			last->name = xr_strdup(langId);
+			last->id = languages_tokens.size() - 1;
 		}
-		languages_tokens.push_back(xr_token());
-		xr_token* last = &languages_tokens.back();
-		last->name = xr_strdup(item.first.c_str());
-		last->id = languages_tokens.size() - 1;
 	}
 	xr_vector<xr_token>::iterator defLangIter;//default lang move to 0 index
 	if (psCurrentLanguageIndex==(u32)-1 && (defLangIter=std::find_if(languages_tokens.begin(), languages_tokens.end(),[&](xr_token token)
@@ -317,7 +321,7 @@ void Startup					( )
 #endif
 	// Main cycle
 	CheckCopyProtection			( );
-Memory.mem_usage();
+	Memory.mem_usage();
 	Device.Run					( );
 
 	// Destroy APP
@@ -719,6 +723,13 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance,
 			string64				b_name;
 			sscanf					(strstr(Core.Params,benchName)+sz,"%[^ ] ",b_name);
 			doBenchmark				(b_name);
+			return 0;
+		}
+
+		LPCSTR ogg_check = "-ogg_check";
+		if (strstr(lpCmdLine, ogg_check))
+		{
+			doOggsCheck();
 			return 0;
 		}
 
@@ -1215,6 +1226,29 @@ int doLauncher()
 	}
 */
 	return 0;
+}
+void doOggsCheck()
+{
+	Engine.External.Initialize();
+	InitSound();
+#pragma comment(lib,"xrSound.lib")
+	FS_FileSet				flist;
+	FS.file_list(flist, "$game_sounds$", FS_ListFiles, "*.ogg");
+	Msg("Total ogg files to check: [%d]", flist.size());
+	FS_FileSetIt It = flist.begin();
+	FS_FileSetIt It_e = flist.end();
+	string_path				fn;
+	for (; It != It_e; ++It)
+	{
+		FS.update_path(fn, "$game_sounds$", (*It).name.c_str());
+		//CSoundRender_Source* source = xr_new<CSoundRender_Source>();
+		//source->load(fn);
+		//xr_delete(source);
+	}
+	Engine.Event.Dump();
+	destroySound();
+	destroySettings();
+	destroyEngine();
 }
 
 void doBenchmark(LPCSTR name)
