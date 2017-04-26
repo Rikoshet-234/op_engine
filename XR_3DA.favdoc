@@ -2,42 +2,6 @@
 <Favorites xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <folders>
     <Folder>
-      <name>Texture clear trouble...</name>
-      <folders />
-      <favorites>
-        <Favorite>
-          <name>SH_Texture.cpp</name>
-          <path>xr_3da\SH_Texture.cpp</path>
-          <absolutePath>S:\xr_3da\SH_Texture.cpp</absolutePath>
-          <position>
-            <line>293</line>
-            <column>19</column>
-            <lineHash>T7kRfGbpX2Q3P1sLLL8qxE/VRVkUEtBnMoQ5+VoSOWo=</lineHash>
-          </position>
-        </Favorite>
-        <Favorite>
-          <name>Level.cpp</name>
-          <path>xr_3da\xrGame\Level.cpp</path>
-          <absolutePath>S:\xr_3da\xrGame\Level.cpp</absolutePath>
-          <position>
-            <line>197</line>
-            <column>1</column>
-            <lineHash>lXttveH+1Za+1YfPaAwpRQWoEM34nYgYVT1SzGFjIgk=</lineHash>
-          </position>
-        </Favorite>
-        <Favorite>
-          <name>ResourceManager.cpp</name>
-          <path>xr_3da\ResourceManager.cpp</path>
-          <absolutePath>S:\xr_3da\ResourceManager.cpp</absolutePath>
-          <position>
-            <line>270</line>
-            <column>38</column>
-            <lineHash>2/tB3useZxRU86/Dh4W0ojO8WhlvOC2IHmlOy4pghlk=</lineHash>
-          </position>
-        </Favorite>
-      </favorites>
-    </Folder>
-    <Folder>
       <name>string_table</name>
       <folders />
       <favorites>
@@ -76,6 +40,101 @@
             <line>119</line>
             <column>55</column>
             <lineHash>scVg75/aEanGE1SiN+ioIaou31PNC1i8kfM7nTiLzs8=</lineHash>
+          </position>
+        </Favorite>
+      </favorites>
+    </Folder>
+    <Folder>
+      <name>ogg check</name>
+      <folders />
+      <favorites>
+        <Favorite>
+          <name>SoundRender_Source_loader.cpp</name>
+          <path>xrSound\SoundRender_Source_loader.cpp</path>
+          <absolutePath>S:\xrSound\SoundRender_Source_loader.cpp</absolutePath>
+          <position>
+            <line>57</line>
+            <column>27</column>
+            <lineHash>oA1WBRNtdu1xJgVNyJC9HAOJrwzcobOoeNZoVQCc1pc=</lineHash>
+          </position>
+        </Favorite>
+        <Favorite>
+          <name>x_ray.cpp</name>
+          <path>xr_3da\x_ray.cpp</path>
+          <absolutePath>S:\xr_3da\x_ray.cpp</absolutePath>
+          <position>
+            <line>1243</line>
+            <column>59</column>
+            <lineHash>nYRbySK8Aohp3GzRXorIy35j/Z1g7At0m/FQ7JB8DGQ=</lineHash>
+          </position>
+        </Favorite>
+      </favorites>
+    </Folder>
+    <Folder>
+      <name>main weapons</name>
+      <folders />
+      <favorites>
+        <Favorite>
+          <name>WeaponMagazined.cpp</name>
+          <path>xr_3da\xrGame\WeaponMagazined.cpp</path>
+          <absolutePath>S:\xr_3da\xrGame\WeaponMagazined.cpp</absolutePath>
+          <position>
+            <line>589</line>
+            <column>9</column>
+            <lineHash>ZNv3gH6BKaj84yA3mRwnHyWucAWPMWTjcOJNTvPW/2Q=</lineHash>
+          </position>
+        </Favorite>
+        <Favorite>
+          <name>Weapon.h</name>
+          <path>xr_3da\xrGame\Weapon.h</path>
+          <absolutePath>S:\xr_3da\xrGame\Weapon.h</absolutePath>
+          <viewKind>7651a701-06e5-11d1-8ebd-00a0c90f26ea</viewKind>
+          <position>
+            <line>272</line>
+            <column>1</column>
+            <lineHash>lwdsBDjuetTV6om8q6Xvc4uQ7eJNLPWB2IT+RcIdu/w=</lineHash>
+          </position>
+        </Favorite>
+        <Favorite>
+          <name>Weapon.cpp</name>
+          <path>xr_3da\xrGame\Weapon.cpp</path>
+          <absolutePath>s:\xr_3da\xrGame\Weapon.cpp</absolutePath>
+          <position>
+            <line>1329</line>
+            <column>1</column>
+            <lineHash>Q+5IN7XUcgQ0f3NBNMIKL9maXsHh9h18Y5Tsncuxf7o=</lineHash>
+          </position>
+        </Favorite>
+        <Favorite>
+          <name>WeaponMagazined.h</name>
+          <path>xr_3da\xrGame\WeaponMagazined.h</path>
+          <absolutePath>S:\xr_3da\xrGame\WeaponMagazined.h</absolutePath>
+          <viewKind>7651a701-06e5-11d1-8ebd-00a0c90f26ea</viewKind>
+          <position>
+            <line>145</line>
+            <column>24</column>
+            <lineHash>GEE5C7hPtMxhRrcSKIzL0ZCrzNxw3qXz4jUiqR0ivgg=</lineHash>
+          </position>
+        </Favorite>
+        <Favorite>
+          <name>WeaponMagazinedWGrenade.cpp</name>
+          <path>xr_3da\xrGame\WeaponMagazinedWGrenade.cpp</path>
+          <absolutePath>S:\xr_3da\xrGame\WeaponMagazinedWGrenade.cpp</absolutePath>
+          <position>
+            <line>249</line>
+            <column>21</column>
+            <lineHash>cNMDD3Hp6ItrGwL7AWNEfqde9pBke9DE4hvxRtmkrzg=</lineHash>
+          </position>
+        </Favorite>
+        <Favorite>
+          <name>WeaponMagazinedWGrenade.h</name>
+          <path>xr_3da\xrGame\WeaponMagazinedWGrenade.h</path>
+          <absolutePath>S:\xr_3da\xrGame\WeaponMagazinedWGrenade.h</absolutePath>
+          <viewKind>7651a701-06e5-11d1-8ebd-00a0c90f26ea</viewKind>
+          <position>
+            <line>16</line>
+            <column>1</column>
+            <lineHash>JkCxvSw7FtKOtq8STeU8B3ygD3uf2iOKiZx5uNW0wzI=</lineHash>
           </position>
         </Favorite>
       </favorites>

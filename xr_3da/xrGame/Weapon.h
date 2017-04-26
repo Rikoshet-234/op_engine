@@ -125,6 +125,7 @@ public:
 		eMisfire,
 		eMagEmpty,
 		eSwitch,
+		eDetachScope
 	};
 	xr_string getStateString(EWeaponStates state) const
 	{
@@ -154,6 +155,8 @@ public:
 		eSubstateReloadBegin		=0,
 		eSubstateReloadInProcess,
 		eSubstateReloadEnd,
+		eSubStateDetachScopeStart,
+		eSubStateDetachScopeEnd
 	};
 
 	virtual bool			IsHidden			()	const		{	return GetState() == eHidden;}						// Does weapon is in hidden state
@@ -267,8 +270,8 @@ protected:
 public:
 
 	IC bool					IsZoomEnabled		()	const	{return m_bZoomEnabled;}
-	virtual	void			ZoomInc				();
-	virtual	void			ZoomDec				();
+	virtual	bool			ZoomInc				();
+	virtual	bool			ZoomDec				();
 	virtual void			OnZoomIn			();
 	virtual void			OnZoomOut			();
 			bool			IsZoomed			()	const	{return m_bZoomMode;};

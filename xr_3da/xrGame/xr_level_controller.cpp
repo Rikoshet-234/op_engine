@@ -9,99 +9,101 @@
 _binding	g_key_bindings		[bindings_count]; 
 _key_group	g_current_keygroup	= _sp;
 
-_action  actions[]		= {
-	{ "left",				kLEFT					,_both},	
-	{ "right",				kRIGHT					,_both},	
-	{ "up",					kUP						,_both},	
-	{ "down",				kDOWN					,_both},	
-	{ "jump",				kJUMP					,_both},	
-	{ "crouch",				kCROUCH					,_both},	
-	{ "crouch_toggle",		kCROUCH_TOGGLE			,_both},	
-	{ "accel",				kACCEL					,_both},	
-	{ "sprint_toggle",  	kSPRINT_TOGGLE  		,_both},	
-																
-	{ "forward",			kFWD					,_both},	
-	{ "back",				kBACK					,_both},	
-	{ "lstrafe",			kL_STRAFE				,_both},	
-	{ "rstrafe",			kR_STRAFE				,_both},	
-																
-	{ "llookout",			kL_LOOKOUT				,_both},	
-	{ "rlookout",			kR_LOOKOUT				,_both},	
-																
-	{ "turn_engine",		kENGINE					,_sp},		
-																
-	{ "cam_1",				kCAM_1					,_both},	
-	{ "cam_2",				kCAM_2					,_both},	
-	{ "cam_3",				kCAM_3					,_both},	
-	{ "cam_4",				kCAM_4					,_both},	
-	{ "cam_zoom_in",		kCAM_ZOOM_IN			,_both},	
-	{ "cam_zoom_out",		kCAM_ZOOM_OUT			,_both},	
-															
-	{ "torch",				kTORCH					,_both},	
-	{ "night_vision",		kNIGHT_VISION			,_both},	
-	{ "wpn_1",				kWPN_1					,_both},	
-	{ "wpn_2",				kWPN_2					,_both},	
-	{ "wpn_3",				kWPN_3					,_both},	
-	{ "wpn_4",				kWPN_4					,_both},	
-	{ "wpn_5",				kWPN_5					,_both},	
-	{ "wpn_6",				kWPN_6					,_both},	
-	{ "wpn_7",				kWPN_7					,_both},	
-	{ "wpn_8",				kWPN_8					,_both},	
-	{ "artefact",			kARTEFACT				,_mp},		
-	{ "wpn_next",			kWPN_NEXT				,_both},	
-	{ "wpn_fire",			kWPN_FIRE				,_both},	
-	{ "wpn_zoom",			kWPN_ZOOM				,_both},	
-	{ "wpn_zoom_inc",		kWPN_ZOOM_INC			,_both},	
-	{ "wpn_zoom_dec",		kWPN_ZOOM_DEC			,_both},	
-	{ "wpn_reload",			kWPN_RELOAD				,_both},	
-	{ "wpn_func",			kWPN_FUNC				,_both},	
-	{ "wpn_firemode_prev",	kWPN_FIREMODE_PREV		,_both},	
-	{ "wpn_firemode_next",	kWPN_FIREMODE_NEXT		,_both},	
-															
-	{ "pause",				kPAUSE					,_both},	
-	{ "drop",				kDROP					,_both},	
-	{ "use",				kUSE					,_both},	
-	{ "scores",				kSCORES					,_both},	
-	{ "chat",				kCHAT					,_mp},		
-	{ "chat_team",			kCHAT_TEAM				,_mp},		
-	{ "screenshot",			kSCREENSHOT				,_both},	
-	{ "quit",				kQUIT					,_both},	
-	{ "console",			kCONSOLE				,_both},	
-	{ "inventory",			kINVENTORY				,_both},	
-	{ "buy_menu",			kBUY					,_mp},		
-	{ "skin_menu",			kSKIN					,_mp},		
-	{ "team_menu",			kTEAM					,_mp},		
-	{ "active_jobs",		kACTIVE_JOBS			,_sp},		
-	{ "map",				kMAP					,_both},	
-	{ "contacts",			kCONTACTS				,_sp},		
-	{ "ext_1",				kEXT_1					,_both},	
-																
-	{ "vote_begin",			kVOTE_BEGIN				,_mp},		
-	{ "vote",				kVOTE					,_mp},		
-	{ "vote_yes",			kVOTEYES				,_mp},		
-	{ "vote_no",			kVOTENO					,_mp},		
-																
-	{ "next_slot",			kNEXT_SLOT				,_both},	
-	{ "prev_slot",			kPREV_SLOT				,_both},	
-															
-	{ "speech_menu_0",		kSPEECH_MENU_0			,_mp},		
-	{ "speech_menu_1",		kSPEECH_MENU_1			,_mp},		
-	{ "speech_menu_2",		kSPEECH_MENU_2			,_mp},		
-	{ "speech_menu_3",		kSPEECH_MENU_3			,_mp},		
-	{ "speech_menu_4",		kSPEECH_MENU_4			,_mp},		
-	{ "speech_menu_5",		kSPEECH_MENU_5			,_mp},		
-	{ "speech_menu_6",		kSPEECH_MENU_6			,_mp},		
-	{ "speech_menu_7",		kSPEECH_MENU_7			,_mp},		
-	{ "speech_menu_8",		kSPEECH_MENU_8			,_mp},		
-	{ "speech_menu_9",		kSPEECH_MENU_9			,_mp},		
-																
-	{ "use_bandage",		kUSE_BANDAGE			,_sp},		
-	{ "use_medkit",			kUSE_MEDKIT				,_sp},		
-	{ "quick_save",			kQUICK_SAVE				,_sp},		
-	{ "quick_load",			kQUICK_LOAD				,_sp},		
-	{ "creep",				kCREEP					,_sp},												
-	{ NULL, 				kLASTACTION				,_both}		
-};															
+_action  actions[] = {
+	{ "left",				kLEFT					,_both},
+	{ "right",				kRIGHT					,_both},
+	{ "up",					kUP						,_both},
+	{ "down",				kDOWN					,_both},
+	{ "jump",				kJUMP					,_both},
+	{ "crouch",				kCROUCH					,_both},
+	{ "crouch_toggle",		kCROUCH_TOGGLE			,_both},
+	{ "accel",				kACCEL					,_both},
+	{ "sprint_toggle",  	kSPRINT_TOGGLE  		,_both},
+
+	{ "forward",			kFWD					,_both},
+	{ "back",				kBACK					,_both},
+	{ "lstrafe",			kL_STRAFE				,_both},
+	{ "rstrafe",			kR_STRAFE				,_both},
+
+	{ "llookout",			kL_LOOKOUT				,_both},
+	{ "rlookout",			kR_LOOKOUT				,_both},
+
+	{ "turn_engine",		kENGINE					,_sp},
+
+	{ "cam_1",				kCAM_1					,_both},
+	{ "cam_2",				kCAM_2					,_both},
+	{ "cam_3",				kCAM_3					,_both},
+	{ "cam_4",				kCAM_4					,_both},
+	{ "cam_zoom_in",		kCAM_ZOOM_IN			,_both},
+	{ "cam_zoom_out",		kCAM_ZOOM_OUT			,_both},
+
+	{ "torch",				kTORCH					,_both},
+	{ "night_vision",		kNIGHT_VISION			,_both},
+	{ "wpn_1",				kWPN_1					,_both},
+	{ "wpn_2",				kWPN_2					,_both},
+	{ "wpn_3",				kWPN_3					,_both},
+	{ "wpn_4",				kWPN_4					,_both},
+	{ "wpn_5",				kWPN_5					,_both},
+	{ "wpn_6",				kWPN_6					,_both},
+	{ "wpn_7",				kWPN_7					,_both},
+	{ "wpn_8",				kWPN_8					,_both},
+	{ "artefact",			kARTEFACT				,_mp},
+	{ "wpn_next",			kWPN_NEXT				,_both},
+	{ "wpn_fire",			kWPN_FIRE				,_both},
+	{ "wpn_zoom",			kWPN_ZOOM				,_both},
+	{ "wpn_zoom_inc",		kWPN_ZOOM_INC			,_both},
+	{ "wpn_zoom_dec",		kWPN_ZOOM_DEC			,_both},
+	{ "wpn_reload",			kWPN_RELOAD				,_both},
+	{ "wpn_func",			kWPN_FUNC				,_both},
+	{ "wpn_firemode_prev",	kWPN_FIREMODE_PREV		,_both},
+	{ "wpn_firemode_next",	kWPN_FIREMODE_NEXT		,_both},
+
+	{ "pause",				kPAUSE					,_both},
+	{ "drop",				kDROP					,_both},
+	{ "use",				kUSE					,_both},
+	{ "scores",				kSCORES					,_both},
+	{ "chat",				kCHAT					,_mp},
+	{ "chat_team",			kCHAT_TEAM				,_mp},
+	{ "screenshot",			kSCREENSHOT				,_both},
+	{ "quit",				kQUIT					,_both},
+	{ "console",			kCONSOLE				,_both},
+	{ "inventory",			kINVENTORY				,_both},
+	{ "buy_menu",			kBUY					,_mp},
+	{ "skin_menu",			kSKIN					,_mp},
+	{ "team_menu",			kTEAM					,_mp},
+	{ "active_jobs",		kACTIVE_JOBS			,_sp},
+	{ "map",				kMAP					,_both},
+	{ "contacts",			kCONTACTS				,_sp},
+	{ "ext_1",				kEXT_1					,_both},
+
+	{ "vote_begin",			kVOTE_BEGIN				,_mp},
+	{ "vote",				kVOTE					,_mp},
+	{ "vote_yes",			kVOTEYES				,_mp},
+	{ "vote_no",			kVOTENO					,_mp},
+
+	{ "next_slot",			kNEXT_SLOT				,_both},
+	{ "prev_slot",			kPREV_SLOT				,_both},
+
+	{ "speech_menu_0",		kSPEECH_MENU_0			,_mp},
+	{ "speech_menu_1",		kSPEECH_MENU_1			,_mp},
+	{ "speech_menu_2",		kSPEECH_MENU_2			,_mp},
+	{ "speech_menu_3",		kSPEECH_MENU_3			,_mp},
+	{ "speech_menu_4",		kSPEECH_MENU_4			,_mp},
+	{ "speech_menu_5",		kSPEECH_MENU_5			,_mp},
+	{ "speech_menu_6",		kSPEECH_MENU_6			,_mp},
+	{ "speech_menu_7",		kSPEECH_MENU_7			,_mp},
+	{ "speech_menu_8",		kSPEECH_MENU_8			,_mp},
+	{ "speech_menu_9",		kSPEECH_MENU_9			,_mp},
+
+	{ "use_bandage",		kUSE_BANDAGE			,_sp},
+	{ "use_medkit",			kUSE_MEDKIT				,_sp},
+	{ "quick_save",			kQUICK_SAVE				,_sp},
+	{ "quick_load",			kQUICK_LOAD				,_sp},
+	{ "creep",				kCREEP					,_sp},
+	{ "wpn_scope_ops",		kWPN_SCOPE_OPS			,_sp },
+	{ "wpn_gl_ops",			kWPN_GL_OPS				,_sp },
+	{nullptr, 				kLASTACTION				,_both}
+};
 
 _keyboard keyboards[] = {
 	{ "kESCAPE",	 	DIK_ESCAPE		},	{ "k1",				DIK_1			},
@@ -168,7 +170,7 @@ _keyboard keyboards[] = {
 	{ "mouse2",			MOUSE_2			},	{ "mouse3",			MOUSE_3			},
 	{ "mouse4",			MOUSE_4			},	{ "mouse5",			MOUSE_5			},
 	{ "mouse6",			MOUSE_6			},	{ "mouse7",			MOUSE_7			},
-	{ "mouse8",			MOUSE_8			},	{ NULL, 			0				}
+	{ "mouse8",			MOUSE_8			},	{nullptr, 			0				}
 };
 
 void initialize_bindings()
@@ -228,7 +230,7 @@ LPCSTR id_to_action_name(int _id)
 		++idx;
 	}
 	Msg				("! cant find corresponding [action_name] for id[%d]", _id);
-	return			NULL;
+	return nullptr;
 }
 
 EGameActions action_name_to_id(LPCSTR _name)
@@ -250,7 +252,7 @@ _action* action_name_to_ptr(LPCSTR _name)
 		++idx;
 	}
 	Msg				("! cant find corresponding [id] for action_name %s", _name);
-	return			NULL;
+	return nullptr;
 }
 
 LPCSTR	dik_to_keyname			(int _dik)
@@ -259,7 +261,7 @@ LPCSTR	dik_to_keyname			(int _dik)
 	if(kb)
 		return kb->key_name;
 	else
-		return NULL;
+		return nullptr;
 }
 
 _keyboard* dik_to_ptr(int _dik, bool bSafe)
@@ -274,7 +276,7 @@ _keyboard* dik_to_ptr(int _dik, bool bSafe)
 	}	
 	if (!bSafe)
 		Msg			("! cant find corresponding [_keyboard] for dik");
-	return			NULL;
+	return nullptr;
 }
 
 int	keyname_to_dik (LPCSTR _name)
@@ -295,7 +297,7 @@ _keyboard*	keyname_to_ptr(LPCSTR _name)
 	}	
 
 	Msg				("! cant find corresponding [_keyboard*] for keyname %s", _name);
-	return			NULL;
+	return nullptr;
 }
 
 bool is_group_not_conflicted(_key_group g1, _key_group g2)
@@ -426,10 +428,10 @@ public:
 				bool b_conflict = !is_group_not_conflicted(binding->m_action->key_group, curr_pbinding->m_action->key_group);
 
 				if(binding->m_keyboard[0]==pkeyboard && b_conflict)
-					binding->m_keyboard[0]=NULL;
+					binding->m_keyboard[0]= nullptr;
 				
 				if(binding->m_keyboard[1]==pkeyboard && b_conflict)
-					binding->m_keyboard[1]=NULL;
+					binding->m_keyboard[1]= nullptr;
 			}
 		}
 
@@ -460,12 +462,12 @@ class CCC_UnBind : public IConsole_Command
 	int m_work_idx;
 public:
 	CCC_UnBind(LPCSTR N, int idx) : IConsole_Command(N),m_work_idx(idx) 
-	{ bEmptyArgsHandled=TRUE; };
+	{ bEmptyArgsHandled= true; };
 	virtual void Execute(LPCSTR args)
 	{
 		int action_id						= action_name_to_id			(args);
 		_binding*	pbinding				= &g_key_bindings[action_id];
-		pbinding->m_keyboard[m_work_idx]	= NULL;
+		pbinding->m_keyboard[m_work_idx]	= nullptr;
 
 		CStringTable::ReparseKeyBindings();
 	}
@@ -475,7 +477,7 @@ class CCC_ListActions : public IConsole_Command
 {
 public:
 	CCC_ListActions(LPCSTR N) : IConsole_Command(N)
-	{ bEmptyArgsHandled=TRUE; };
+	{ bEmptyArgsHandled= true; };
 
 	virtual void Execute(LPCSTR args) {
 		Log("- --- Action list start ---");
@@ -492,15 +494,15 @@ class CCC_UnBindAll : public IConsole_Command
 {
 public:
 	CCC_UnBindAll(LPCSTR N) : IConsole_Command(N)
-	{ bEmptyArgsHandled=TRUE; };
+	{ bEmptyArgsHandled= true; };
 
 	virtual void Execute(LPCSTR args) 
 	{
 		for(int idx=0; idx<bindings_count;++idx)
 		{
 			_binding* pbinding		= &g_key_bindings[idx];
-			pbinding->m_keyboard[0]	= NULL;
-			pbinding->m_keyboard[1]	= NULL;
+			pbinding->m_keyboard[0]	= nullptr;
+			pbinding->m_keyboard[1]	= nullptr;
 		}
 
 		bindConsoleCmds.clear();
@@ -518,7 +520,7 @@ class CCC_BindList : public IConsole_Command
 {
 public:
 	CCC_BindList(LPCSTR N) : IConsole_Command(N)
-	{ bEmptyArgsHandled=TRUE; };
+	{ bEmptyArgsHandled= true; };
 
 	virtual void Execute(LPCSTR args) {
 		Log				("- --- Bind list start ---");
@@ -565,7 +567,7 @@ class CCC_UnBindConsoleCmd : public IConsole_Command
 {
 public:
 	CCC_UnBindConsoleCmd(LPCSTR N) : IConsole_Command(N)
-	{ bEmptyArgsHandled=FALSE; };
+	{ bEmptyArgsHandled= false; };
 
 	virtual void Execute(LPCSTR args) 
 	{

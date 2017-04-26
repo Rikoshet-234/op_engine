@@ -27,6 +27,7 @@
 #include "WeaponKnife.h"
 #include "NightVisionDevice.h"
 #include "CustomOutfit.h"
+#include "ui/UIInventoryWnd.h"
 
 bool g_bAutoClearCrouch = true;
 bool g_bForceCrouch = false;
@@ -80,6 +81,30 @@ void CActor::IR_OnKeyboardPress(int cmd)
 		if(inventory().Action(cmd, CMD_START))					return;
 
 	switch(cmd){
+	case kWPN_SCOPE_OPS:
+		//if (inventory().ActiveItem())
+		//{
+		//	CWeaponMagazined* weapon = smart_cast<CWeaponMagazined*>(inventory().ActiveItem());
+		//	if (weapon)
+		//	{
+		//		mstate_wishful &= ~mcSprint;
+		//		if (weapon->IsScopeAttached() && weapon->ScopeAttachable()) //если прицел стоит и можно снять
+		//		{
+		//			weapon->SwitchState(CWeapon::EWeaponStates::eDetachScope);
+		//		}
+		//		else if (weapon->ScopeAttachable() && !weapon->IsScopeAttached())
+		//		{
+		//			//Actor()->SetWeaponHideState(INV_STATE_BLOCK_ALL, true);
+		//			//if (weapon->Attach())
+		//			//Actor()->SetWeaponHideState(INV_STATE_BLOCK_ALL, false);
+		//		}
+		//	}
+		//}
+		//Log("kSCOPE_OPS action");
+		break;
+	case kWPN_GL_OPS:
+		//Log("kGL_OPS action");
+		break;
 	case kCREEP:
 		{
 			if (g_bForceCreep)

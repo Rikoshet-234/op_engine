@@ -67,6 +67,8 @@ void key_binding_registrator::script_register(lua_State *L)
 				value("kSKIN",						int(kSKIN)),
 				value("kTEAM",						int(kTEAM)),
 				value("kCREEP",						int(kCREEP)),
+				value("kSCOPE_OPS", int(kWPN_SCOPE_OPS)),
+				value("kGL_OPS", int(kWPN_GL_OPS)),
 				value("kNOTBINDED",					int(kNOTBINDED))
 			],
 		class_<key_binding_registrator >("DIK_keys")

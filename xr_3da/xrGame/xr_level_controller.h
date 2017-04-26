@@ -94,6 +94,8 @@ enum	EGameActions
 	kQUICK_LOAD,
 
 	kCREEP,
+	kWPN_SCOPE_OPS,
+	kWPN_GL_OPS,
 
 	kLASTACTION,
 	kNOTBINDED,

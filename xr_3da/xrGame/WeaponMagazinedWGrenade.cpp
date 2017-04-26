@@ -23,6 +23,16 @@
 #include "phdebug.h"
 #endif
 
+bool CWeaponMagazinedWGrenade::ZoomInc()
+{
+	return m_bGrenadeMode ? false: inherited::ZoomInc();
+}
+
+bool CWeaponMagazinedWGrenade::ZoomDec()
+{
+	return m_bGrenadeMode? false : inherited::ZoomDec();
+}
+
 CWeaponMagazinedWGrenade::CWeaponMagazinedWGrenade(LPCSTR name,ESoundTypes eSoundType) : CWeaponMagazined(name, eSoundType)
 {
 	m_ammoType2 = 0;
@@ -236,7 +246,10 @@ bool CWeaponMagazinedWGrenade::SwitchMode(bool switchOnLoad)
 	m_bPending				= true;
 
 	PerformSwitchGL			(switchOnLoad);
-	
+	if (m_bGrenadeMode)
+		m_fBackupZoom = m_fRTZoomFactor;
+	else
+		m_fRTZoomFactor = m_fBackupZoom;
 	PlaySound				(sndSwitch,get_LastFP());
 
 	PlayAnimModeSwitch		();

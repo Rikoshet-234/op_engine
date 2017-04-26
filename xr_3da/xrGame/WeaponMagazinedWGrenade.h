@@ -10,6 +10,11 @@ class CWeaponMagazinedWGrenade : public CWeaponMagazined,
 								 public CRocketLauncher
 {
 	typedef CWeaponMagazined inherited;
+protected:
+		bool ZoomInc() override;
+		bool ZoomDec() override;
+		float m_fBackupZoom;
+
 public:
 					CWeaponMagazinedWGrenade	(LPCSTR name="AK74",ESoundTypes eSoundType=SOUND_TYPE_WEAPON_SUBMACHINEGUN);
 	virtual			~CWeaponMagazinedWGrenade	();

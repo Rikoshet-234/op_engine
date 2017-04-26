@@ -32,6 +32,7 @@
 #include "../ai_script_lua_space.h"
 #include "ui/UIMainIngameWnd.h"
 #include "../defines.h"
+#include "WeaponMagazinedWGrenade.h"
 
 #define WEAPON_REMOVE_TIME		60000
 #define ROTATION_TIME			0.25f
@@ -1717,22 +1718,24 @@ void GetZoomData(const float scope_factor, const float zoomStepCount,float& delt
 
 }
 
-void CWeapon::ZoomInc()
+bool CWeapon::ZoomInc()
 {
 	float delta,min_zoom_factor;
 	GetZoomData(m_fScopeZoomFactor,m_fScopeZoomStepCount,delta,min_zoom_factor);
-
 	m_fZoomFactor	-=delta;
+	bool zoomProc = static_cast<unsigned>(m_fZoomFactor - m_fScopeZoomFactor) <= (min_zoom_factor - m_fScopeZoomFactor);
 	clamp(m_fZoomFactor,m_fScopeZoomFactor,min_zoom_factor);
+	return zoomProc;
 }
 
-void CWeapon::ZoomDec()
+bool CWeapon::ZoomDec()
 {
 	float delta,min_zoom_factor;
 	GetZoomData(m_fScopeZoomFactor,m_fScopeZoomStepCount,delta,min_zoom_factor);
-
 	m_fZoomFactor	+=delta;
+	bool zoomProc = static_cast<unsigned>(m_fZoomFactor - m_fScopeZoomFactor) <= (min_zoom_factor - m_fScopeZoomFactor);
 	clamp(m_fZoomFactor,m_fScopeZoomFactor, min_zoom_factor);
+	return zoomProc;
 }
 
 bool CWeapon::PlayAnimation(MotionSVec animation,BOOL mixMode,LPCSTR debugText,CHudItem* callback) 

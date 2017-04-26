@@ -286,16 +286,20 @@ bool CWeaponMagazined::IsAmmoAvailable()
 	return		(false);
 }
 
-void CWeaponMagazined::ZoomInc()
+bool CWeaponMagazined::ZoomInc()
 {
-	PlaySound	(sndZoomInc,get_LastFP());
-	inherited::ZoomInc();
+	bool zoomed = inherited::ZoomInc();
+	if (zoomed)
+		PlaySound(sndZoomInc, get_LastFP());
+	return zoomed;
 }
 
-void CWeaponMagazined::ZoomDec()
+bool CWeaponMagazined::ZoomDec()
 {
-	PlaySound	(sndZoomDec,get_LastFP());
-	inherited::ZoomDec();
+	bool zoomed = inherited::ZoomDec();
+	if (zoomed)
+		PlaySound(sndZoomDec, get_LastFP());
+	return zoomed;
 }
 
 
@@ -455,6 +459,12 @@ void CWeaponMagazined::OnStateSwitch	(u32 S)
 	inherited::OnStateSwitch(S);
 	switch (S)
 	{
+	case eDetachScope:
+		{
+			m_sub_state = eSubStateDetachScopeStart;
+			SwitchState(eHiding);
+		}
+		break;
 	case eIdle:
 		switch2_Idle	();
 		break;
@@ -692,7 +702,22 @@ void CWeaponMagazined::OnAnimationEnd(u32 state)
 	switch(state) 
 	{
 		case eReload:	ReloadMagazine();	SwitchState(eIdle);	break;	// End of reload animation
-		case eHiding:	SwitchState(eHidden);   break;	// End of Hide
+		case eHiding:	
+			{
+				if (m_sub_state == eSubStateDetachScopeStart)
+				{
+					m_sub_state = eSubStateDetachScopeEnd;
+					switch2_Hidden();          
+					//CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
+					//pGameSP->InventoryMenu->PlaySnd(CUIInventoryWnd::eInventorySndAction::eInvDetachAddon);//играем музыку
+					Detach(GetScopeName().c_str(), true);
+					SwitchState(eShowing);
+					return;
+				}
+				else
+					SwitchState(eHidden);
+			}
+			break;	// End of Hide
 		case eShowing:	SwitchState(eIdle);		break;	// End of Show
 		case eIdle:		switch2_Idle();			break;  // Keep showing idle
 	}

@@ -56,21 +56,22 @@ public:
 	virtual void			Hide						();
 
 	void					AddItemToBag				(PIItem pItem);
+	enum eInventorySndAction {
+		eInvSndOpen = 0,
+		eInvSndClose,
+		eInvItemToSlot,
+		eInvItemToBelt,
+		eInvItemToRuck,
+		eInvProperties,
+		eInvDropItem,
+		eInvAttachAddon,
+		eInvDetachAddon,
+		eInvItemUse,
+		eInvSndMax
+	};
+	void						PlaySnd(eInventorySndAction a);
 protected:
-	enum eInventorySndAction{	eInvSndOpen	=0,
-								eInvSndClose,
-								eInvItemToSlot,
-								eInvItemToBelt,
-								eInvItemToRuck,
-								eInvProperties,
-								eInvDropItem,
-								eInvAttachAddon,
-								eInvDetachAddon,
-								eInvItemUse,
-								eInvSndMax};
-
 	ref_sound					sounds					[eInvSndMax];
-	void						PlaySnd					(eInventorySndAction a);
 
 	CUIStatic					UIBeltSlots;
 	CUIStatic					UIBack;

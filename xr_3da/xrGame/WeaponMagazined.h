@@ -69,8 +69,8 @@ protected:
 	u32				dwUpdateSounds_Frame;
 	bool			m_bRequredDemandCheck;
 protected:
-	void ZoomInc	() override;
-	void ZoomDec	() override;
+	bool ZoomInc	() override;
+	bool ZoomDec	() override;
 
 
 	virtual void	OnMagazineEmpty	();
