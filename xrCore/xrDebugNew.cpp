@@ -5,7 +5,6 @@
 
 #include "dxerr9.h"
 
-
 #pragma warning(push)
 #pragma warning(disable:4995)
 #include <malloc.h>
@@ -61,6 +60,7 @@ XRCORE_API	xrDebug		Debug;
 static bool	error_after_dialog = false;
 
 extern void copy_to_clipboard	(const char *string);
+void out_of_memory_handler_fragmentation_hint(const char* str_hr, const char* expr, const char* e2, const char *file, int line, const char *function, bool &ignore_always);
 
 void copy_to_clipboard	(const char *string)
 {
@@ -375,7 +375,11 @@ void xrDebug::error		(long hr, const char* expr, const char *file, int line, con
 
 void xrDebug::error		(long hr, const char* expr, const char* e2, const char *file, int line, const char *function, bool &ignore_always)
 {
-	backend		(error2string(hr),expr,e2,0,file,line,function,ignore_always);
+	// handle out of memory (usually from D3DXCreateTexture* functions) in special way
+	if (E_OUTOFMEMORY == hr)
+		out_of_memory_handler_fragmentation_hint(error2string(hr), expr, e2, file, line, function, ignore_always);
+	else
+		backend(error2string(hr),expr,e2,0,file,line,function,ignore_always);
 }
 
 void xrDebug::fail		(const char *e1, const char *file, int line, const char *function, bool &ignore_always)
@@ -426,18 +430,35 @@ void __cdecl xrDebug::fatal(const char *file, int line, const char *function, co
 int out_of_memory_handler	(size_t size)
 {
 	Memory.mem_compact		();
-#ifndef _EDITOR
 	u32						crt_heap		= mem_usage_impl((HANDLE)_get_heap_handle(),0,0);
-#else // _EDITOR
-	u32						crt_heap		= 0;
-#endif // _EDITOR
 	u32						process_heap	= mem_usage_impl(GetProcessHeap(),0,0);
-	int						eco_strings		= (int)g_pStringContainer->stat_economy			();
-	int						eco_smem		= (int)g_pSharedMemoryContainer->stat_economy	();
-	Msg						("* [x-ray]: crt heap[%d K], process heap[%d K]",crt_heap/1024,process_heap/1024);
-	Msg						("* [x-ray]: economy: strings[%d K], smem[%d K]",eco_strings/1024,eco_smem);
-	Debug.fatal				(DEBUG_INFO,"Out of memory. Memory request: %d K",size/1024);
+	u32						eco_strings		= g_pStringContainer->stat_economy			();
+	u32						eco_smem		= g_pSharedMemoryContainer->stat_economy	();
+	log_vminfo();
+	Msg						("* [x-ray]: crt heap[%u K], process heap[%u K]",crt_heap/1024,process_heap/1024);
+	Msg						("* [x-ray]: economy: strings[%u K], smem[%u K]",eco_strings/1024,eco_smem);
+	Debug.fatal				(DEBUG_INFO,"Out of memory. Memory request: %zu K",size/1024);
 	return					1;
+}
+
+void out_of_memory_handler_fragmentation_hint(const char* str_hr, const char* expr, const char* e2, const char *file, int line, const char *function, bool &ignore_always)
+{
+	// try to find out how large continuous block can be allocated
+	size_t max_allocatable_block_size = 1;
+	while (void * allocated = malloc(max_allocatable_block_size))
+	{
+		free(allocated);
+		max_allocatable_block_size <<= 1;
+	}
+	u32 crt_heap = mem_usage_impl((HANDLE)_get_heap_handle(), 0, 0);
+	u32 process_heap = mem_usage_impl(GetProcessHeap(), 0, 0);
+	u32 eco_strings = g_pStringContainer->stat_economy();
+	u32 eco_smem = g_pSharedMemoryContainer->stat_economy();
+	log_vminfo();
+	Msg("* [x-ray]: crt heap[%u K], process heap[%u K]", crt_heap / 1024, process_heap / 1024);
+	Msg("* [x-ray]: economy: strings[%u K], smem[%u K]", eco_strings / 1024, eco_smem);
+	Msg("* [memory]: max allocatable block: [%zu K]", max_allocatable_block_size / 1024);
+	Debug.backend(str_hr, expr, e2, 0, file, line, function, ignore_always);
 }
 
 extern LPCSTR log_name();
@@ -895,7 +916,24 @@ LONG WINAPI UnhandledFilter	(_EXCEPTION_POINTERS *pExceptionInfo)
 
 	static void std_out_of_memory_handler	()
 	{
-		handler_base					("std: out of memory");
+		// print overall memory info
+		u32 crt_heap = mem_usage_impl((HANDLE)_get_heap_handle(), 0, 0);
+		u32 process_heap = mem_usage_impl(GetProcessHeap(), 0, 0);
+		u32 eco_strings = g_pStringContainer->stat_economy();
+		u32 eco_smem = g_pSharedMemoryContainer->stat_economy();
+		log_vminfo();
+		Msg("* [x-ray]: crt heap[%u K], process heap[%u K]", crt_heap / 1024, process_heap / 1024);
+		Msg("* [x-ray]: economy: strings[%u K], smem[%u K]", eco_strings / 1024, eco_smem);
+
+		// output str_dump.txt if string container is more than 512MB
+		if (eco_strings > 500 * 1024 * 1024)
+		{
+			// dump string to see what garbage rots there
+			g_pStringContainer->dump();
+			handler_base("std: out of memory. В папке с логами создан str_dump.txt. Поделитесь этим файлом с разработчиками мода.");
+		}
+		else
+			handler_base("std: out of memory");
 	}
 
 	static void pure_call_handler			()
