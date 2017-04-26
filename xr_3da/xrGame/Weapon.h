@@ -125,7 +125,12 @@ public:
 		eMisfire,
 		eMagEmpty,
 		eSwitch,
-		eDetachScope
+		eDetachScope,
+		eAttachScope,
+		eDetachGL,
+		eAttachGL,
+		eProcessScope,//всякие inherited вызовы... лучше разделю, а то грабельки вылазят... 
+		eProcessGL
 	};
 	xr_string getStateString(EWeaponStates state) const
 	{
@@ -155,8 +160,25 @@ public:
 		eSubstateReloadBegin		=0,
 		eSubstateReloadInProcess,
 		eSubstateReloadEnd,
+
 		eSubStateDetachScopeStart,
-		eSubStateDetachScopeEnd
+		eSubStateDetachScopeProcess,
+		eSubStateDetachScopeEnd,
+		
+		eSubStateAttachScopeStart,
+		eSubStateAttachScopeProcess,
+		eSubStateAttachScopeEnd,
+		
+		eSubStateAttachGLStart,
+		eSubStateAttachGLProcess,
+		eSubStateAttachGLEnd,
+
+		eSubStateDetachGLStart,
+		eSubStateDetachGLProcess,
+		eSubStateDetachGLEnd,
+
+
+		eSubStateMax
 	};
 
 	virtual bool			IsHidden			()	const		{	return GetState() == eHidden;}						// Does weapon is in hidden state

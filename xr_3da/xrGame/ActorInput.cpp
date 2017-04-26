@@ -28,6 +28,7 @@
 #include "NightVisionDevice.h"
 #include "CustomOutfit.h"
 #include "ui/UIInventoryWnd.h"
+#include "WeaponMagazinedWGrenade.h"
 
 bool g_bAutoClearCrouch = true;
 bool g_bForceCrouch = false;
@@ -82,28 +83,43 @@ void CActor::IR_OnKeyboardPress(int cmd)
 
 	switch(cmd){
 	case kWPN_SCOPE_OPS:
-		//if (inventory().ActiveItem())
-		//{
-		//	CWeaponMagazined* weapon = smart_cast<CWeaponMagazined*>(inventory().ActiveItem());
-		//	if (weapon)
-		//	{
-		//		mstate_wishful &= ~mcSprint;
-		//		if (weapon->IsScopeAttached() && weapon->ScopeAttachable()) //если прицел стоит и можно снять
-		//		{
-		//			weapon->SwitchState(CWeapon::EWeaponStates::eDetachScope);
-		//		}
-		//		else if (weapon->ScopeAttachable() && !weapon->IsScopeAttached())
-		//		{
-		//			//Actor()->SetWeaponHideState(INV_STATE_BLOCK_ALL, true);
-		//			//if (weapon->Attach())
-		//			//Actor()->SetWeaponHideState(INV_STATE_BLOCK_ALL, false);
-		//		}
-		//	}
-		//}
-		//Log("kSCOPE_OPS action");
+		if (inventory().ActiveItem())
+		{
+			CWeaponMagazined* weapon = smart_cast<CWeaponMagazined*>(inventory().ActiveItem());
+			if (weapon)
+			{
+				if (weapon->IsScopeAttached() && weapon->ScopeAttachable()) //если прицел стоит и можно снять
+				{
+					mstate_wishful &= ~mcSprint;
+					weapon->SwitchState(CWeapon::EWeaponStates::eDetachScope);
+				}
+				else if (weapon->ScopeAttachable() && !weapon->IsScopeAttached())//если прецела нет и можно одевать
+				{
+					mstate_wishful &= ~mcSprint;
+					weapon->SwitchState(CWeapon::EWeaponStates::eAttachScope);
+				}
+			}
+		}
 		break;
 	case kWPN_GL_OPS:
-		//Log("kGL_OPS action");
+		if (inventory().ActiveItem())
+		{
+			CWeaponMagazinedWGrenade* weapon = smart_cast<CWeaponMagazinedWGrenade*>(inventory().ActiveItem());
+			if (weapon)
+			{
+				if (weapon->IsGrenadeLauncherAttached() && weapon->GrenadeLauncherAttachable()) //если ПГ стоит и можно снять
+				{
+					mstate_wishful &= ~mcSprint;
+					weapon->SwitchState(CWeapon::EWeaponStates::eDetachGL);
+				}
+				else if (weapon->GrenadeLauncherAttachable() && !weapon->IsGrenadeLauncherAttached())//если ПГ нет и можно одевать
+				{
+					mstate_wishful &= ~mcSprint;
+					weapon->SwitchState(CWeapon::EWeaponStates::eAttachGL);
+				}
+			}
+		}
+
 		break;
 	case kCREEP:
 		{

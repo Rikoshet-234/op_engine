@@ -21,6 +21,8 @@
 #include "script_callback_ex.h"
 #include "ui/UIXmlInit.h"
 #include "script_game_object.h"
+#include "ui/UIInventoryWnd.h"
+#include "UIGameSP.h"
 
 CWeaponMagazined::CWeaponMagazined(LPCSTR name, ESoundTypes eSoundType) : CWeapon(name)
 {
@@ -46,6 +48,7 @@ CWeaponMagazined::CWeaponMagazined(LPCSTR name, ESoundTypes eSoundType) : CWeapo
 	m_iCurFireMode = 0;
 	m_bforceReloadAfterIdle = false;
 	m_bRequredDemandCheck = true;
+	m_pSoundAddonProc = nullptr;
 }
 
 CWeaponMagazined::~CWeaponMagazined()
@@ -227,6 +230,7 @@ void CWeaponMagazined::Reload()
 	inherited::Reload();
 
 	TryReload();
+
 }
 
 bool CWeaponMagazined::TryReload() 
@@ -459,10 +463,51 @@ void CWeaponMagazined::OnStateSwitch	(u32 S)
 	inherited::OnStateSwitch(S);
 	switch (S)
 	{
+	case eProcessScope:
+		{
+			if (m_pSoundAddonProc && m_pSoundAddonProc->_handle() && !!m_pSoundAddonProc->_feedback())
+				SwitchState(eProcessScope);
+			else
+			{
+				switch (m_sub_state)
+				{
+					case eSubStateDetachScopeProcess:
+						{
+							Detach(m_sScopeName.c_str(), true);
+							m_sub_state = eSubStateDetachScopeEnd;
+						}
+						break;
+					case eSubStateAttachScopeProcess:
+						{
+							Attach(g_actor->inventory().Get(m_sScopeName,true),true);
+							m_sub_state = eSubStateAttachScopeEnd;
+						}
+						break;
+					default:
+						m_sub_state = eSubStateMax;
+						break;
+				}
+				m_bPending = false;
+				m_pSoundAddonProc = nullptr;
+				SwitchState(eShowing);
+			}
+		}
+		break;
 	case eDetachScope:
 		{
 			m_sub_state = eSubStateDetachScopeStart;
 			SwitchState(eHiding);
+		}
+		break;
+	case eAttachScope:
+		{
+			if (g_actor && g_actor->inventory().Get(m_sScopeName, true))
+			{
+				m_sub_state = eSubStateAttachScopeStart;
+				SwitchState(eHiding);
+				break;
+			}
+			SwitchState(eIdle);
 		}
 		break;
 	case eIdle:
@@ -704,18 +749,41 @@ void CWeaponMagazined::OnAnimationEnd(u32 state)
 		case eReload:	ReloadMagazine();	SwitchState(eIdle);	break;	// End of reload animation
 		case eHiding:	
 			{
-				if (m_sub_state == eSubStateDetachScopeStart)
+				bool defaultHidding = false;
+				CUIInventoryWnd::eInventorySndAction actSoundId= CUIInventoryWnd::eInventorySndAction::eInvSndMax;
+				switch (m_sub_state)
 				{
-					m_sub_state = eSubStateDetachScopeEnd;
-					switch2_Hidden();          
-					//CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-					//pGameSP->InventoryMenu->PlaySnd(CUIInventoryWnd::eInventorySndAction::eInvDetachAddon);//играем музыку
-					Detach(GetScopeName().c_str(), true);
-					SwitchState(eShowing);
-					return;
+					case eSubStateDetachScopeStart:
+						{
+							m_sub_state = eSubStateDetachScopeProcess;
+							actSoundId = CUIInventoryWnd::eInventorySndAction::eInvDetachAddon;
+						}
+						break;
+					case eSubStateAttachScopeStart:
+						{
+							m_sub_state = eSubStateAttachScopeProcess;
+							actSoundId = CUIInventoryWnd::eInventorySndAction::eInvAttachAddon;
+						}
+						break;
+					default:
+						defaultHidding = true;
+						break;
 				}
-				else
+				if (defaultHidding)
 					SwitchState(eHidden);
+				else
+				{
+					m_bPending = true;
+					switch2_Hidden();
+					if (actSoundId != CUIInventoryWnd::eInventorySndAction::eInvSndMax)
+					{
+						CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
+						m_pSoundAddonProc = pGameSP->InventoryMenu->GetSound(actSoundId);
+						if (m_pSoundAddonProc && m_pSoundAddonProc->_handle())
+							m_pSoundAddonProc->play(this, sm_2D);
+					}
+					SwitchState(eProcessScope);
+				}
 			}
 			break;	// End of Hide
 		case eShowing:	SwitchState(eIdle);		break;	// End of Show
@@ -855,7 +923,7 @@ bool CWeaponMagazined::Action(s32 cmd, u32 flags)
 				if (iAmmoElapsed < iMagazineSize || IsMisfire() || m_ammoType != static_cast<u32>(m_iPropousedAmmoType))
 				{
 					m_bRequredDemandCheck = false;
-					Reload();
+					switch2_Empty();//Reload();
 					m_bRequredDemandCheck = true;
 				}
 		} 
@@ -964,6 +1032,29 @@ void CWeaponMagazined::LoadAmmo(CWeaponAmmo* pAmmo)
 			UnloadMagazine();
 		}
 	}
+}
+
+bool CWeaponMagazined::AttachScopeSection(const char* item_section_name, bool singleAttach)
+{
+	if (!g_actor)
+		return false;
+	CInventoryItem* iitem = g_actor->inventory().Get(item_section_name,true);
+	if (iitem)//нашли
+	{
+		CScope*				pScope = smart_cast<CScope*>(iitem);
+		if (pScope && m_eScopeStatus == CSE_ALifeItemWeapon::eAddonAttachable && (m_flagsAddOnState&CSE_ALifeItemWeapon::eWeaponAddonScope) == 0)
+		{
+			m_flagsAddOnState |= CSE_ALifeItemWeapon::eWeaponAddonScope;
+			iitem->object().DestroyObject();
+			if (singleAttach)//если аттач только одного итема а не всех подряд
+			{
+				InitAddons();
+				UpdateAddonsVisibility();
+			}
+			return true;
+		}
+	}
+	return false;
 }
 
 bool CWeaponMagazined::Attach(PIItem pIItem, bool b_send_event)
