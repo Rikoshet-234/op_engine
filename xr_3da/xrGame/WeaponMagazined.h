@@ -68,6 +68,7 @@ protected:
 	//кадр момента пересчета UpdateSounds
 	u32				dwUpdateSounds_Frame;
 	bool			m_bRequredDemandCheck;
+	ref_sound* m_pSoundAddonProc;
 protected:
 	bool ZoomInc	() override;
 	bool ZoomDec	() override;
@@ -126,6 +127,8 @@ public:
 
 	virtual void	OnH_A_Chield		();
 
+	bool AttachScopeSection(const char* item_section_name,bool singleAttach=true);
+	
 	virtual bool	Attach(PIItem pIItem, bool b_send_event);
 	virtual bool	Detach(const char* item_section_name, bool b_spawn_item);
 	virtual bool	CanAttach(PIItem pIItem);

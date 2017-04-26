@@ -70,6 +70,7 @@ public:
 		eInvSndMax
 	};
 	void						PlaySnd(eInventorySndAction a);
+	ref_sound* GetSound(eInventorySndAction a);
 protected:
 	ref_sound					sounds					[eInvSndMax];
 

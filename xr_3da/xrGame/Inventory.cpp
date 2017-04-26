@@ -859,6 +859,10 @@ PIItem CInventory::SameSlot(const u32 slot, PIItem pIItem, bool bSearchRuck) con
 	return nullptr;
 }
 
+PIItem CInventory::Get(shared_str name, bool bSearchRuck) const
+{
+	return Get(name.c_str(), bSearchRuck);
+}
 //найти в инвенторе вещь с указанным именем
 PIItem CInventory::Get(const char *name, bool bSearchRuck) const
 {

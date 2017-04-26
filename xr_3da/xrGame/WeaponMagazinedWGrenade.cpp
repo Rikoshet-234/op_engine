@@ -18,6 +18,8 @@
 #include "Actor.h"
 #include "OPFuncs/ExpandedCmdParams.h"
 #include "OPFuncs/utils.h"
+#include "ui/UIInventoryWnd.h"
+#include "UIGameSP.h"
 
 #ifdef DEBUG
 #include "phdebug.h"
@@ -505,6 +507,36 @@ void CWeaponMagazinedWGrenade::OnStateSwitch(u32 S)
 	SHOW_WEAPON_STATE(S);
 	switch (S)
 	{
+	case eProcessGL:
+		{
+			if (m_pSoundAddonProc && m_pSoundAddonProc->_handle() && !!m_pSoundAddonProc->_feedback())
+				SwitchState(eProcessGL);
+			else
+			{
+				switch (m_sub_state)
+				{
+				case eSubStateDetachGLProcess:
+					{
+						Detach(m_sGrenadeLauncherName.c_str(), true);
+						m_sub_state = eSubStateDetachGLEnd;
+					}
+					break;
+				case eSubStateAttachGLProcess:
+					{
+						Attach(g_actor->inventory().Get(m_sGrenadeLauncherName, true), true);
+						m_sub_state = eSubStateAttachGLEnd;
+					}
+				break;
+				default:
+					m_sub_state = eSubStateMax;
+					break;
+				}
+				m_bPending = false;
+				m_pSoundAddonProc = nullptr;
+				SwitchState(eShowing);
+			}
+		}
+		break;
 	case eSwitch:
 		{
 			if( !SwitchMode() ){
@@ -512,6 +544,23 @@ void CWeaponMagazinedWGrenade::OnStateSwitch(u32 S)
 				return;
 			}
 		}break;
+	case eDetachGL:
+		{
+			m_sub_state = eSubStateDetachGLStart;
+			SwitchState(eHiding);
+		}
+		break;
+	case eAttachGL:
+		{
+			if (g_actor && g_actor->inventory().Get(m_sGrenadeLauncherName, true))
+			{
+				m_sub_state = eSubStateAttachGLStart;
+				SwitchState(eHiding);
+				break;
+			}
+			SwitchState(eIdle);
+		}
+		break;
 	}
 	
 	inherited::OnStateSwitch(S);
@@ -524,15 +573,56 @@ void CWeaponMagazinedWGrenade::OnAnimationEnd(u32 state)
 	SHOW_WEAPON_STATE(state);
 	switch (state)
 	{
-	case eSwitch:
-		{
-			SwitchState(eIdle);
-		}break;
+		case eSwitch:
+			{
+				SwitchState(eIdle);
+			}
+			break;
 		case eFire:
-		{
-			if(m_bGrenadeMode)
-				Reload();
-		}break;
+			{
+				if(m_bGrenadeMode)
+					Reload();
+			}
+			break;
+		case eHiding:
+			{
+				bool defaultHidding = false;
+				CUIInventoryWnd::eInventorySndAction actSoundId = CUIInventoryWnd::eInventorySndAction::eInvSndMax;
+				switch (m_sub_state)
+				{
+				case eSubStateDetachGLStart:
+				{
+					m_sub_state = eSubStateDetachGLProcess;
+					actSoundId = CUIInventoryWnd::eInventorySndAction::eInvDetachAddon;
+				}
+				break;
+				case eSubStateAttachGLStart:
+				{
+					m_sub_state = eSubStateAttachGLProcess;
+					actSoundId = CUIInventoryWnd::eInventorySndAction::eInvAttachAddon;
+				}
+				break;
+				default:
+					defaultHidding = true;
+					break;
+				}
+				if (defaultHidding)
+					SwitchState(eHidden);
+				else
+				{
+					m_bPending = true;
+					switch2_Hidden();
+					if (actSoundId != CUIInventoryWnd::eInventorySndAction::eInvSndMax)
+					{
+						CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
+						m_pSoundAddonProc = pGameSP->InventoryMenu->GetSound(actSoundId);
+						if (m_pSoundAddonProc && m_pSoundAddonProc->_handle())
+							m_pSoundAddonProc->play(this, sm_2D);
+					}
+					SwitchState(eProcessGL);
+				}
+			}
+			break;
 	}
 	inherited::OnAnimationEnd(state);
 }

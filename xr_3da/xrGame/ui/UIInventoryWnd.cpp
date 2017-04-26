@@ -340,6 +340,11 @@ void CUIInventoryWnd::PlaySnd(eInventorySndAction a)
 		sounds[a].play					(nullptr, sm_2D);
 }
 
+ref_sound* CUIInventoryWnd::GetSound(eInventorySndAction a)
+{
+	return &sounds[a];
+}
+
 CUIInventoryWnd::~CUIInventoryWnd()
 {
 //.	ClearDragDrop(m_vDragDropItems);
