@@ -15,6 +15,7 @@ CUIOutfitParams::CUIOutfitParams()
 	modificators = CreateRestoresStringMap();
 	m_list=nullptr;
 	m_bShowModifiers=false;
+	inOutfit = nullptr;
 }
 
 CUIOutfitParams::~CUIOutfitParams()
@@ -55,25 +56,32 @@ bool CUIOutfitParams::Check(shared_str section) const
 
 void CUIOutfitParams::SetInfo(CCustomOutfit* outfitItem,CUIScrollView *parent) 
 {
-	m_list->RemoveAll();
 	if (!outfitItem)
 		return;
+	inOutfit = outfitItem;
+	SetInfo(inOutfit->cNameSect(), parent);
+}
+
+void CUIOutfitParams::SetInfo(const shared_str& outfit_section, CUIScrollView* parent)
+{
+	m_list->RemoveAll();
+	
 #pragma region update immune lines
-	std::for_each(immunes.begin(),immunes.end(),[&](std::pair<ALife::EHitType,shared_str> immunePair)
+	std::for_each(immunes.begin(), immunes.end(), [&](std::pair<ALife::EHitType, shared_str> immunePair)
 	{
-		createImmuneItem(outfitItem,immunePair,false);
+		createImmuneItem(outfit_section, immunePair, false);
 	});
 	if (m_lImmuneUnsortedItems.size()>0)
 	{
-		std::sort(m_lImmuneUnsortedItems.begin(),m_lImmuneUnsortedItems.end(),[](CUIListItem* i1, CUIListItem* i2)
+		std::sort(m_lImmuneUnsortedItems.begin(), m_lImmuneUnsortedItems.end(), [](CUIListItem* i1, CUIListItem* i2)
 		{
-			CUIListItemIconed *iconedItem1=smart_cast<CUIListItemIconed*>(i1);
-			CUIListItemIconed *iconedItem2=smart_cast<CUIListItemIconed*>(i2);
+			CUIListItemIconed *iconedItem1 = smart_cast<CUIListItemIconed*>(i1);
+			CUIListItemIconed *iconedItem2 = smart_cast<CUIListItemIconed*>(i2);
 			if (!iconedItem1 || !iconedItem2)
 				return false;
-			return		lstrcmpi(iconedItem1->GetFieldText(1),iconedItem2->GetFieldText(1))<0;
+			return		lstrcmpi(iconedItem1->GetFieldText(1), iconedItem2->GetFieldText(1))<0;
 		});
-		std::for_each(m_lImmuneUnsortedItems.begin(),m_lImmuneUnsortedItems.end(),[&](CUIListItemIconed* item)
+		std::for_each(m_lImmuneUnsortedItems.begin(), m_lImmuneUnsortedItems.end(), [&](CUIListItemIconed* item)
 		{
 			m_list->AddItem<CUIListItemIconed>(item);
 		});
@@ -82,38 +90,38 @@ void CUIOutfitParams::SetInfo(CCustomOutfit* outfitItem,CUIScrollView *parent)
 #pragma region update modifiers lines
 	if (m_bShowModifiers)
 	{
-		float outfitAddWeight=outfitItem ? outfitItem->m_additional_weight*outfitItem->GetCondition() : 0;
-		float outfitOriginalAddWeight=outfitItem ? outfitItem->m_additional_weight:0;
-		CUIListItemIconed* weightItem= findIconedItem(m_lModificatorsUnsortedItems,"additional_weight",fsimilar(outfitAddWeight, 0.0f) && fsimilar(outfitOriginalAddWeight, 0.0f),xmlParams(currentFileNameXml,PARAMS_PATH));
+		float outfitAddWeight = inOutfit ? inOutfit->m_additional_weight*inOutfit->GetCondition() : 0;
+		float outfitOriginalAddWeight = pSettings->r_float(outfit_section, "additional_inventory_weight");
+		CUIListItemIconed* weightItem = findIconedItem(m_lModificatorsUnsortedItems, "additional_weight", fsimilar(outfitAddWeight, 0.0f) && fsimilar(outfitOriginalAddWeight, 0.0f), xmlParams(currentFileNameXml, PARAMS_PATH));
 		if (weightItem)
-			setIconedItem(m_mIconIDs,weightItem,"additional_weight","ui_inv_outfit_additional_inventory_weight",outfitAddWeight,1,outfitOriginalAddWeight,1);
-		std::for_each(modificators.begin(),modificators.end(),[&](std::pair<int, restoreParam> modifPair)
+			setIconedItem(m_mIconIDs, weightItem, "additional_weight", "ui_inv_outfit_additional_inventory_weight", outfitAddWeight, 1, outfitOriginalAddWeight, 1);
+		std::for_each(modificators.begin(), modificators.end(), [&](std::pair<int, restoreParam> modifPair)
 		{
-			createModifItem(outfitItem,modifPair,false);
+			createModifItem(outfit_section, modifPair, false);
 		});
 		if (m_lModificatorsUnsortedItems.size()>0)
 		{
 			if (m_lImmuneUnsortedItems.size()>0)
 				addSeparator(m_list);
-			std::sort(m_lModificatorsUnsortedItems.begin(),m_lModificatorsUnsortedItems.end(),[](CUIListItem* i1, CUIListItem* i2)
+			std::sort(m_lModificatorsUnsortedItems.begin(), m_lModificatorsUnsortedItems.end(), [](CUIListItem* i1, CUIListItem* i2)
 			{
-				CUIListItemIconed *iconedItem1=smart_cast<CUIListItemIconed*>(i1);
-				CUIListItemIconed *iconedItem2=smart_cast<CUIListItemIconed*>(i2);
+				CUIListItemIconed *iconedItem1 = smart_cast<CUIListItemIconed*>(i1);
+				CUIListItemIconed *iconedItem2 = smart_cast<CUIListItemIconed*>(i2);
 				if (!iconedItem1 || !iconedItem2)
 					return false;
-				return		lstrcmpi(iconedItem1->GetFieldText(1),iconedItem2->GetFieldText(1))<0;
+				return		lstrcmpi(iconedItem1->GetFieldText(1), iconedItem2->GetFieldText(1))<0;
 			});
-			std::for_each(m_lModificatorsUnsortedItems.begin(),m_lModificatorsUnsortedItems.end(),[&](CUIListItemIconed* item)
+			std::for_each(m_lModificatorsUnsortedItems.begin(), m_lModificatorsUnsortedItems.end(), [&](CUIListItemIconed* item)
 			{
 				m_list->AddItem<CUIListItemIconed>(item);
 			});
 		}
 	}
 #pragma endregion
-	m_list->SetHeight(m_list->GetItemsCount()*m_list->GetItemHeight()+5);
+	m_list->SetHeight(m_list->GetItemsCount()*m_list->GetItemHeight() + 5);
 	m_list->GetInternalScrollbar()->SetPageSize(m_list->GetItemsCount());
 	m_list->ScrollToBegin();
-	parent->AddWindow(m_list,false);
+	parent->AddWindow(m_list, false);
 }
 
 void CUIOutfitParams::ClearAll()
@@ -122,75 +130,75 @@ void CUIOutfitParams::ClearAll()
 	ClearItems(m_lModificatorsUnsortedItems);
 }
 
-void CUIOutfitParams::ClearItems(std::vector<CUIListItemIconed*>& baseList)
+void CUIOutfitParams::ClearItems(std::vector<CUIListItemIconed*>& baseList) const
 {
-	while(!baseList.empty())
+	while (!baseList.empty())
 	{
-		auto item=baseList.front();
-		baseList.erase(std::remove(baseList.begin(),baseList.end(),item),baseList.end());
+		auto item = baseList.front();
+		baseList.erase(std::remove(baseList.begin(), baseList.end(), item), baseList.end());
 		item->DetachAll();
 		xr_delete(item);
 	}
 }
 
-void CUIOutfitParams::createImmuneItem(CCustomOutfit* outfit, std::pair<ALife::EHitType, shared_str> immunePair, bool force_add)
+void CUIOutfitParams::createImmuneItem(shared_str outfit_section, std::pair<ALife::EHitType, shared_str> immunePair, bool force_add)
 {
-	float curr_val_outfit			= outfit ? outfit->GetDefHitTypeProtection(ALife::EHitType(immunePair.first)) : 1.0f;
-	curr_val_outfit			= 1.0f - curr_val_outfit;
-	float original_val_outfit			= outfit ? outfit->GetDefHitTypeProtectionOriginal(ALife::EHitType(immunePair.first)) : 1.0f;
-	original_val_outfit			= 1.0f - original_val_outfit;
+	float curr_val_outfit = inOutfit ? inOutfit->GetDefHitTypeProtection(ALife::EHitType(immunePair.first)) : 1.0f;
+	curr_val_outfit = 1.0f - curr_val_outfit;
+	LPCSTR hitName = ALife::g_cafHitType2String(immunePair.first);
+	string64 buf;
+	sprintf_s(buf, "%s_protection", hitName);
+	float original_val_outfit = pSettings->r_float(outfit_section, buf);
 
-	bool emptyParam=fsimilar(curr_val_outfit, 0.0f) && !force_add;
-	LPCSTR hitName= ALife::g_cafHitType2String(immunePair.first);
-	CUIListItemIconed* item= findIconedItem(m_lImmuneUnsortedItems,hitName,emptyParam,xmlParams(currentFileNameXml,PARAMS_PATH));
+	bool emptyParam = fsimilar(curr_val_outfit, 0.0f) && !force_add;
+	CUIListItemIconed* item = findIconedItem(m_lImmuneUnsortedItems, hitName, emptyParam, xmlParams(currentFileNameXml, PARAMS_PATH));
 	if (!item)
 		return;
-	setIconedItem(m_mIconIDs,item,hitName,immunePair.second,curr_val_outfit,0,original_val_outfit,0);
+	setIconedItem(m_mIconIDs, item, hitName, immunePair.second, curr_val_outfit, 0, original_val_outfit, 0);
 }
 
-void CUIOutfitParams::createModifItem(CCustomOutfit* outfit, std::pair<int, restoreParam> modifPair, bool force_add)
+void CUIOutfitParams::createModifItem(shared_str outfit_section, std::pair<int, restoreParam> modifPair, bool force_add)
 {
-	if (!outfit)
-		return;
+	float modifValue = READ_IF_EXISTS(pSettings, r_float, outfit_section, modifPair.second.paramName.c_str(), modifPair.first == POWER_LOSS_ID ? 1.0f : 0.0f);
 	float outfitValue=0;
 	float outfitValue1=0;
 	switch (modifPair.first)
 	{
 		case BLEEDING_RESTORE_ID:
 			{
-				outfitValue1 = outfit->m_fBleedingRestoreSpeed*1000*-1;
-				outfitValue=outfitValue1*outfit->GetCondition();
+				outfitValue1 = modifValue *1000*-1;
+				outfitValue=outfitValue1*(inOutfit? inOutfit->GetCondition(): 1.0f);
 			}
 			break;
 		case SATIETY_RESTORE_ID:
 			{
-				outfitValue1 = outfit->m_fSatietyRestoreSpeed*1000;
-				outfitValue=outfitValue1*outfit->GetCondition();
+				outfitValue1 = modifValue *1000;
+				outfitValue=outfitValue1*(inOutfit ? inOutfit->GetCondition() : 1.0f);
 			}
 			break;
 		case RADIATION_RESTORE_ID:
 			{
-				outfitValue1 = outfit->m_fRadiationRestoreSpeed*1000;
-				outfitValue=outfitValue1*outfit->GetCondition();
+				outfitValue1 = modifValue *1000;
+				outfitValue=outfitValue1*(inOutfit ? inOutfit->GetCondition() : 1.0f);
 			}
 			break;
 		case HEALTH_RESTORE_ID:
 			{
-				outfitValue1 = outfit->m_fHealthRestoreSpeed*1000;
-				outfitValue=outfitValue1*outfit->GetCondition();
+				outfitValue1 = modifValue *1000;
+				outfitValue=outfitValue1*(inOutfit ? inOutfit->GetCondition() : 1.0f);
 			}
 			break;
 		case POWER_RESTORE_ID:
 			{
-				outfitValue1 = outfit->m_fPowerRestoreSpeed*1000;
-				outfitValue=outfitValue1*outfit->GetCondition();
+				outfitValue1 = modifValue*1000;
+				outfitValue=outfitValue1*(inOutfit ? inOutfit->GetCondition() : 1.0f);
 
 			}
 			break;
 		case POWER_LOSS_ID:
 			{
-				outfitValue1 = outfit->GetPowerLoss()*100;
-				outfitValue=outfitValue1*outfit->GetCondition();
+				outfitValue1 = modifValue*100;
+				outfitValue=outfitValue1*(inOutfit ? inOutfit->GetCondition() : 1.0f);
 			}
 			break;
 		default:

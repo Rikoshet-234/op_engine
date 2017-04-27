@@ -51,7 +51,7 @@ void AddOne				(const char *split)
 
 	logCS.Enter			();
 
-#ifdef DEBUG
+#if defined(DEBUG) || defined(RELDEBUG)
 	OutputDebugString	(split);
 	OutputDebugString	("\n");
 #endif
