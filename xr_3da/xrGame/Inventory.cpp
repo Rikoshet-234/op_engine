@@ -1216,15 +1216,15 @@ void CInventory::Items_SetCurrentEntityHud(bool current_entity)
 	{
 		PIItem pIItem = *it;
 		CHudItem* pHudItem = smart_cast<CHudItem*> (pIItem);
-		if (pHudItem) 
+		/*if (pHudItem) 
 		{
 			pHudItem->GetHUD()->Visible(current_entity);
-		};
+		};*/
 		CWeapon* pWeapon = smart_cast<CWeapon*>(pIItem);
 		if (pWeapon)
 		{
-			pWeapon->InitAddons();
 			pWeapon->UpdateAddonsVisibility();
+			pWeapon->InitAddons();
 		}
 	}
 };

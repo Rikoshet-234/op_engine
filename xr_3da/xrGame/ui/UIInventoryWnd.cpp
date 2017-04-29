@@ -46,12 +46,12 @@ CUIInventoryWnd::CUIInventoryWnd()
 	
 	UIRank								= nullptr;
 
-	Init								();
+	CUIInventoryWnd::Init								();
 	m_pCurrentCellItem=nullptr;
 
 	g_pInvWnd							= this;	
 	m_b_need_reinit						= false;
-	Hide								();	
+	CUIInventoryWnd::Hide								();	
 	SetUIWindowType(EAWindowType::wtInventory);
 }
 

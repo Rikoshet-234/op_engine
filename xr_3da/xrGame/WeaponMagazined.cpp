@@ -1053,8 +1053,8 @@ bool CWeaponMagazined::AttachScopeSection(const char* item_section_name, bool si
 			iitem->object().DestroyObject();
 			if (singleAttach)//если аттач только одного итема а не всех подряд
 			{
-				InitAddons();
 				UpdateAddonsVisibility();
+				InitAddons();
 			}
 			return true;
 		}

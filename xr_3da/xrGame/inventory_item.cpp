@@ -136,6 +136,7 @@ CInventoryItem::CInventoryItem()
 	m_flags.set			(FCanTake,TRUE);
 	m_flags.set			(FCanTrade,TRUE);
 	m_flags.set			(FUsingCondition,FALSE);
+	m_flags.set(FVisibleForUI, TRUE);
 	m_fCondition		= 1.0f;
 
 	m_name = m_nameShort = NULL;
@@ -144,6 +145,7 @@ CInventoryItem::CInventoryItem()
 	m_Description		= "";
 	scriptDescriptionFunctorName="";
 	m_bUsefulFromConfig = false;
+
 }
 
 CInventoryItem::~CInventoryItem() 
@@ -201,12 +203,13 @@ void CInventoryItem::Load(LPCSTR section)
 		m_Description = CStringTable().translate(descriptionVar.c_str());
 	}
 
+
 	m_flags.set(Fbelt, READ_IF_EXISTS(pSettings, r_bool, section, "belt", FALSE));
 	m_flags.set(FRuckDefault, READ_IF_EXISTS(pSettings, r_bool, section, "default_to_ruck", TRUE));
-
 	m_flags.set(FCanTake, READ_IF_EXISTS(pSettings, r_bool, section, "can_take", TRUE));
 	m_flags.set(FCanTrade, READ_IF_EXISTS(pSettings, r_bool, section, "can_trade", TRUE));
 	m_flags.set(FIsQuestItem, READ_IF_EXISTS(pSettings, r_bool, section, "quest_item", FALSE));
+	m_flags.set(FVisibleForUI, READ_IF_EXISTS(pSettings, r_bool, section, "visible_for_ui", TRUE));
 	if (pSettings->line_exist(section, "useful_for_npc"))
 	{
 		m_flags.set(Fuseful_for_NPC, pSettings->r_bool(section, "useful_for_npc"));
