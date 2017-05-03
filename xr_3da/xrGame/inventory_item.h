@@ -130,6 +130,8 @@ public:
 			u32					Cost				() const	{ return m_cost; }
 	virtual float				Weight				() 			{ return m_weight;}		
 
+	bool GetVisibleForUI() { return !!m_flags.test(FVisibleForUI); }
+	void SetVisibleForUI(bool value) { m_flags.set(FVisibleForUI,value); }
 public:
 	CInventory*					m_pCurrentInventory;
 

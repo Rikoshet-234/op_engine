@@ -16,6 +16,7 @@ public:
 	CUIListManipulations();
 	virtual ~CUIListManipulations() {}
 
+	CUIDragDropListEx* GetListByID(IWListTypes listType);
 	void ClearSuitablesInList(IWListTypes listType);
 	void SetSuitableBySection(LPCSTR section);
 	void SetSuitableBySection(luabind::object const& sections);
