@@ -132,6 +132,7 @@ void InitSettings	()
 	pGameIni					= xr_new<CInifile>	(fname,TRUE);
 	CHECK_OR_EXIT				(!pGameIni->sections().empty(),make_string("Cannot find file %s.\nReinstalling application may fix this problem.",fname));
 
+#pragma region load font profiles	
 	if (!pSettings->section_exist("font_profiles"))
 	{
 		Msg("! ERROR Cannot find required section [%s].", "font_profiles");
@@ -142,7 +143,6 @@ void InitSettings	()
 		Msg("! ERROR Cannot find required font profile[%s]", "default");
 		FATAL("Invalid required configuration! See log for detail.");
 	}
-#pragma region load font profiles	
 	CInifile::Sect& sect = pSettings->r_section("font_profiles");
 	for (CInifile::SectCIt I = sect.Data.begin(); I != sect.Data.end(); ++I)
 	{
@@ -180,7 +180,7 @@ void InitSettings	()
 			last->id = languages_tokens.size() - 1;
 		}
 	}
-	xr_vector<xr_token>::iterator defLangIter;//default lang move to 0 index
+	xr_vector<xr_token>::iterator defLangIter;
 	if (psCurrentLanguageIndex==(u32)-1 && (defLangIter=std::find_if(languages_tokens.begin(), languages_tokens.end(),[&](xr_token token)
 	{
 		return xr_strcmp(token.name, defaultLang) == 0;
