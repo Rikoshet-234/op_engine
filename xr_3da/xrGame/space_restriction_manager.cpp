@@ -235,6 +235,10 @@ IC	void CSpaceRestrictionManager::join_restrictions		(shared_str &restrictions, 
 struct ItemParserItem
 {
 	ItemParserItem(LPCSTR item,	size_t len) : item(item), len(len) {}
+	bool operator==(const ItemParserItem& rhs) const
+	{
+		return len == rhs.len && !memcmp(item, rhs.item, len);
+	}
 	LPCSTR item;
 	size_t len;
 };
@@ -271,6 +275,11 @@ struct ItemParser
 			items.emplace_back(ItemParserItem(begin, end-begin+1));
 	}
 
+	inline bool Contains(const ItemParserItem& item) const
+	{
+		return std::find(items.begin(), items.end(), item) != items.end();
+	}
+
 	xr_vector<ItemParserItem> items;
 };
 
@@ -297,21 +306,16 @@ IC	void CSpaceRestrictionManager::difference_restrictions	(shared_str &restricti
 	u32 m_temp2_pos = 0;
 	const ItemParser ipRestrisctions(restrictions);
 	const ItemParser ipUpdate(update);
-	for (auto i=ipRestrisctions.items.begin(); i != ipRestrisctions.items.end(); ++i)
+	//! Do the set subtract operation: restrictions - update
+	for (auto&& i : ipRestrisctions.items)
 	{
-		for (auto j=ipUpdate.items.begin(); j != ipUpdate.items.end(); ++j)
+		if (!ipUpdate.Contains(i))
 		{
-			if (i->len != j->len)
-				continue;
-
-			if (memcmp(i->item, j->item, i->len))
-				continue;
-
 			if (m_temp2_pos)
 				m_temp2[m_temp2_pos++] = ',';
 
-			memcpy(m_temp2 + m_temp2_pos, i->item, i->len);
-			m_temp2_pos += i->len;
+			memcpy(m_temp2 + m_temp2_pos, i.item, i.len);
+			m_temp2_pos += i.len;
 		}
 	}
 	m_temp2[m_temp2_pos] = 0;
