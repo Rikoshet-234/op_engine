@@ -8,6 +8,7 @@
 #define stdafxH
 
 #pragma once
+#define ENGINE_API		__declspec(dllimport)
 
 #include "../xrCore/xrCore.h"
 

@@ -24,6 +24,7 @@
 #include "../xrCore/OPFuncs/op_engine_version.h"
 #include "../xrCore/FTimerStat.h"
 #include "../xrSound/soundrender_source.h"
+#include "CMultiHUDs.h"
 
 //---------------------------------------------------------------------
 ENGINE_API CInifile* pGameIni		= nullptr;
@@ -192,6 +193,7 @@ void InitSettings	()
 		Msg("! ERROR Cannot find configured default language[%s]!", defaultLang);
 		FATAL("Invalid required configuration! See log for detail.");
 	}
+	multiHUDs = xr_new<CMultiHUDs>();
 #pragma endregion 
 }
 
@@ -339,12 +341,11 @@ void Startup					( )
 		destroySettings();
 
 	LALib.OnDestroy				( );
-	
 	if(!g_bBenchmark)
 		destroyConsole();
 	else
 		Console->Reset();
-
+	xr_delete(multiHUDs);
 	destroyEngine();
 }
 

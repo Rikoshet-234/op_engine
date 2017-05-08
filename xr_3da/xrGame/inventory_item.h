@@ -67,11 +67,11 @@ protected:
 								Fuseful_for_NPC		=(1<<8),
 								FInInterpolation	=(1<<9),
 								FInInterpolate		=(1<<10),
-								FIsQuestItem		=(1<<11),
-								FVisibleForUI		= (1 << 12),
+								FIsQuestItem		=(1<<11)
 	};
 
 	Flags16						m_flags;
+	bool m_bVisibleForUI;
 public:
 								CInventoryItem		();
 	virtual						~CInventoryItem		();
@@ -130,8 +130,8 @@ public:
 			u32					Cost				() const	{ return m_cost; }
 	virtual float				Weight				() 			{ return m_weight;}		
 
-	bool GetVisibleForUI() { return !!m_flags.test(FVisibleForUI); }
-	void SetVisibleForUI(bool value) { m_flags.set(FVisibleForUI,value); }
+	bool GetVisibleForUI() { return m_bVisibleForUI; }
+	void SetVisibleForUI(bool value) { m_bVisibleForUI=value; }
 public:
 	CInventory*					m_pCurrentInventory;
 

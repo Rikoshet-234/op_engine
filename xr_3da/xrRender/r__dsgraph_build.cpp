@@ -73,21 +73,52 @@ void R_dsgraph_structure::r_dsgraph_insert_dynamic	(IRender_Visual *pVisual, Fve
 
 	// HUD rendering
 	if (RI.val_bHUD)			{
-		if (sh->flags.bStrictB2F)	{
+		if (sh->flags.bStrictB2F)	
+		{
+#if RENDER==R_R1
 			mapSorted_Node* N		= mapSorted.insertInAnyWay	(distSQ);
 			N->val.ssa				= SSA;
 			N->val.pObject			= RI.val_pObject;
 			N->val.pVisual			= pVisual;
 			N->val.Matrix			= *RI.val_pTransform;
 			N->val.se				= sh;
+#else
+			if (sh->flags.bEmissive)
+			{
+				mapSorted_Node* N = mapHUDEmissive.insertInAnyWay(distSQ);
+				N->val.ssa = SSA;
+				N->val.pObject = RI.val_pObject;
+				N->val.pVisual = pVisual;
+				N->val.Matrix = *RI.val_pTransform;
+				N->val.se = &*pVisual->shader->E[4];		// 4=L_special
+			}
+			mapSorted_Node* N		= mapHUDSorted.insertInAnyWay	(distSQ);
+			N->val.ssa				= SSA;
+			N->val.pObject			= RI.val_pObject;
+			N->val.pVisual			= pVisual;
+			N->val.Matrix			= *RI.val_pTransform;
+			N->val.se				= sh;
+#endif
 			return;
-		} else {
+		} 
+		else 
+		{
 			mapHUD_Node* N			= mapHUD.insertInAnyWay		(distSQ);
 			N->val.ssa				= SSA;
 			N->val.pObject			= RI.val_pObject;
 			N->val.pVisual			= pVisual;
 			N->val.Matrix			= *RI.val_pTransform;
 			N->val.se				= sh;
+#if RENDER==R_R2
+			if (sh->flags.bEmissive) {
+				mapSorted_Node* N2		= mapHUDEmissive.insertInAnyWay	(distSQ);
+				N2->val.ssa				= SSA;
+				N2->val.pObject			= RI.val_pObject;
+				N2->val.pVisual			= pVisual;
+				N2->val.Matrix			= *RI.val_pTransform;
+				N2->val.se				= &*pVisual->shader->E[4];		// 4=L_special
+			}
+#endif
 			return;
 		}
 	}

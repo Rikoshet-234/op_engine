@@ -1194,13 +1194,16 @@ void  CInventory::AddAvailableItems(TIItemContainer& items_container, bool for_t
 		for(;slot_it!=slot_it_e;++slot_it)
 		{
 			const CInventorySlot& S = *slot_it;
-			bool visible = true;
-			if (checkVisibility)
-				visible = S.m_pIItem->GetVisibleForUI();
-			if(S.m_pIItem && (!for_trade || S.m_pIItem->CanTrade()) && visible)
+			if (S.m_pIItem)
 			{
-				if((!S.m_bPersistent || S.m_pIItem->GetSlot()==GRENADE_SLOT))
-					items_container.push_back(S.m_pIItem);
+				bool visible = true;
+				if (checkVisibility)
+					visible = S.m_pIItem->GetVisibleForUI();
+				if ((!for_trade || S.m_pIItem->CanTrade()) && visible)
+				{
+					if ((!S.m_bPersistent || S.m_pIItem->GetSlot() == GRENADE_SLOT))
+						items_container.push_back(S.m_pIItem);
+				}
 			}
 		}
 	}		
