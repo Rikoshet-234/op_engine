@@ -114,22 +114,33 @@ void CUIComboBox::OnListItemSelect()
 void CUIComboBox::SetCurrentValue()
 {
 	m_list.Clear		();
-	xr_token* tok		= GetOptToken();
-
 	bool fp_init = m_entry == "font_profile";
 	bool lang_init = m_entry == "g_lang";
-	while (tok->name)
-	{		
-		LPCSTR txt = tok->name;
-		if (fp_init)
-			txt = *CStringTable().translate(pSettings->r_string("font_profiles", txt));
-		else if (lang_init)
-			txt = *CStringTable().translate(pSettings->r_string("languages", txt));
-		if (xr_strlen(txt)>0)
-			AddItem_(txt, tok->id);
-		tok++;
+	if (fp_init || lang_init)
+	{
+		xr_vector<xr_token>* tokens = GetOptVectorToken();
+		std::for_each(tokens->begin(), tokens->end(), [&](xr_token token)
+		{
+			LPCSTR txt = token.name;
+			if (fp_init)
+				txt = *CStringTable().translate(pSettings->r_string("font_profiles", txt));
+			else if (lang_init)
+				txt = *CStringTable().translate(pSettings->r_string("languages", txt));
+			if (xr_strlen(txt) > 0)
+				AddItem_(txt, token.id);
+		});
 	}
-
+	else
+	{
+		xr_token* tok = GetOptToken();
+		while (tok->name)
+		{
+			LPCSTR txt = tok->name;
+			if (xr_strlen(txt) > 0)
+				AddItem_(txt, tok->id);
+			tok++;
+		}
+	}
 	LPCSTR cur_val		= *CStringTable().translate( GetOptTokenValue());
 	m_text.SetText		( cur_val );
 	m_list.SetSelectedText( cur_val );
