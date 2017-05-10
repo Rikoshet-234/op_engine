@@ -355,7 +355,7 @@ void CSoundRender_Core::_create_data( ref_sound_data& S, LPCSTR fName, esound_ty
 	string_path			fn;
 	if (0x72616863 == *(uint32_t*)fName)//! jarni: brutal hack :), 0x72616863 == "char", beginning of "characters_voice"
 	{
-		strconcat(sizeof(fn), fn, m_localization.c_str(), fName, strext(fn) ? "" : ".ogg");
+		strconcat(sizeof(fn), fn, m_localization.c_str(), fName, strext(fName) ? "" : ".ogg");
 		if (!FS.exist("$game_sounds$", fn))
 			strcpy(fn, fName);
 	}
