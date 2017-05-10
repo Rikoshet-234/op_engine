@@ -35,6 +35,7 @@ protected:
 			// token
 			char*			GetOptTokenValue	();
 			xr_token*		GetOptToken			();
+			xr_vector<xr_token>* GetOptVectorToken();
 			void			SaveOptTokenValue	(const char* val);
 
 	xr_string		m_entry;

@@ -93,6 +93,11 @@ xr_token* CUIOptionsItem::GetOptToken()
 	return Console->GetXRToken(m_entry.c_str());
 }
 
+xr_vector<xr_token>* CUIOptionsItem::GetOptVectorToken()
+{
+	return Console->GetXRVectorTokens(m_entry.c_str());
+}
+
 void CUIOptionsItem::SaveOptTokenValue(const char* val){
 	SaveOptStringValue(val);
 }

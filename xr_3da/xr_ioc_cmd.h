@@ -118,9 +118,15 @@ public:
 		}
 	}
 
+	xr_vector<xr_token>* GetVectorTokens() const
+	{
+		return tokens;
+	}
+
 	xr_token* GetToken() const
 	{
-		return &*tokens->begin();
+		Msg("! DO NOT USE THIS CALL DIRECTLY! Use alternative GetVectorTokens() for this class");
+		return nullptr;// &*tokens->begin();
 	}
 };
 
