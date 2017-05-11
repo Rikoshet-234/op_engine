@@ -9,6 +9,16 @@ CUIListManipulations::CUIListManipulations()
 }
 
 
+CUIDragDropListEx* CUIListManipulations::GetListByID(IWListTypes listType)
+{
+	auto listIt = std::find_if(sourceDragDropLists.begin(), sourceDragDropLists.end(), [listType](CUIDragDropListEx* list)
+	{
+		return list->GetUIListId() == listType;
+	});
+	if (listIt != sourceDragDropLists.end())
+		return *listIt;
+	return nullptr;
+}
 
 void CUIListManipulations::ClearSuitablesInList(IWListTypes listType)
 {

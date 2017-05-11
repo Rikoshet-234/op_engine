@@ -8,6 +8,7 @@
 //. u32			psCurrentMode		= 1024;
 	u32	psCurrentVidMode[2] = { 1024,768 };
 	u32	psCurrentBPP = 32;
+	u32 psCurrentHUDProfileIndex = 0;
 	u32 psCurrentFontProfileIndex = 0;
 	u32 psCurrentLanguageIndex = (u32)-1;
 // release version always has "mt_*" enabled

@@ -238,7 +238,8 @@ void CWeaponShotgun::OnAnimationEnd(u32 state)
 
 void CWeaponShotgun::Reload() 
 {
-	if (m_bRequredDemandCheck && g_uCommonFlags.is(E_COMMON_FLAGS::gpDemandReload))
+	bool isActor = smart_cast<CActor*>(H_Parent()) != nullptr;
+	if (isActor && m_bRequredDemandCheck && g_uCommonFlags.is(E_COMMON_FLAGS::gpDemandReload))
 	{
 		return;
 	}
@@ -341,19 +342,22 @@ bool CWeaponShotgun::HaveCartridgeInInventory		(u8 cnt)
 	{
 		//попытатьс€ найти в инвентаре патроны текущего типа 
 		m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAny(*m_ammoTypes[checkedType]));
-		
-		if(!m_pAmmo && !g_uCommonFlags.is(E_COMMON_FLAGS::gpFixedReload))
-			for(u32 i = 0; i < m_ammoTypes.size(); ++i) 
-			{
-				//проверить патроны всех подход€щих типов
-				m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAny(*m_ammoTypes[i]));
-				if(m_pAmmo) 
-				{ 
-					m_ammoType = i; 
-					m_iPropousedAmmoType=i;
-					break; 
+		bool isActor = smart_cast<CActor*>(H_Parent()) != nullptr;
+		if (!m_pAmmo)
+		{
+			if (!isActor || (isActor && !g_uCommonFlags.is(E_COMMON_FLAGS::gpFixedReload)))
+				for (u32 i = 0; i < m_ammoTypes.size(); ++i)
+				{
+					//проверить патроны всех подход€щих типов
+					m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAny(*m_ammoTypes[i]));
+					if (m_pAmmo)
+					{
+						m_ammoType = i;
+						m_iPropousedAmmoType = i;
+						break;
+					}
 				}
-			}
+		}
 	}
 	return (m_pAmmo!= nullptr)&&(m_pAmmo->m_boxCurr>=cnt) ;
 }

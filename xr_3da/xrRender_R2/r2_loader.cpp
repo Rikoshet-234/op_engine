@@ -16,7 +16,6 @@
 
 void CRender::level_Load(IReader* fs)
 {
-	i_swi_allocated = 0;
 
 	R_ASSERT						(0!=g_pGameLevel);
 	R_ASSERT						(!b_loaded);
@@ -348,10 +347,7 @@ void CRender::LoadSWIs(CStreamReader* base_fs)
 		xr_vector<FSlideWindowItem>::iterator it_e	= SWIs.end();
 
 		for(;it!=it_e;++it)
-		{
-			i_swi_allocated -= it->count;
 			xr_free(it->sw);
-		}
 
 		SWIs.clear_not_free();
 
@@ -364,7 +360,6 @@ void CRender::LoadSWIs(CStreamReader* base_fs)
 			swi.reserved[3]	= fs->r_u32();	
 			swi.count		= fs->r_u32();
 			VERIFY			(NULL==swi.sw);
-			i_swi_allocated   += swi.count;
 			swi.sw			= xr_alloc<FSlideWindow> (swi.count);
 			fs->r			(swi.sw,sizeof(FSlideWindow)*swi.count);
 		}

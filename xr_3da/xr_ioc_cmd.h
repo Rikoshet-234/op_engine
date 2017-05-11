@@ -57,7 +57,10 @@ protected:
 	u32* value;
 	xr_vector<xr_token>* tokens;
 public:
-	CCC_VectorToken(LPCSTR N, u32* V, xr_vector<xr_token>* T) :IConsole_Command(N), value(V), tokens(T) {};
+	CCC_VectorToken(LPCSTR N, u32* V, xr_vector<xr_token>* T) :IConsole_Command(N), value(V), tokens(T)
+	{
+		int i = 0;
+	};
 
 	void Info(TInfo& I) override
 	{
@@ -100,14 +103,19 @@ public:
 
 	void Status(TStatus& S) override
 	{
-		auto finder = std::find_if(tokens->begin(), tokens->end(), [&](xr_token token)
-		{
-			return token.id == static_cast<int>(*value);
-		});
-		if (finder != tokens->end())
-			strcpy_s(S, (*finder).name);
-		else
+		if (*value==static_cast<u32>(-1) || tokens->size()==0)
 			strcpy_s(S, "?");
+		else
+		{
+			auto finder = std::find_if(tokens->begin(), tokens->end(), [&](xr_token token)
+			{
+				return token.id == static_cast<int>(*value);
+			});
+			if (finder != tokens->end())
+				strcpy_s(S, (*finder).name);
+			else
+				strcpy_s(S, "?");
+		}
 	}
 
 	xr_vector<xr_token>* GetVectorTokens() const

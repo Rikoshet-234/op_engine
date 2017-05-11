@@ -46,12 +46,12 @@ CUIInventoryWnd::CUIInventoryWnd()
 	
 	UIRank								= nullptr;
 
-	Init								();
+	CUIInventoryWnd::Init								();
 	m_pCurrentCellItem=nullptr;
 
 	g_pInvWnd							= this;	
 	m_b_need_reinit						= false;
-	Hide								();	
+	CUIInventoryWnd::Hide								();	
 	SetUIWindowType(EAWindowType::wtInventory);
 }
 
@@ -588,7 +588,12 @@ bool CUIInventoryWnd::OnKeyboard(int dik, EUIMessages keyboard_action)
 	if (WINDOW_KEY_PRESSED == keyboard_action)
 	{
 //#ifdef DEBUG
-		if(DIK_NUMPAD7 == dik && CurrentIItem())
+		if (DIK_NUMPAD1 == dik && CurrentIItem())
+		{
+			CurrentIItem()->SetVisibleForUI(false);
+			Msg("Hide current selected item from UI [%s]",CurrentIItem()->GetGameObject()->Section());
+		} 
+		else if(DIK_NUMPAD7 == dik && CurrentIItem())
 		{
 			CurrentIItem()->ChangeCondition(-0.05f);
 			UIItemInfo.InitItem(CurrentIItem());

@@ -302,6 +302,7 @@ IC	void CSpaceRestrictionManager::difference_restrictions	(shared_str &restricti
 	}
 
 #else
+	
 	string4096 m_temp2 = { 0 };
 	u32 m_temp2_pos = 0;
 	const ItemParser ipRestrisctions(restrictions);

@@ -16,7 +16,7 @@ bool CUIListWnd::AddItem(const char*  str, const float shift, void* pData,
 
 	VERIFY(pItem);
 
-	pItem->Init(str, shift, m_bVertFlip?GetHeight()-GetSize()* m_iItemHeight-m_iItemHeight:GetSize()* m_iItemHeight, 
+	pItem->Init(str, shift, m_bVertFlip?GetHeight()-GetItemsCount()* m_iItemHeight-m_iItemHeight: GetItemsCount()* m_iItemHeight,
 		m_iItemWidth, m_iItemHeight);
 
 	pItem->SetData(pData);
@@ -31,9 +31,21 @@ template <class Element>
 bool CUIListWnd::AddItem(Element* pItem, int insertBeforeIdx)
 {	
 	AttachChild(pItem);
-
-	pItem->Init(pItem->GetWndRect().left, m_bVertFlip?GetHeight()-GetItemsCount()* m_iItemHeight-m_iItemHeight:GetItemsCount()* m_iItemHeight, 
-		m_iItemWidth, m_iItemHeight);
+	float itemsHeight=0;
+	float separatorsHeight=0;
+	std::for_each(m_ItemList.begin(), m_ItemList.end(), [&](CUIListItem* item)
+	{
+		if (item->m_bSeparator)
+			separatorsHeight += item->GetHeight();
+		else
+			itemsHeight += m_iItemHeight;
+	});
+	float totalHeight = itemsHeight + separatorsHeight;
+	float itemHeight = pItem->m_bSeparator ? pItem->GetHeight() : m_iItemHeight;
+	pItem->Init(pItem->GetWndRect().left, m_bVertFlip?
+											GetHeight()- totalHeight - itemHeight :
+											totalHeight,
+		m_iItemWidth, itemHeight);
 
 
 	//добавление в конец или начало списка

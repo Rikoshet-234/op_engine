@@ -1,6 +1,10 @@
-#include "pch_script.h"
+#include "../pch_script.h"
 #include "UIWpnParams.h"
 #include "UIXmlInit.h"
+#include "UIScrollView.h"
+#include "UIListWnd.h"
+#include "UIScrollView.h"
+#include "UIListItemEx.h"
 #include "../level.h"
 #include "../game_base_space.h"
 #include "../ai_space.h"
@@ -39,15 +43,24 @@ void destroy_lua_wpn_params()
 }
 
 CUIWpnParams::CUIWpnParams(){
-	AttachChild(&m_textAccuracy);
-	AttachChild(&m_textDamage);
-	AttachChild(&m_textHandling);
-	AttachChild(&m_textRPM);
+	CUIWindow::AttachChild(&m_textAccuracy);
+	CUIWindow::AttachChild(&m_textDamage);
+	CUIWindow::AttachChild(&m_textHandling);
+	CUIWindow::AttachChild(&m_textRPM);
 
-	AttachChild(&m_progressAccuracy);
-	AttachChild(&m_progressDamage);
-	AttachChild(&m_progressHandling);
-	AttachChild(&m_progressRPM);
+	CUIWindow::AttachChild(&m_progressAccuracy);
+	CUIWindow::AttachChild(&m_progressDamage);
+	CUIWindow::AttachChild(&m_progressHandling);
+	CUIWindow::AttachChild(&m_progressRPM);
+	//CUIWindow::AttachChild(&m_dyn_list_info);
+	//m_dyn_list_info.EnableScrollBar(false);
+	//m_dyn_list_info.EnableAlwaysShowScroll(false);
+	//m_dyn_list_info.SetIgnoreScrolling(true);
+	m_progressAccuracy.SetRange(0, 100);
+	m_progressDamage.SetRange(0, 100);
+	m_progressHandling.SetRange(0, 100);
+	m_progressRPM.SetRange(0, 100);
+
 }
 
 CUIWpnParams::~CUIWpnParams()
@@ -67,17 +80,12 @@ void CUIWpnParams::InitFromXml(CUIXml& xml_doc){
 	CUIXmlInit::InitProgressBar		(xml_doc, "wpn_params:progress_damage",		0, &m_progressDamage);
 	CUIXmlInit::InitProgressBar		(xml_doc, "wpn_params:progress_handling",	0, &m_progressHandling);
 	CUIXmlInit::InitProgressBar		(xml_doc, "wpn_params:progress_rpm",		0, &m_progressRPM);
-
-	m_progressAccuracy.SetRange		(0, 100);
-	m_progressDamage.SetRange		(0, 100);
-	m_progressHandling.SetRange		(0, 100);
-	m_progressRPM.SetRange			(0, 100);
-
+	//CUIXmlInit::InitListWnd(xml_doc, "wpn_params:dynamic_info_list", 0, &m_dyn_list_info);
 }
 
-void CUIWpnParams::SetInfo(const shared_str& wpn_section)
+void CUIWpnParams::SetInfo(const shared_str& wpn_section,CUIScrollView *parent)
 {
-
+	//m_dyn_list_info.RemoveAll();
 	if(!g_lua_wpn_params)
 		g_lua_wpn_params = xr_new<SLuaWpnParams>();
 
@@ -88,6 +96,15 @@ void CUIWpnParams::SetInfo(const shared_str& wpn_section)
 	else
 		m_progressDamage.SetProgressPos	(g_lua_wpn_params->m_functorDamageMP(*wpn_section));
 	m_progressHandling.SetProgressPos	(g_lua_wpn_params->m_functorHandling(*wpn_section));
+
+	/*CUIListItem *pNewItem = xr_new<CUIListItem>();
+	pNewItem->SetText("text");
+	m_dyn_list_info.AddItem<CUIListItem>(pNewItem);*/
+
+
+	/*m_dyn_list_info.AddItem<CUIListItemEx>("text");
+	m_dyn_list_info.AddItem<CUIListItemEx>(" • text");*/
+	parent->AddWindow(this, false);
 }
 
 bool CUIWpnParams::Check(const shared_str& wpn_section){

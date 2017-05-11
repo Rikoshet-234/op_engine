@@ -52,6 +52,7 @@
 #include "UICellCustomItems.h"
 #include "../../defines.h"
 #include <stdlib.h>
+#include "../../CMultiHUDs.h"
 
 #ifdef DEBUG
 #	include "../debug_renderer.h"
@@ -84,15 +85,16 @@ const u32	g_clWhite					= 0xffffffff;
 
 CUIMainIngameWnd::CUIMainIngameWnd()
 {
-	m_pActor					= nullptr;
-	m_pWeapon					= nullptr;
-	m_pGrenade					= nullptr;
-	m_pItem						= nullptr;
-	UIZoneMap					= xr_new<CUIZoneMap>();
-	m_pPickUpItem				= nullptr;
-	m_artefactPanel				= xr_new<CUIArtefactPanel>();
-	m_pMPChatWnd				= nullptr;
-	m_pMPLogWnd					= nullptr;	
+	m_pActor = nullptr;
+	m_pWeapon = nullptr;
+	m_pGrenade = nullptr;
+	m_pItem = nullptr;
+	UIZoneMap = xr_new<CUIZoneMap>();
+	m_pPickUpItem = nullptr;
+	m_artefactPanel = xr_new<CUIArtefactPanel>();
+	m_pMPChatWnd = nullptr;
+	m_pMPLogWnd = nullptr;
+	m_UIIcons = nullptr;
 }
 
 #include "UIProgressShape.h"
@@ -1259,7 +1261,7 @@ void CUIMainIngameWnd::re_init()
 	UIStaticRadiation.DetachChild(&UIRadiationBar);
 
 	CUIXml						uiXml;
-	uiXml.Init					(CONFIG_PATH, UI_PATH, MAININGAME_XML);
+	uiXml.Init(CONFIG_PATH, UI_PATH, MAININGAME_XML);
 	CUIXmlInit					xml_init;
 	CUIWindow::Init				(0,0, UI_BASE_WIDTH, UI_BASE_HEIGHT);
 

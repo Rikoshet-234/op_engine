@@ -306,8 +306,8 @@ void CUICarBodyWnd::UpdateLists()
 	TIItemContainer::iterator it;
 	for(it =  ruck_list.begin(); ruck_list.end() != it; ++it) 
 	{
-		CUICellItem* itm				= create_cell_item(*it);
-		AddSingleItemToList(itm,m_pUIOurBagList);
+			CUICellItem* itm = create_cell_item(*it);
+			AddSingleItemToList(itm, m_pUIOurBagList);
 	}
 
 

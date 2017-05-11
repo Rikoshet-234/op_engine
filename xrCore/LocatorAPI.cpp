@@ -392,7 +392,6 @@ void CLocatorAPI::ProcessArchive(LPCSTR _path, LPCSTR base_path)
 void CLocatorAPI::ProcessOne	(const char* path, void* _F)
 {
 	_finddata_t& F	= *((_finddata_t*)_F);
-
 	string_path	N;
 	strcpy_s	(N,sizeof(N),path);
 	strcat_s		(N,F.name);

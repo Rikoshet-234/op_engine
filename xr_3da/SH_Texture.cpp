@@ -15,6 +15,8 @@
 #define		PRIORITY_LOW	4
 
 #include "../build_defines.h"
+#include "CMultiHUDs.h"
+#include "../xrXMLParser/xrXMLParser.h"
 
 void resptrcode_texture::create(LPCSTR _name)
 {
@@ -182,7 +184,17 @@ void CTexture::Load		()
 #ifndef		DEDICATED_SERVER
 	// Check for OGM
 	string_path			fn;
-	if (FS.exist(fn,"$game_textures$",*cName,".ogm")){
+	LPCSTR path_alias = _game_textures_;
+	xr_string currentName = cName.c_str();
+	HUDProfile* profile = multiHUDs->GetCurrentProfile();
+	if (profile && profile->ExistFileInProfile(currentName.c_str()))
+	{
+		path_alias = _game_huds_;
+		string512 buf;
+		sprintf_s(buf, "%stextures\\%s", profile->folder_path.c_str(), currentName.c_str());
+		currentName = buf;
+	}
+	if (FS.exist(fn, path_alias, currentName.c_str(),".ogm")){
 		// AVI
 		pTheora		= xr_new<CTheoraSurface>();
 		m_play_time	= 0xFFFFFFFF;
@@ -195,12 +207,12 @@ void CTexture::Load		()
 			pTheora->Play		(TRUE,Device.dwTimeContinual);
 
 			// Now create texture
-			IDirect3DTexture9*	pTexture = 0;
+			IDirect3DTexture9*	pTexture = nullptr;
 			u32 _w = pTheora->Width(false);
 			u32 _h = pTheora->Height(false);
 
 			HRESULT hrr = HW.pDevice->CreateTexture(
-				_w, _h, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &pTexture, NULL );
+				_w, _h, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &pTexture, nullptr );
 
 			pSurface = pTexture;
 			if (FAILED(hrr))
@@ -208,12 +220,12 @@ void CTexture::Load		()
 				FATAL		("Invalid video stream");
 				R_CHK		(hrr);
 				xr_delete	(pTheora);
-				pSurface	= 0;
+				pSurface	= nullptr;
 			}
 
 		}
 	} else
-	if (FS.exist(fn,"$game_textures$",*cName,".avi")){
+	if (FS.exist(fn, path_alias, currentName.c_str(),".avi")){
 		// AVI
 		pAVI = xr_new<CAviPlayerCustom>();
 
@@ -224,10 +236,10 @@ void CTexture::Load		()
 			flags.MemoryUsage	= pAVI->m_dwWidth*pAVI->m_dwHeight*4;
 
 			// Now create texture
-			IDirect3DTexture9*	pTexture = 0;
+			IDirect3DTexture9*	pTexture = nullptr;
 			HRESULT hrr = HW.pDevice->CreateTexture(
 				pAVI->m_dwWidth,pAVI->m_dwHeight,1,0,D3DFMT_A8R8G8B8,D3DPOOL_MANAGED,
-				&pTexture,NULL
+				&pTexture, nullptr
 				);
 			pSurface	= pTexture;
 			if (FAILED(hrr))
@@ -235,12 +247,12 @@ void CTexture::Load		()
 				FATAL		("Invalid video stream");
 				R_CHK		(hrr);
 				xr_delete	(pAVI);
-				pSurface = 0;
+				pSurface = nullptr;
 			}
 
 		}
 	} else
-	if (FS.exist(fn,"$game_textures$",*cName,".seq"))
+	if (FS.exist(fn, path_alias, currentName.c_str(),".seq"))
 	{
 		// Sequence
 		string256 buffer;
@@ -248,13 +260,13 @@ void CTexture::Load		()
 
 		flags.seqCycles	= FALSE;
 		_fs->r_string	(buffer,sizeof(buffer));
-		if (0==stricmp	(buffer,"cycled"))
+		if (0==_stricmp	(buffer,"cycled"))
 		{
 			flags.seqCycles	= TRUE;
 			_fs->r_string	(buffer,sizeof(buffer));
 		}
-		f32 fps	= (float)atof(buffer);
-		seqMSPF		= (u32)(1000/fps);
+		f32 fps	= static_cast<float>(atof(buffer));
+		seqMSPF		= static_cast<u32>(1000 / fps);
 		while (!_fs->eof())
 		{
 			_fs->r_string(buffer,sizeof(buffer));
@@ -272,13 +284,13 @@ void CTexture::Load		()
 				}
 			}
 		}
-		pSurface	= 0;
+		pSurface	= nullptr;
 		FS.r_close	(_fs);
 	} else
 	{
 		// Normal texture
 		u32	mem  = 0;
-		pSurface = ::Render->texture_load	(*cName,mem);
+		pSurface = ::Render->texture_load	(currentName.c_str(),mem);
 
 		// Calc memory usage and preload into vid-mem
 		if (pSurface) {

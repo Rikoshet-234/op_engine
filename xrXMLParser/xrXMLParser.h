@@ -15,6 +15,8 @@
 
 const LPCSTR GAMEDATA_PATH			= "$game_data$";
 const LPCSTR CONFIG_PATH			= "$game_config$";
+const LPCSTR HUDS_PATH = "$game_huds$";
+const LPCSTR TEXTURES_PATH = "$game_textures$";
 const LPCSTR UI_PATH				= "ui";
 const LPCSTR GAME_PATH				= "gameplay";
 const LPCSTR STRING_TABLE_PATH		= "text";

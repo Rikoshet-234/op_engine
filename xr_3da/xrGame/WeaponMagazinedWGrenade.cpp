@@ -288,7 +288,10 @@ void  CWeaponMagazinedWGrenade::PerformSwitchGL(bool switchOnLoad)
 			if(GrenadeLauncherAttachable())
 				LoadZoomOffset(*hud_sect, "grenade_normal_");
 			else
-				LoadZoomOffset(*hud_sect, "");
+				if (m_bEmptyScopeTexture && IsScopeAttached())
+					LoadZoomOffset(*hud_sect, "scope_");
+				else
+					LoadZoomOffset(*hud_sect, "");
 		}
 	}
 	if (m_bGrenadeMode)
@@ -683,8 +686,8 @@ bool CWeaponMagazinedWGrenade::Attach(PIItem pIItem, bool b_send_event)
 			if (OnServer()) 
 				pIItem->object().DestroyObject	();
 		}
-		InitAddons				();
 		UpdateAddonsVisibility	();
+		InitAddons();
 		return					true;
 	}
 	else
@@ -733,7 +736,10 @@ void CWeaponMagazinedWGrenade::InitAddons()
 				if(IsGrenadeLauncherAttached())
 					LoadZoomOffset(*hud_sect, "grenade_normal_");
 				else
-					LoadZoomOffset(*hud_sect, "");
+					if (m_bEmptyScopeTexture && IsScopeAttached())
+						LoadZoomOffset(*hud_sect, "scope_");
+					else
+						LoadZoomOffset(*hud_sect, "");
 			}
 		}
 	}

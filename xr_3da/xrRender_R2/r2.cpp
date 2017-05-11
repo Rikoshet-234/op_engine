@@ -167,8 +167,8 @@ void					CRender::create					()
 
 	// nvstencil on NV40 and up
 	o.nvstencil			= FALSE;
-	if ((HW.Caps.id_vendor==0x10DE)&&(HW.Caps.id_device>=0x40))	o.nvstencil = TRUE;
-	if (strstr(Core.Params,"-nonvs"))		o.nvstencil	= FALSE;
+	//if ((HW.Caps.id_vendor==0x10DE)&&(HW.Caps.id_device>=0x40))	o.nvstencil = TRUE;
+	//if (strstr(Core.Params,"-nonvs"))		o.nvstencil	= FALSE;
 
 	// nv-dbt
 	o.nvdbt				= HW.support	((D3DFORMAT)MAKEFOURCC('N','V','D','B'), D3DRTYPE_SURFACE, 0);
@@ -180,6 +180,13 @@ void					CRender::create					()
 	if (strstr(Core.Params,"-smap2560"))	o.smapsize	= 2560;
 	if (strstr(Core.Params,"-smap3072"))	o.smapsize	= 3072;
 	if (strstr(Core.Params,"-smap4096"))	o.smapsize	= 4096;
+	D3DCAPS9 caps;
+	CHK_DX(HW.pDevice->GetDeviceCaps(&caps));
+	u32 video_mem = HW.pDevice->GetAvailableTextureMem();
+	if ((caps.MaxTextureHeight >= 6144) && (video_mem > 512) && strstr(Core.Params,"-smap6144"))
+		o.smapsize	= 6144;
+	if ((caps.MaxTextureHeight >= 8192) && (video_mem > 512) && strstr(Core.Params,"-smap8192"))
+		o.smapsize	= 8192;
 
 	// gloss
 	char*	g			= strstr(Core.Params,"-gloss ");

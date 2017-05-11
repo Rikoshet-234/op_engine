@@ -14,7 +14,6 @@
 #include "xr_time.h"
 #include "character_info_defs.h"
 #include "inventory_space.h"
-//#include "NightVisionDevice.h"
 
 enum EPdaMsg;
 enum ESoundTypes;
@@ -155,6 +154,8 @@ public:
 	void				SetCondition(float val);
 	void				DropItem(CScriptGameObject* pItem);
 	void				DropItemAndTeleport(CScriptGameObject* pItem, Fvector position);
+	bool GetVisibleForUI();
+	void SetVisisbeForUI(bool value);
 #pragma endregion
 #pragma region CEntity
 	_DECLARE_FUNCTION10(DeathTime, u32);

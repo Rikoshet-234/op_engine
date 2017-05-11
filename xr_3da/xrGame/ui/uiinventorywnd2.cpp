@@ -82,6 +82,20 @@ void CUIInventoryWnd::InitInventory_delayed()
 	m_b_need_reinit = true;
 }
 
+void CUIInventoryWnd::PaintItemFromSlot(u32 slotId)
+{
+	CUIDragDropListEx* destList = GetListByID(static_cast<IWListTypes>(slotId));
+	PIItem _itm = m_pInv->m_slots[slotId].m_pIItem;
+	if (_itm && destList)
+	{
+		if (_itm->GetVisibleForUI())
+		{
+			CUICellItem* itm = create_cell_item(_itm);
+			destList->SetItem(itm);
+		}
+	}
+}
+
 void CUIInventoryWnd::InitInventory() 
 {
 	CInventoryOwner *pInvOwner	= smart_cast<CInventoryOwner*>(Level().CurrentEntity());
@@ -95,71 +109,18 @@ void CUIInventoryWnd::InitInventory()
 	SetCurrentItem				(nullptr);
 
 #pragma region put items to slots
-	PIItem _itm							= m_pInv->m_slots[DETECTOR_ARTS_SLOT].m_pIItem;
-	if(_itm)
-	{
-		CUICellItem* itm				= create_cell_item(_itm);
-		m_pUIDetectorArtsList->SetItem		(itm);
-	}
-	_itm							= m_pInv->m_slots[DETECTOR_ANOM_SLOT].m_pIItem;
-	if(_itm)
-	{
-		CUICellItem* itm				= create_cell_item(_itm);
-		m_pUIDetectorAnomsList->SetItem		(itm);
-	}
-
-	_itm							= m_pInv->m_slots[APPARATUS_SLOT].m_pIItem;
-	if(_itm)
-	{
-		CUICellItem* itm				= create_cell_item(_itm);
-		m_pUIApparatusList->SetItem		(itm);
-	}
-
-	_itm							= m_pInv->m_slots[BIODEV_SLOT].m_pIItem;
-	if(_itm)
-	{
-		CUICellItem* itm				= create_cell_item(_itm);
-		m_pUIBiodevList->SetItem		(itm);
-	}
-
-	_itm							= m_pInv->m_slots[PNV_SLOT].m_pIItem;
-	if(_itm)
-	{
-		CUICellItem* itm				= create_cell_item(_itm);
-		m_pUIPNVList->SetItem		(itm);
-	}
-
-	_itm							= m_pInv->m_slots[KNIFE_SLOT].m_pIItem;
-	if(_itm)
-	{
-		CUICellItem* itm				= create_cell_item(_itm);
-		m_pUIKnifeList->SetItem		(itm);
-	}
-
-	_itm							= m_pInv->m_slots[PISTOL_SLOT].m_pIItem;
-	if(_itm)
-	{
-		CUICellItem* itm				= create_cell_item(_itm);
-		m_pUIPistolList->SetItem		(itm);
-	}
-
-
-	_itm								= m_pInv->m_slots[RIFLE_SLOT].m_pIItem;
-	if(_itm)
-	{
-		CUICellItem* itm				= create_cell_item(_itm);
-		m_pUIAutomaticList->SetItem		(itm);
-	}
-
-	_itm								= m_pInv->m_slots[SHOTGUN_SLOT].m_pIItem;
-	if(_itm)
-	{
-		CUICellItem* itm				= create_cell_item(_itm);
-		m_pUIShotgunList->SetItem		(itm);
-	}
+	PaintItemFromSlot(DETECTOR_ARTS_SLOT);
+	PaintItemFromSlot(DETECTOR_ANOM_SLOT);
+	PaintItemFromSlot(APPARATUS_SLOT);
+	PaintItemFromSlot(BIODEV_SLOT);
+	PaintItemFromSlot(PNV_SLOT);
+	PaintItemFromSlot(KNIFE_SLOT);
+	PaintItemFromSlot(PISTOL_SLOT);
+	PaintItemFromSlot(RIFLE_SLOT);
+	PaintItemFromSlot(SHOTGUN_SLOT);
 
 	PIItem _outfit						= m_pInv->m_slots[OUTFIT_SLOT].m_pIItem;
-	CUICellItem* outfit					= (_outfit)?create_cell_item(_outfit):NULL;
+	CUICellItem* outfit					= (_outfit && _outfit->GetVisibleForUI())?create_cell_item(_outfit):NULL;
 	m_pUIOutfitList->SetItem			(outfit);
 #pragma endregion
 
@@ -167,8 +128,11 @@ void CUIInventoryWnd::InitInventory()
 	TIItemContainer::iterator it, it_e;
 	for(it=m_pInv->m_belt.begin(),it_e=m_pInv->m_belt.end(); it!=it_e; ++it) 
 	{
-		CUICellItem* itm			= create_cell_item(*it);
-		m_pUIBeltList->SetItem		(itm);
+		if ((*it)->GetVisibleForUI())
+		{
+			CUICellItem* itm = create_cell_item(*it);
+			m_pUIBeltList->SetItem(itm);
+		}
 	}
 
 #pragma endregion
@@ -180,11 +144,14 @@ void CUIInventoryWnd::InitInventory()
 	int i=1;
 	for(it=ruck_list.begin(),it_e=ruck_list.end(); it!=it_e; ++it,++i) 
 	{
-		CUICellItem* itm			= create_cell_item(*it);
-		m_pUIBagList->SetItem		(itm);
+		if ((*it)->GetVisibleForUI())
+		{
+			CUICellItem* itm = create_cell_item(*it);
+			m_pUIBagList->SetItem(itm);
+		}
 	}
-	//fake
-	_itm								= m_pInv->m_slots[GRENADE_SLOT].m_pIItem;
+	//fake grenade slot
+	PIItem _itm								= m_pInv->m_slots[GRENADE_SLOT].m_pIItem;
 	if(_itm)
 	{
 		CUICellItem* itm				= create_cell_item(_itm);

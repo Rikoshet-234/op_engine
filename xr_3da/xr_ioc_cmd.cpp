@@ -15,6 +15,7 @@
 
 #include "xr_object.h"
 #include "../build_defines.h"
+#include "CMultiHUDs.h"
 
 
 xr_token							snd_freq_token							[ ]={
@@ -527,6 +528,19 @@ void CCC_Register()
 	// General
 	CMD3(CCC_VectorToken, "font_profile", &psCurrentFontProfileIndex, &vid_font_profile_tokens);
 	CMD3(CCC_VectorToken, "g_lang", &psCurrentLanguageIndex, &languages_tokens);
+#pragma region check multihud support
+	if (multiHUDs->EnabledMultiHUDs())
+	{
+		CMD3(CCC_VectorToken, "g_current_hud", &multiHUDs->psCurrentHUDProfileIndex, &multiHUDs->tokens);
+	}
+	else
+	{
+		Msg("Multi HUDs support disabled. using HUD params from default gamedata");
+		multiHUDs->psCurrentHUDProfileIndex = static_cast<u32>(-1);
+	}
+#pragma endregion
+
+
 
 	CMD1(CCC_Help,		"help"					);
 	CMD1(CCC_Quit,		"quit"					);

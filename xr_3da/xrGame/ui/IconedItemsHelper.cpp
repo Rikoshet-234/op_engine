@@ -166,9 +166,11 @@ void setIconedItem(xr_map<shared_str ,shared_str> iconIDs,CUIListItemIconed* ite
 void addSeparator(CUIListWnd* list,shared_str textId)
 {
 		CUIListItem* separator=xr_new<CUIListItem>();
+		separator->SetHeight(5);
 		separator->SetAutoDelete(true);
 		separator->SetText(CStringTable().translate(textId).c_str());
 		separator->SetTextAlignment(ETextAlignment::alCenter);
+		separator->m_bSeparator = true;
 		list->AddItem(separator);
 }
 
@@ -177,5 +179,6 @@ void addSeparator(CUIListWnd* list)
 		CUIListItem* separator=xr_new<CUIListItem>();
 		separator->SetAutoDelete(true);
 		separator->SetHeight(5);
+		separator->m_bSeparator = true;
 		list->AddItem(separator);
 }

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "xrUIXmlParser.h"
+#include "../../CMultiHUDs.h"
 
 #ifdef XRGAME_EXPORTS
 	#include "../ui_base.h"

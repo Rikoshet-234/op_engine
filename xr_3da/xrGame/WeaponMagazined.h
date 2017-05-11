@@ -69,6 +69,7 @@ protected:
 	u32				dwUpdateSounds_Frame;
 	bool			m_bRequredDemandCheck;
 	ref_sound* m_pSoundAddonProc;
+	bool m_bEmptyScopeTexture;
 protected:
 	bool ZoomInc	() override;
 	bool ZoomDec	() override;
@@ -110,6 +111,7 @@ public:
 	virtual void	Load			(LPCSTR section);
 	
 	
+	bool UseScopeTexture() override;
 
 	virtual CWeaponMagazined*cast_weapon_magazined	()		 {return this;}
 

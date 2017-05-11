@@ -9347,9 +9347,6 @@
     <ClCompile Include="ui\UICharacterInfo.cpp">
       <Filter>UI\Common\CharacterInfo</Filter>
     </ClCompile>
-    <ClCompile Include="ui\IUWpnParams.cpp">
-      <Filter>UI\Common\ItemInfo</Filter>
-    </ClCompile>
     <ClCompile Include="ui\ui_af_params.cpp">
       <Filter>UI\Common\ItemInfo</Filter>
     </ClCompile>
@@ -9811,6 +9808,9 @@
     </ClCompile>
     <ClCompile Include="NightVisionDevice_script.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Devices\NightVision</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIWpnParams.cpp">
+      <Filter>UI\Common\ItemInfo</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

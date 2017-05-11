@@ -26,9 +26,10 @@
 #include "ai_space.h"
 #include "script_engine.h"
 #include "script_game_object.h"
-#include "OPFuncs/lua_functions.h"
 #include "../ISpatial.h"
 #include "OPFuncs/utils.h"
+#include "alife_simulator.h"
+#include "alife_simulator_header.h"
 
 #ifdef DEBUG
 #	include "debug_renderer.h"
@@ -81,8 +82,6 @@ net_updateData* CInventoryItem::NetSync()
 	return m_net_updateData;
 }
 
-
-
 #include <cctype>
 #include <algorithm>
 
@@ -125,20 +124,21 @@ std::string CInventoryItem::ParseDescription() const
 
 CInventoryItem::CInventoryItem() 
 {
-	m_net_updateData	= NULL;
+	m_net_updateData	= nullptr;
 	m_slot				= NO_ACTIVE_SLOT;
 	m_flags.set			(Fbelt,FALSE);
 	m_flags.set			(Fruck,TRUE);
 	m_flags.set			(FRuckDefault,TRUE);
-	m_pCurrentInventory	= NULL;
+	m_pCurrentInventory	= nullptr;
 	SetDropManual		(FALSE);
 
 	m_flags.set			(FCanTake,TRUE);
 	m_flags.set			(FCanTrade,TRUE);
 	m_flags.set			(FUsingCondition,FALSE);
+	m_bVisibleForUI = true;
 	m_fCondition		= 1.0f;
 
-	m_name = m_nameShort = NULL;
+	m_name = m_nameShort = nullptr;
 
 	m_eItemPlace		= eItemPlaceUndefined;
 	m_Description		= "";
@@ -201,12 +201,14 @@ void CInventoryItem::Load(LPCSTR section)
 		m_Description = CStringTable().translate(descriptionVar.c_str());
 	}
 
+
 	m_flags.set(Fbelt, READ_IF_EXISTS(pSettings, r_bool, section, "belt", FALSE));
 	m_flags.set(FRuckDefault, READ_IF_EXISTS(pSettings, r_bool, section, "default_to_ruck", TRUE));
-
 	m_flags.set(FCanTake, READ_IF_EXISTS(pSettings, r_bool, section, "can_take", TRUE));
 	m_flags.set(FCanTrade, READ_IF_EXISTS(pSettings, r_bool, section, "can_trade", TRUE));
 	m_flags.set(FIsQuestItem, READ_IF_EXISTS(pSettings, r_bool, section, "quest_item", FALSE));
+	if (pSettings->line_exist(section, "visible_for_ui"))
+		m_bVisibleForUI = !!pSettings->r_bool(section, "useful_for_npc");
 	if (pSettings->line_exist(section, "useful_for_npc"))
 	{
 		m_flags.set(Fuseful_for_NPC, pSettings->r_bool(section, "useful_for_npc"));
@@ -236,13 +238,11 @@ void CInventoryItem::Load(LPCSTR section)
 	}
 }
 
-
 void  CInventoryItem::ChangeCondition(float fDeltaCondition)
 {
 	m_fCondition += fDeltaCondition;
 	clamp(m_fCondition, 0.f, 1.f);
 }
-
 
 void	CInventoryItem::Hit					(SHit* pHDS)
 {
@@ -457,17 +457,16 @@ BOOL CInventoryItem::net_Spawn(CSE_Abstract* DC)
 	//	m_bInterpolate					= false;
 	if (!m_bUsefulFromConfig)
 		m_flags.set(Fuseful_for_NPC, TRUE);
-	CSE_Abstract					*e = (CSE_Abstract*)(DC);
+	CSE_Abstract					*e = static_cast<CSE_Abstract*>(DC);
 	CSE_ALifeObject					*alife_object = smart_cast<CSE_ALifeObject*>(e);
 	if (alife_object && !m_bUsefulFromConfig)
 	{
 		m_flags.set(Fuseful_for_NPC, alife_object->m_flags.test(CSE_ALifeObject::flUsefulForAI));
 	}
-
 	CSE_ALifeInventoryItem			*pSE_InventoryItem = smart_cast<CSE_ALifeInventoryItem*>(e);
 	if (!pSE_InventoryItem)			return TRUE;
-
 	//!!!
+
 	m_fCondition = pSE_InventoryItem->m_fCondition;
 	if (GameID() != GAME_SINGLE)
 		object().processing_activate();
@@ -485,63 +484,63 @@ void CInventoryItem::net_Destroy		()
 
 void CInventoryItem::save(NET_Packet &packet)
 {
-	packet.w_u8				((u8)m_eItemPlace);
+	packet.w_u8(m_bVisibleForUI ? 1 : 0);
+	packet.w_u8				(static_cast<u8>(m_eItemPlace));
 	packet.w_float			(m_fCondition);
-
 	if (object().H_Parent()) {
 		packet.w_u8			(0);
 		return;
 	}
 
-	u8 _num_items			= (u8)object().PHGetSyncItemsNumber(); 
+	u8 _num_items			= static_cast<u8>(object().PHGetSyncItemsNumber()); 
 	packet.w_u8				(_num_items);
 	object().PHSaveState	(packet);
 }
 
 typedef CSE_ALifeInventoryItem::mask_num_items	mask_num_items;
 
-void CInventoryItem::net_Import			(NET_Packet& P) 
-{	
+void CInventoryItem::net_Import(NET_Packet& P)
+{
 	u8							NumItems = 0;
-	NumItems					= P.r_u8();
+	NumItems = P.r_u8();
 	if (!NumItems)
 		return;
-
+#pragma region woodoo magic
 	net_update_IItem			N;
-	N.State.force.set			(0.f,0.f,0.f);
-	N.State.torque.set			(0.f,0.f,0.f);
-	
-	P.r_vec3					(N.State.position);
+	N.State.force.set(0.f, 0.f, 0.f);
+	N.State.torque.set(0.f, 0.f, 0.f);
 
-	N.State.quaternion.x		= P.r_float_q8(0.f,1.f);
-	N.State.quaternion.y		= P.r_float_q8(0.f,1.f);
-	N.State.quaternion.z		= P.r_float_q8(0.f,1.f);
-	N.State.quaternion.w		= P.r_float_q8(0.f,1.f);
+	P.r_vec3(N.State.position);
+
+	N.State.quaternion.x = P.r_float_q8(0.f, 1.f);
+	N.State.quaternion.y = P.r_float_q8(0.f, 1.f);
+	N.State.quaternion.z = P.r_float_q8(0.f, 1.f);
+	N.State.quaternion.w = P.r_float_q8(0.f, 1.f);
 
 	mask_num_items				num_items;
-	num_items.common			= NumItems;
-	NumItems					= num_items.num_items;
+	num_items.common = NumItems;
+	NumItems = num_items.num_items;
 
-	N.State.enabled				= num_items.mask & CSE_ALifeInventoryItem::inventory_item_state_enabled;
+	N.State.enabled = num_items.mask & CSE_ALifeInventoryItem::inventory_item_state_enabled;
 	if (!(num_items.mask & CSE_ALifeInventoryItem::inventory_item_angular_null)) {
-		N.State.angular_vel.x	= P.r_float_q8(0.f,10.f*PI_MUL_2);
-		N.State.angular_vel.y	= P.r_float_q8(0.f,10.f*PI_MUL_2);
-		N.State.angular_vel.z	= P.r_float_q8(0.f,10.f*PI_MUL_2);
+		N.State.angular_vel.x = P.r_float_q8(0.f, 10.f*PI_MUL_2);
+		N.State.angular_vel.y = P.r_float_q8(0.f, 10.f*PI_MUL_2);
+		N.State.angular_vel.z = P.r_float_q8(0.f, 10.f*PI_MUL_2);
 	}
 	else
-		N.State.angular_vel.set	(0.f,0.f,0.f);
+		N.State.angular_vel.set(0.f, 0.f, 0.f);
 
 	if (!(num_items.mask & CSE_ALifeInventoryItem::inventory_item_linear_null)) {
-		N.State.linear_vel.x	= P.r_float_q8(-32.f,32.f);
-		N.State.linear_vel.y	= P.r_float_q8(-32.f,32.f);
-		N.State.linear_vel.z	= P.r_float_q8(-32.f,32.f);
+		N.State.linear_vel.x = P.r_float_q8(-32.f, 32.f);
+		N.State.linear_vel.y = P.r_float_q8(-32.f, 32.f);
+		N.State.linear_vel.z = P.r_float_q8(-32.f, 32.f);
 	}
 	else
-		N.State.linear_vel.set	(0.f,0.f,0.f);
+		N.State.linear_vel.set(0.f, 0.f, 0.f);
 	////////////////////////////////////////////
 
-	N.State.previous_position	= N.State.position;
-	N.State.previous_quaternion	= N.State.quaternion;
+	N.State.previous_position = N.State.position;
+	N.State.previous_quaternion = N.State.quaternion;
 
 	net_updateData				*p = NetSync();
 
@@ -549,18 +548,19 @@ void CInventoryItem::net_Import			(NET_Packet& P)
 	//	return;
 	if (!p->NET_IItem.empty())
 	{
-		m_flags.set				(FInInterpolate, TRUE);
+		m_flags.set(FInInterpolate, TRUE);
 	}
 
-	Level().AddObject_To_Objects4CrPr		(m_object);
-	object().CrPr_SetActivated				(false);
-	object().CrPr_SetActivationStep			(0);
+	Level().AddObject_To_Objects4CrPr(m_object);
+	object().CrPr_SetActivated(false);
+	object().CrPr_SetActivationStep(0);
 
-	p->NET_IItem.push_back					(N);
+	p->NET_IItem.push_back(N);
 	while (p->NET_IItem.size() > 2)
 	{
-		p->NET_IItem.pop_front				();
+		p->NET_IItem.pop_front();
 	};
+#pragma endregion
 };
 
 void CInventoryItem::net_Export			(NET_Packet& P) 
@@ -570,6 +570,7 @@ void CInventoryItem::net_Export			(NET_Packet& P)
 		P.w_u8				(0);
 		return;
 	}
+#pragma region woodoo magic
 	CPHSynchronize* pSyncObj				= NULL;
 	SPHNetState								State;
 	pSyncObj = object().PHGetSyncItem		(0);
@@ -641,13 +642,17 @@ void CInventoryItem::net_Export			(NET_Packet& P)
 		P.w_float_q8		(State.linear_vel.y,-32.f,32.f);
 		P.w_float_q8		(State.linear_vel.z,-32.f,32.f);
 	}
+#pragma endregion
 };
 
 void CInventoryItem::load(IReader &packet)
 {
-	m_eItemPlace			= (EItemPlace)packet.r_u8();
+	if (ai().get_alife()->header().version() > 0x0003)
+	{
+		m_bVisibleForUI= packet.r_u8() == 1 ? true : false;
+	}
+	m_eItemPlace			= static_cast<EItemPlace>(packet.r_u8());
 	m_fCondition			= packet.r_float();
-
 	u8						tmp = packet.r_u8();
 	if (!tmp)
 		return;
@@ -976,7 +981,7 @@ void CInventoryItem::reload		(LPCSTR section)
 
 void CInventoryItem::reinit		()
 {
-	m_pCurrentInventory	= NULL;
+	m_pCurrentInventory	= nullptr;
 	m_eItemPlace	= eItemPlaceUndefined;
 }
 
@@ -987,17 +992,17 @@ bool CInventoryItem::can_kill			() const
 
 CInventoryItem *CInventoryItem::can_kill	(CInventory *inventory) const
 {
-	return				(0);
+	return				(nullptr);
 }
 
 const CInventoryItem *CInventoryItem::can_kill			(const xr_vector<const CGameObject*> &items) const
 {
-	return				(0);
+	return				(nullptr);
 }
 
 CInventoryItem *CInventoryItem::can_make_killing	(const CInventory *inventory) const
 {
-	return				(0);
+	return				(nullptr);
 }
 
 bool CInventoryItem::ready_to_kill		() const

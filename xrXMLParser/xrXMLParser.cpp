@@ -2,6 +2,7 @@
 #pragma hdrstop
 
 #include "xrXMLParser.h"
+#include "../xr_3da/CMultiHUDs.h"
 
 XRXMLPARSER_API CXml::CXml()
 	:	m_root			(NULL),
@@ -41,6 +42,11 @@ void ParseFile(LPCSTR path, CMemoryWriter& W, IReader *F, CXml* xml )
 				if(inc_name==strstr(inc_name,"ui\\"))
 				{
 					shared_str fn	= xml->correct_file_name("ui", strchr(inc_name,'\\')+1);
+					HUDProfile* profile = multiHUDs->GetCurrentProfile();
+					if (!profile || (profile && !profile->ExistFileInProfile(fn.c_str()) && xr_strcmp(path,HUDS_PATH)==0))
+					{
+						path = CONFIG_PATH;
+					}
 					string_path		buff;
 					strconcat		(sizeof(buff),buff,"ui\\",fn.c_str());
 					I 				= FS.r_open(path, buff);
@@ -50,7 +56,7 @@ void ParseFile(LPCSTR path, CMemoryWriter& W, IReader *F, CXml* xml )
 					I 	= FS.r_open(path, inc_name);
 
 				if(!I)
-                {
+				{
 					string1024 str2;
 					sprintf(str2,"XML file[%s] parsing failed. Can't find include file:[%s]",path,inc_name);
 					R_ASSERT2(false,str2);
@@ -67,9 +73,15 @@ void ParseFile(LPCSTR path, CMemoryWriter& W, IReader *F, CXml* xml )
 bool CXml::Init(LPCSTR path_alias, LPCSTR path, LPCSTR _xml_filename)
 {
 	shared_str fn			= correct_file_name(path, _xml_filename);
-
 	string_path				str;
-	sprintf					(str,"%s\\%s", path, *fn);
+	HUDProfile* profile = multiHUDs->GetCurrentProfile();
+	if (profile && profile->ExistFileInProfile(fn.c_str()))
+	{
+		path_alias = HUDS_PATH;
+		sprintf(str, "%s\\%s", profile->GetProfileConfigUIPath(), *fn);
+	}
+	else
+		sprintf					(str,"%s\\%s", path, *fn);
 	return Init				(path_alias, str);
 }
 

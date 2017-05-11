@@ -224,8 +224,7 @@ void CUIItemInfo::InitItem(CInventoryItem* pInvItem)
 void CUIItemInfo::TryAddWpnInfo (const shared_str& wpn_section){
 	if (UIWpnParams->Check(wpn_section))
 	{
-		UIWpnParams->SetInfo(wpn_section);
-		UIDesc->AddWindow(UIWpnParams,false);
+		UIWpnParams->SetInfo(wpn_section,UIDesc);
 	}
 }
 
@@ -234,7 +233,6 @@ void CUIItemInfo::TryAddArtefactInfo	(const shared_str& af_section)
 	if (UIArtefactParams->Check(af_section))
 	{
 		UIArtefactParams->SetInfo(af_section,UIDesc);
-		//UIDesc->AddWindow(UIArtefactParams, false);
 	}
 }
 
@@ -243,7 +241,6 @@ void CUIItemInfo::TryAddOutfitInfo(CInventoryItem* outfitItem)
 	if (UIOutfitParams->Check(outfitItem))
 	{
 		UIOutfitParams->SetInfo(smart_cast<CCustomOutfit*>(outfitItem),UIDesc);
-//		UIDesc->AddWindow(UIOutfitParams, false);
 	}
 }
 

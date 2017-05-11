@@ -196,7 +196,7 @@ void CScriptGameObject::ForEachInventoryItems(const luabind::functor<void> &func
 	
 	CInventory* pInv = &owner->inventory();
 	TIItemContainer item_list;
-	pInv->AddAvailableItems(item_list, true);
+	pInv->AddAvailableItems(item_list, true,true,true,false);
 
 	TIItemContainer::iterator it;
 	for(it =  item_list.begin(); item_list.end() != it; ++it) 

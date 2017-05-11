@@ -1162,12 +1162,15 @@ u32  CInventory::BeltWidth() const
 	return m_iMaxBelt;
 }
 
-void  CInventory::AddAvailableItems(TIItemContainer& items_container, bool for_trade,bool useBelt,bool useSlots) const
+void  CInventory::AddAvailableItems(TIItemContainer& items_container, bool for_trade,bool useBelt,bool useSlots, bool checkVisibility) const
 {
 	for(TIItemContainer::const_iterator it = m_ruck.begin(); m_ruck.end() != it; ++it) 
 	{
 		PIItem pIItem = *it;
-		if(!for_trade || pIItem->CanTrade())
+		bool visible = true;
+		if (checkVisibility)
+			visible= pIItem->GetVisibleForUI();
+		if((!for_trade || pIItem->CanTrade()) && visible)
 			items_container.push_back(pIItem);
 	}
 
@@ -1176,7 +1179,10 @@ void  CInventory::AddAvailableItems(TIItemContainer& items_container, bool for_t
 		for(TIItemContainer::const_iterator it = m_belt.begin(); m_belt.end() != it; ++it) 
 		{
 			PIItem pIItem = *it;
-			if(!for_trade || pIItem->CanTrade())
+			bool visible = true;
+			if (checkVisibility)
+				visible = pIItem->GetVisibleForUI();
+			if((!for_trade || pIItem->CanTrade()) && visible)
 				items_container.push_back(pIItem);
 		}
 	}
@@ -1188,10 +1194,16 @@ void  CInventory::AddAvailableItems(TIItemContainer& items_container, bool for_t
 		for(;slot_it!=slot_it_e;++slot_it)
 		{
 			const CInventorySlot& S = *slot_it;
-			if(S.m_pIItem && (!for_trade || S.m_pIItem->CanTrade())  )
+			if (S.m_pIItem)
 			{
-				if(!S.m_bPersistent || S.m_pIItem->GetSlot()==GRENADE_SLOT )
-					items_container.push_back(S.m_pIItem);
+				bool visible = true;
+				if (checkVisibility)
+					visible = S.m_pIItem->GetVisibleForUI();
+				if ((!for_trade || S.m_pIItem->CanTrade()) && visible)
+				{
+					if ((!S.m_bPersistent || S.m_pIItem->GetSlot() == GRENADE_SLOT))
+						items_container.push_back(S.m_pIItem);
+				}
 			}
 		}
 	}		
@@ -1216,15 +1228,15 @@ void CInventory::Items_SetCurrentEntityHud(bool current_entity)
 	{
 		PIItem pIItem = *it;
 		CHudItem* pHudItem = smart_cast<CHudItem*> (pIItem);
-		if (pHudItem) 
+		/*if (pHudItem) 
 		{
 			pHudItem->GetHUD()->Visible(current_entity);
-		};
+		};*/
 		CWeapon* pWeapon = smart_cast<CWeapon*>(pIItem);
 		if (pWeapon)
 		{
-			pWeapon->InitAddons();
 			pWeapon->UpdateAddonsVisibility();
+			pWeapon->InitAddons();
 		}
 	}
 };

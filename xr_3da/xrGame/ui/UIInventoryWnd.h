@@ -31,6 +31,7 @@ class CUIInventoryWnd: public CUIDialogWnd,public CUIListManipulations
 private:
 	typedef CUIDialogWnd	inherited;
 	bool					m_b_need_reinit;
+	void PaintItemFromSlot(u32 slotId);
 public:
 							CUIInventoryWnd				();
 	virtual					~CUIInventoryWnd			();

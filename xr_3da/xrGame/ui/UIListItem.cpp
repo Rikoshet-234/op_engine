@@ -6,24 +6,25 @@
 
 #include "UIlistitem.h"
 
-CUIListItem::CUIListItem(void)
+CUIListItem::CUIListItem()
 {
 	m_eButtonState = BUTTON_NORMAL;
 	m_ePressMode = NORMAL_PRESS;
 
 	m_bButtonClicked = false;
 
-	m_pData = NULL;
+	m_pData = nullptr;
 
 	m_iIndex = -1;
 	m_iValue = 0;
 	m_bHighlightText = false;
 	m_iGroupID = -1;
 	SetAutoDelete(true);
-	SetTextAlignment(CGameFont::alLeft);
+	CUIStatic::SetTextAlignment(CGameFont::alLeft);
+	m_bSeparator = false;
 }
 
-CUIListItem::~CUIListItem(void)
+CUIListItem::~CUIListItem()
 {
 }
 

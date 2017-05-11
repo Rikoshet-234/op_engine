@@ -164,6 +164,11 @@ void CWeaponMagazined::Load	(LPCSTR section)
 	LoadFireModes(section);
 }
 
+bool CWeaponMagazined::UseScopeTexture()
+{
+	return !m_bEmptyScopeTexture;
+}
+
 void CWeaponMagazined::LoadFireModes(LPCSTR section)
 {
 	if (pSettings->line_exist(section, "fire_modes"))
@@ -237,7 +242,8 @@ bool CWeaponMagazined::TryReload()
 {
 	if(m_pCurrentInventory) 
 	{
-		if (m_bRequredDemandCheck && g_uCommonFlags.is(E_COMMON_FLAGS::gpDemandReload))
+		bool isActor = smart_cast<CActor*>(H_Parent()) != nullptr;
+		if (isActor && m_bRequredDemandCheck && g_uCommonFlags.is(E_COMMON_FLAGS::gpDemandReload))
 			return false;
 		int ammoIndex=m_ammoType;
 		if (static_cast<int>(m_ammoType)!=m_iPropousedAmmoType && m_iPropousedAmmoType!=-1)
@@ -259,19 +265,22 @@ bool CWeaponMagazined::TryReload()
 			return true;
 		} 
 		else 
-			if(!m_pAmmo && !g_uCommonFlags.is(E_COMMON_FLAGS::gpFixedReload))
-				for(u32 i = 0; i < m_ammoTypes.size(); ++i) 
-				{
-					m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAny( *m_ammoTypes[i] ));
-					if(m_pAmmo) 
-					{ 
-						m_ammoType = i; 
-						m_iPropousedAmmoType=i;
-						m_bPending = true;
-						SwitchState(eReload);
-						return true; 
+			if (!m_pAmmo)
+			{
+				if (!isActor || (isActor && !g_uCommonFlags.is(E_COMMON_FLAGS::gpFixedReload)))
+					for (u32 i = 0; i < m_ammoTypes.size(); ++i)
+					{
+						m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAny(*m_ammoTypes[i]));
+						if (m_pAmmo)
+						{
+							m_ammoType = i;
+							m_iPropousedAmmoType = i;
+							m_bPending = true;
+							SwitchState(eReload);
+							return true;
+						}
 					}
-				}
+			}
 	}
 	
 	SwitchState(eIdle);
@@ -1048,8 +1057,8 @@ bool CWeaponMagazined::AttachScopeSection(const char* item_section_name, bool si
 			iitem->object().DestroyObject();
 			if (singleAttach)//если аттач только одного итема а не всех подряд
 			{
-				InitAddons();
 				UpdateAddonsVisibility();
+				InitAddons();
 			}
 			return true;
 		}
@@ -1206,15 +1215,16 @@ void CWeaponMagazined::InitAddons()
 		}
 		else if(m_eScopeStatus == ALife::eAddonPermanent)
 		{
+			scope_tex_name = pSettings->r_string(cNameSect(), "scope_texture");
 			m_fScopeZoomFactor = pSettings->r_float	(cNameSect(), "scope_zoom_factor");
 			m_fScopeZoomStepCount = READ_IF_EXISTS(pSettings, r_float, cNameSect(), "scope_zoom_step_count", m_fScopeZoomStepCount==0 ? 1.0f : m_fScopeZoomStepCount);
-			scope_tex_name = pSettings->r_string(cNameSect(), "scope_texture");
 		}
+		m_bEmptyScopeTexture = scope_tex_name.size() == 0;
 		if(m_UIScope /*&& (!m_UIScope->GetTextureName() || m_UIScope->GetTextureName().equal(scope_tex_name))*/)
 		{
 			xr_delete(m_UIScope);
 		}
-		if (!m_UIScope)
+		if (!m_UIScope && !m_bEmptyScopeTexture)
 		{
 			CUIXml									uiXml;
 			uiXml.Init								(CONFIG_PATH, UI_PATH,"scope.xml");
@@ -1224,14 +1234,14 @@ void CWeaponMagazined::InitAddons()
 			CUIWindow* scopeWindow=m_UIScope->FindChild("scope_texture");
 			if (scopeWindow)
 			{
-#pragma region set texture for central part of scope 
+#pragma region set texture for central part of scene 
 				CUIStatic* scopeStatic=smart_cast<CUIStatic*>(scopeWindow);
 				shared_str preparedTextureName=GenScopeTextureName(scope_tex_name,"_open","");
 				if (xr_strlen(preparedTextureName)==0)
 					preparedTextureName=scope_tex_name;
 				scopeStatic->InitTexture(preparedTextureName.c_str());
 #pragma endregion
-#pragma region set texture for dump (left/right) parts of scope 
+#pragma region set texture for dump (left/right) parts of scene 
 				CUIWindow* leftScopeWindow=m_UIScope->FindChild("left_texture");//find default left and right parts
 				CUIWindow* rightScopeWindow=m_UIScope->FindChild("right_texture");
 				if (leftScopeWindow && rightScopeWindow)//part found,maybe widescreen?
@@ -1273,7 +1283,8 @@ void CWeaponMagazined::InitAddons()
 			m_fIronSightZoomFactor = pSettings->r_float	(cNameSect(), "scope_zoom_factor");
 	}
 
-	
+	if (m_bZoomEnabled && m_pHUD) 
+		LoadZoomOffset(*hud_sect, m_bEmptyScopeTexture && IsScopeAttached() ? "scope_" : "");
 
 	if(IsSilencerAttached() && SilencerAttachable())
 	{		

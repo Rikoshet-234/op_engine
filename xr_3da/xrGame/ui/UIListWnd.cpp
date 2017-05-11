@@ -87,13 +87,6 @@ void CUIListWnd::Init(float x, float y, float width, float height, float item_he
 	m_ScrollBar->Show(false);
 	m_ScrollBar->Enable(false);
 
-/*
-	m_StaticActiveBackground.Init(ACTIVE_BACKGROUND,"hud\\default", 0,0,alNone);
-	m_StaticActiveBackground.SetTile(iFloor(m_iItemWidth/ACTIVE_BACKGROUND_WIDTH), 
-									 iFloor(m_iItemHeight/ACTIVE_BACKGROUND_HEIGHT),
-									 fmod(m_iItemWidth,float(ACTIVE_BACKGROUND_WIDTH)), 
-									 fmod(m_iItemHeight,float(ACTIVE_BACKGROUND_HEIGHT)));
-*/
 	UpdateList();
 }
 //////////////////////////////////////////////////////////////////////////
@@ -112,18 +105,11 @@ void CUIListWnd::SetHeight(float height){
 void CUIListWnd::SetWidth(float width)
 {
 	inherited::SetWidth(width);
-/*
-	m_StaticActiveBackground.SetTile(iFloor(GetWidth()/ACTIVE_BACKGROUND_WIDTH), 
-									 iFloor(m_iItemHeight/ACTIVE_BACKGROUND_HEIGHT),
-									 fmod(GetWidth(),float(ACTIVE_BACKGROUND_WIDTH)), 
-									 fmod(float(m_iItemHeight),float(ACTIVE_BACKGROUND_HEIGHT))
-									 );
-*/
 }
 
 void CUIListWnd::RemoveItem(int index)
 {
-	if(index<0 || index>=(int)m_ItemList.size()) return;
+	if(index<0 || index>=static_cast<int>(m_ItemList.size())) return;
 
 	LIST_ITEM_LIST_it it;
 
@@ -232,12 +218,11 @@ void CUIListWnd::UpdateList()
 	   
 
 	//показать текущий список
-	for(int i=m_iFirstShownIndex; 
-			i<_min(m_ItemList.size(),m_iFirstShownIndex + m_iRowNum+1);
-			++i, ++it)
+	for(int i=m_iFirstShownIndex; i<_min(m_ItemList.size(),m_iFirstShownIndex + m_iRowNum+1);++i, ++it)
 	{
-		(*it)->SetWndRect((*it)->GetWndRect().left, m_bVertFlip?GetHeight()-(i-m_iFirstShownIndex)* m_iItemHeight-m_iItemHeight:(i-m_iFirstShownIndex)* m_iItemHeight, 
-							m_iItemWidth, m_iItemHeight);
+		float itemHeight = (*it)->m_bSeparator ? (*it)->GetHeight() : m_iItemHeight;
+		(*it)->SetWndRect((*it)->GetWndRect().left, m_bVertFlip?GetHeight()-(i-m_iFirstShownIndex)* m_iItemHeight- itemHeight :(i-m_iFirstShownIndex)* m_iItemHeight,
+							m_iItemWidth, itemHeight);
 		(*it)->Show(true);
 		
 		if(m_bListActivity) 

@@ -2,7 +2,9 @@
 #include "UIWindow.h"
 
 #include "UIProgressBar.h"
+#include "UIListWnd.h"
 
+class CUIScrollView;
 class CUIXml;
 
 #include "../script_export_space.h"
@@ -16,10 +18,11 @@ public:
 	virtual						~CUIWpnParams			();
 
 	void 						InitFromXml				(CUIXml& xml_doc);
-	void 						SetInfo					(const shared_str& wnp_section);
+	void 						SetInfo					(const shared_str& wnp_section, CUIScrollView *parent);
 	bool 						Check					(const shared_str& wpn_section);
 
 protected:
+	//CUIListWnd					m_dyn_list_info;
 	CUIProgressBar				m_progressAccuracy;
 	CUIProgressBar				m_progressHandling;
 	CUIProgressBar				m_progressDamage;

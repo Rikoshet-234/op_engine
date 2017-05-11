@@ -7,6 +7,7 @@
 	#include "light_GI.h"
 #endif
 
+#define MIN_VIRTUAL_SIZE 0.01f
 class	light		:	public IRender_Light, public ISpatial
 {
 public:
@@ -27,6 +28,7 @@ public:
 	u32				frame_render;
 
 #if RENDER==R_R2
+	float			virtual_size;
 	light*						omnipart	[6]	;
 	xr_vector<light_indirect>	indirect		;
 	u32							indirect_photons;
@@ -74,6 +76,14 @@ public:
 #endif
 
 public:
+virtual float							get_virtual_size()
+	{
+#if RENDER==R_R2
+		return virtual_size; 
+#else
+		return 0.0;
+#endif
+	}
 	virtual void	set_type				(LT type)						{ flags.type = type;		}
 	virtual void	set_active				(bool b);
 	virtual bool	get_active				()								{ return flags.bActive;		}
@@ -85,7 +95,12 @@ public:
 	virtual void	set_rotation			(const Fvector& D, const Fvector& R);
 	virtual void	set_cone				(float angle);
 	virtual void	set_range				(float R);
-	virtual void	set_virtual_size		(float R)						{};
+	virtual void	set_virtual_size		(float S)							
+	{
+#if RENDER==R_R2
+		virtual_size = (S > MIN_VIRTUAL_SIZE)?S:MIN_VIRTUAL_SIZE;
+#endif
+	};
 	virtual void	set_color				(const Fcolor& C)				{ color.set(C);				}
 	virtual void	set_color				(float r, float g, float b)		{ color.set(r,g,b,1);		}
 	virtual void	set_texture				(LPCSTR name);
