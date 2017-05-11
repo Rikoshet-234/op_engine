@@ -187,7 +187,7 @@ void CTexture::Load		()
 	LPCSTR path_alias = _game_textures_;
 	xr_string currentName = cName.c_str();
 	HUDProfile* profile = multiHUDs->GetCurrentProfile();
-	if (profile->ExistFileInProfile(currentName.c_str()))
+	if (profile && profile->ExistFileInProfile(currentName.c_str()))
 	{
 		path_alias = _game_huds_;
 		string512 buf;

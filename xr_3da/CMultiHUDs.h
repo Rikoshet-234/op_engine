@@ -1,4 +1,6 @@
-﻿#pragma once
+﻿#ifndef CMultiHUDs_h
+#define CMultiHUDs_h
+#pragma once
 
 class ENGINE_API HUDProfile
 {
@@ -26,3 +28,5 @@ public:
 };
 
 extern ENGINE_API	CMultiHUDs*	multiHUDs;
+
+#endif

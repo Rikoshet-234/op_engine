@@ -78,15 +78,18 @@ CMultiHUDs::CMultiHUDs()
 		tokens.clear();
 		std::for_each(hudProfiles.begin(), hudProfiles.end(), [&](HUDProfile profile)
 		{
-			IReader* F = FS.r_open(profile.description_fn.c_str());
-			if (F)
+			//IReader* F = FS.r_open(profile.description_fn.c_str());
+			//if (F)
 			{
-				xr_string test;
-				F->r_string(test);
-				FS.r_close(F);
+				//xr_string test;
+				//F->r_string(test);
+				//FS.r_close(F);
 				tokens.push_back(xr_token());
 				xr_token* last = &tokens.back();
-				last->name = xr_strdup(test.c_str());
+				xr_string tmp = profile.folder_path.c_str();
+				auto it = std::remove_if(std::begin(tmp), std::end(tmp), [](char c) {return (c == '\\'); });
+				tmp.erase(it, std::end(tmp));
+				last->name = xr_strdup(tmp.c_str());
 				last->id = tokens.size() - 1;
 			}
 		});
@@ -100,7 +103,5 @@ bool CMultiHUDs::EnabledMultiHUDs() const
 
 HUDProfile* CMultiHUDs::GetCurrentProfile()
 {
-	if (psCurrentHUDProfileIndex==static_cast<u32>(-1) || psCurrentHUDProfileIndex>hudProfiles.size())
-		return nullptr;
-	return &hudProfiles[psCurrentHUDProfileIndex];
+	return EnabledMultiHUDs() ? &hudProfiles[psCurrentHUDProfileIndex] : nullptr ;
 }

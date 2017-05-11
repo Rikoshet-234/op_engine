@@ -242,7 +242,8 @@ bool CWeaponMagazined::TryReload()
 {
 	if(m_pCurrentInventory) 
 	{
-		if (m_bRequredDemandCheck && g_uCommonFlags.is(E_COMMON_FLAGS::gpDemandReload))
+		bool isActor = smart_cast<CActor*>(H_Parent()) != nullptr;
+		if (isActor && m_bRequredDemandCheck && g_uCommonFlags.is(E_COMMON_FLAGS::gpDemandReload))
 			return false;
 		int ammoIndex=m_ammoType;
 		if (static_cast<int>(m_ammoType)!=m_iPropousedAmmoType && m_iPropousedAmmoType!=-1)
@@ -264,19 +265,22 @@ bool CWeaponMagazined::TryReload()
 			return true;
 		} 
 		else 
-			if(!m_pAmmo && !g_uCommonFlags.is(E_COMMON_FLAGS::gpFixedReload))
-				for(u32 i = 0; i < m_ammoTypes.size(); ++i) 
-				{
-					m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAny( *m_ammoTypes[i] ));
-					if(m_pAmmo) 
-					{ 
-						m_ammoType = i; 
-						m_iPropousedAmmoType=i;
-						m_bPending = true;
-						SwitchState(eReload);
-						return true; 
+			if (!m_pAmmo)
+			{
+				if (!isActor || (isActor && !g_uCommonFlags.is(E_COMMON_FLAGS::gpFixedReload)))
+					for (u32 i = 0; i < m_ammoTypes.size(); ++i)
+					{
+						m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAny(*m_ammoTypes[i]));
+						if (m_pAmmo)
+						{
+							m_ammoType = i;
+							m_iPropousedAmmoType = i;
+							m_bPending = true;
+							SwitchState(eReload);
+							return true;
+						}
 					}
-				}
+			}
 	}
 	
 	SwitchState(eIdle);
