@@ -10,6 +10,7 @@
 #pragma warning(default:4995)
 
 #include "../../xrCore/OPFuncs/ExpandedCmdParams.h"
+#include "../CMultiHUDs.h"
 
 // #include "std_classes.h"
 // #include "xr_avi.h"
@@ -289,7 +290,18 @@ IDirect3DBaseTexture9*	CRender::texture_load(LPCSTR fRName, u32& ret_msize)
 	if (!FS.exist(fn, _game_textures_,	fname,	".dds")	&& strstr(fname,"_bump"))	goto _BUMP_from_base;
 	if (FS.exist(fn,"$level$",			fname,	".dds"))							goto _DDS;
 	if (FS.exist(fn,"$game_saves$",		fname,	".dds"))							goto _DDS;
-	if (FS.path_exist(_game_huds_) && FS.exist(fn, _game_huds_, fname, ".dds"))	goto _DDS;
+	if (FS.path_exist(_game_huds_))
+	{
+		CHUDProfile* profile = multiHUDs->GetCurrentProfile();
+		if (profile)
+		{
+			string_path nm;
+			strconcat(sizeof(nm), nm, fname, ".dds");
+			LPCSTR buf = profile->GetFileFromProfile(nm,false);
+			if (buf != nullptr)
+				if (FS.exist(fn, _game_huds_, buf))	goto _DDS;
+		}
+	}
 	if (FS.exist(fn, _game_textures_,	fname,	".dds"))							goto _DDS;
 
 #ifdef _EDITOR

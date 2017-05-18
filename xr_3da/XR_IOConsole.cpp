@@ -52,6 +52,8 @@ void CConsole::Reset()
 		xr_delete(pFont);
 }
 
+#include <iostream>
+#include <string>
 void CConsole::Initialize()
 {
 	scroll_delta	= cmd_delta = old_cmd_delta = 0;
@@ -73,12 +75,19 @@ void CConsole::Initialize()
 	if (pSettings->section_exist("allowed_param_names"))
 	{
 		CInifile::Sect& data	= pSettings->r_section("allowed_param_names");
-		std::for_each(data.Data.begin(),data.Data.end(),[&](CInifile::Item item)
+		if (data.Data.size() > 0)
 		{
-			Msg("- Create user-defined param [%s]",item.first.c_str());
-			Commands.insert(mk_pair(item.first.c_str(),xr_new<CCC_UserParam>(item.first.c_str(),"")));
-			userDefinedNames.push_back(item.first);
-		});
+			std::string params("- Create user - defined param [");
+			std::for_each(data.Data.begin(), data.Data.end(), [&](CInifile::Item item)
+			{
+				params += " ";
+				params+=item.first.c_str();
+				Commands.insert(mk_pair(item.first.c_str(), xr_new<CCC_UserParam>(item.first.c_str(), "")));
+				userDefinedNames.push_back(item.first);
+			});
+			params+= " ]";
+			Msg(params.c_str());
+		}
 	}
 }
 

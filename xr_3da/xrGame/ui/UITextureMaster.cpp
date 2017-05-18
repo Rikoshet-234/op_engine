@@ -12,6 +12,7 @@
 #include "UITextureMaster.h"
 #include "uiabstract.h"
 #include "xrUIXmlParser.h"
+#include "../../CMultiHUDs.h"
 
 xr_map<shared_str, TEX_INFO>	CUITextureMaster::m_textures;
 #ifdef DEBUG
@@ -88,6 +89,11 @@ void CUITextureMaster::InitTexture(const char* texture_name, const char* shader_
 
 	xr_map<shared_str, TEX_INFO>::iterator	it;
 
+	/*CHUDProfile profile = multiHUDs->GetCurrentProfile();
+	if (profile && xr_strcmp(texture_name,"preview")==0)
+	{
+		
+	}*/
 	it = m_textures.find(texture_name);
 
 	if (it != m_textures.end())
