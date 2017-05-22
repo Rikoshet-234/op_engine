@@ -1,7 +1,8 @@
 ﻿#include "stdafx.h"
 #include "CMultiHUDs.h"
 #include "../xrXMLParser/xrXMLParser.h"
-
+#include "xrGame/Level.h"
+#include "CustomHUD.h"
 
 ENGINE_API CMultiHUDs* multiHUDs = nullptr;
 xr_string checkFile(xr_string pathName,xr_string fileName)
@@ -16,27 +17,47 @@ xr_string checkFile(xr_string pathName,xr_string fileName)
 	return xr_string();
 }
 
-LPCSTR HUDProfile::GetProfileConfigUIPath()
+
+xr_string CHUDProfile::GetProfileConfigUIPath()
 {
 	string512 buf;
 	sprintf_s(buf, "%sconfig\\ui", folder_path.c_str());
-	return xr_strdup(buf);
+	return buf;
 }
 
-LPCSTR HUDProfile::GetProfilePath()
+bool CHUDProfile::ExistFileInProfile(LPCSTR fileName)
 {
-	string_path path;
-	FS.update_path(path, HUDS_PATH, folder_path.c_str());
-	return xr_strdup(path);
+	return GetFileFromProfile(fileName).size()>0;
 }
 
-bool HUDProfile::ExistFileInProfile(LPCSTR fileName)
+xr_string CHUDProfile::GetProfileName()
 {
+	xr_string tmp = folder_path.c_str();
+	auto it = std::remove_if(std::begin(tmp), std::end(tmp), [](char c) {return (c == '\\'); });
+	tmp.erase(it, std::end(tmp));
+	return tmp;
+}
+
+xr_string CHUDProfile::GetFileFromProfile(LPCSTR fileName,bool remExt)
+{
+	std::string temp1(fileName);
+	std::transform(temp1.begin(), temp1.end(), temp1.begin(), ::tolower);
 	auto findResult = std::find_if(files.begin(), files.end(), [&](shared_str name)
 	{
-		return std::string(name.c_str()).find(fileName)!=std::string::npos;
+		return std::string(name.c_str()).find(temp1) != std::string::npos;
 	});
-	return findResult != files.end();
+	if (findResult != files.end())
+	{
+		xr_string temp= (*findResult).c_str();
+		if (remExt)
+		{
+			LPSTR _ext = strext(temp.c_str());
+			if (_ext)
+				*_ext = 0;
+		}
+		return temp;
+	}
+	return xr_string();
 }
 
 CMultiHUDs::CMultiHUDs()
@@ -46,26 +67,32 @@ CMultiHUDs::CMultiHUDs()
 	FS.file_list(flist, HUDS_PATH, FS_ListFolders| FS_RootOnly);
 	std::for_each(flist.begin(), flist.end(), [&](FS_File file)
 	{
-		if (checkFile(file.name, "config\\ui\\maingame.xml").size() > 0)
+		if (checkFile(file.name, "description.txt").size() > 0)
 		{
-			hudProfiles.push_back(HUDProfile());
-			HUDProfile* profile = &hudProfiles.back();
+			hudProfiles.push_back(CHUDProfile());
+			CHUDProfile* profile = &hudProfiles.back();
 			profile->folder_path = file.name.c_str();
 			profile->description_fn = checkFile(profile->folder_path.c_str(), "description.txt").c_str();
-			profile->preview_texture_fn = checkFile(profile->folder_path.c_str(), "preview.seq").c_str();
+			//string_path texture_path;
+			//sprintf_s(texture_path, "%spreview", profile->folder_path.c_str());
+			//profile->preview_texture_fn = texture_path;
+			profile->preview_texture_fn = "preview";//checkFile(profile->folder_path.c_str(), "preview.seq").c_str();
 			FS_FileSet profileFiles;
 			string_path profilePath;
 			FS.update_path(profilePath, HUDS_PATH, profile->folder_path.c_str());
 			FS.file_list(profileFiles, profilePath, FS_ListFiles);
 			std::for_each(profileFiles.begin(), profileFiles.end(), [&](FS_File pFile)
 			{
-				profile->files.push_back(pFile.name.c_str());
+				string_path temp;
+				strcpy_s(temp, profile->folder_path.c_str());
+				strcat_s(temp, pFile.name.c_str());
+				profile->files.push_back(temp);
 			});
 		}
 	});
 	if (hudProfiles.size() > 0)
 	{
-		auto defProfile = std::find_if(hudProfiles.begin(), hudProfiles.end(), [](HUDProfile profile)
+		auto defProfile = std::find_if(hudProfiles.begin(), hudProfiles.end(), [](CHUDProfile profile)
 		{
 			return xr_strcmp(profile.folder_path.c_str(), "default\\") == 0;
 		});
@@ -76,22 +103,15 @@ CMultiHUDs::CMultiHUDs()
 		else
 			psCurrentHUDProfileIndex = std::distance(hudProfiles.begin(), defProfile);
 		tokens.clear();
-		std::for_each(hudProfiles.begin(), hudProfiles.end(), [&](HUDProfile profile)
+		std::for_each(hudProfiles.begin(), hudProfiles.end(), [&](CHUDProfile profile)
 		{
-			//IReader* F = FS.r_open(profile.description_fn.c_str());
-			//if (F)
-			{
-				//xr_string test;
-				//F->r_string(test);
-				//FS.r_close(F);
-				tokens.push_back(xr_token());
-				xr_token* last = &tokens.back();
-				xr_string tmp = profile.folder_path.c_str();
-				auto it = std::remove_if(std::begin(tmp), std::end(tmp), [](char c) {return (c == '\\'); });
-				tmp.erase(it, std::end(tmp));
-				last->name = xr_strdup(tmp.c_str());
-				last->id = tokens.size() - 1;
-			}
+			tokens.push_back(xr_token());
+			xr_token* last = &tokens.back();
+			//xr_string tmp = profile.folder_path.c_str();
+			//auto it = std::remove_if(std::begin(tmp), std::end(tmp), [](char c) {return (c == '\\'); });
+			//tmp.erase(it, std::end(tmp));
+			last->name = xr_strdup(profile.GetProfileName().c_str());
+			last->id = tokens.size() - 1;
 		});
 	}
 }
@@ -101,7 +121,25 @@ bool CMultiHUDs::EnabledMultiHUDs() const
 	return psCurrentHUDProfileIndex != static_cast<u32>(-1) && hudProfiles.size() > 0;
 }
 
-HUDProfile* CMultiHUDs::GetCurrentProfile()
+CHUDProfile* CMultiHUDs::GetCurrentProfile()
 {
 	return EnabledMultiHUDs() ? &hudProfiles[psCurrentHUDProfileIndex] : nullptr ;
 }
+
+CHUDProfile* CMultiHUDs::GetProfile(LPCSTR profileName)
+{
+	xr_vector<CHUDProfile>::iterator it=std::find_if(hudProfiles.begin(),hudProfiles.end(),[&](CHUDProfile profile)
+	{
+		return xr_strcmp(profileName, profile.GetProfileName().c_str()) == 0;
+	});
+	if (it!=hudProfiles.end())
+		return &*it;
+	return nullptr;
+}
+
+void CMultiHUDs::HUDChanged()
+{
+	if (g_pGameLevel)
+		g_pGameLevel->pHUD->OnHUDChanged();
+}
+

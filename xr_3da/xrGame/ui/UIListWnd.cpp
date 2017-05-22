@@ -73,12 +73,7 @@ void CUIListWnd::Init(float x, float y, float width, float height, float item_he
 	m_iFirstShownIndex = 0;
 
 	SetItemHeight(item_height);
-	m_iRowNum = iFloor(height/m_iItemHeight);
-
-
-	
-
-	
+	m_iRowNum = iFloor(height/m_iItemHeight);	
 
 	m_ScrollBar->SetRange(0,0);
 	m_ScrollBar->SetPageSize(s16(0));

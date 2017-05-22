@@ -42,7 +42,7 @@ void ParseFile(LPCSTR path, CMemoryWriter& W, IReader *F, CXml* xml )
 				if(inc_name==strstr(inc_name,"ui\\"))
 				{
 					shared_str fn	= xml->correct_file_name("ui", strchr(inc_name,'\\')+1);
-					HUDProfile* profile = multiHUDs->GetCurrentProfile();
+					CHUDProfile* profile = multiHUDs->GetCurrentProfile();
 					if (!profile || (profile && !profile->ExistFileInProfile(fn.c_str()) && xr_strcmp(path,HUDS_PATH)==0))
 					{
 						path = CONFIG_PATH;
@@ -74,11 +74,11 @@ bool CXml::Init(LPCSTR path_alias, LPCSTR path, LPCSTR _xml_filename)
 {
 	shared_str fn			= correct_file_name(path, _xml_filename);
 	string_path				str;
-	HUDProfile* profile = multiHUDs->GetCurrentProfile();
+	CHUDProfile* profile = multiHUDs->GetCurrentProfile();
 	if (profile && profile->ExistFileInProfile(fn.c_str()))
 	{
 		path_alias = HUDS_PATH;
-		sprintf(str, "%s\\%s", profile->GetProfileConfigUIPath(), *fn);
+		sprintf(str, "%s\\%s", profile->GetProfileConfigUIPath().c_str(), *fn);
 	}
 	else
 		sprintf					(str,"%s\\%s", path, *fn);

@@ -21,7 +21,7 @@ struct TEX_INFO{
 class CUITextureMaster{
 public:
 
-	static void ParseShTexInfo			(LPCSTR xml_file);
+	static void ParseShTexInfo			(LPCSTR xml_file,bool fix_dublicate=false, bool show_duplicate=false);
 
 	static void		InitTexture			(LPCSTR texture_name,		IUISimpleTextureControl* tc);
 	static void		InitTexture			(LPCSTR texture_name, const char* shader_name, IUISimpleTextureControl* tc);

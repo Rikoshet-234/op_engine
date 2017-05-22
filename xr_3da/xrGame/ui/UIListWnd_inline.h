@@ -80,6 +80,5 @@ bool CUIListWnd::AddItem(Element* pItem, int insertBeforeIdx)
 //	m_ScrollBar.Refresh();
 
 	UpdateScrollBar();
-
 	return true;
 }

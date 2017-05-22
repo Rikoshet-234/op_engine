@@ -2311,6 +2311,9 @@
     <Filter Include="Core\Client\Objects\items &amp; weapons\Devices\NightVision">
       <UniqueIdentifier>{fa97d0e8-28d4-4a87-8034-ce69e8b009bc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="AI\AScript\ScriptClasses\ScriptMultiHUDs">
+      <UniqueIdentifier>{188b13ee-7412-49fb-bbc1-0f6a72b4a0e7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mt_config.h">
@@ -6612,6 +6615,9 @@
     <ClInclude Include="NightVisionDevice.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Devices\NightVision</Filter>
     </ClInclude>
+    <ClInclude Include="multihuds_registrator.h">
+      <Filter>AI\AScript\ScriptClasses\ScriptMultiHUDs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -9811,6 +9817,9 @@
     </ClCompile>
     <ClCompile Include="ui\UIWpnParams.cpp">
       <Filter>UI\Common\ItemInfo</Filter>
+    </ClCompile>
+    <ClCompile Include="multihuds_registrator_script.cpp">
+      <Filter>AI\AScript\ScriptClasses\ScriptMultiHUDs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

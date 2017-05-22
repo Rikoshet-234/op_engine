@@ -52,7 +52,7 @@
 #include "UICellCustomItems.h"
 #include "../../defines.h"
 #include <stdlib.h>
-#include "../../CMultiHUDs.h"
+
 
 #ifdef DEBUG
 #	include "../debug_renderer.h"

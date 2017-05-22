@@ -174,7 +174,7 @@ void CTexture::Load		()
 
 	flags.bUser						= false;
 	flags.MemoryUsage				= 0;
-	if (0==stricmp(*cName,"$null"))	return;
+	if (0==_stricmp(*cName,"$null"))	return;
 	if (0!=strstr(*cName,"$user$"))	{
 		flags.bUser	= true;
 		return;
@@ -186,13 +186,21 @@ void CTexture::Load		()
 	string_path			fn;
 	LPCSTR path_alias = _game_textures_;
 	xr_string currentName = cName.c_str();
-	HUDProfile* profile = multiHUDs->GetCurrentProfile();
-	if (profile && profile->ExistFileInProfile(currentName.c_str()))
+
+	CHUDProfile* profile = multiHUDs->GetCurrentProfile();
+	if (profile) 
 	{
-		path_alias = _game_huds_;
-		string512 buf;
-		sprintf_s(buf, "%stextures\\%s", profile->folder_path.c_str(), currentName.c_str());
-		currentName = buf;
+		string_path dds;
+		string_path seq;
+		strconcat(sizeof(seq), seq, currentName.c_str(), ".seq");
+		strconcat(sizeof(dds), dds, currentName.c_str(), ".dds");
+		xr_string buf = profile->GetFileFromProfile(seq,true);
+		xr_string buf2 = profile->GetFileFromProfile(dds, true);
+		if (buf.size()>0 || buf2.size()>0)
+		{
+			path_alias = _game_huds_;
+			currentName = buf.size()>0 ? buf : buf2.size()>0 ? buf2 :"";
+		}
 	}
 	if (FS.exist(fn, path_alias, currentName.c_str(),".ogm")){
 		// AVI
@@ -224,8 +232,8 @@ void CTexture::Load		()
 			}
 
 		}
-	} else
-	if (FS.exist(fn, path_alias, currentName.c_str(),".avi")){
+	} 
+	else if (FS.exist(fn, path_alias, currentName.c_str(),".avi")){
 		// AVI
 		pAVI = xr_new<CAviPlayerCustom>();
 
@@ -251,8 +259,8 @@ void CTexture::Load		()
 			}
 
 		}
-	} else
-	if (FS.exist(fn, path_alias, currentName.c_str(),".seq"))
+	} 
+	else if (FS.exist(fn, path_alias, currentName.c_str(),".seq"))
 	{
 		// Sequence
 		string256 buffer;
@@ -286,7 +294,8 @@ void CTexture::Load		()
 		}
 		pSurface	= nullptr;
 		FS.r_close	(_fs);
-	} else
+	} 
+	else
 	{
 		// Normal texture
 		u32	mem  = 0;

@@ -163,7 +163,7 @@
     <OutDir>$(BinOutputDir)\</OutDir>
     <IntDir>$(IntermediateOutputDir)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)\xrCore;$(SolutionDir)\SDK\Xiph\Include;$(SolutionDir)\SDK\boost_1_30_0;$(SolutionDir)\SDK\luabind\luabind;$(SolutionDir)\xrLua\src;$(SolutionDir)\SDK\dx9sdk\dx9sdk\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\SDK\loki;$(SolutionDir)\xrCore;$(SolutionDir)\SDK\Xiph\Include;$(SolutionDir)\SDK\boost_1_30_0;$(SolutionDir)\SDK\luabind\luabind;$(SolutionDir)\xrLua\src;$(SolutionDir)\SDK\dx9sdk\dx9sdk\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibrariesOutputDir)\;$(SolutionDir)\SDK\OpenAL\libs;$(SolutionDir)\SDK\Xiph\Libs;$(SolutionDir)\SDK\dx9sdk\dx9sdk\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">

@@ -2,12 +2,13 @@
 #define CMultiHUDs_h
 #pragma once
 
-class ENGINE_API HUDProfile
+class ENGINE_API CHUDProfile
 {
 public:
 	bool ExistFileInProfile(LPCSTR fileName);
-	LPCSTR GetProfilePath();
-	LPCSTR GetProfileConfigUIPath();
+	xr_string GetProfileName();
+	xr_string GetFileFromProfile(LPCSTR fileName, bool remExt=false);
+	xr_string GetProfileConfigUIPath();
 	xr_vector<shared_str> files;
 	shared_str folder_path;
 	shared_str description_fn;
@@ -17,14 +18,18 @@ public:
 class ENGINE_API CMultiHUDs
 {
 private:
-	xr_vector<HUDProfile> hudProfiles;
+	xr_vector<CHUDProfile> hudProfiles;
 public:
 	xr_vector<xr_token> tokens;
 	u32	psCurrentHUDProfileIndex;
 	CMultiHUDs();
 
 	bool EnabledMultiHUDs() const;
-	HUDProfile* GetCurrentProfile();
+	CHUDProfile* GetCurrentProfile();
+	CHUDProfile* GetProfile(LPCSTR profileName);
+	xr_vector<CHUDProfile> *GetProfiles() { return &hudProfiles; }
+
+	void HUDChanged();
 };
 
 extern ENGINE_API	CMultiHUDs*	multiHUDs;

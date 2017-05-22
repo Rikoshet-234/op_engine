@@ -8,6 +8,8 @@
 #include "../igame_level.h"
 #include "clsid_game.h"
 #include "GamePersistent.h"
+#include "../CMultiHUDs.h"
+#include "ui/UITextureMaster.h"
 
 
 CFontManager::CFontManager()
@@ -308,6 +310,21 @@ void CHUDManager::OnConnected()
 	b_online				= true;
 	if(pUI){
 		Device.seqFrame.Add	(pUI,REG_PRIORITY_LOW-1000);
+	}
+}
+
+void CHUDManager::OnHUDChanged()
+{
+	CHUDProfile* profile = multiHUDs->GetCurrentProfile();
+	if (profile->GetFileFromProfile("ui_hud.xml").size()>0)
+	{
+		CUITextureMaster::ParseShTexInfo("ui_hud.xml",true);
+	}
+	if (pUI->UIMainIngameWnd)
+	{
+		xr_delete(pUI->UIMainIngameWnd);
+		pUI->UIMainIngameWnd = xr_new<CUIMainIngameWnd>();
+		pUI->UIMainIngameWnd->Init();
 	}
 }
 

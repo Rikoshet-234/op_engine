@@ -10,6 +10,7 @@
 #pragma warning(default:4995)
 
 #include "../../xrCore/OPFuncs/ExpandedCmdParams.h"
+#include "../CMultiHUDs.h"
 
 // #include "std_classes.h"
 // #include "xr_avi.h"
@@ -289,7 +290,18 @@ IDirect3DBaseTexture9*	CRender::texture_load(LPCSTR fRName, u32& ret_msize)
 	if (!FS.exist(fn, _game_textures_,	fname,	".dds")	&& strstr(fname,"_bump"))	goto _BUMP_from_base;
 	if (FS.exist(fn,"$level$",			fname,	".dds"))							goto _DDS;
 	if (FS.exist(fn,"$game_saves$",		fname,	".dds"))							goto _DDS;
-	if (FS.path_exist(_game_huds_) && FS.exist(fn, _game_huds_, fname, ".dds"))	goto _DDS;
+	if (FS.path_exist(_game_huds_))
+	{
+		CHUDProfile* profile = multiHUDs->GetCurrentProfile();
+		if (profile)
+		{
+			string_path nm;
+			strconcat(sizeof(nm), nm, fname, ".dds");
+			xr_string buf = profile->GetFileFromProfile(nm,false);
+			if (buf.size()>0)
+				if (FS.exist(fn, _game_huds_, buf.c_str()))	goto _DDS;
+		}
+	}
 	if (FS.exist(fn, _game_textures_,	fname,	".dds"))							goto _DDS;
 
 #ifdef _EDITOR
@@ -444,7 +456,7 @@ _BUMP_from_base:
 //////////////////
 		if (strstr(fname,"_bump#"))			
 		{
-			R_ASSERT2	(FS.exist(fn,"$game_textures$",	"ed\\ed_dummy_bump#",	".dds"), "ed_dummy_bump#");
+			R_ASSERT2	(FS.exist(fn,"$game_textures$",	"ui\\ed_dummy_bump#",	".dds"), "ed_dummy_bump#");
 			S						= FS.r_open	(fn);
 			R_ASSERT2				(S, fn);
 			img_size				= S->length	();
@@ -452,7 +464,7 @@ _BUMP_from_base:
 		}
 		if (strstr(fname,"_bump"))			
 		{
-			R_ASSERT2	(FS.exist(fn,"$game_textures$",	"ed\\ed_dummy_bump",	".dds"),"ed_dummy_bump");
+			R_ASSERT2	(FS.exist(fn,"$game_textures$",	"ui\\ed_dummy_bump",	".dds"),"ed_dummy_bump");
 			S						= FS.r_open	(fn);
 
 			R_ASSERT2	(S, fn);

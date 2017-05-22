@@ -73,8 +73,9 @@ public:
 	void					ShowCrosshair		(bool show);
 
 	void					SetHitmarkType		(LPCSTR tex_name);
-	virtual void			OnScreenRatioChanged();
-	virtual void			OnDisconnected		();
-	virtual void			OnConnected			();
+	void			OnScreenRatioChanged() override;
+	void			OnDisconnected		() override;
+	void			OnConnected			() override;
+	void OnHUDChanged() override;
 	virtual void			net_Relcase			(CObject *object);
 };

@@ -177,8 +177,8 @@ void addSeparator(CUIListWnd* list,shared_str textId)
 void addSeparator(CUIListWnd* list)
 {
 		CUIListItem* separator=xr_new<CUIListItem>();
-		separator->SetAutoDelete(true);
-		separator->SetHeight(5);
 		separator->m_bSeparator = true;
+		separator->SetAutoDelete(true);
+		//separator->SetHeight(1);
 		list->AddItem(separator);
 }
