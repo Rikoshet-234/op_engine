@@ -114,7 +114,7 @@ void CMainMenu::ReadTextureInfo()
 		{
 			_GetItem(itemsList.c_str(), i, single_item);
 			strcat(single_item,".xml");
-			CUITextureMaster::ParseShTexInfo(single_item);
+			CUITextureMaster::ParseShTexInfo(single_item,false,true);
 		}		
 	}
 }

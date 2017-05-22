@@ -78,7 +78,7 @@ bool CXml::Init(LPCSTR path_alias, LPCSTR path, LPCSTR _xml_filename)
 	if (profile && profile->ExistFileInProfile(fn.c_str()))
 	{
 		path_alias = HUDS_PATH;
-		sprintf(str, "%s\\%s", profile->GetProfileConfigUIPath(), *fn);
+		sprintf(str, "%s\\%s", profile->GetProfileConfigUIPath().c_str(), *fn);
 	}
 	else
 		sprintf					(str,"%s\\%s", path, *fn);

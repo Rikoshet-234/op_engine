@@ -82,7 +82,9 @@ void multihuds_registrator::script_register(lua_State *L)
 		[
 			class_<CMultiHUDs>("CMultiHUDs")
 				.def("profiles", &get_profiles)
-				.def("current",&CMultiHUDs::GetCurrentProfile),
+				.def("current",&CMultiHUDs::GetCurrentProfile)
+				.def("enabled", &CMultiHUDs::EnabledMultiHUDs)
+				.def("ReloadHUD", &CMultiHUDs::HUDChanged),
 			class_<CHUDProfile>("CHUDProfile")
 			.def("get_name",&CHUDProfile::GetProfileName)
 			.def("get_short_description",&get_short_description)

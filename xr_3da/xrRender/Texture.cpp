@@ -297,9 +297,9 @@ IDirect3DBaseTexture9*	CRender::texture_load(LPCSTR fRName, u32& ret_msize)
 		{
 			string_path nm;
 			strconcat(sizeof(nm), nm, fname, ".dds");
-			LPCSTR buf = profile->GetFileFromProfile(nm,false);
-			if (buf != nullptr)
-				if (FS.exist(fn, _game_huds_, buf))	goto _DDS;
+			xr_string buf = profile->GetFileFromProfile(nm,false);
+			if (buf.size()>0)
+				if (FS.exist(fn, _game_huds_, buf.c_str()))	goto _DDS;
 		}
 	}
 	if (FS.exist(fn, _game_textures_,	fname,	".dds"))							goto _DDS;
@@ -456,7 +456,7 @@ _BUMP_from_base:
 //////////////////
 		if (strstr(fname,"_bump#"))			
 		{
-			R_ASSERT2	(FS.exist(fn,"$game_textures$",	"ed\\ed_dummy_bump#",	".dds"), "ed_dummy_bump#");
+			R_ASSERT2	(FS.exist(fn,"$game_textures$",	"ui\\ed_dummy_bump#",	".dds"), "ed_dummy_bump#");
 			S						= FS.r_open	(fn);
 			R_ASSERT2				(S, fn);
 			img_size				= S->length	();
@@ -464,7 +464,7 @@ _BUMP_from_base:
 		}
 		if (strstr(fname,"_bump"))			
 		{
-			R_ASSERT2	(FS.exist(fn,"$game_textures$",	"ed\\ed_dummy_bump",	".dds"),"ed_dummy_bump");
+			R_ASSERT2	(FS.exist(fn,"$game_textures$",	"ui\\ed_dummy_bump",	".dds"),"ed_dummy_bump");
 			S						= FS.r_open	(fn);
 
 			R_ASSERT2	(S, fn);

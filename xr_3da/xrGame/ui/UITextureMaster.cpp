@@ -24,32 +24,48 @@ void CUITextureMaster::WriteLog(){
 	Msg("UI texture manager work time is %d ms", m_time);
 #endif
 }
-void CUITextureMaster::ParseShTexInfo(LPCSTR xml_file){
+void CUITextureMaster::ParseShTexInfo(LPCSTR xml_file, bool fix_dublicate, bool show_duplicate) {
 	CUIXml xml;
 	xml.Init(CONFIG_PATH, UI_PATH, xml_file);
-	shared_str file = xml.Read("file_name",0,""); 
+	shared_str file = xml.Read("file_name", 0, "");
+	CHUDProfile* profile = multiHUDs->GetCurrentProfile();
+	xr_string pfFile;
+	if (profile)
+	{
+		string_path pf;
+		strcpy_s(pf, file.c_str());
+		strcat_s(pf, ".dds");
+		pfFile = profile->GetFileFromProfile(pf);
+	}
 
-//	shared_textures_it	sht_it = m_shTex.find(texture);
-//	if (m_shTex.end() == sht_it)
-//	{
-		int num = xml.GetNodesNum("",0,"texture");
-//		regions regs;
-		for (int i = 0; i<num; i++)
+	int num = xml.GetNodesNum("", 0, "texture");
+	for (int i = 0; i < num; i++)
+	{
+		TEX_INFO info;
+
+		//info.file = file;
+		
+		info.file = pfFile.size()>0 ? pfFile.c_str() : file;
+
+		info.rect.x1 = xml.ReadAttribFlt("texture", i, "x");
+		info.rect.x2 = xml.ReadAttribFlt("texture", i, "width") + info.rect.x1;
+		info.rect.y1 = xml.ReadAttribFlt("texture", i, "y");
+		info.rect.y2 = xml.ReadAttribFlt("texture", i, "height") + info.rect.y1;
+		shared_str id = xml.ReadAttrib("texture", i, "id");
+
+		if (fix_dublicate || show_duplicate)
 		{
-			TEX_INFO info;
-
-			info.file = file;
-
-			info.rect.x1 = xml.ReadAttribFlt("texture",i,"x");
-			info.rect.x2 = xml.ReadAttribFlt("texture",i,"width") + info.rect.x1;
-			info.rect.y1 = xml.ReadAttribFlt("texture",i,"y");
-			info.rect.y2 = xml.ReadAttribFlt("texture",i,"height") + info.rect.y1;
-			shared_str id = xml.ReadAttrib("texture",i,"id");
-
-			m_textures.insert(mk_pair(id,info));
+			xr_map<shared_str, TEX_INFO>::iterator it = m_textures.find(id);
+			if (it != m_textures.end())
+			{
+				if (show_duplicate)
+					Msg("~ WARNING find double texture id [%s] loaded file[%s] input file[%s]", id.c_str(), it->second.get_file_name(), info.get_file_name());
+				if (fix_dublicate)
+					m_textures.erase(it);
+			}
 		}
-//		m_shTex.insert(mk_pair(texture, regs));
-//	}
+		m_textures.insert(mk_pair(id, info));
+	}
 }
 
 bool CUITextureMaster::IsSh(const char* texture_name){

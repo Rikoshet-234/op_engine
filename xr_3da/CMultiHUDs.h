@@ -7,9 +7,8 @@ class ENGINE_API CHUDProfile
 public:
 	bool ExistFileInProfile(LPCSTR fileName);
 	xr_string GetProfileName();
-	LPCSTR GetFileFromProfile(LPCSTR fileName, bool remExt=false);
-	LPCSTR GetProfilePath();
-	LPCSTR GetProfileConfigUIPath();
+	xr_string GetFileFromProfile(LPCSTR fileName, bool remExt=false);
+	xr_string GetProfileConfigUIPath();
 	xr_vector<shared_str> files;
 	shared_str folder_path;
 	shared_str description_fn;
@@ -29,6 +28,8 @@ public:
 	CHUDProfile* GetCurrentProfile();
 	CHUDProfile* GetProfile(LPCSTR profileName);
 	xr_vector<CHUDProfile> *GetProfiles() { return &hudProfiles; }
+
+	void HUDChanged();
 };
 
 extern ENGINE_API	CMultiHUDs*	multiHUDs;

@@ -174,7 +174,7 @@ void CTexture::Load		()
 
 	flags.bUser						= false;
 	flags.MemoryUsage				= 0;
-	if (0==stricmp(*cName,"$null"))	return;
+	if (0==_stricmp(*cName,"$null"))	return;
 	if (0!=strstr(*cName,"$user$"))	{
 		flags.bUser	= true;
 		return;
@@ -186,6 +186,7 @@ void CTexture::Load		()
 	string_path			fn;
 	LPCSTR path_alias = _game_textures_;
 	xr_string currentName = cName.c_str();
+
 	CHUDProfile* profile = multiHUDs->GetCurrentProfile();
 	if (profile) 
 	{
@@ -193,12 +194,12 @@ void CTexture::Load		()
 		string_path seq;
 		strconcat(sizeof(seq), seq, currentName.c_str(), ".seq");
 		strconcat(sizeof(dds), dds, currentName.c_str(), ".dds");
-		LPCSTR buf = profile->GetFileFromProfile(seq,true);
-		LPCSTR buf2 = profile->GetFileFromProfile(dds, true);
-		if (buf != nullptr || buf2!=nullptr)
+		xr_string buf = profile->GetFileFromProfile(seq,true);
+		xr_string buf2 = profile->GetFileFromProfile(dds, true);
+		if (buf.size()>0 || buf2.size()>0)
 		{
 			path_alias = _game_huds_;
-			currentName = buf != nullptr ? buf : buf2 != nullptr ? buf2 :"";
+			currentName = buf.size()>0 ? buf : buf2.size()>0 ? buf2 :"";
 		}
 	}
 	if (FS.exist(fn, path_alias, currentName.c_str(),".ogm")){

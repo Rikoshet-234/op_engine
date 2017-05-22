@@ -25,6 +25,7 @@ public:
 			int	GetGroupID() { return m_iGroupID; }
 			void SetGroupID(int ID) { m_iGroupID = ID; }
 
+			void SetHeight(float height) override;
 	virtual void	MarkSelected				(bool b){};
 	// переопределяем критерий подсвечивания текста
 	virtual bool IsHighlightText();

@@ -48,6 +48,13 @@ void CUIListItem::Init(const char* str, float x, float y, float width, float hei
 }
 
 
+void CUIListItem::SetHeight(float height)
+{
+	if (m_bSeparator)
+		height = 2;
+	inherited::SetHeight(height);
+}
+
 bool CUIListItem::IsHighlightText()
 {
 	return CUIButton::IsHighlightText();
