@@ -3,6 +3,8 @@
 #include "../xrXMLParser/xrXMLParser.h"
 #include "xrGame/Level.h"
 #include "CustomHUD.h"
+#include "IGame_Persistent.h"
+#include "ResourceManager.h"
 
 ENGINE_API CMultiHUDs* multiHUDs = nullptr;
 xr_string checkFile(xr_string pathName,xr_string fileName)
@@ -139,6 +141,9 @@ CHUDProfile* CMultiHUDs::GetProfile(LPCSTR profileName)
 
 void CMultiHUDs::HUDChanged()
 {
+	CHUDProfile* profile = multiHUDs->GetCurrentProfile();
+	if (profile->GetFileFromProfile("ui_hud.xml").size()>0)
+		g_pGamePersistent->m_pMainMenu->ParseShTexInfoSingle("ui_hud.xml",true,false);
 	if (g_pGameLevel)
 		g_pGameLevel->pHUD->OnHUDChanged();
 }

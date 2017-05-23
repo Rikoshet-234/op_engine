@@ -315,11 +315,6 @@ void CHUDManager::OnConnected()
 
 void CHUDManager::OnHUDChanged()
 {
-	CHUDProfile* profile = multiHUDs->GetCurrentProfile();
-	if (profile->GetFileFromProfile("ui_hud.xml").size()>0)
-	{
-		CUITextureMaster::ParseShTexInfo("ui_hud.xml",true);
-	}
 	if (pUI->UIMainIngameWnd)
 	{
 		xr_delete(pUI->UIMainIngameWnd);

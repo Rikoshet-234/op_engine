@@ -24,6 +24,15 @@ void CUITextureMaster::WriteLog(){
 	Msg("UI texture manager work time is %d ms", m_time);
 #endif
 }
+
+void CUITextureMaster::Dump()
+{
+	std::for_each(m_textures.begin(), m_textures.end(), [](std::pair<shared_str, TEX_INFO> info)
+	{
+		Msg("m_texture [%s][%s]",info.first.c_str(),info.second.get_file_name());
+	});
+}
+
 void CUITextureMaster::ParseShTexInfo(LPCSTR xml_file, bool fix_dublicate, bool show_duplicate) {
 	CUIXml xml;
 	xml.Init(CONFIG_PATH, UI_PATH, xml_file);
@@ -59,7 +68,7 @@ void CUITextureMaster::ParseShTexInfo(LPCSTR xml_file, bool fix_dublicate, bool 
 			if (it != m_textures.end())
 			{
 				if (show_duplicate)
-					Msg("~ WARNING find double texture id [%s] loaded file[%s] input file[%s]", id.c_str(), it->second.get_file_name(), info.get_file_name());
+					Msg("~ WARNING find double texture id [%s] loaded file[%s] input file[%s]", id.c_str(), it->second.get_file_name(), xml_file);
 				if (fix_dublicate)
 					m_textures.erase(it);
 			}
@@ -181,7 +190,7 @@ TEX_INFO CUITextureMaster::FindItem(LPCSTR texture_name, LPCSTR def_texture_name
 		return (it->second);
 	else{
 		R_ASSERT2(m_textures.find(def_texture_name)!=m_textures.end(),texture_name);
-		return FindItem	(def_texture_name,NULL);
+		return FindItem	(def_texture_name, nullptr);
 	}
 }
 
@@ -194,4 +203,17 @@ void CUITextureMaster::GetTextureShader(LPCSTR texture_name, ref_shader& sh){
 		Msg("! CUITextureMaster::GetTextureShader Can't find texture [%s]", texture_name);
 
 	sh.create("hud\\default", *((*it).second.file));	
+}
+
+void CUITextureMaster::CleanPrefixedTextures(LPCSTR prefixFileName)
+{
+	xr_map<shared_str, TEX_INFO>::iterator	it= m_textures.begin();
+	while (it != m_textures.end()) {
+		if (strstr((*it).second.get_file_name(), prefixFileName))
+		{
+			it = m_textures.erase(it);
+		}
+		else
+			++it;
+	}
 }

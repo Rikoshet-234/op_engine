@@ -11,6 +11,7 @@
 
 #include "../../xrCore/OPFuncs/ExpandedCmdParams.h"
 #include "../CMultiHUDs.h"
+#include "../xrGame/ui/UITextureMaster.h"
 
 // #include "std_classes.h"
 // #include "xr_avi.h"
@@ -308,6 +309,7 @@ IDirect3DBaseTexture9*	CRender::texture_load(LPCSTR fRName, u32& ret_msize)
 	ELog.Msg(mtError,"Can't find texture '%s'",fname);
 #else
 	Msg("! CRender::texture_load, Error: Can't find texture '%s'",fname);
+
 #endif
 	return 0;
 

@@ -30,9 +30,10 @@ public:
 	static Frect	GetTextureRect		(LPCSTR texture_name);
 	static LPCSTR	GetTextureFileName	(LPCSTR texture_name);
 	static void		GetTextureShader	(LPCSTR texture_name, ref_shader& sh);
+	static void CleanPrefixedTextures(LPCSTR prefixFileName);
 	static TEX_INFO	FindItem			(LPCSTR texture_name, LPCSTR def_texture_name);
 	static void WriteLog();
-
+	static void Dump();
 protected:
 	IC	static bool IsSh					(const char* texture_name);
 
