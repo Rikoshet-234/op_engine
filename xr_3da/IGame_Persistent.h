@@ -86,7 +86,7 @@ public:
 
 	virtual void					RegisterModel		(IRender_Visual* V)
 #ifndef _EDITOR
-     = 0;
+	 = 0;
 #else
 	{}
 #endif
@@ -103,7 +103,7 @@ public:
 			u32						GameType			() {return m_game_params.m_e_game_type;};
 	virtual void					Statistics			(CGameFont* F)
 #ifndef _EDITOR
-     = 0;
+	 = 0;
 #else
 	{}
 #endif
@@ -118,6 +118,7 @@ public:
 	virtual void	Activate						(bool bActive)										=0; 
 	virtual	bool	IsActive						()													=0; 
 	virtual void	DestroyInternal					(bool bForce)										=0;
+	virtual void ParseShTexInfoSingle(LPCSTR file,bool fix_duplicate = false,bool show_duplicate=false) = 0;
 };
 
 extern ENGINE_API	bool g_dedicated_server;

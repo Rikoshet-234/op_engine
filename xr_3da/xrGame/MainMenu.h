@@ -156,6 +156,7 @@ public:
 	LPCSTR			GetGSVer						();
 		bool		ValidateCDKey					();
 		bool		IsCDKeyIsValid();
+		void ParseShTexInfoSingle(LPCSTR file,bool fix_duplicate = false, bool show_duplicate = false) override;
 };
 
 extern CMainMenu*	MainMenu();

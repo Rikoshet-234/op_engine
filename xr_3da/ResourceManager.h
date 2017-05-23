@@ -172,6 +172,7 @@ public:
 	void			Evict					();
 	void			StoreNecessaryTextures	();
 	void			DestroyNecessaryTextures();
+	void			UnloadPrefixedTextures(LPCSTR prefix);
 	void			Dump					(bool bBrief);
 	map_Texture &textures() { return m_textures; }
 

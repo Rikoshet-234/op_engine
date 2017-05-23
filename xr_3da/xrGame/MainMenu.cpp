@@ -15,9 +15,11 @@
 #include "gamespy/GameSpy_HTTP.h"
 #include "gamespy/GameSpy_Available.h"
 #include "gamespy/CdkeyDecode/cdkeydecode.h"
+#include "../ResourceManager.h"
 #include "string_table.h"
 
 #include "object_broker.h"
+#include "../CMultiHUDs.h"
 
 //#define DEMO_BUILD
 
@@ -98,6 +100,25 @@ CMainMenu::~CMainMenu	()
 	g_pGamePersistent->m_pMainMenu	= nullptr;
 	xr_delete						(m_pGameSpyFull);
 	delete_data						(m_pMB_ErrDlgs);	
+}
+
+void CMainMenu::ParseShTexInfoSingle(LPCSTR file, bool fix_duplicate, bool show_duplicate )
+{
+	//Msg("-----before-------------");
+	//CUITextureMaster::Dump();
+	//Msg("-----before-------------");
+	std::for_each(multiHUDs->GetProfiles()->begin(), multiHUDs->GetProfiles()->end(), [](CHUDProfile profile)
+	{
+		string256 buf;
+		sprintf_s(buf, "%stextures", profile.folder_path.c_str());
+		//Device.Resources->UnloadPrefixedTextures(buf);
+		CUITextureMaster::CleanPrefixedTextures(buf);
+	});
+	CUITextureMaster::ParseShTexInfo(file, fix_duplicate, show_duplicate);
+	//Msg("-----after-------------");
+	//CUITextureMaster::Dump();
+	//Msg("-----after-------------");
+
 }
 
 void CMainMenu::ReadTextureInfo()

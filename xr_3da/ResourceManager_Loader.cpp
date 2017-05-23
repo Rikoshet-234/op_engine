@@ -17,7 +17,7 @@ void	CResourceManager::OnDeviceDestroy(BOOL )
 		xr_delete		(m->second);
 	}
 	m_matrices.clear	();
-    
+	
 	// Constants
 	for (map_Constant::iterator c=m_constants.begin(); c!=m_constants.end(); c++)
 	{
@@ -26,7 +26,7 @@ void	CResourceManager::OnDeviceDestroy(BOOL )
 	}
 	m_constants.clear	();
 
-   	// Release blenders
+	// Release blenders
 	for (map_BlenderIt b=m_blenders.begin(); b!=m_blenders.end(); b++)
 	{
 		xr_free				((char*&)b->first);
@@ -61,7 +61,7 @@ void	CResourceManager::OnDeviceCreate	(IReader* F)
 #endif
 	IReader*	fs			= 0;
 	// Load constants
- 	fs	 		  			= F->open_chunk	(0);
+	fs	 		  			= F->open_chunk	(0);
 	if (fs){
 		while (!fs->eof())	{
 			fs->r_stringZ	(name,sizeof(name));
@@ -72,7 +72,7 @@ void	CResourceManager::OnDeviceCreate	(IReader* F)
 	}
 
 	// Load matrices
-    fs						= F->open_chunk(1);
+	fs						= F->open_chunk(1);
 	if (fs){
 		while (!fs->eof())	{
 			fs->r_stringZ	(name,sizeof(name));
@@ -83,7 +83,7 @@ void	CResourceManager::OnDeviceCreate	(IReader* F)
 	}
 
 	// Load blenders
-    fs						= F->open_chunk	(2);
+	fs						= F->open_chunk	(2);
 	if (fs){
 		IReader*	chunk	= NULL;
 		int			chunk_id= 0;
@@ -193,4 +193,25 @@ void CResourceManager::StoreNecessaryTextures()
 void CResourceManager::DestroyNecessaryTextures()
 {
 	m_necessary.clear			();
+}
+
+void CResourceManager::UnloadPrefixedTextures(LPCSTR prefix)
+{
+	map_TextureIt it = m_textures.begin();
+	map_Texture mapForDelete;
+	std::for_each(m_textures.begin(), m_textures.end(), [&](std::pair<const char* , CTexture*> info)
+	{
+		if (strstr(info.second->cName.c_str(), prefix))
+		{
+			mapForDelete.insert(info);
+		}
+	});
+	it = mapForDelete.begin();
+	while (it != mapForDelete.end())
+	{
+		(*it).second->Unload();
+		_DeleteTexture((*it).second);
+		//xr_free((*it).second);
+		++it;
+	}
 }
