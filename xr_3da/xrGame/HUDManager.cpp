@@ -10,6 +10,7 @@
 #include "GamePersistent.h"
 #include "../CMultiHUDs.h"
 #include "ui/UITextureMaster.h"
+#include "UIZoneMap.h"
 
 
 CFontManager::CFontManager()
@@ -320,6 +321,7 @@ void CHUDManager::OnHUDChanged()
 		xr_delete(pUI->UIMainIngameWnd);
 		pUI->UIMainIngameWnd = xr_new<CUIMainIngameWnd>();
 		pUI->UIMainIngameWnd->Init();
+		pUI->UIMainIngameWnd->GetZoneMap()->SetupCurrentMap();
 	}
 }
 

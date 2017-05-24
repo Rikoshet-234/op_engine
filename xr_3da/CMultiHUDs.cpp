@@ -94,13 +94,15 @@ CMultiHUDs::CMultiHUDs()
 	});
 	if (hudProfiles.size() > 0)
 	{
+		xr_string hudsFound("Found HUDs [ ");
+		xr_string huds;
 		auto defProfile = std::find_if(hudProfiles.begin(), hudProfiles.end(), [](CHUDProfile profile)
 		{
 			return xr_strcmp(profile.folder_path.c_str(), "default\\") == 0;
 		});
 		if (defProfile == hudProfiles.end())
 		{
-			Msg("! Multi HUDs found, but profile 'default' not found!");
+			Msg("~ WARNING Multi HUDs found, but profile 'default' not found!");
 		}
 		else
 			psCurrentHUDProfileIndex = std::distance(hudProfiles.begin(), defProfile);
@@ -114,7 +116,12 @@ CMultiHUDs::CMultiHUDs()
 			//tmp.erase(it, std::end(tmp));
 			last->name = xr_strdup(profile.GetProfileName().c_str());
 			last->id = tokens.size() - 1;
+			if (huds.size() > 0)
+				huds += " ";
+			huds += profile.GetProfileName();
 		});
+		hudsFound += huds + " ]";
+		Msg("- %s", hudsFound);
 	}
 }
 

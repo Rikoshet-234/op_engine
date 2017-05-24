@@ -66,6 +66,7 @@ protected:
 	Frect				UIWeaponIcon_rect;
 public:
 	CUIStatic*			GetPDAOnline					() { return &UIPdaOnline; };
+	CUIZoneMap*			GetZoneMap() const { return UIZoneMap; }
 protected:
 
 
