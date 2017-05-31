@@ -257,7 +257,6 @@ public:
 
 			A->DumpInfo(args);
 	}
-
 	void	Info	(TInfo& I) override
 	{
 		strcpy_s(I,"dumps all infoportions that actor have"); 
@@ -1623,12 +1622,15 @@ void CCC_RegisterCommands()
 	psHUD_Flags.set(HUD_INFO,			true);
 	psHUD_Flags.set(HUD_MIN_CROSSHAIR,	true);
 	psHUD_Flags.set(HUD_DIALOG_NUMBERED,true);
+	psHUD_Flags.set(HUD_ARTEFACT_PANEL_VISIBLE, false);
+	
 
 	CMD3(CCC_Mask,				"hud_weapon",			&psHUD_Flags,	HUD_WEAPON);
 	CMD3(CCC_Mask,				"hud_info",				&psHUD_Flags,	HUD_INFO);
 	CMD3(CCC_Mask,				"hud_crosshair",		&psHUD_Flags,	HUD_CROSSHAIR);
 	CMD3(CCC_Mask,				"hud_crosshair_dist",	&psHUD_Flags,	HUD_CROSSHAIR_DIST);
 	CMD3(CCC_Mask,				"hud_min_crosshair",	&psHUD_Flags,	HUD_MIN_CROSSHAIR);
+	CMD3(CCC_Mask,				"hud_art_panel_visible", &psHUD_Flags, HUD_ARTEFACT_PANEL_VISIBLE);
 	CMD3(CCC_Mask,				"dialog_numbered",		&psHUD_Flags,	HUD_DIALOG_NUMBERED);
 	//CMD1(CCC_TexTest,			"textest");
 
@@ -1664,6 +1666,7 @@ void CCC_RegisterCommands()
 	CMD3(CCC_Mask,				"gp_demand_reload", &g_uCommonFlags, gpDemandReload);
 	CMD3(CCC_Mask,				"gp_fixed_reload",				&g_uCommonFlags,gpFixedReload);
 	CMD3(CCC_Mask,				"gp_sticky_scope",				&g_uCommonFlags,gpStickyScope);
+	CMD3(CCC_Mask, "gp_show_modificators", &g_uCommonFlags, gpShowModificators);
 	CMD3(CCC_ChangeScopeVisual,	"gp_open_scope",				&g_uCommonFlags,gpOpenScope);
 
 

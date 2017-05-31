@@ -323,6 +323,8 @@ void CActor::IR_OnKeyboardHold(int cmd)
 	}
 }
 
+
+
 void CActor::IR_OnMouseMove(int dx, int dy)
 {
 	if (Remote())		return;

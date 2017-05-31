@@ -143,6 +143,7 @@ public:
 	virtual void				OnMoveToSlot		() {};
 	virtual void				OnMoveToBelt		() {};
 	virtual void				OnMoveToRuck		() {};
+	virtual void				OnMoveToDrop		() {};
 					
 			UIIconInfo			GetIconInfo() const {return m_iconInfo;}
 			int					GetGridWidth		() const ;

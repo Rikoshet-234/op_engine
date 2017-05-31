@@ -23,8 +23,9 @@
 #include "xr_ioc_cmd.h"
 #include "../xrCore/OPFuncs/op_engine_version.h"
 #include "../xrCore/FTimerStat.h"
-#include "../xrSound/soundrender_source.h"
 #include "CMultiHUDs.h"
+
+
 
 //---------------------------------------------------------------------
 ENGINE_API CInifile* pGameIni		= nullptr;
@@ -1228,11 +1229,12 @@ int doLauncher()
 */
 	return 0;
 }
+
+#pragma region check correct ogg file 
 void doOggsCheck()
 {
 	Engine.External.Initialize();
 	InitSound();
-#pragma comment(lib,"xrSound.lib")
 	FS_FileSet				flist;
 	FS.file_list(flist, "$game_sounds$", FS_ListFiles, "*.ogg");
 	Msg("Total ogg files to check: [%d]", flist.size());
@@ -1242,9 +1244,7 @@ void doOggsCheck()
 	for (; It != It_e; ++It)
 	{
 		FS.update_path(fn, "$game_sounds$", (*It).name.c_str());
-		//CSoundRender_Source* source = xr_new<CSoundRender_Source>();
-		//source->load(fn);
-		//xr_delete(source);
+		CSound_manager_interface::_check_ogg(fn);
 	}
 	Engine.Event.Dump();
 	destroySound();
@@ -1252,6 +1252,7 @@ void doOggsCheck()
 	destroyEngine();
 }
 
+#pragma endregion
 void doBenchmark(LPCSTR name)
 {
 	g_bBenchmark = true;

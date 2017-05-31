@@ -87,10 +87,10 @@ void CSoundRender_Source::LoadWave	(LPCSTR pName)
 	if (ovm->comments){
 		IReader F			(ovm->user_comments[0],ovm->comment_lengths[0]);
 		u32 vers			= F.r_u32	();
-        if (vers==0x0001){
+		if (vers==0x0001){
 			m_fMinDist		= F.r_float	();
 			m_fMaxDist		= F.r_float	();
-	        m_fBaseVolume	= 1.f;
+			m_fBaseVolume	= 1.f;
 			m_uGameType		= F.r_u32	();
 			m_fMaxAIDist	= m_fMaxDist;
 		}else if (vers==0x0002){
@@ -102,7 +102,7 @@ void CSoundRender_Source::LoadWave	(LPCSTR pName)
 		}else if (vers==OGG_COMMENT_VERSION){
 			m_fMinDist		= F.r_float	();
 			m_fMaxDist		= F.r_float	();
-            m_fBaseVolume	= F.r_float	();
+			m_fBaseVolume	= F.r_float	();
 			m_uGameType		= F.r_u32	();
 			m_fMaxAIDist	= F.r_float	();
 		}else{
@@ -132,7 +132,7 @@ void CSoundRender_Source::load(LPCSTR name)
 #ifdef _EDITOR
 	if (!FS.exist(fn)){ 
 		FS.update_path	(fn,"$game_sounds$","$no_sound.ogg");
-    }
+	}
 #endif
 	LoadWave			(fn);		//.R_ASSERT(wave);
 	SoundRender->cache.cat_create	(CAT, dwBytesTotal);
@@ -145,8 +145,8 @@ void CSoundRender_Source::load(LPCSTR name)
 void CSoundRender_Source::unload()
 {
 	SoundRender->cache.cat_destroy	(CAT);
-    dwTimeTotal						= 0;
-    dwBytesTotal					= 0;
-    dwBytesPerMS					= 0;
+	dwTimeTotal						= 0;
+	dwBytesTotal					= 0;
+	dwBytesPerMS					= 0;
 }
 

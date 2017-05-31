@@ -12,7 +12,7 @@
 CUIOutfitParams::CUIOutfitParams()
 {
 	immunes = CreateImmunesStringMap();
-	modificators = CreateRestoresStringMap();
+	modificators = CreateModificatorsStringMap();
 	m_list=nullptr;
 	m_bShowModifiers=false;
 	inOutfit = nullptr;
@@ -202,7 +202,7 @@ void CUIOutfitParams::createModifItem(shared_str outfit_section, std::pair<int, 
 			}
 			break;
 		default:
-			NODEFAULT;
+			return;
 	}
 	bool emptyParam=fsimilar(outfitValue, 0.0f) && fsimilar(outfitValue1, 0.0f) && !force_add;
 	CUIListItemIconed* item= findIconedItem(m_lModificatorsUnsortedItems,modifPair.second.paramName.c_str(),emptyParam,xmlParams(currentFileNameXml,PARAMS_PATH));

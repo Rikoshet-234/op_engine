@@ -12,7 +12,7 @@
 #include "restriction_space.h"
 #include "../IGame_Persistent.h"
 #include "../../build_defines.h"
-#include "ai_space.h"
+#include "Actor.h"
 #include "script_engine.h"
 
 #define	FASTMODE_DISTANCE (50.f)	//distance to camera from sphere, when zone switches to fast update sequence
@@ -61,58 +61,62 @@ struct SArtefactActivation{
 };
 
 
-CArtefact::CArtefact(void) 
+CArtefact::CArtefact()
 {
-	shedule.t_min				= 20;
-	shedule.t_max				= 50;
-	m_sParticlesName			= nullptr;
-	m_pTrailLight				= nullptr;
-	m_activationObj				= nullptr;
+	shedule.t_min = 20;
+	shedule.t_max = 50;
+	m_sParticlesName = nullptr;
+	m_pTrailLight = nullptr;
+	m_activationObj = nullptr;
+	m_CarringBoneID = u16(-1);
+	m_bLightsEnabled = false;
+	m_bCanSpawnZone = false;
+	m_fTrailLightRange = 0;
+	m_fArtJumpSpeedDelta = 0;
 }
 
 
 CArtefact::~CArtefact(void) 
 {}
 
-void CArtefact::Load(LPCSTR section) 
+void CArtefact::Load(LPCSTR section)
 {
-	inherited::Load			(section);
+	inherited::Load(section);
 
 
 	if (pSettings->line_exist(section, "particles"))
 	{
-		m_sParticlesName	= pSettings->r_string(section, "particles");
-		if (m_sParticlesName=="")
-			Msg("! WARNING particles param present, but is empty in [%s]",section);
+		m_sParticlesName = pSettings->r_string(section, "particles");
+		if (m_sParticlesName == "")
+			Msg("! WARNING particles param present, but is empty in [%s]", section);
 	}
 
-	m_bLightsEnabled		= !!pSettings->r_bool(section, "lights_enabled");
-	if(m_bLightsEnabled){
-		sscanf(pSettings->r_string(section,"trail_light_color"), "%f,%f,%f", 
+	m_bLightsEnabled = !!pSettings->r_bool(section, "lights_enabled");
+	if (m_bLightsEnabled) {
+		sscanf(pSettings->r_string(section, "trail_light_color"), "%f,%f,%f",
 			&m_TrailLightColor.r, &m_TrailLightColor.g, &m_TrailLightColor.b);
-		m_fTrailLightRange	= pSettings->r_float(section,"trail_light_range");
+		m_fTrailLightRange = pSettings->r_float(section, "trail_light_range");
 	}
 
 
-	{
-		m_art_additional_weight=READ_IF_EXISTS(pSettings,r_float,section,"additional_weight",0);
+	m_art_additional_weight = READ_IF_EXISTS(pSettings, r_float, section, "additional_weight", 0);
 
-		m_fHealthRestoreSpeed = pSettings->r_float		(section,"health_restore_speed"		);
-		m_fRadiationRestoreSpeed = pSettings->r_float	(section,"radiation_restore_speed"	);
-		m_fSatietyRestoreSpeed = pSettings->r_float		(section,"satiety_restore_speed"	);
-		m_fPowerRestoreSpeed = pSettings->r_float		(section,"power_restore_speed"		);
-		m_fBleedingRestoreSpeed = pSettings->r_float	(section,"bleeding_restore_speed"	);
-		if(pSettings->section_exist(/**cNameSect(), */pSettings->r_string(section,"hit_absorbation_sect")))
-			m_ArtefactHitImmunities.LoadImmunities(pSettings->r_string(section,"hit_absorbation_sect"),pSettings);
-	}
+	m_fHealthRestoreSpeed = pSettings->r_float(section, "health_restore_speed");
+	m_fRadiationRestoreSpeed = pSettings->r_float(section, "radiation_restore_speed");
+	m_fSatietyRestoreSpeed = pSettings->r_float(section, "satiety_restore_speed");
+	m_fPowerRestoreSpeed = pSettings->r_float(section, "power_restore_speed");
+	m_fBleedingRestoreSpeed = pSettings->r_float(section, "bleeding_restore_speed");
+	if (pSettings->section_exist(/**cNameSect(), */pSettings->r_string(section, "hit_absorbation_sect")))
+		m_ArtefactHitImmunities.LoadImmunities(pSettings->r_string(section, "hit_absorbation_sect"), pSettings);
+
 	m_bCanSpawnZone = !!pSettings->line_exist("artefact_spawn_zones", section);
+	m_fArtJumpSpeedDelta = READ_IF_EXISTS(pSettings, r_float, section, "jump_speed_delta", 0);
 
-
-	animGet				(m_anim_idle,					pSettings->r_string(*hud_sect,"anim_idle"));
-	animGet				(m_anim_idle_sprint,			pSettings->r_string(*hud_sect,"anim_idle_sprint"));
-	animGet				(m_anim_hide,					pSettings->r_string(*hud_sect,"anim_hide"));
-	animGet				(m_anim_show,					pSettings->r_string(*hud_sect,"anim_show"));
-	animGet				(m_anim_activate,				pSettings->r_string(*hud_sect,"anim_activate"));
+	animGet(m_anim_idle, pSettings->r_string(*hud_sect, "anim_idle"));
+	animGet(m_anim_idle_sprint, pSettings->r_string(*hud_sect, "anim_idle_sprint"));
+	animGet(m_anim_hide, pSettings->r_string(*hud_sect, "anim_hide"));
+	animGet(m_anim_show, pSettings->r_string(*hud_sect, "anim_show"));
+	animGet(m_anim_activate, pSettings->r_string(*hud_sect, "anim_activate"));
 }
 #include "../xrCore/FTimerStat.h"
 BOOL CArtefact::net_Spawn(CSE_Abstract* DC) 
@@ -278,6 +282,42 @@ void CArtefact::UpdateLights()
 	VERIFY(!ph_world->Processing());
 	if(!m_bLightsEnabled || !m_pTrailLight->get_active()) return;
 	m_pTrailLight->set_position(Position());
+}
+
+void CArtefact::OnMoveToBelt()
+{
+	if (m_pCurrentInventory)
+	{
+		CActor* pActor = smart_cast<CActor*> (m_pCurrentInventory->GetOwner());
+		if (pActor)
+		{
+			pActor->UpdateJumpSpeed(+m_fArtJumpSpeedDelta);
+		}
+	}
+}
+
+void CArtefact::OnMoveToRuck()
+{
+	if (m_pCurrentInventory)
+	{
+		CActor* pActor = smart_cast<CActor*> (m_pCurrentInventory->GetOwner());
+		if (pActor && m_eItemPlace== eItemPlaceBelt)
+		{
+			pActor->UpdateJumpSpeed(-m_fArtJumpSpeedDelta);
+		}
+	}
+}
+
+void CArtefact::OnMoveToDrop()
+{
+	if (m_pCurrentInventory)
+	{
+		CActor* pActor = smart_cast<CActor*> (m_pCurrentInventory->GetOwner());
+		if (pActor && m_eItemPlace == eItemPlaceBelt)
+		{
+			pActor->UpdateJumpSpeed(-m_fArtJumpSpeedDelta);
+		}
+	}
 }
 
 void CArtefact::ActivateArtefact	()

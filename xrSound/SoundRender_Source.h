@@ -4,6 +4,10 @@
 
 #include "soundrender_cache.h"
 
+extern int ov_seek_func(void *datasource, s64 offset, int whence);
+extern size_t ov_read_func(void *ptr, size_t size, size_t nmemb, void *datasource);
+extern int ov_close_func(void *datasource);
+extern long ov_tell_func(void *datasource);
 // refs
 struct OggVorbis_File;
 
@@ -32,7 +36,7 @@ public:
 							~CSoundRender_Source	();
 
 	void					load					(LPCSTR name);
-    void					unload					();
+	void					unload					();
 	void					decompress				(u32 line, OggVorbis_File* ovf);
 	
 	virtual	u32				length_ms				()	{return dwTimeTotal;	}

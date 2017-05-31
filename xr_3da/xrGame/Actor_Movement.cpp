@@ -596,3 +596,10 @@ bool CActor::is_jump()
 {
 	return ((mstate_real & (mcJump|mcFall|mcLanding|mcLanding2)) != 0);
 }
+
+void CActor::UpdateJumpSpeed(float jumpSpeedDelta)
+{
+	float newValue = m_fJumpSpeed + jumpSpeedDelta;
+	m_fJumpSpeed = newValue;
+	character_physics_support()->movement()->SetJumpUpVelocity(newValue);
+}

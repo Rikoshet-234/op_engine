@@ -136,103 +136,149 @@ void	CInifile::Load(IReader* F, LPCSTR path)
 
 	while (!F->eof())
 	{
-		F->r_string		(str,sizeof(str));
-		_Trim			(str);
-		LPSTR semi	= strchr(str,';');
-		LPSTR semi_1	= strchr(str,'/');
-		
-		if(semi_1 && (*(semi_1+1)=='/') && ((!semi) || (semi && (semi_1<semi) )) ){
+		F->r_string(str, sizeof(str));
+		_Trim(str);
+		LPSTR semi = strchr(str, ';');
+		LPSTR semi_1 = strchr(str, '/');
+
+		if (semi_1 && (*(semi_1 + 1) == '/') && ((!semi) || (semi && (semi_1 < semi)))) {
 			semi = semi_1;
 		}
 
 #ifdef DEBUG
-		LPSTR comment	= 0;
+		LPSTR comment = 0;
 #endif
 		if (semi) {
-			*semi		= 0;
+			*semi = 0;
 #ifdef DEBUG
-			comment		= semi+1;
+			comment = semi + 1;
 #endif
 		}
 
-		if (str[0] && (str[0]=='#') && strstr(str,"#include")){
-			string64	inc_name;	
-			R_ASSERT	(path&&path[0]);
-			if (_GetItem	(str,1,inc_name,'"')){
-				string_path	fn,inc_path,folder;
-				strconcat	(sizeof(fn),fn,path,inc_name);
-				_splitpath	(fn,inc_path,folder, 0, 0 );
-				strcat		(inc_path,folder);
-				IReader* I 	= FS.r_open(fn); R_ASSERT3(I,"Can't find include file:", inc_name);
-				Load		(I,inc_path);
-				FS.r_close	(I);
+
+		if (str[0] && (str[0] == '#') && strstr(str, "#include")) 
+		{
+			string64	inc_name;
+			R_ASSERT(path&&path[0]);
+			if (_GetItem(str, 1, inc_name, '"')) {
+				string_path	fn, inc_path, folder;
+				strconcat(sizeof(fn), fn, path, inc_name);
+				_splitpath(fn, inc_path, folder, 0, 0);
+				strcat(inc_path, folder);
+				IReader* I = FS.r_open(fn); R_ASSERT3(I, "Can't find include file:", inc_name);
+				Load(I, inc_path);
+				FS.r_close(I);
 			}
-		}else if (str[0] && (str[0]=='[')){
+		}
+		else if (str[0] && (str[0] == '[')) 
+		{
 			// insert previous filled section
-			if (Current){
-				RootIt I		= std::lower_bound(DATA.begin(),DATA.end(),*Current->Name,sect_pred);
-				R_ASSERT3(!((I!=DATA.end())&&((*I)->Name==Current->Name)),"Duplicate section found.",*Current->Name);
-				DATA.insert		(I,Current);
+			if (Current) {
+				RootIt I = std::lower_bound(DATA.begin(), DATA.end(), *Current->Name, sect_pred);
+				R_ASSERT3(!((I != DATA.end()) && ((*I)->Name == Current->Name)), "Duplicate section found.", *Current->Name);
+				DATA.insert(I, Current);
 			}
-			Current				= xr_new<Sect>();
-			Current->Name		= 0;
+			Current = xr_new<Sect>();
+			Current->Name = 0;
 			// start new section
-			R_ASSERT3(strchr(str,']'),"Bad ini section found: ",str);
-			LPCSTR inherited_names = strstr(str,"]:");
-			if (0!=inherited_names){
-				VERIFY2			(bReadOnly,"Allow for readonly mode only.");
-				inherited_names	+= 2;
-				int cnt			= _GetItemCount(inherited_names);
-				for (int k=0; k<cnt; ++k){
+			R_ASSERT3(strchr(str, ']'), "Bad ini section found: ", str);
+			LPCSTR inherited_names = strstr(str, "]:");
+			if (0 != inherited_names) {
+				VERIFY2(bReadOnly, "Allow for readonly mode only.");
+				inherited_names += 2;
+				int cnt = _GetItemCount(inherited_names);
+				for (int k = 0; k < cnt; ++k) {
 					xr_string	tmp;
-					_GetItem	(inherited_names,k,tmp);
+					_GetItem(inherited_names, k, tmp);
 					Sect& inherited_section = r_section(tmp.c_str());
-					for (SectIt_ it =inherited_section.Data.begin(); it!=inherited_section.Data.end(); it++)
-						insert_item	(Current,*it);
+					for (SectIt_ it = inherited_section.Data.begin(); it != inherited_section.Data.end(); it++)
+						insert_item(Current, *it);
 				}
 			}
-			*strchr(str,']') 	= 0;
-			Current->Name 		= strlwr(str+1);
-		} else {
-			if (Current){
-				char*		name	= str;
-				char*		t		= strchr(name,'=');
-				if (t)		{
-					*t		= 0;
-					_Trim	(name);
-					_parse	(str2,++t);
-				} else {
-					_Trim	(name);
-					str2[0]	= 0;
+			*strchr(str, ']') = 0;
+			Current->Name = _strlwr(str + 1);
+		}
+		else {
+			if (Current) 
+			{
+				char*		name = str;
+#if 0
+				char* pipe = strstr(str, "<<END");
+				if (pipe)
+				{
+					bool ended = false;
+					xr_string pipe_data;
+					while (!F->eof())
+					{
+						string4096 intBuf;
+						F->r_string(intBuf, sizeof(intBuf));
+						_Trim(intBuf);
+						LPSTR comment = strchr(intBuf, ';');
+						LPSTR unk_semi = strchr(intBuf, '/');
+						if (unk_semi && (*(unk_semi + 1) == '/') && ((!comment) || (comment && (unk_semi < comment)))) 
+							comment = unk_semi;
+						if (comment) 
+							*comment = 0;
+						if (strstr(intBuf,">>END"))
+						{
+							ended = true;
+							break;
+						}
+						pipe_data += intBuf;
+						if (pipe_data.size() > 0)
+							pipe_data += "\n";
+					}
+					if (!ended)
+					{
+						string512 buf;
+						sprintf_s(buf, "Invalid config structure. Section [%s], line[%s] path[%s]", Current->Name.c_str(),name,path);
+						Debug.fatal(DEBUG_INFO, buf);
+					}
+					strcpy_s(str2, sizeof(str2), pipe_data.c_str());
+				}
+				else
+#endif
+				{
+					char*		t = strchr(name, '=');
+					if (t) {
+						*t = 0;
+						_Trim(name);
+						_parse(str2, ++t);
+					}
+					else {
+						_Trim(name);
+						str2[0] = 0;
+					}
 				}
 
 				Item		I;
-				I.first		= (name[0]?name:NULL);
-				I.second	= (str2[0]?str2:NULL);
+				I.first = (name[0] ? name : NULL);
+				I.second = (str2[0] ? str2 : NULL);
 #ifdef DEBUG
-				I.comment	= bReadOnly?0:comment;
+				I.comment = bReadOnly ? 0 : comment;
 #endif
 
 				if (bReadOnly) {
-					if (*I.first)							insert_item	(Current,I);
-				} else {
-					if	(
-							*I.first
-							|| *I.second 
+					if (*I.first)							insert_item(Current, I);
+				}
+				else {
+					if (
+						*I.first
+						|| *I.second
 #ifdef DEBUG
-							|| *I.comment
+						|| *I.comment
 #endif
 						)
-						insert_item	(Current,I);
+						insert_item(Current, I);
 				}
 			}
 		}
 	}
 	if (Current)
 	{
-		RootIt I		= std::lower_bound(DATA.begin(),DATA.end(),*Current->Name,sect_pred);
-		R_ASSERT3(!((I!=DATA.end())&&((*I)->Name==Current->Name)),"Duplicate section found.",*Current->Name);
-		DATA.insert		(I,Current);
+		RootIt I = std::lower_bound(DATA.begin(), DATA.end(), *Current->Name, sect_pred);
+		R_ASSERT3(!((I != DATA.end()) && ((*I)->Name == Current->Name)), "Duplicate section found.", *Current->Name);
+		DATA.insert(I, Current);
 	}
 }
 
