@@ -25,21 +25,22 @@ class	ENGINE_API	CGammaControl;
 class ENGINE_API CRenderDevice 
 {
 private:
-    // Main objects used for creating and rendering the 3D scene
-    u32										m_dwWindowStyle;
-    RECT									m_rcWindowBounds;
-    RECT									m_rcWindowClient;
+	// Main objects used for creating and rendering the 3D scene
+	u32										m_dwWindowStyle;
+	RECT									m_rcWindowBounds;
+	RECT									m_rcWindowClient;
 
 	u32										Timer_MM_Delta;
 	CTimer_paused							Timer;
 	CTimer_paused							TimerGlobal;
 	CTimer									TimerMM;
+	CTimer									frame_timer;
 
 	void									_Create		(LPCSTR shName);
 	void									_Destroy	(BOOL	bKeepTextures);
 	void									_SetupStates();
 public:
-    HWND									m_hWnd;
+	HWND									m_hWnd;
 	LRESULT									MsgProc		(HWND,UINT,WPARAM,LPARAM);
 
 	u32										dwFrame;
@@ -109,7 +110,7 @@ public:
 			,mt_csLeave(MUTEX_PROFILE_ID(CRenderDevice::mt_csLeave))
 		#endif // PROFILE_CRITICAL_SECTIONS
 	{
-	    m_hWnd              = NULL;
+		m_hWnd              = NULL;
 		b_is_Active			= FALSE;
 		b_is_Ready			= FALSE;
 		Timer.Start			();

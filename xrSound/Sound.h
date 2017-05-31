@@ -279,13 +279,14 @@ public:
 	/// General
 	static void						_create					( u64 window, LPCSTR localization );
 	static void						_destroy				( );
-
+	static void _check_ogg(LPCSTR oggFile);
 	virtual void					_restart				( )																						= 0;
 	virtual BOOL					i_locked 				( )																						= 0;
 	//@}
 
 	//@{
 	/// Sound interface
+
 	virtual void					create					( ref_sound& S, LPCSTR fName,				esound_type sound_type, int		game_type)	= 0;
 	virtual void					clone					( ref_sound& S, const ref_sound& from,		esound_type sound_type, int		game_type)	= 0;
 	virtual void					destroy					( ref_sound& S)																			= 0;

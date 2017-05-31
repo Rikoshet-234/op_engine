@@ -337,81 +337,95 @@ void CUICarBodyWnd::SendMessage(CUIWindow *pWnd, s16 msg, void *pData)
 {
 	if (BUTTON_CLICKED == msg && m_pUITakeAll == pWnd)
 	{
-		TakeAll					();
+		TakeAll();
 	}
-	else if(pWnd == m_pUIPropertiesBox &&	msg == PROPERTY_CLICKED)
+	else if (pWnd == m_pUIPropertiesBox &&	msg == PROPERTY_CLICKED)
 	{
-		if(m_pUIPropertiesBox->GetClickedItem())
+		if (m_pUIPropertiesBox->GetClickedItem())
 		{
-			u32 itemTag=m_pUIPropertiesBox->GetClickedItem()->GetTAG();
-			switch(itemTag)
+			u32 itemTag = m_pUIPropertiesBox->GetClickedItem()->GetTAG();
+			switch (itemTag)
 			{
 
 			case INVENTORY_EAT_ACTION:	//סתוסעü מבתוךע
 				EatItem();
 				break;
 			case INVENTORY_UNLOAD_MAGAZINE:
+			{
+				CUICellItem * itm = CurrentItem();
+				CWeapon* weapon = static_cast<CWeapon*>(itm->m_pData);
+				if (!weapon)
+					break;
+				CWeaponMagazined* wg = smart_cast<CWeaponMagazined*>(weapon);
+				if (!wg)
+					break;
+				wg->PlayEmptySnd();
+				OPFuncs::UnloadWeapon(wg);
+				for (size_t i = 0; i < itm->ChildsCount(); ++i)
 				{
-					CUICellItem * itm = CurrentItem();
-					CWeapon* weapon=static_cast<CWeapon*>(itm->m_pData);
-					if (!weapon)
-						break;
-					CWeaponMagazined* wg = smart_cast<CWeaponMagazined*>(weapon);
-					if (!wg)
-						break;
-					wg->PlayEmptySnd();
-					OPFuncs::UnloadWeapon(wg);
-					for(size_t i=0; i<itm->ChildsCount(); ++i)
+					CUICellItem * child_itm = itm->Child(i);
+					OPFuncs::UnloadWeapon(smart_cast<CWeaponMagazined*>(static_cast<CWeapon*>(child_itm->m_pData)));
+				}
+				SetCurrentItem(nullptr);
+			}break;
+			case INVENTORY_CB_MOVE_ALL:
+			case INVENTORY_CB_MOVE_SINGLE:
+			{
+				CActor *pActor = smart_cast<CActor*>(Level().CurrentEntity());
+				if (!pActor && !CurrentItem())
+					break;
+				CUIDragDropListEx* owner_list = CurrentItem()->OwnerList();
+				if (!owner_list)
+					break;
+				u16 from_id;
+				u16 to_id;
+				u16 bag_id = (m_pInventoryBox) ? m_pInventoryBox->ID() : smart_cast<CGameObject*>(m_pOthersObject)->ID();
+				u16 currItem_id = CurrentIItem()->object().ID();
+				u16 actor_id = Actor()->ID();
+				from_id = owner_list == m_pUIOthersBagList ? bag_id : actor_id;
+				to_id = owner_list == m_pUIOthersBagList ? actor_id : bag_id;
+				CUICellItem* currItem = CurrentItem();
+				PlaySnd(eInvItemMove);
+				float to_max_weight = m_pOthersObject ? m_pOthersObject->inventory().GetMaxWeight() : 10000;
+				float to_current_weight= m_pOthersObject ? to_id== Actor()->ID() ? 0 : m_pOthersObject->inventory().CalcTotalWeight() : 0;
+				if (itemTag == INVENTORY_CB_MOVE_ALL)
+				{
+					for (unsigned int i = 0; i < currItem->ChildsCount(); ++i)
 					{
-						CUICellItem * child_itm			= itm->Child(i);
-						OPFuncs::UnloadWeapon(smart_cast<CWeaponMagazined*>(static_cast<CWeapon*>(child_itm->m_pData)));
-					}
-					SetCurrentItem(nullptr);
-				}break;
-				case INVENTORY_CB_MOVE_ALL:
-				case INVENTORY_CB_MOVE_SINGLE:
-					{
-						CActor *pActor				= smart_cast<CActor*>(Level().CurrentEntity());
-						if(!pActor && !CurrentItem())
-							break;
-						CUIDragDropListEx* owner_list		= CurrentItem()->OwnerList();
-						if (!owner_list)
-							break;
-						u16 from_id;
-						u16 to_id;
-						u16 bag_id=(m_pInventoryBox)?m_pInventoryBox->ID():smart_cast<CGameObject*>(m_pOthersObject)->ID();
-						u16 currItem_id=CurrentIItem()->object().ID();
-						u16 actor_id=Actor()->ID();
-						from_id=owner_list==m_pUIOthersBagList ? bag_id:actor_id;
-						to_id=owner_list==m_pUIOthersBagList ? actor_id: bag_id;
-						CUICellItem* currItem=CurrentItem();
-						PlaySnd	(eInvItemMove);
-						if (itemTag==INVENTORY_CB_MOVE_ALL)
+						PIItem			iitm = static_cast<PIItem>(currItem->Child(i)->m_pData);
+						if (to_current_weight + iitm->Weight() < to_max_weight)
 						{
-							for(u32 i=0; i<currItem->ChildsCount(); ++i)
-							{
-								PIItem			iitm			= static_cast<PIItem>(currItem->Child(i)->m_pData);
-								move_item(from_id, to_id, iitm->object().ID());
-							}
+							move_item(from_id, to_id, iitm->object().ID());
+							to_current_weight += iitm->Weight();
 						}
-						move_item(from_id, to_id, currItem_id);
+						else
+						{
+							Msg("# Object[%d] - maximum internal capacity reached", to_id);
+							break;
+						}
 					}
-					break;
-				case INVENTORY_DETACH_GRENADE_LAUNCHER_ADDON:
-					DetachAddon(*(smart_cast<CWeapon*>(CurrentIItem()))->GetGrenadeLauncherName());
-					break;
-				case INVENTORY_DETACH_SCOPE_ADDON:
-					DetachAddon(*(smart_cast<CWeapon*>(CurrentIItem()))->GetScopeName());
-					break;
-				case INVENTORY_DETACH_SILENCER_ADDON:
-					DetachAddon(*(smart_cast<CWeapon*>(CurrentIItem()))->GetSilencerName());
-					break;
+				}
+				if (to_current_weight + CurrentIItem()->Weight() < to_max_weight)
+					move_item(from_id, to_id, currItem_id);
+				else
+					Msg("# Object[%d] - maximum internal capacity reached", to_id);
+			}
+			break;
+			case INVENTORY_DETACH_GRENADE_LAUNCHER_ADDON:
+				DetachAddon(*(smart_cast<CWeapon*>(CurrentIItem()))->GetGrenadeLauncherName());
+				break;
+			case INVENTORY_DETACH_SCOPE_ADDON:
+				DetachAddon(*(smart_cast<CWeapon*>(CurrentIItem()))->GetScopeName());
+				break;
+			case INVENTORY_DETACH_SILENCER_ADDON:
+				DetachAddon(*(smart_cast<CWeapon*>(CurrentIItem()))->GetSilencerName());
+				break;
 			}
 			UpdateLists_delayed();
 		}
 	}
 
-	inherited::SendMessage			(pWnd, msg, pData);
+	inherited::SendMessage(pWnd, msg, pData);
 }
 
 void CUICarBodyWnd::Draw()

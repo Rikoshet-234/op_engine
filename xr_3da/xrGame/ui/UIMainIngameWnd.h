@@ -67,6 +67,7 @@ protected:
 public:
 	CUIStatic*			GetPDAOnline					() { return &UIPdaOnline; };
 	CUIZoneMap*			GetZoneMap() const { return UIZoneMap; }
+	void UpdateArtPanelVisible() ;
 protected:
 
 

@@ -13,7 +13,7 @@
 	u32 psCurrentLanguageIndex = (u32)-1;
 // release version always has "mt_*" enabled
 	Flags32		psDeviceFlags = { rsFullscreen | rsDetails | mtPhysics | mtSound | mtNetwork | rsDrawStatic | rsDrawDynamic };
-	Flags32		g_uCommonFlags = { flAiUseTorchDynamicLights | uiShowConditions | uiShowExtDesc | uiShowFocused | gpDeferredReload | gpFixedReload | uiShowTradeSB };
+	Flags32		g_uCommonFlags = { flAiUseTorchDynamicLights | uiShowConditions | uiShowExtDesc | uiShowFocused | gpDeferredReload | gpFixedReload | uiShowTradeSB | gpShowModificators };
 // textures 
 	int			psTextureLOD = 0;
 

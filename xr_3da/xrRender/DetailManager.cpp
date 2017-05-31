@@ -21,11 +21,11 @@
 
 const float dbgOffset			= 0.f;
 const int	dbgItems			= 128;
-
+ENGINE_API u32 TargetRenderLoad();
 //--------------------------------------------------- Decompression
 static int magic4x4[4][4] =
 {
- 	{ 0, 14,  3, 13},
+	{ 0, 14,  3, 13},
 	{11,  5,  8,  6},
 	{12,  2, 15,  1},
 	{ 7,  9,  4, 10}
@@ -34,7 +34,7 @@ static int magic4x4[4][4] =
 void bwdithermap	(int levels, int magic[16][16])
 {
 	/* Get size of each step */
-    float N = 255.0f / (levels - 1);
+	float N = 255.0f / (levels - 1);
 
 	/*
 	* Expand 4x4 dither pattern to 16x16.  4x4 leaves obvious patterning,
@@ -46,8 +46,8 @@ void bwdithermap	(int levels, int magic[16][16])
 	* pixel value with mod N == 0 at the next level).
 	*/
 
-    float	magicfact = (N - 1) / 16;
-    for ( int i = 0; i < 4; i++ )
+	float	magicfact = (N - 1) / 16;
+	for ( int i = 0; i < 4; i++ )
 		for ( int j = 0; j < 4; j++ )
 			for ( int k = 0; k < 4; k++ )
 				for ( int l = 0; l < 4; l++ )
@@ -169,7 +169,7 @@ void CDetailManager::Unload		()
 	for (DetailIt it=objects.begin(); it!=objects.end(); it++){
 		(*it)->Unload();
 		xr_delete		(*it);
-    }
+	}
 	objects.clear		();
 	m_visibles[0].clear	();
 	m_visibles[1].clear	();
@@ -274,7 +274,9 @@ void CDetailManager::Render	()
 	if (0==dtFS)						return;
 	if (!psDeviceFlags.is(rsDetails))	return;
 #endif
-
+#pragma region ECO_RENDER
+	if (TargetRenderLoad() == 30) return; // не рисовать траву в меню
+#pragma endregion
 	// MT
 	MT_SYNC					();
 
@@ -299,7 +301,9 @@ void __stdcall	CDetailManager::MT_CALC		()
 	if (0==dtFS)						return;
 	if (!psDeviceFlags.is(rsDetails))	return;
 #endif    
-
+#pragma region ECO_RENDER
+	if (TargetRenderLoad() == 30) return; // не рисовать траву в меню
+#pragma endregion
 	MT.Enter					();
 	if (m_frame_calc!=Device.dwFrame)	
 		if ((m_frame_rendered+1)==Device.dwFrame) //already rendered

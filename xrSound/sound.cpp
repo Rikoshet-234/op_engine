@@ -27,7 +27,12 @@ void CSound_manager_interface::_create		(u64 window, LPCSTR localization)
 void CSound_manager_interface::_destroy	()
 {
 	Sound->_clear		();
-    xr_delete			(SoundRender);
-    Sound				= 0;
+	xr_delete			(SoundRender);
+	Sound				= 0;
+}
+
+void CSound_manager_interface::_check_ogg(LPCSTR oggFile)
+{
+	SoundRender->_check_ogg(oggFile);
 }
 

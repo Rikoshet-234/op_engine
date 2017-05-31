@@ -16,15 +16,16 @@
 #include "../inventory.h"
 #include "../Artifact.h"
 #include "IconedItemsHelper.h"
+#include "../../defines.h"
 
 #define PARAMS_PATH "outfit_info:immunities_list"
 #define FILE_PATH "inventory_new.xml"
 static xmlParams s_xmlParams(FILE_PATH,PARAMS_PATH);
 
-CUIOutfitInfo::CUIOutfitInfo(): m_outfit(nullptr), m_bShowModifiers(false), m_list(nullptr)
+CUIOutfitInfo::CUIOutfitInfo(): m_outfit(nullptr), m_list(nullptr), m_bShowModifiers(false)
 {
 	immunes = CreateImmunesStringMap();
-	modificators = CreateRestoresStringMap();
+	modificators = CreateModificatorsStringMap();
 }
 
 CUIOutfitInfo::~CUIOutfitInfo() {}
@@ -84,6 +85,8 @@ void CUIOutfitInfo::createModifItem(CCustomOutfit* outfit,std::pair<int, restore
 	float artsValue=artefactRestores[modifPair.first];
 	switch (modifPair.first)
 	{
+		case JUMP_SPEED_DELTA_ID:
+			break;
 		case BLEEDING_RESTORE_ID:
 			{
 				float actorVal= pSettings->r_float	("actor_condition", "wound_incarnation_v");
@@ -166,21 +169,40 @@ void CUIOutfitInfo::Update(CCustomOutfit* outfitP)
 		});
 	}
 #pragma endregion
-	if (m_bShowModifiers)
+	if (m_bShowModifiers && !!g_uCommonFlags.test(gpShowModificators))
 	{
 #pragma region update modifier lines
-		float outfitAddWeight=m_outfit ? m_outfit->m_additional_weight*m_outfit->GetCondition() : 0;
-		float artefactsWeight=g_actor ? Actor()->GetArtefactAdditionalWeight(): 0;
-		CUIListItemIconed* weightItem= findIconedItem(m_lModificatorsUnsortedItems,"additional_weight",fsimilar(outfitAddWeight, 0.0f) && fsimilar(artefactsWeight, 0.0f),s_xmlParams);
+		#pragma region update weight modificator output disabled at the request of the mod developers community
+		/*float outfitAddWeight = m_outfit ? m_outfit->m_additional_weight * m_outfit->GetCondition() : 0;
+		float artefactsWeight = g_actor ? Actor()->GetArtefactAdditionalWeight() : 0;
+		CUIListItemIconed* weightItem = findIconedItem(m_lModificatorsUnsortedItems, "additional_weight", fsimilar(outfitAddWeight, 0.0f) && fsimilar(artefactsWeight, 0.0f), s_xmlParams);
 		if (weightItem)
-			setIconedItem(iconIDs,weightItem,"additional_weight","ui_inv_outfit_additional_inventory_weight",outfitAddWeight,1,artefactsWeight,1);
+			setIconedItem(iconIDs, weightItem, "additional_weight", "ui_inv_outfit_additional_inventory_weight", outfitAddWeight, 1, artefactsWeight, 1);*/
+		#pragma endregion
 		std::for_each(modificators.begin(),modificators.end(),[&](std::pair<int, restoreParam> modifPair)
 		{
-			createModifItem(m_outfit,modifPair,false);
+			#pragma region some modificators output disabled at the request of the mod developers community
+			bool showSingleModif = true;
+			switch (modifPair.first)
+			{
+				case POWER_RESTORE_ID:
+				case SATIETY_RESTORE_ID:
+				case POWER_LOSS_ID:
+					showSingleModif = false;
+					break;
+				case HEALTH_RESTORE_ID:
+				case RADIATION_RESTORE_ID:
+				case BLEEDING_RESTORE_ID:
+				case JUMP_SPEED_DELTA_ID:
+				default: break;
+			}
+			if (showSingleModif)
+			#pragma endregion
+				createModifItem(m_outfit,modifPair,false);
 		});
 		if (m_lModificatorsUnsortedItems.size()>0)
 		{
-			addSeparator(m_list);
+			//addSeparator(m_list);
 			std::sort(m_lModificatorsUnsortedItems.begin(),m_lModificatorsUnsortedItems.end(),[](CUIListItem* i1, CUIListItem* i2)
 			{
 				CUIListItemIconed *iconedItem1=smart_cast<CUIListItemIconed*>(i1);
@@ -202,26 +224,27 @@ void CUIOutfitInfo::UpdateImmuneView()
 {
 	CEntityAlive *pEntityAlive = smart_cast<CEntityAlive*>(Level().CurrentEntity());
 	CInventoryOwner* pOurInvOwner = smart_cast<CInventoryOwner*>(pEntityAlive);
-	CCustomOutfit* pOutfit	= smart_cast<CCustomOutfit*>(pOurInvOwner->inventory().m_slots[OUTFIT_SLOT].m_pIItem);	
+	CCustomOutfit* pOutfit = smart_cast<CCustomOutfit*>(pOurInvOwner->inventory().m_slots[OUTFIT_SLOT].m_pIItem);
 	if (g_actor)
 	{
 		artefactRestores.clear();//собираем информацию о модификаторах с артефактов
-		for(u32 i=0;i<modificators.size();i++) 
+		for (u32 i = 0; i < modificators.size(); i++)
 			artefactRestores.push_back(0);
-		std::for_each(Actor()->inventory().m_belt.begin(),Actor()->inventory().m_belt.end(),[&](CInventoryItem* item)
+		std::for_each(Actor()->inventory().m_belt.begin(), Actor()->inventory().m_belt.end(), [&](CInventoryItem* item)
 		{
 			CArtefact*	artefact = smart_cast<CArtefact*>(item);
-			if(artefact)
+			if (artefact)
 			{
-				artefactRestores[0]+=artefact->m_fBleedingRestoreSpeed;
-				artefactRestores[1]+=artefact->m_fSatietyRestoreSpeed;
-				artefactRestores[2]+=artefact->m_fRadiationRestoreSpeed;
-				artefactRestores[3]+=artefact->m_fHealthRestoreSpeed;
-				artefactRestores[4]+=artefact->m_fPowerRestoreSpeed;
+				artefactRestores[BLEEDING_RESTORE_ID] += artefact->m_fBleedingRestoreSpeed;
+				artefactRestores[RADIATION_RESTORE_ID] += artefact->m_fRadiationRestoreSpeed;
+				artefactRestores[HEALTH_RESTORE_ID] += artefact->m_fHealthRestoreSpeed;
+				artefactRestores[SATIETY_RESTORE_ID] += artefact->m_fSatietyRestoreSpeed;
+				artefactRestores[POWER_RESTORE_ID] += artefact->m_fPowerRestoreSpeed;
+				artefactRestores[JUMP_SPEED_DELTA_ID] += artefact->m_fArtJumpSpeedDelta;
 			}
 		});
 	}
-	Update(pOutfit);		
+	Update(pOutfit);
 }
 
 

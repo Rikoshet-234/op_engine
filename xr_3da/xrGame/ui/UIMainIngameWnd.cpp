@@ -279,6 +279,7 @@ void CUIMainIngameWnd::Init()
 	{
 		m_artefactPanel->InitFromXML		(uiXml, "artefact_panel", 0);
 		this->AttachChild					(m_artefactPanel);	
+		//UpdateArtPanelVisible();
 	}
 
 	AttachChild								(&UIStaticDiskIO);
@@ -286,10 +287,15 @@ void CUIMainIngameWnd::Init()
 	UIStaticDiskIO.GetUIStaticItem().SetRect(0,0,16,16);
 	UIStaticDiskIO.InitTexture				("ui\\ui_disk_io");
 	UIStaticDiskIO.SetOriginalRect			(0,0,32,32);
-	UIStaticDiskIO.SetStretchTexture		(TRUE);
+	UIStaticDiskIO.SetStretchTexture		(true);
 
 
 	HUD_SOUND::LoadSound					("maingame_ui", "snd_new_contact"		, m_contactSnd		, SOUND_TYPE_IDLE);
+}
+
+void CUIMainIngameWnd::UpdateArtPanelVisible() 
+{
+	m_artefactPanel->SetVisible(!!psHUD_Flags.is(HUD_ARTEFACT_PANEL_VISIBLE));
 }
 
 float UIStaticDiskIO_start_time = 0.0f;
@@ -318,11 +324,11 @@ void CUIMainIngameWnd::Draw()
 
 		static float cur_lum = luminocity;
 		cur_lum = luminocity*0.01f + cur_lum*0.99f;
-		UIMotionIcon.SetLuminosity((s16)iFloor(cur_lum*100.0f));
+		UIMotionIcon.SetLuminosity(static_cast<s16>(iFloor(cur_lum * 100.0f)));
 	}
 	if(!m_pActor) return;
 
-	UIMotionIcon.SetNoise		((s16)(0xffff&iFloor(m_pActor->m_snd_noise*100.0f)));
+	UIMotionIcon.SetNoise		(static_cast<s16>(0xffff & iFloor(m_pActor->m_snd_noise * 100.0f)));
 	CUIWindow::Draw				();
 	UIZoneMap->Render			();			
 
@@ -437,9 +443,8 @@ void CUIMainIngameWnd::Update()
 			UIStaticArmor.Show				(false);
 		}
 
-		UpdateActiveItemInfo				();
-
-
+		UpdateActiveItemInfo();
+		UpdateArtPanelVisible();
 		EWarningIcons i					= ewiWeaponJammed;
 		while (i < ewiInvincible)
 		{
@@ -487,7 +492,8 @@ void CUIMainIngameWnd::Update()
 			float min = m_Thresholds[i].front();
 			float max = m_Thresholds[i].back();
 
-			if (rit != m_Thresholds[i].rend()){
+			if (rit != m_Thresholds[i].rend())
+			{
 				float v = *rit;
 				u32 color=color_argb(0xFF, clampr<u32>(static_cast<u32>(255 * ((v - min) / (max - min) * 2)), 0, 255), 
 					clampr<u32>(static_cast<u32>(255 * (2.0f - (v - min) / (max - min) * 2)), 0, 255),
@@ -500,13 +506,13 @@ void CUIMainIngameWnd::Update()
 						UIStaticRadiationDanger.SetVisible(color!=0x00ffffff);
 				}
 				SetWarningIconColor(i, color);
-			}else
+			}
+			else
 			{
 				TurnOffWarningIcon(i);
 				if (i==ewiRadiation && UIStaticRadiationDanger.GetVisible())
 					UIStaticRadiationDanger.SetVisible(false);
 			}
-
 			i = static_cast<EWarningIcons>(i + 1);
 		}
 	}
@@ -1109,7 +1115,7 @@ void CUIMainIngameWnd::AnimateContacts(bool b_snd)
 	UIPdaOnline.ResetClrAnimation	();
 
 	if(b_snd)
-		HUD_SOUND::PlaySound	(m_contactSnd, Fvector().set(0,0,0), 0, true );
+		HUD_SOUND::PlaySound	(m_contactSnd, Fvector().set(0,0,0), nullptr, true );
 
 }
 

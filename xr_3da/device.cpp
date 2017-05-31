@@ -29,7 +29,7 @@ BOOL CRenderDevice::Begin	()
 #ifndef DEDICATED_SERVER
 	HW.Validate		();
 	HRESULT	_hr		= HW.pDevice->TestCooperativeLevel();
-    if (FAILED(_hr))
+	if (FAILED(_hr))
 	{
 		// If the device was lost, do not render until we get it back
 		if		(D3DERR_DEVICELOST==_hr)		{
@@ -105,7 +105,7 @@ void CRenderDevice::End		(void)
 	// end scene
 	RCache.OnFrameEnd	();
 	Memory.dbg_check		();
-    CHK_DX				(HW.pDevice->EndScene());
+	CHK_DX				(HW.pDevice->EndScene());
 
 	HRESULT _hr		= HW.pDevice->Present( NULL, NULL, NULL, NULL );
 	if				(D3DERR_DEVICELOST==_hr)	return;			// we will handle this later
@@ -167,12 +167,27 @@ int g_svDedicateServerUpdateReate = 100;
 
 ENGINE_API xr_list<LOADING_EVENT>			g_loading_events;
 
+#pragma region ported ECO_RENDER
+extern bool IsMainMenuActive();
+
+ENGINE_API u32 TargetRenderLoad()
+{
+	u32 result = 100;
+	if (IsMainMenuActive())
+		result = 30;
+	if (Device.Paused())
+		result = 10;
+	if (!Device.b_is_Active)
+		result = 0;
+	return result;
+}
+#pragma endregion
 void CRenderDevice::Run			()
 {
 //	DUMP_PHASE;
 	g_bLoaded		= FALSE;
 	MSG				msg;
-    BOOL			bGotMsg;
+	BOOL			bGotMsg;
 	Log				("Starting engine...");
 	thread_name		("X-RAY Primary thread");
 
@@ -195,27 +210,28 @@ void CRenderDevice::Run			()
 	thread_spawn				(mt_Thread,"X-RAY Secondary thread",0,0);
 
 	// Message cycle
-    PeekMessage					( &msg, NULL, 0U, 0U, PM_NOREMOVE );
+	PeekMessage					( &msg, NULL, 0U, 0U, PM_NOREMOVE );
 
 	seqAppStart.Process			(rp_AppStart);
 
 	CHK_DX(HW.pDevice->Clear(0,0,D3DCLEAR_TARGET,D3DCOLOR_XRGB(0,0,0),1,0));
 
 	while( WM_QUIT != msg.message  )
-    {
-        bGotMsg = PeekMessage( &msg, NULL, 0U, 0U, PM_REMOVE );
-        if( bGotMsg )
-        {
-              TranslateMessage	( &msg );
-              DispatchMessage	( &msg );
-         }
-        else
-        {
+	{
+		bGotMsg = PeekMessage( &msg, NULL, 0U, 0U, PM_REMOVE );
+		if( bGotMsg )
+		{
+			  TranslateMessage	( &msg );
+			  DispatchMessage	( &msg );
+		 }
+		else
+		{
 			if (b_is_Ready) {
 
 #ifdef DEDICATED_SERVER
 				u32 FrameStartTime = TimerGlobal.GetElapsed_ms();
 #endif
+
 				if (psDeviceFlags.test(rsStatistic))	g_bEnableStatGather	= TRUE;
 				else									g_bEnableStatGather	= FALSE;
 				if(g_loading_events.size())
@@ -256,6 +272,20 @@ void CRenderDevice::Run			()
 #ifndef DEDICATED_SERVER
 				Statistic->RenderTOTAL_Real.FrameStart	();
 				Statistic->RenderTOTAL_Real.Begin		();
+#pragma region ported ECO_RENDER				
+				u32 optimal = 0;
+				if (TargetRenderLoad() < 50)	optimal = 30;
+				while (optimal-- > 0)
+				{
+					u32 time_diff = frame_timer.GetElapsed_ms();
+					if (time_diff < optimal)   // если более 100 кадров в секунду, как в меню например
+					{
+						SleepEx(1, (optimal - time_diff) > 10);	   // попытка обойти разно-платформные особенности	 
+						//Statistic->RenderTOTAL.cycles++;      // idle cycles count
+					}
+				}
+#pragma endregion
+				frame_timer.Start();
 				if (b_is_Active)							{
 					if (Begin())				{
 
@@ -318,8 +348,8 @@ void CRenderDevice::Run			()
 			}
 			if (!b_is_Active)	
 					Sleep	(1);
-        }
-    }
+		}
+	}
 	seqAppEnd.Process		(rp_AppEnd);
 
 	// Stop Balance-Thread
@@ -336,13 +366,16 @@ void CRenderDevice::FrameMove()
 	dwFrame			++;
 
 	dwTimeContinual	= TimerMM.GetElapsed_ms	();
-	if (psDeviceFlags.test(rsConstantFPS))	{
+	if (psDeviceFlags.test(rsConstantFPS))	
+	{
 		// 20ms = 50fps
 		fTimeDelta		=	0.020f;			
 		fTimeGlobal		+=	0.020f;
 		dwTimeDelta		=	20;
 		dwTimeGlobal	+=	20;
-	} else {
+	} 
+	else 
+	{
 		// Timer
 		float fPreviousFrameTime = Timer.GetElapsed_sec(); Timer.Start();	// previous frame
 		fTimeDelta = 0.1f * fTimeDelta + 0.9f*fPreviousFrameTime;			// smooth random system activity - worst case ~7% error
@@ -356,7 +389,6 @@ void CRenderDevice::FrameMove()
 		dwTimeGlobal	= TimerGlobal.GetElapsed_ms	();	//u32((qTime*u64(1000))/CPU::cycles_per_second);
 		dwTimeDelta		= dwTimeGlobal-_old_global;
 	}
-
 	// Frame move
 	Statistic->EngineTOTAL.Begin	();
 	if(!g_bLoaded) 

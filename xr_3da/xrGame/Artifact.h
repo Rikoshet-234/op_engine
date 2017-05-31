@@ -43,7 +43,6 @@ protected:
 
 	u16								m_CarringBoneID;
 	shared_str						m_sParticlesName;
-protected:
 	SArtefactActivation*			m_activationObj;
 	//////////////////////////////////////////////////////////////////////////
 	//	Lights
@@ -54,9 +53,11 @@ protected:
 	ref_light						m_pTrailLight;
 	Fcolor							m_TrailLightColor;
 	float							m_fTrailLightRange;
-protected:
 	virtual void					UpdateLights();
-	
+	void				OnMoveToBelt() override;
+	void				OnMoveToRuck() override;
+	void				OnMoveToDrop() override;
+
 public:
 	virtual void					StartLights();
 	virtual void					StopLights();
@@ -73,6 +74,7 @@ public:
 	float							m_fPowerRestoreSpeed;
 	float							m_fBleedingRestoreSpeed;
 	float							m_art_additional_weight;
+	float							m_fArtJumpSpeedDelta;
 	CHitImmunity 					m_ArtefactHitImmunities;
 
 protected:

@@ -317,6 +317,8 @@ void CActor::Load	(LPCSTR section )
 
 	m_fWalkAccel				= pSettings->r_float(section,"walk_accel");	
 	m_fJumpSpeed				= pSettings->r_float(section,"jump_speed");
+	m_fJumpSpeedStored = m_fJumpSpeed;
+	character_physics_support()->movement()->SetJumpUpVelocity(m_fJumpSpeed);
 	m_fRunFactor				= pSettings->r_float(section,"run_coef");
 	m_fRunBackFactor			= pSettings->r_float(section,"run_back_coef");
 	m_fWalkBackFactor			= pSettings->r_float(section,"walk_back_coef");
@@ -329,7 +331,6 @@ void CActor::Load	(LPCSTR section )
 
 
 	m_fCamHeightFactor			= pSettings->r_float(section,"camera_height_factor");
-	character_physics_support()->movement()		->SetJumpUpVelocity(m_fJumpSpeed);
 	float AirControlParam		= pSettings->r_float	(section,"air_control_param"	);
 	character_physics_support()->movement()		->SetAirControlParam(AirControlParam);
 

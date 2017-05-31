@@ -31,7 +31,8 @@ struct xmlParams
 #define HEALTH_RESTORE_ID 3
 #define POWER_RESTORE_ID 4
 #define POWER_LOSS_ID 5
-xr_map<int,restoreParam> CreateRestoresStringMap();
+#define JUMP_SPEED_DELTA_ID 6
+xr_map<int,restoreParam> CreateModificatorsStringMap();
 
 CUIListItemIconed* findIconedItem(std::vector<CUIListItemIconed*> &basedList,LPCSTR keyValue,bool emptyParam,xmlParams xmlData);
 void setIconedItem(xr_map<shared_str ,shared_str> iconIDs,CUIListItemIconed* item,LPCSTR iconKey,shared_str column1Value,float column2Value,int column2Type,float column3Value,int column3Type,int addParam=0);

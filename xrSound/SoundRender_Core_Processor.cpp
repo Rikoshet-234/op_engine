@@ -22,7 +22,7 @@ void CSoundRender_Core::update	( const Fvector& P, const Fvector& D, const Fvect
 	u32 it;
 
 	if (0==bReady)				return;
-    bLocked						= TRUE;
+	bLocked						= TRUE;
 	u32 new_tm					= Timer.GetElapsed_ms();
 	Timer_Delta					= new_tm-Timer_Value;
 	float dt					= float(Timer_Delta)/1000.f;
@@ -97,20 +97,20 @@ void CSoundRender_Core::update	( const Fvector& P, const Fvector& D, const Fvect
 	}
 
 	// update EAX
-    if (psSoundFlags.test(ss_EAX) && bEAX){
-        if (bListenerMoved){
-            bListenerMoved			= FALSE;
-            e_target				= *get_environment	(P);
-        }
-        e_current.lerp				(e_current,e_target,dt);
+	if (psSoundFlags.test(ss_EAX) && bEAX){
+		if (bListenerMoved){
+			bListenerMoved			= FALSE;
+			e_target				= *get_environment	(P);
+		}
+		e_current.lerp				(e_current,e_target,dt);
 
-        i_eax_listener_set			(&e_current);
+		i_eax_listener_set			(&e_current);
 		i_eax_commit_setting		();
 	}
 
-    // update listener
-    update_listener					(P,D,N,dt);
-    
+	// update listener
+	update_listener					(P,D,N,dt);
+	
 	// Start rendering of pending targets
 	if (!s_targets_defer.empty())
 	{
@@ -122,7 +122,7 @@ void CSoundRender_Core::update	( const Fvector& P, const Fvector& D, const Fvect
 	// Events
 	update_events					();
 
-    bLocked							= FALSE;
+	bLocked							= FALSE;
 }
 
 static	u32	g_saved_event_count		= 0;
@@ -261,12 +261,12 @@ float CSoundRender_Core::get_occlusion(Fvector& P, float R, Fvector* occ)
 		ETOOLS::ray_options		(CDB::OPT_CULL);
 		ETOOLS::ray_query		(geom_SOM,base,dir,range);
 		u32 r_cnt				= ETOOLS::r_count();
-        CDB::RESULT*	_B 		= ETOOLS::r_begin();
+		CDB::RESULT*	_B 		= ETOOLS::r_begin();
 #else
 		geom_DB.ray_options		(CDB::OPT_CULL);
 		geom_DB.ray_query		(geom_SOM,base,dir,range);
 		u32 r_cnt				= geom_DB.r_count();
-        CDB::RESULT*	_B 		= geom_DB.r_begin();
+		CDB::RESULT*	_B 		= geom_DB.r_begin();
 #endif            
 		if (0!=r_cnt){
 			for (u32 k=0; k<r_cnt; k++){

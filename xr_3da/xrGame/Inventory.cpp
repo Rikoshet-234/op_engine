@@ -255,7 +255,7 @@ bool CInventory::DropItem(CGameObject *pObj)
 		m_all.erase				(it);
 	else
 		Msg						("! CInventory::Drop item not found in inventory!!!");
-
+	pIItem->OnMoveToDrop();
 	pIItem->m_pCurrentInventory = nullptr;
 
 	m_pOwner->OnItemDrop			(smart_cast<CInventoryItem*>(pObj));
@@ -413,11 +413,8 @@ bool CInventory::Ruck(PIItem pIItem)
 	InvalidateState									();
 
 	m_pOwner->OnItemRuck							(pIItem, pIItem->m_eItemPlace);
-	pIItem->m_eItemPlace							= eItemPlaceRuck;
-
-
-
 	pIItem->OnMoveToRuck							();
+	pIItem->m_eItemPlace = eItemPlaceRuck;
 
 	if(in_slot)
 		pIItem->object().processing_deactivate();

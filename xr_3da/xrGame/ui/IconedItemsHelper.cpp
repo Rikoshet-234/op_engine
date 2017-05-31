@@ -23,15 +23,16 @@ xr_map<ALife::EHitType,shared_str> CreateImmunesStringMap()
 	return immunes;
 }
 
-xr_map<int,restoreParam> CreateRestoresStringMap()
+xr_map<int,restoreParam> CreateModificatorsStringMap()
 {
 	xr_map<int,restoreParam> restores;
 	restores.insert(mk_pair(BLEEDING_RESTORE_ID,restoreParam("bleeding_restore_speed","ui_inv_bleeding","wound_incarnation_v")));
-	restores.insert(mk_pair(SATIETY_RESTORE_ID,restoreParam("satiety_restore_speed","ui_inv_satiety","satiety_v")));
 	restores.insert(mk_pair(RADIATION_RESTORE_ID,restoreParam("radiation_restore_speed","ui_inv_radiation","radiation_v")));
 	restores.insert(mk_pair(HEALTH_RESTORE_ID,restoreParam("health_restore_speed","ui_inv_health","satiety_health_v")));
+	restores.insert(mk_pair(SATIETY_RESTORE_ID, restoreParam("satiety_restore_speed", "ui_inv_satiety", "satiety_v")));
 	restores.insert(mk_pair(POWER_RESTORE_ID,restoreParam("power_restore_speed","ui_inv_power","satiety_power_v")));
 	restores.insert(mk_pair(POWER_LOSS_ID,restoreParam("power_loss","ui_inv_power_loss","")));
+	restores.insert(mk_pair(JUMP_SPEED_DELTA_ID, restoreParam("jump_speed_delta", "ui_inv_jump_speed_delta", "jump_speed")));
 	return restores;
 }
 
@@ -86,7 +87,7 @@ void setIconedItem(xr_map<shared_str ,shared_str> iconIDs,CUIListItemIconed* ite
 		switch(column2Type)
 		{
 		case 0:
-			sprintf_s	(buff_column2,"%s%+3.0f%%", (column2Value>0.0f)?"%c[green]":"%c[red]", column2Value*100.0f);
+				sprintf_s	(buff_column2,"%s%+3.0f%%", (column2Value>0.0f)?"%c[green]":"%c[red]", column2Value*100.0f);
 			break;
 		case 1:
 			{
@@ -111,7 +112,10 @@ void setIconedItem(xr_map<shared_str ,shared_str> iconIDs,CUIListItemIconed* ite
 					sprintf_s	(buff_column2,"%s%+3.0fk%%", color, column2Value);
 				}
 				else
-					sprintf_s	(buff_column2,"%s%+3.0f%%", color, column2Value);
+					if (addParam == JUMP_SPEED_DELTA_ID)
+						sprintf_s(buff_column2, "%s%+.1fm", color, column2Value);
+					else
+						sprintf_s(buff_column2,"%s%+3.0f%%", color, column2Value);
 			}
 			break;
 		default:NODEFAULT;
@@ -146,13 +150,16 @@ void setIconedItem(xr_map<shared_str ,shared_str> iconIDs,CUIListItemIconed* ite
 				LPCSTR color=(column3Value>0.0f)?"%c[green]":"%c[red]";
 				if (addParam==BLEEDING_RESTORE_ID||addParam==RADIATION_RESTORE_ID)
 					color = (column3Value>0)?"%c[red]":"%c[green]";
-				if (column3Value>9999)
+				if (column3Value > 9999)
 				{
-					column3Value/=1000;
-					sprintf_s	(buff_column3,"%s%+3.0fk%%", color, column3Value);
+					column3Value /= 1000;
+					sprintf_s(buff_column3, "%s%+3.0fk%%", color, column3Value);
 				}
 				else
-					sprintf_s	(buff_column3,"%s%+3.0f%%", color, column3Value);
+					if (addParam == JUMP_SPEED_DELTA_ID)
+						sprintf_s(buff_column3, "%s%+.1fm", color, column3Value);
+					else
+						sprintf_s(buff_column3, "%s%+3.0f%%", color, column3Value);
 			}
 			break;
 		default:NODEFAULT;

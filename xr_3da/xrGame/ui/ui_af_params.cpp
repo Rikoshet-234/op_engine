@@ -10,7 +10,7 @@
 CUIArtefactParams::CUIArtefactParams()
 {
 	immunes = CreateImmunesStringMap();
-	modificators = CreateRestoresStringMap();
+	modificators = CreateModificatorsStringMap();
 	m_list=nullptr;
 	m_bShowModifiers=false;
 }
@@ -147,12 +147,12 @@ void CUIArtefactParams::createImmuneItem(shared_str af_section, std::pair<ALife:
 
 void CUIArtefactParams::createModifItem(shared_str af_section, std::pair<int, restoreParam> modifPair, bool force_add)
 {
-	if (modifPair.first==POWER_LOSS_ID)
-		return;
-	float artValue=pSettings->r_float(af_section, modifPair.second.paramName.c_str());
-	float actorValue=pSettings->r_float	("actor_condition", modifPair.second.actorParamName.c_str());
+	float artValue=READ_IF_EXISTS(pSettings,r_float,af_section, modifPair.second.paramName.c_str(),0);
+	float actorValue= READ_IF_EXISTS(pSettings,r_float,"actor_condition", modifPair.second.actorParamName.c_str(),1);
 	switch (modifPair.first)
 	{
+		case JUMP_SPEED_DELTA_ID:
+			break;
 		case BLEEDING_RESTORE_ID:
 			{
 				artValue = (artValue/actorValue)*100.0f*-1.0f;
@@ -184,9 +184,9 @@ void CUIArtefactParams::createModifItem(shared_str af_section, std::pair<int, re
 			}
 			break;
 		default:
-			NODEFAULT;
+			return;
 	}
-		bool emptyParam=fsimilar(artValue, 0.0f) && !force_add;
+	bool emptyParam=fsimilar(artValue, 0.0f) && !force_add;
 	CUIListItemIconed* item= findIconedItem(m_lModificatorsUnsortedItems,modifPair.second.paramName.c_str(),emptyParam,xmlParams(currentFileNameXml,PARAMS_PATH));
 	if (!item)
 		return;

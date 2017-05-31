@@ -458,6 +458,7 @@ protected:
 
 	float					m_fWalkAccel;
 	float					m_fJumpSpeed;
+	float					m_fJumpSpeedStored;
 	float					m_fRunFactor;
 	float					m_fRunBackFactor;
 	float					m_fWalkBackFactor;
@@ -468,6 +469,10 @@ protected:
 	float					m_fWalk_StrafeFactor;
 	float					m_fRun_StrafeFactor;
 public:
+	float GetJumpSpeed() { return m_fJumpSpeed;}
+	void SetJumpSpeed(float jumpSpeed) { m_fJumpSpeed = jumpSpeed; }
+	void UpdateJumpSpeed(float jumpSpeedDelta);
+
 			IC u32 get_state() const
 			{
 				return this->mstate_real;
