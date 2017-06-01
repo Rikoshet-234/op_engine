@@ -34,7 +34,7 @@ protected:
 
 	//звук текущего выстрела
 	HUD_SOUND*		m_pSndShotCurrent;
-
+	HUD_SOUND		sndPreviewAmmo;
 	virtual void	StopHUDSounds		();
 
 	//дополнительная информация о глушителе
@@ -47,6 +47,7 @@ protected:
 	ESoundTypes		m_eSoundShot;
 	ESoundTypes		m_eSoundEmptyClick;
 	ESoundTypes		m_eSoundChangeFireMode;
+	ESoundTypes		m_eSoundPreviewAmmo;
 	ESoundTypes		m_eSoundReload;
 	ESoundTypes		m_eSoundZoomIn;
 	ESoundTypes		m_eSoundZoomOut;
@@ -223,7 +224,8 @@ public:
 	virtual void	PlayReloadSound		();
 	virtual bool			TryPlayAnimIdle	();
 	
-
+private:
+	void PlayPreviewAmmoSound() override;
 };
 
 #endif //__XR_WEAPON_MAG_H__

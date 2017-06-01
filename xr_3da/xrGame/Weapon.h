@@ -537,11 +537,9 @@ public:
 	virtual BOOL			ParentMayHaveAimBullet		();
 	virtual BOOL			ParentIsActor				();
 
+	const float				&hit_probability() const;
 private:
 	float					m_hit_probability[egdCount];
-
-public:
-	const float				&hit_probability			() const;
-
+	virtual void PlayPreviewAmmoSound() {};
 };
 

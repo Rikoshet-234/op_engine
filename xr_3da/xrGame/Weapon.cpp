@@ -818,98 +818,102 @@ void CWeapon::UpdatePosition(const Fmatrix& trans)
 	VERIFY				(!fis_zero(DET(renderable.xform)));
 }
 
-bool CWeapon::Action(s32 cmd, u32 flags) 
+bool CWeapon::Action(s32 cmd, u32 flags)
 {
-	if(inherited::Action(cmd, flags)) return true;
+	if (inherited::Action(cmd, flags)) return true;
 
-	
+
 	switch (cmd)
 	{
 	case kWPN_FIRE:
 	{
 		//если оружие чем-то занято, то ничего не делать
 		{
-			if(flags&CMD_START) 
+			if (flags&CMD_START)
 			{
-				if(IsPending())		return false;
-				FireStart			();
-			}else 
-						FireEnd();
-				};
+				if (IsPending())		return false;
+				FireStart();
+			}
+			else
+				FireEnd();
+		};
 	}
-		return true;
+	return true;
 	case kWPN_NEXT:
+	{
+		if (IsPending() || OnClient())
 		{
-			if (IsPending() || OnClient()) 
-			{
-				return false;
-			}
-			if(flags&CMD_START) 
-			{
-				if (Actor() && Actor()->inventory().ActiveItem())
-				{
-					u32 l_newType = m_iPropousedAmmoType;
-					bool b1, b2;
-					do
-					{
-						l_newType++;
-						if (l_newType>=m_ammoTypes.size())
-							l_newType=0;
-						b1 = static_cast<int>(l_newType) != m_iPropousedAmmoType;
-						if (!b1)
-						{
-							l_newType=m_ammoType;
-							break;
-						}
-						bool found=m_pCurrentInventory->GetAny(*m_ammoTypes[l_newType])!=nullptr;
-						b2 = unlimited_ammo() ? false : !found;						
-					} while( b1 && b2);
-					xr_string str_name;
-					xr_string icon_sect_name;
-					xr_string str_count;
-					m_iPropousedAmmoType=l_newType;
-					m_pCurrentInventory->m_bForceRecalcAmmos=true;
-					GetBriefInfo(str_name, icon_sect_name, str_count);
-					HUD().GetUI()->UIMainIngameWnd->SetActiveItemAmmoInfo(str_name,icon_sect_name,str_count);
-					m_set_next_ammoType_on_reload = m_iPropousedAmmoType;						
-					if (static_cast<u32>(m_iPropousedAmmoType)!=m_ammoType && !g_uCommonFlags.is(E_COMMON_FLAGS::gpDeferredReload))
-						if(OnServer()) Reload();
-				}
-			}
-			return true;
+			return false;
 		}
-	case kWPN_ZOOM:
-		if(IsZoomEnabled())
+		if (flags&CMD_START)
+		{
+			if (Actor() && Actor()->inventory().ActiveItem())
 			{
-				if(flags&CMD_START && !IsPending())
+				u32 l_newType = m_iPropousedAmmoType;
+				bool b1, b2;
+				do
 				{
-					if (g_uCommonFlags.is(gpStickyScope) && IsZoomed())
+					l_newType++;
+					if (l_newType >= m_ammoTypes.size())
+						l_newType = 0;
+					b1 = static_cast<int>(l_newType) != m_iPropousedAmmoType;
+					if (!b1)
 					{
-						OnZoomOut();
+						l_newType = m_ammoType;
+						break;
 					}
-					else
-						OnZoomIn();
-				}
-				else if(IsZoomed() && !g_uCommonFlags.is(gpStickyScope))
+					bool found = m_pCurrentInventory->GetAny(*m_ammoTypes[l_newType]) != nullptr;
+					b2 = unlimited_ammo() ? false : !found;
+				} while (b1 && b2);
+				xr_string str_name;
+				xr_string icon_sect_name;
+				xr_string str_count;
+				PlayPreviewAmmoSound();
+				m_iPropousedAmmoType = l_newType;
+				m_pCurrentInventory->m_bForceRecalcAmmos = true;
+				GetBriefInfo(str_name, icon_sect_name, str_count);
+				HUD().GetUI()->UIMainIngameWnd->SetActiveItemAmmoInfo(str_name, icon_sect_name, str_count);
+				m_set_next_ammoType_on_reload = m_iPropousedAmmoType;
+				if (static_cast<u32>(m_iPropousedAmmoType) != m_ammoType && !g_uCommonFlags.is(E_COMMON_FLAGS::gpDeferredReload))
+					if (OnServer()) Reload();
+			}
+		}
+		return true;
+	}
+	case kWPN_ZOOM:
+		if (IsZoomEnabled())
+		{
+			if (flags&CMD_START && !IsPending())
+			{
+				if (g_uCommonFlags.is(gpStickyScope) && IsZoomed())
 				{
 					OnZoomOut();
 				}
-				return true;
-			}else 
-				return false;
-
-		case kWPN_ZOOM_INC:
-		case kWPN_ZOOM_DEC:
-			if(IsZoomEnabled() && IsZoomed() && IsScopeAttached())
+				else
+					OnZoomIn();
+			}
+			else if (IsZoomed() && !g_uCommonFlags.is(gpStickyScope))
 			{
-				if (m_fScopeZoomStepCount>1)
-					if(cmd==kWPN_ZOOM_INC)  
-						ZoomInc();
-					else					
-						ZoomDec();
-					return true;
-			}else
-				return false;
+				OnZoomOut();
+			}
+			return true;
+		}
+		else
+			return false;
+
+	case kWPN_ZOOM_INC:
+	case kWPN_ZOOM_DEC:
+		if (IsZoomEnabled() && IsZoomed() && IsScopeAttached())
+		{
+			if (m_fScopeZoomStepCount > 1)
+				if (cmd == kWPN_ZOOM_INC)
+					ZoomInc();
+				else
+					ZoomDec();
+			return true;
+		}
+		else
+			return false;
 	}
 	return false;
 }

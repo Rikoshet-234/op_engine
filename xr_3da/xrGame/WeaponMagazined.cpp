@@ -34,7 +34,7 @@ CWeaponMagazined::CWeaponMagazined(LPCSTR name, ESoundTypes eSoundType) : CWeapo
 	m_eSoundZoomIn = ESoundTypes(SOUND_TYPE_ITEM_USING | eSoundType);
 	m_eSoundZoomOut = ESoundTypes(SOUND_TYPE_ITEM_USING | eSoundType);
 	m_eSoundChangeFireMode = ESoundTypes(SOUND_TYPE_ITEM_USING | eSoundType);
-
+	m_eSoundPreviewAmmo = ESoundTypes(SOUND_TYPE_ITEM_USING | eSoundType);
 	m_eSoundZoomInc = ESoundTypes(SOUND_TYPE_ITEM_USING | eSoundType);
 	m_eSoundZoomDec = ESoundTypes(SOUND_TYPE_ITEM_USING | eSoundType);
 
@@ -60,6 +60,7 @@ CWeaponMagazined::~CWeaponMagazined()
 	HUD_SOUND::DestroySound(sndEmptyClick);
 	HUD_SOUND::DestroySound(sndReload);
 	HUD_SOUND::DestroySound(sndChangeFireMode);
+	HUD_SOUND::DestroySound(sndPreviewAmmo);
 	HUD_SOUND::DestroySound	(sndZoomIn);
 	HUD_SOUND::DestroySound	(sndZoomOut);
 	HUD_SOUND::DestroySound	(sndZoomDec);
@@ -77,6 +78,7 @@ void CWeaponMagazined::StopHUDSounds		()
 
 	HUD_SOUND::StopSound(sndShot);
 	HUD_SOUND::StopSound(sndChangeFireMode);
+	HUD_SOUND::StopSound(sndPreviewAmmo);
 
 	HUD_SOUND::StopSound(sndZoomOut);
 	HUD_SOUND::StopSound(sndZoomIn);
@@ -100,61 +102,62 @@ BOOL CWeaponMagazined::net_Spawn		(CSE_Abstract* DC)
 	return inherited::net_Spawn(DC);
 }
 
-void CWeaponMagazined::Load	(LPCSTR section)
+void CWeaponMagazined::Load(LPCSTR section)
 {
-	inherited::Load		(section);
-		
-#pragma region Load sounds
-	HUD_SOUND::LoadSound(section,"snd_draw"		, sndShow		, m_eSoundShow		);
-	HUD_SOUND::LoadSound(section,"snd_holster"	, sndHide		, m_eSoundHide		);
-	HUD_SOUND::LoadSound(section,"snd_shoot"	, sndShot		, m_eSoundShot		);
-	HUD_SOUND::LoadSound(section,"snd_empty"	, sndEmptyClick	, m_eSoundEmptyClick	);
-	HUD_SOUND::LoadSound(section,"snd_reload"	, sndReload		, m_eSoundReload		);
-	HUD_SOUND::LoadSound(section,"snd_change_firemode"	, sndChangeFireMode		, m_eSoundChangeFireMode		);
-	
-	HUD_SOUND::LoadSound(section, "snd_zoomin",  sndZoomIn,		m_eSoundZoomIn,false);
-	HUD_SOUND::LoadSound(section, "snd_zoomout", sndZoomOut,	m_eSoundZoomOut,false);
+	inherited::Load(section);
 
-	HUD_SOUND::LoadSound(section, "snd_zoomdec", sndZoomInc,	m_eSoundZoomInc,false);
-	HUD_SOUND::LoadSound(section, "snd_zoominc", sndZoomDec,	m_eSoundZoomDec,false);
+#pragma region Load sounds
+	HUD_SOUND::LoadSound(section, "snd_draw", sndShow, m_eSoundShow);
+	HUD_SOUND::LoadSound(section, "snd_holster", sndHide, m_eSoundHide);
+	HUD_SOUND::LoadSound(section, "snd_shoot", sndShot, m_eSoundShot);
+	HUD_SOUND::LoadSound(section, "snd_empty", sndEmptyClick, m_eSoundEmptyClick);
+	HUD_SOUND::LoadSound(section, "snd_reload", sndReload, m_eSoundReload);
+	HUD_SOUND::LoadSound(section, "snd_change_firemode", sndChangeFireMode, m_eSoundChangeFireMode);
+	HUD_SOUND::LoadSound(section, "snd_preview_ammo", sndPreviewAmmo, m_eSoundPreviewAmmo);
+
+	HUD_SOUND::LoadSound(section, "snd_zoomin", sndZoomIn, m_eSoundZoomIn, false);
+	HUD_SOUND::LoadSound(section, "snd_zoomout", sndZoomOut, m_eSoundZoomOut, false);
+
+	HUD_SOUND::LoadSound(section, "snd_zoomdec", sndZoomInc, m_eSoundZoomInc, false);
+	HUD_SOUND::LoadSound(section, "snd_zoominc", sndZoomDec, m_eSoundZoomDec, false);
 #pragma endregion
 	m_pSndShotCurrent = &sndShot;
-		
-	
+
+
 	// HUD :: Anims
-	R_ASSERT			(m_pHUD);
+	R_ASSERT(m_pHUD);
 #pragma region Load animations
-	animGet				(mhud.mhud_idle,		pSettings->r_string(*hud_sect, "anim_idle"));
-	animGet				(mhud.mhud_reload,	pSettings->r_string(*hud_sect, "anim_reload"));
-	animGet				(mhud.mhud_show,		pSettings->r_string(*hud_sect, "anim_draw"));
-	animGet				(mhud.mhud_hide,		pSettings->r_string(*hud_sect, "anim_holster"));
-	animGet				(mhud.mhud_shots,	pSettings->r_string(*hud_sect, "anim_shoot"));
+	animGet(mhud.mhud_idle, pSettings->r_string(*hud_sect, "anim_idle"));
+	animGet(mhud.mhud_reload, pSettings->r_string(*hud_sect, "anim_reload"));
+	animGet(mhud.mhud_show, pSettings->r_string(*hud_sect, "anim_draw"));
+	animGet(mhud.mhud_hide, pSettings->r_string(*hud_sect, "anim_holster"));
+	animGet(mhud.mhud_shots, pSettings->r_string(*hud_sect, "anim_shoot"));
 
-	LPCSTR animName="anim_idle_sprint";
-	if(pSettings->line_exist(*hud_sect,animName))
-		animGet				(mhud.mhud_idle_sprint,pSettings->r_string(*hud_sect, animName),*hud_sect,animName);
+	LPCSTR animName = "anim_idle_sprint";
+	if (pSettings->line_exist(*hud_sect, animName))
+		animGet(mhud.mhud_idle_sprint, pSettings->r_string(*hud_sect, animName), *hud_sect, animName);
 
-	animName="anim_idle_moving";
-	if(pSettings->line_exist(*hud_sect,"anim_idle_moving"))
-		animGet				(mhud.anim_idle_moving,pSettings->r_string(*hud_sect, animName),*hud_sect,animName);
+	animName = "anim_idle_moving";
+	if (pSettings->line_exist(*hud_sect, "anim_idle_moving"))
+		animGet(mhud.anim_idle_moving, pSettings->r_string(*hud_sect, animName), *hud_sect, animName);
 #pragma endregion 
 
-	if(IsZoomEnabled())
-		animGet				(mhud.mhud_idle_aim,pSettings->r_string(*hud_sect, "anim_idle_aim"),*hud_sect,"anim_idle_aim");
-	
+	if (IsZoomEnabled())
+		animGet(mhud.mhud_idle_aim, pSettings->r_string(*hud_sect, "anim_idle_aim"), *hud_sect, "anim_idle_aim");
+
 
 	//звуки и партиклы глушителя, еслит такой есть
-	if(m_eSilencerStatus == ALife::eAddonAttachable)
+	if (m_eSilencerStatus == ALife::eAddonAttachable)
 	{
-		if(pSettings->line_exist(section, "silencer_flame_particles"))
+		if (pSettings->line_exist(section, "silencer_flame_particles"))
 			m_sSilencerFlameParticles = pSettings->r_string(section, "silencer_flame_particles");
-		if(pSettings->line_exist(section, "silencer_smoke_particles"))
+		if (pSettings->line_exist(section, "silencer_smoke_particles"))
 			m_sSilencerSmokeParticles = pSettings->r_string(section, "silencer_smoke_particles");
 		if (m_sSilencerFlameParticles && !m_sSilencerSmokeParticles)
-			m_sSilencerSmokeParticles=m_sSilencerFlameParticles;
+			m_sSilencerSmokeParticles = m_sSilencerFlameParticles;
 		if (!m_sSilencerFlameParticles && m_sSilencerSmokeParticles)
-			m_sSilencerFlameParticles=m_sSilencerSmokeParticles;
-		HUD_SOUND::LoadSound(section,"snd_silncer_shot", sndSilencerShot, m_eSoundShot);
+			m_sSilencerFlameParticles = m_sSilencerSmokeParticles;
+		HUD_SOUND::LoadSound(section, "snd_silncer_shot", sndSilencerShot, m_eSoundShot);
 	}
 	//  [7/20/2005]
 	if (pSettings->line_exist(section, "dispersion_start"))
@@ -596,25 +599,26 @@ void CWeaponMagazined::UpdateCL			()
 	UpdateSounds		();
 }
 
-void CWeaponMagazined::UpdateSounds	()
+void CWeaponMagazined::UpdateSounds()
 {
-	if (Device.dwFrame == dwUpdateSounds_Frame)  
+	if (Device.dwFrame == dwUpdateSounds_Frame)
 		return;
-	
+
 	dwUpdateSounds_Frame = Device.dwFrame;
 
 	// ref_sound positions
-	if (sndShow.playing			())	sndShow.set_position		(get_LastFP());
-	if (sndHide.playing			())	sndHide.set_position		(get_LastFP());
-	if (sndShot.playing			()) sndShot.set_position		(get_LastFP());
-	if (sndReload.playing		()) sndReload.set_position		(get_LastFP());
-	if (sndEmptyClick.playing	())	sndEmptyClick.set_position	(get_LastFP());
-	if (sndChangeFireMode.playing	())	sndChangeFireMode.set_position	(get_LastFP());
+	if (sndShow.playing())	sndShow.set_position(get_LastFP());
+	if (sndHide.playing())	sndHide.set_position(get_LastFP());
+	if (sndShot.playing()) sndShot.set_position(get_LastFP());
+	if (sndReload.playing()) sndReload.set_position(get_LastFP());
+	if (sndEmptyClick.playing())	sndEmptyClick.set_position(get_LastFP());
+	if (sndChangeFireMode.playing())	sndChangeFireMode.set_position(get_LastFP());
+	if (sndPreviewAmmo.playing())	sndPreviewAmmo.set_position(get_LastFP());
 
-	if (sndZoomIn.playing		()) sndZoomIn.set_position		(get_LastFP());
-	if (sndZoomOut.playing	())	sndZoomOut.set_position	(get_LastFP());
-	if (sndZoomInc.playing		()) sndZoomInc.set_position		(get_LastFP());
-	if (sndZoomDec.playing	())	sndZoomDec.set_position	(get_LastFP());
+	if (sndZoomIn.playing()) sndZoomIn.set_position(get_LastFP());
+	if (sndZoomOut.playing())	sndZoomOut.set_position(get_LastFP());
+	if (sndZoomInc.playing()) sndZoomInc.set_position(get_LastFP());
+	if (sndZoomDec.playing())	sndZoomDec.set_position(get_LastFP());
 }
 
 
@@ -1399,6 +1403,11 @@ bool CWeaponMagazined::TryPlayAnimIdle()
 		}
 	}
 	return false;
+}
+
+void CWeaponMagazined::PlayPreviewAmmoSound()
+{
+	PlaySound(sndPreviewAmmo, get_LastFP());
 }
 
 void CWeaponMagazined::PlayAnimIdle()
