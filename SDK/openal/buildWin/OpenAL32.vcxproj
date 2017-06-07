@@ -1,0 +1,183 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="NsightTegraProject">
+    <NsightTegraProjectRevisionNumber>6</NsightTegraProjectRevisionNumber>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGUID>{70251080-6136-4F0C-AD93-0EB8A914AD75}</ProjectGUID>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>Win32</Platform>
+    <ProjectName>OpenAL32</ProjectName>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <Import Project="..\..\..\GlobalProperties.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">s$(LibrariesOutputDir)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntermediateOutputDir)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(LibrariesOutputDir)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntermediateOutputDir)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</GenerateManifest>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Projects\vegaengine-ogre\Development\external\OpenAL\OpenAL32\Include;C:\Projects\vegaengine-ogre\Development\external\OpenAL\include;C:\Projects\vegaengine-ogre\Development\external\OpenAL\buildWin;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>Debug/</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <CompileAs>CompileAsC</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_DEBUG;AL_ALEXT_PROTOTYPES;_WIN32;_WIN32_WINNT=0x0501;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;strcasecmp=_stricmp;strncasecmp=_strnicmp;snprintf=_snprintf;CMAKE_INTDIR="Debug";AL_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_DEBUG;AL_ALEXT_PROTOTYPES;_WIN32;_WIN32_WINNT=0x0501;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;strcasecmp=_stricmp;strncasecmp=_strnicmp;snprintf=_snprintf;CMAKE_INTDIR=\"Debug\";AL_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Projects\vegaengine-ogre\Development\external\OpenAL\OpenAL32\Include;C:\Projects\vegaengine-ogre\Development\external\OpenAL\include;C:\Projects\vegaengine-ogre\Development\external\OpenAL\buildWin;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Projects\vegaengine-ogre\Development\external\OpenAL\OpenAL32\Include;C:\Projects\vegaengine-ogre\Development\external\OpenAL\include;C:\Projects\vegaengine-ogre\Development\external\OpenAL\buildWin;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalOptions> /machine:X86 /debug %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;winmm.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ImportLibrary>C:/Projects/vegaengine-ogre/Development/external/OpenAL/buildWin/Debug/OpenAL32.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/Projects/vegaengine-ogre/Development/external/OpenAL/buildWin/Debug/OpenAL32.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+      <Version>
+      </Version>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>..\OpenAL32\Include;..\include;..\buildWin;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <CompileAs>CompileAsC</CompileAs>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;AL_ALEXT_PROTOTYPES;_WIN32;_WIN32_WINNT=0x0501;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;CMAKE_INTDIR="Release";AL_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName>$(IntDir)$(ProjectName).pdb</ProgramDataBaseFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;NDEBUG;AL_ALEXT_PROTOTYPES;_WIN32;_WIN32_WINNT=0x0501;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;strcasecmp=_stricmp;strncasecmp=_strnicmp;snprintf=_snprintf;CMAKE_INTDIR=\"Release\";AL_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\OpenAL32\Include;..\include;..\buildWin;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>..\OpenAL32\Include;..\include;..\buildWin;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalOptions> /machine:X86 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;winmm.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <ImportLibrary>C:/Projects/vegaengine-ogre/Development/external/OpenAL/buildWin/Release/OpenAL32.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/Projects/vegaengine-ogre/Development/external/OpenAL/buildWin/Release/OpenAL32.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+      <Version>
+      </Version>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\OpenAL32\alAuxEffectSlot.c" />
+    <ClCompile Include="..\OpenAL32\alBuffer.c" />
+    <ClCompile Include="..\OpenAL32\alEffect.c" />
+    <ClCompile Include="..\OpenAL32\alError.c" />
+    <ClCompile Include="..\OpenAL32\alExtension.c" />
+    <ClCompile Include="..\OpenAL32\alFilter.c" />
+    <ClCompile Include="..\OpenAL32\alListener.c" />
+    <ClCompile Include="..\OpenAL32\alSource.c" />
+    <ClCompile Include="..\OpenAL32\alState.c" />
+    <ClCompile Include="..\OpenAL32\alThunk.c" />
+    <ClCompile Include="..\Alc\ALc.c" />
+    <ClCompile Include="..\Alc\ALu.c" />
+    <ClCompile Include="..\Alc\alcConfig.c" />
+    <ClCompile Include="..\Alc\alcDedicated.c" />
+    <ClCompile Include="..\Alc\alcEcho.c" />
+    <ClCompile Include="..\Alc\alcModulator.c" />
+    <ClCompile Include="..\Alc\alcReverb.c" />
+    <ClCompile Include="..\Alc\alcRing.c" />
+    <ClCompile Include="..\Alc\alcThread.c" />
+    <ClCompile Include="..\Alc\bs2b.c" />
+    <ClCompile Include="..\Alc\helpers.c" />
+    <ClCompile Include="..\Alc\panning.c" />
+    <ClCompile Include="..\Alc\hrtf.c" />
+    <ClCompile Include="..\Alc\mixer.c" />
+    <ClCompile Include="..\Alc\mixer_c.c" />
+    <ClCompile Include="..\Alc\mixer_sse.c">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> -msse %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> -msse %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <ClCompile Include="..\Alc\backends\loopback.c" />
+    <ClCompile Include="..\Alc\backends\null.c" />
+    <ClCompile Include="..\Alc\backends\mmdevapi.c" />
+    <ClCompile Include="..\Alc\backends\dsound.c" />
+    <ClCompile Include="..\Alc\backends\winmm.c" />
+    <ClCompile Include="..\Alc\backends\wave.c" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

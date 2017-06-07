@@ -1,6 +1,7 @@
 #pragma once
 #include "UIWindow.h"
 #include "../UIStaticItem.h"
+#include "UIStatic.h"
 class CUIXml;
 class CArtefact;
 
@@ -22,4 +23,11 @@ protected:
 	Fvector2					m_cell_size;
 	xr_vector<Frect>            m_vRects;
 	CUIStaticItem               m_si;
+	CUIStatic* m_sArtPanel;
+	enum EAligment{
+		alLeft = 0,
+		alRight,
+		alCenter
+	};
+	EAligment m_eIconsAligment;
 };

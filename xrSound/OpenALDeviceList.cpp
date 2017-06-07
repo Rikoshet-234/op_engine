@@ -93,12 +93,13 @@ void ALDeviceList::Enumerate()
 			ALCdevice *device		= alcOpenDevice(devices);
 			if (device) 
 			{
-				ALCcontext *context = alcCreateContext(device, NULL);
+				ALCcontext *context = alcCreateContext(device, nullptr);
 				if (context) 
 				{
 					alcMakeContextCurrent(context);
 					// if new actual device name isn't already in the list, then add it...
 					actualDeviceName = alcGetString(device, ALC_DEVICE_SPECIFIER);
+
 
 					if ( (actualDeviceName != NULL) && xr_strlen(actualDeviceName)>0 ) 
 					{
@@ -106,9 +107,12 @@ void ALDeviceList::Enumerate()
 						alcGetIntegerv					(device, ALC_MINOR_VERSION, sizeof(int), &minor);
 						m_devices.push_back				(ALDeviceDesc(actualDeviceName,minor,major));
 						m_devices.back().xram			= (alIsExtensionPresent("EAX-RAM") == TRUE);
+						bool test = alIsExtensionPresent("EAX2.0") == TRUE;
+						test = false;
 						m_devices.back().eax			= (alIsExtensionPresent("EAX2.0") == TRUE);
-						m_devices.back().eax_unwanted	= ((0==xr_strcmp(actualDeviceName,AL_GENERIC_HARDWARE))||
-														   (0==xr_strcmp(actualDeviceName,AL_GENERIC_SOFTWARE)));
+						m_devices.back().eax_unwanted = 0;
+						/*m_devices.back().eax_unwanted	= ((0==xr_strcmp(actualDeviceName,AL_GENERIC_HARDWARE))||
+														   (0==xr_strcmp(actualDeviceName,AL_GENERIC_SOFTWARE)));*/
 						++index;
 					}
 					alcDestroyContext(context);

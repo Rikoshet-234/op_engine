@@ -101,10 +101,12 @@ void CSoundRender_CoreA::_initialize	(u64 window)
 
     // Check for EAX extension
     bEAX 				        = deviceDesc.eax && !deviceDesc.eax_unwanted;
-    eaxSet 				        = (EAXSet)alGetProcAddress	((const ALchar*)"EAXSet");
-    if (eaxSet==NULL) bEAX 		= false;
-    eaxGet 				        = (EAXGet)alGetProcAddress	((const ALchar*)"EAXGet");
-    if (eaxGet==NULL) bEAX 		= false;
+    eaxSet 				        = static_cast<EAXSet>(alGetProcAddress(static_cast<const ALchar*>("EAXSet")));
+    if (eaxSet== nullptr) 
+		bEAX 		= false;
+    eaxGet 				        = static_cast<EAXGet>(alGetProcAddress(static_cast<const ALchar*>("EAXGet")));
+    if (eaxGet== nullptr) 
+		bEAX 		= false;
 
     if (bEAX){
 		bDeferredEAX			= EAXTestSupport(TRUE);
