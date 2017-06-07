@@ -77,24 +77,24 @@ void CUI::UIOnFrame()
 #include "huditem.h"
 bool CUI::Render()
 {
-	if( GameIndicatorsShown() )
+	if (GameIndicatorsShown())
 	{
-		if (pUIGame) 
-			pUIGame->Render	();
+		if (pUIGame)
+			pUIGame->Render();
 	}
 
 	CEntity* pEntity = smart_cast<CEntity*>(Level().CurrentEntity());
 	if (pEntity)
 	{
-		CActor* pActor			=	smart_cast<CActor*>(pEntity);
-		if(pActor)
+		CActor* pActor = smart_cast<CActor*>(pEntity);
+		if (pActor)
 		{
-			PIItem item		=  pActor->inventory().ActiveItem();
-			if(item && pActor->HUDview() && smart_cast<CHudItem*>(item))
+			PIItem item = pActor->inventory().ActiveItem();
+			if (item && pActor->HUDview() && smart_cast<CHudItem*>(item))
 				(smart_cast<CHudItem*>(item))->OnDrawUI();
 		}
 
-		if( GameIndicatorsShown() && psHUD_Flags.is(HUD_DRAW | HUD_DRAW_RT) )
+		if (GameIndicatorsShown() && psHUD_Flags.is(HUD_DRAW | HUD_DRAW_RT))
 		{
 			UIMainIngameWnd->Draw();
 			m_pMessagesWnd->Draw();
@@ -102,13 +102,13 @@ bool CUI::Render()
 		else
 		{  //hack - draw messagess wnd in scope mode
 			CUIGameSP* gSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-			if (gSP){
+			if (gSP) {
 				if (!gSP->PdaMenu->GetVisible())
 					m_pMessagesWnd->Draw();
 			}
 			else
 				m_pMessagesWnd->Draw();
-		}	
+		}
 	}
 	else
 		m_pMessagesWnd->Draw();

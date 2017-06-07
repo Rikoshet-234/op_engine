@@ -279,7 +279,6 @@ void CUIMainIngameWnd::Init()
 	{
 		m_artefactPanel->InitFromXML		(uiXml, "artefact_panel", 0);
 		this->AttachChild					(m_artefactPanel);	
-		//UpdateArtPanelVisible();
 	}
 
 	AttachChild								(&UIStaticDiskIO);
@@ -295,7 +294,8 @@ void CUIMainIngameWnd::Init()
 
 void CUIMainIngameWnd::UpdateArtPanelVisible() 
 {
-	m_artefactPanel->SetVisible(!!psHUD_Flags.is(HUD_ARTEFACT_PANEL_VISIBLE));
+	bool visible = !!psHUD_Flags.is(HUD_ARTEFACT_PANEL_VISIBLE);
+	m_artefactPanel->SetVisible(visible);
 }
 
 float UIStaticDiskIO_start_time = 0.0f;
@@ -419,6 +419,7 @@ void CUIMainIngameWnd::Update()
 				SetWarningIconColor	(ewiInvincible,0xffffffff);
 			else
 				SetWarningIconColor	(ewiInvincible,0x00ffffff);
+			UpdateArtPanelVisible();
 		}
 		// ewiArtefact
 		if( (GameID() == GAME_ARTEFACTHUNT) && !(Device.dwFrame%30) ){
@@ -444,7 +445,6 @@ void CUIMainIngameWnd::Update()
 		}
 
 		UpdateActiveItemInfo();
-		UpdateArtPanelVisible();
 		EWarningIcons i					= ewiWeaponJammed;
 		while (i < ewiInvincible)
 		{
@@ -968,7 +968,7 @@ void CUIMainIngameWnd::RenderQuickInfos()
 	UIStaticQuickHelp.Show				(NULL!=actor_action);
 
 	if(NULL!=actor_action){
-		if(stricmp(actor_action,UIStaticQuickHelp.GetText()))
+		if(_stricmp(actor_action,UIStaticQuickHelp.GetText()))
 			UIStaticQuickHelp.SetTextST				(actor_action);
 	}
 
