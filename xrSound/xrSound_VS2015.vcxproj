@@ -156,7 +156,7 @@
       <DisableSpecificWarnings>4577;</DisableSpecificWarnings>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>vorbisfile_static.lib;ogg_static.lib;OpenAL32.lib;legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>OpenAL32.lib;vorbisfile_static.lib;ogg_static.lib;legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>DebugFastLink</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)$(ProjectName).pdb</ProgramDatabaseFile>
       <GenerateMapFile>false</GenerateMapFile>
@@ -204,7 +204,7 @@
       <DisableSpecificWarnings>4577;</DisableSpecificWarnings>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>vorbisfile_static.lib;ogg_static.lib;OpenAL32.lib;legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>OpenAL32.lib;vorbisfile_static.lib;ogg_static.lib;legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)$(ProjectName).pdb</ProgramDatabaseFile>
       <GenerateMapFile>false</GenerateMapFile>
