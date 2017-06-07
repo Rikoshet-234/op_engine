@@ -111,8 +111,8 @@ void ALDeviceList::Enumerate()
 						test = false;
 						m_devices.back().eax			= (alIsExtensionPresent("EAX2.0") == TRUE);
 						m_devices.back().eax_unwanted = 0;
-						/*m_devices.back().eax_unwanted	= ((0==xr_strcmp(actualDeviceName,AL_GENERIC_HARDWARE))||
-														   (0==xr_strcmp(actualDeviceName,AL_GENERIC_SOFTWARE)));*/
+						//m_devices.back().eax_unwanted	= ((0==xr_strcmp(actualDeviceName,AL_GENERIC_HARDWARE))||
+						//								   (0==xr_strcmp(actualDeviceName,AL_GENERIC_SOFTWARE)));
 						++index;
 					}
 					alcDestroyContext(context);
