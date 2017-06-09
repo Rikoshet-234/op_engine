@@ -8,6 +8,9 @@
 
 #pragma once
 #include "../../xrLua/lua_tools.h"
+#include "script_storage_space.h"
+#include "ai_space.h"
+#include "script_engine.h"
 
 #if !defined(AI_COMPILER) && !defined(PRIQUEL)
 IC CGameGraph::CGameGraph											()
@@ -181,9 +184,9 @@ IC	const GameGraph::SLevel &GameGraph::CHeader::level				(const _LEVEL_ID &id) c
 	LEVEL_MAP::const_iterator	I = levels().find(id);
 	if (I == levels().end())
 	{
-		Msg(get_lua_traceback(g_game_lua,5));
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "! ERROR there is no specified level in the game graph : %d", id);
+		FATAL("ENGINE Crush. See log for details.");
 	}
-	R_ASSERT2					(I != levels().end(),make_string("there is no specified level in the game graph : %d",id));
 	return						((*I).second);
 }
 
@@ -194,13 +197,12 @@ IC	const GameGraph::SLevel &GameGraph::CHeader::level				(LPCSTR level_name) con
 	for ( ; I != E; ++I)
 		if (!xr_strcmp((*I).second.name(),level_name))
 			return				((*I).second);
-	
+	ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "! ERROR there is no specified level in the game graph : %s", level_name);
+	FATAL("ENGINE Crush. See log for details.");
+
 #ifdef DEBUG
 	Msg							("! There is no specified level %s in the game graph!",level_name);
 	return						(levels().begin()->second);
-#else
-	R_ASSERT3					(false,"There is no specified level in the game graph!",level_name);
-	NODEFAULT;
 #endif
 }
 
@@ -212,7 +214,7 @@ IC	const GameGraph::SLevel *GameGraph::CHeader::level				(LPCSTR level_name, boo
 		if (!xr_strcmp((*I).second.name(),level_name))
 			return				(&(*I).second);
 	
-	return						(0);
+	return	nullptr;
 }
 
 IC	const xrGUID &CGameGraph::CHeader::guid							() const

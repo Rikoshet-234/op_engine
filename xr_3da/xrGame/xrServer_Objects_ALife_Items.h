@@ -57,7 +57,7 @@ public:
 	virtual CSE_ALifeInventoryItem	*cast_inventory_item	() {return this;};
 	virtual	u32						update_rate				() const;
 	// end of the virtual inheritance dependant code
-
+	//virtual void					OnEvent(NET_Packet &tNetPacket, u16 type, u32 time, ClientID sender);
 	IC		bool					attached	() const
 	{
 		return						(base()->ID_Parent < 0xffff);
@@ -68,6 +68,8 @@ public:
 	u8								m_u8NumItems;
 	SPHNetState						State;
 	///////////////////////////////////
+	void writeWoodooMagic(NET_Packet& tNetPacket);
+	void readWoodooMagic(NET_Packet& tNetPacket);
 SERVER_ENTITY_DECLARE_END
 add_to_type_list(CSE_ALifeInventoryItem)
 #define script_type_list save_type_list(CSE_ALifeInventoryItem)

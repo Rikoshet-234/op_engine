@@ -76,6 +76,8 @@ CSE_ALifeInventoryItem::~CSE_ALifeInventoryItem	()
 void CSE_ALifeInventoryItem::STATE_Write	(NET_Packet &tNetPacket)
 {
 	tNetPacket.w_float			(m_fCondition);
+	tNetPacket.w_float(m_fMass);
+	tNetPacket.w_u32(m_dwCost);
 	State.position				= base()->o_Position;
 }
 
@@ -84,7 +86,11 @@ void CSE_ALifeInventoryItem::STATE_Read		(NET_Packet &tNetPacket, u16 size)
 	u16 m_wVersion = base()->m_wVersion;
 	if (m_wVersion > 52)
 		tNetPacket.r_float		(m_fCondition);
-
+	if (m_wVersion > 120)
+	{
+		tNetPacket.r_float(m_fMass);
+		tNetPacket.r_u32(m_dwCost);
+	}
 	State.position				= base()->o_Position;
 }
 
@@ -93,88 +99,101 @@ static inline bool check (const u8 &mask, const u8 &test)
 	return							(!!(mask & test));
 }
 
-void CSE_ALifeInventoryItem::UPDATE_Write	(NET_Packet &tNetPacket)
+void CSE_ALifeInventoryItem::writeWoodooMagic(NET_Packet& tNetPacket)
 {
+#pragma region woodoo magic
 	if (!m_u8NumItems) {
-		tNetPacket.w_u8				(0);
+		tNetPacket.w_u8(0);
 		return;
 	}
 
 	mask_num_items					num_items;
-	num_items.mask					= 0;
-	num_items.num_items				= m_u8NumItems;
+	num_items.mask = 0;
+	num_items.num_items = m_u8NumItems;
 
-	R_ASSERT2						(
+	R_ASSERT2(
 		num_items.num_items < (u8(1) << 5),
-		make_string("%d",num_items.num_items)
+		make_string("%d", num_items.num_items)
 	);
 
 	if (State.enabled)									num_items.mask |= inventory_item_state_enabled;
 	if (fis_zero(State.angular_vel.square_magnitude()))	num_items.mask |= inventory_item_angular_null;
 	if (fis_zero(State.linear_vel.square_magnitude()))	num_items.mask |= inventory_item_linear_null;
 
-	tNetPacket.w_u8					(num_items.common);
+	tNetPacket.w_u8(num_items.common);
 
-	tNetPacket.w_vec3				(State.position);
+	tNetPacket.w_vec3(State.position);
 
-	tNetPacket.w_float_q8			(State.quaternion.x,0.f,1.f);
-	tNetPacket.w_float_q8			(State.quaternion.y,0.f,1.f);
-	tNetPacket.w_float_q8			(State.quaternion.z,0.f,1.f);
-	tNetPacket.w_float_q8			(State.quaternion.w,0.f,1.f);	
+	tNetPacket.w_float_q8(State.quaternion.x, 0.f, 1.f);
+	tNetPacket.w_float_q8(State.quaternion.y, 0.f, 1.f);
+	tNetPacket.w_float_q8(State.quaternion.z, 0.f, 1.f);
+	tNetPacket.w_float_q8(State.quaternion.w, 0.f, 1.f);
 
-	if (!check(num_items.mask,inventory_item_angular_null)) {
-		tNetPacket.w_float_q8		(State.angular_vel.x,0.f,10*PI_MUL_2);
-		tNetPacket.w_float_q8		(State.angular_vel.y,0.f,10*PI_MUL_2);
-		tNetPacket.w_float_q8		(State.angular_vel.z,0.f,10*PI_MUL_2);
+	if (!check(num_items.mask, inventory_item_angular_null)) {
+		tNetPacket.w_float_q8(State.angular_vel.x, 0.f, 10 * PI_MUL_2);
+		tNetPacket.w_float_q8(State.angular_vel.y, 0.f, 10 * PI_MUL_2);
+		tNetPacket.w_float_q8(State.angular_vel.z, 0.f, 10 * PI_MUL_2);
 	}
 
-	if (!check(num_items.mask,inventory_item_linear_null)) {
-		tNetPacket.w_float_q8		(State.linear_vel.x,-32.f,32.f);
-		tNetPacket.w_float_q8		(State.linear_vel.y,-32.f,32.f);
-		tNetPacket.w_float_q8		(State.linear_vel.z,-32.f,32.f);
+	if (!check(num_items.mask, inventory_item_linear_null)) {
+		tNetPacket.w_float_q8(State.linear_vel.x, -32.f, 32.f);
+		tNetPacket.w_float_q8(State.linear_vel.y, -32.f, 32.f);
+		tNetPacket.w_float_q8(State.linear_vel.z, -32.f, 32.f);
 	}
-};
+#pragma endregion
+}
 
-void CSE_ALifeInventoryItem::UPDATE_Read	(NET_Packet &tNetPacket)
+void CSE_ALifeInventoryItem::UPDATE_Write(NET_Packet &tNetPacket)
 {
-	tNetPacket.r_u8					(m_u8NumItems);
+	writeWoodooMagic(tNetPacket);
+}
+
+void CSE_ALifeInventoryItem::readWoodooMagic(NET_Packet& tNetPacket)
+{
+#pragma region woodoo magic
+	tNetPacket.r_u8(m_u8NumItems);
 	if (!m_u8NumItems) {
 		return;
 	}
 
 	mask_num_items					num_items;
-	num_items.common				= m_u8NumItems;
-	m_u8NumItems					= num_items.num_items;
+	num_items.common = m_u8NumItems;
+	m_u8NumItems = num_items.num_items;
 
-	R_ASSERT2						(
+	R_ASSERT2(
 		m_u8NumItems < (u8(1) << 5),
-		make_string("%d",m_u8NumItems)
+		make_string("%d", m_u8NumItems)
 	);
 
-	tNetPacket.r_vec3				(State.position);
+	tNetPacket.r_vec3(State.position);
 
-	tNetPacket.r_float_q8			(State.quaternion.x,0.f,1.f);
-	tNetPacket.r_float_q8			(State.quaternion.y,0.f,1.f);
-	tNetPacket.r_float_q8			(State.quaternion.z,0.f,1.f);
-	tNetPacket.r_float_q8			(State.quaternion.w,0.f,1.f);	
+	tNetPacket.r_float_q8(State.quaternion.x, 0.f, 1.f);
+	tNetPacket.r_float_q8(State.quaternion.y, 0.f, 1.f);
+	tNetPacket.r_float_q8(State.quaternion.z, 0.f, 1.f);
+	tNetPacket.r_float_q8(State.quaternion.w, 0.f, 1.f);
 
-	State.enabled					= check(num_items.mask,inventory_item_state_enabled);
+	State.enabled = check(num_items.mask, inventory_item_state_enabled);
 
-	if (!check(num_items.mask,inventory_item_angular_null)) {
-		tNetPacket.r_float_q8		(State.angular_vel.x,0.f,10*PI_MUL_2);
-		tNetPacket.r_float_q8		(State.angular_vel.y,0.f,10*PI_MUL_2);
-		tNetPacket.r_float_q8		(State.angular_vel.z,0.f,10*PI_MUL_2);
+	if (!check(num_items.mask, inventory_item_angular_null)) {
+		tNetPacket.r_float_q8(State.angular_vel.x, 0.f, 10 * PI_MUL_2);
+		tNetPacket.r_float_q8(State.angular_vel.y, 0.f, 10 * PI_MUL_2);
+		tNetPacket.r_float_q8(State.angular_vel.z, 0.f, 10 * PI_MUL_2);
 	}
 	else
-		State.angular_vel.set		(0.f,0.f,0.f);
+		State.angular_vel.set(0.f, 0.f, 0.f);
 
-	if (!check(num_items.mask,inventory_item_linear_null)) {
-		tNetPacket.r_float_q8		(State.linear_vel.x,-32.f,32.f);
-		tNetPacket.r_float_q8		(State.linear_vel.y,-32.f,32.f);
-		tNetPacket.r_float_q8		(State.linear_vel.z,-32.f,32.f);
+	if (!check(num_items.mask, inventory_item_linear_null)) {
+		tNetPacket.r_float_q8(State.linear_vel.x, -32.f, 32.f);
+		tNetPacket.r_float_q8(State.linear_vel.y, -32.f, 32.f);
+		tNetPacket.r_float_q8(State.linear_vel.z, -32.f, 32.f);
 	}
 	else
-		State.linear_vel.set		(0.f,0.f,0.f);
+		State.linear_vel.set(0.f, 0.f, 0.f);
+#pragma endregion
+}
+void CSE_ALifeInventoryItem::UPDATE_Read	(NET_Packet &tNetPacket)
+{
+	readWoodooMagic(tNetPacket);
 };
 
 void CSE_ALifeInventoryItem::FillProps		(LPCSTR pref, PropItemVec& values)

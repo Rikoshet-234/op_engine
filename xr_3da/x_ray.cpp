@@ -194,8 +194,8 @@ void InitSettings	()
 		Msg("! ERROR Cannot find configured default language[%s]!", defaultLang);
 		FATAL("Invalid required configuration! See log for detail.");
 	}
-	multiHUDs = xr_new<CMultiHUDs>();
 #pragma endregion 
+	multiHUDs = xr_new<CMultiHUDs>();
 }
 
 void InitConsole	()

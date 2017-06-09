@@ -144,6 +144,9 @@ CInventoryItem::CInventoryItem()
 	m_Description		= "";
 	scriptDescriptionFunctorName="";
 	m_bUsefulFromConfig = false;
+	m_bDisposableItem = true;
+	m_weight = -1;
+	m_cost = static_cast<unsigned int>(-1);
 }
 
 CInventoryItem::~CInventoryItem() 
@@ -201,6 +204,7 @@ void CInventoryItem::Load(LPCSTR section)
 		m_Description = CStringTable().translate(descriptionVar.c_str());
 	}
 
+	m_bDisposableItem = !!READ_IF_EXISTS(pSettings, r_bool, section, "disposable", TRUE);
 
 	m_flags.set(Fbelt, READ_IF_EXISTS(pSettings, r_bool, section, "belt", FALSE));
 	m_flags.set(FRuckDefault, READ_IF_EXISTS(pSettings, r_bool, section, "default_to_ruck", TRUE));
@@ -208,7 +212,7 @@ void CInventoryItem::Load(LPCSTR section)
 	m_flags.set(FCanTrade, READ_IF_EXISTS(pSettings, r_bool, section, "can_trade", TRUE));
 	m_flags.set(FIsQuestItem, READ_IF_EXISTS(pSettings, r_bool, section, "quest_item", FALSE));
 	if (pSettings->line_exist(section, "visible_for_ui"))
-		m_bVisibleForUI = !!pSettings->r_bool(section, "useful_for_npc");
+		m_bVisibleForUI = !!pSettings->r_bool(section, "visible_for_ui");
 	if (pSettings->line_exist(section, "useful_for_npc"))
 	{
 		m_flags.set(Fuseful_for_NPC, pSettings->r_bool(section, "useful_for_npc"));
@@ -465,9 +469,10 @@ BOOL CInventoryItem::net_Spawn(CSE_Abstract* DC)
 	}
 	CSE_ALifeInventoryItem			*pSE_InventoryItem = smart_cast<CSE_ALifeInventoryItem*>(e);
 	if (!pSE_InventoryItem)			return TRUE;
-	//!!!
 
 	m_fCondition = pSE_InventoryItem->m_fCondition;
+	m_weight= pSE_InventoryItem->m_fMass;
+	m_cost = pSE_InventoryItem->m_dwCost;
 	if (GameID() != GAME_SINGLE)
 		object().processing_activate();
 
@@ -487,6 +492,8 @@ void CInventoryItem::save(NET_Packet &packet)
 	packet.w_u8(m_bVisibleForUI ? 1 : 0);
 	packet.w_u8				(static_cast<u8>(m_eItemPlace));
 	packet.w_float			(m_fCondition);
+	packet.w_float(m_weight);
+	packet.w_u32(m_cost);
 	if (object().H_Parent()) {
 		packet.w_u8			(0);
 		return;
@@ -499,7 +506,7 @@ void CInventoryItem::save(NET_Packet &packet)
 
 typedef CSE_ALifeInventoryItem::mask_num_items	mask_num_items;
 
-void CInventoryItem::net_Import(NET_Packet& P)
+void CInventoryItem::importWoodooMagic(NET_Packet& P)
 {
 	u8							NumItems = 0;
 	NumItems = P.r_u8();
@@ -561,88 +568,98 @@ void CInventoryItem::net_Import(NET_Packet& P)
 		p->NET_IItem.pop_front();
 	};
 #pragma endregion
+}
+
+void CInventoryItem::net_Import(NET_Packet& P)
+{
+	importWoodooMagic(P);
 };
 
-void CInventoryItem::net_Export			(NET_Packet& P) 
-{	
-	if (object().H_Parent() || IsGameTypeSingle()) 
+void CInventoryItem::exportWoodooMagic(NET_Packet& P)
+{
+	if (object().H_Parent() || IsGameTypeSingle())
 	{
-		P.w_u8				(0);
+		P.w_u8(0);
 		return;
 	}
 #pragma region woodoo magic
-	CPHSynchronize* pSyncObj				= NULL;
+	CPHSynchronize* pSyncObj = NULL;
 	SPHNetState								State;
-	pSyncObj = object().PHGetSyncItem		(0);
+	pSyncObj = object().PHGetSyncItem(0);
 
-	if (pSyncObj && !object().H_Parent()) 
-		pSyncObj->get_State					(State);
-	else 	
-		State.position.set					(object().Position());
+	if (pSyncObj && !object().H_Parent())
+		pSyncObj->get_State(State);
+	else
+		State.position.set(object().Position());
 
 
 	mask_num_items			num_items;
-	num_items.mask			= 0;
+	num_items.mask = 0;
 	u16						temp = bone_count_to_synchronize();
 
-	R_ASSERT				(temp < (u16(1) << 5));
-	num_items.num_items		= u8(temp);
+	R_ASSERT(temp < (u16(1) << 5));
+	num_items.num_items = u8(temp);
 
 	if (State.enabled)									num_items.mask |= CSE_ALifeInventoryItem::inventory_item_state_enabled;
 	if (fis_zero(State.angular_vel.square_magnitude()))	num_items.mask |= CSE_ALifeInventoryItem::inventory_item_angular_null;
 	if (fis_zero(State.linear_vel.square_magnitude()))	num_items.mask |= CSE_ALifeInventoryItem::inventory_item_linear_null;
 
-	P.w_u8					(num_items.common);
+	P.w_u8(num_items.common);
 
-	P.w_vec3				(State.position);
+	P.w_vec3(State.position);
 
 	float					magnitude = _sqrt(State.quaternion.magnitude());
 	if (fis_zero(magnitude)) {
-		magnitude			= 1;
-		State.quaternion.x	= 0.f;
-		State.quaternion.y	= 0.f;
-		State.quaternion.z	= 1.f;
-		State.quaternion.w	= 0.f;
+		magnitude = 1;
+		State.quaternion.x = 0.f;
+		State.quaternion.y = 0.f;
+		State.quaternion.z = 1.f;
+		State.quaternion.w = 0.f;
 	}
 	else {
-		float				invert_magnitude = 1.f/magnitude;
-		
-		State.quaternion.x	*= invert_magnitude;
-		State.quaternion.y	*= invert_magnitude;
-		State.quaternion.z	*= invert_magnitude;
-		State.quaternion.w	*= invert_magnitude;
+		float				invert_magnitude = 1.f / magnitude;
 
-		clamp				(State.quaternion.x,0.f,1.f);
-		clamp				(State.quaternion.y,0.f,1.f);
-		clamp				(State.quaternion.z,0.f,1.f);
-		clamp				(State.quaternion.w,0.f,1.f);
+		State.quaternion.x *= invert_magnitude;
+		State.quaternion.y *= invert_magnitude;
+		State.quaternion.z *= invert_magnitude;
+		State.quaternion.w *= invert_magnitude;
+
+		clamp(State.quaternion.x, 0.f, 1.f);
+		clamp(State.quaternion.y, 0.f, 1.f);
+		clamp(State.quaternion.z, 0.f, 1.f);
+		clamp(State.quaternion.w, 0.f, 1.f);
 	}
 
-	P.w_float_q8			(State.quaternion.x,0.f,1.f);
-	P.w_float_q8			(State.quaternion.y,0.f,1.f);
-	P.w_float_q8			(State.quaternion.z,0.f,1.f);
-	P.w_float_q8			(State.quaternion.w,0.f,1.f);
+	P.w_float_q8(State.quaternion.x, 0.f, 1.f);
+	P.w_float_q8(State.quaternion.y, 0.f, 1.f);
+	P.w_float_q8(State.quaternion.z, 0.f, 1.f);
+	P.w_float_q8(State.quaternion.w, 0.f, 1.f);
 
 	if (!(num_items.mask & CSE_ALifeInventoryItem::inventory_item_angular_null)) {
-		clamp				(State.angular_vel.x,0.f,10.f*PI_MUL_2);
-		clamp				(State.angular_vel.y,0.f,10.f*PI_MUL_2);
-		clamp				(State.angular_vel.z,0.f,10.f*PI_MUL_2);
+		clamp(State.angular_vel.x, 0.f, 10.f*PI_MUL_2);
+		clamp(State.angular_vel.y, 0.f, 10.f*PI_MUL_2);
+		clamp(State.angular_vel.z, 0.f, 10.f*PI_MUL_2);
 
-		P.w_float_q8		(State.angular_vel.x,0.f,10.f*PI_MUL_2);
-		P.w_float_q8		(State.angular_vel.y,0.f,10.f*PI_MUL_2);
-		P.w_float_q8		(State.angular_vel.z,0.f,10.f*PI_MUL_2);
+		P.w_float_q8(State.angular_vel.x, 0.f, 10.f*PI_MUL_2);
+		P.w_float_q8(State.angular_vel.y, 0.f, 10.f*PI_MUL_2);
+		P.w_float_q8(State.angular_vel.z, 0.f, 10.f*PI_MUL_2);
 	}
 
 	if (!(num_items.mask & CSE_ALifeInventoryItem::inventory_item_linear_null)) {
-		clamp				(State.linear_vel.x,-32.f,32.f);
-		clamp				(State.linear_vel.y,-32.f,32.f);
-		clamp				(State.linear_vel.z,-32.f,32.f);
+		clamp(State.linear_vel.x, -32.f, 32.f);
+		clamp(State.linear_vel.y, -32.f, 32.f);
+		clamp(State.linear_vel.z, -32.f, 32.f);
 
-		P.w_float_q8		(State.linear_vel.x,-32.f,32.f);
-		P.w_float_q8		(State.linear_vel.y,-32.f,32.f);
-		P.w_float_q8		(State.linear_vel.z,-32.f,32.f);
+		P.w_float_q8(State.linear_vel.x, -32.f, 32.f);
+		P.w_float_q8(State.linear_vel.y, -32.f, 32.f);
+		P.w_float_q8(State.linear_vel.z, -32.f, 32.f);
 	}
 #pragma endregion
+}
+
+void CInventoryItem::net_Export			(NET_Packet& P) 
+{	
+	exportWoodooMagic(P);
 };
 
 void CInventoryItem::load(IReader &packet)
@@ -653,6 +670,12 @@ void CInventoryItem::load(IReader &packet)
 	}
 	m_eItemPlace			= static_cast<EItemPlace>(packet.r_u8());
 	m_fCondition			= packet.r_float();
+	if (ai().get_alife()->header().version() > 0x0004)
+	{
+		m_weight=packet.r_float();
+		m_cost= packet.r_u32();
+	}
+
 	u8						tmp = packet.r_u8();
 	if (!tmp)
 		return;
@@ -1244,6 +1267,28 @@ bool CInventoryItem::IsNecessaryItem(CInventoryItem* item)
 BOOL CInventoryItem::IsInvalid() const
 {
 	return object().getDestroy() || GetDropManual();
+}
+
+void CInventoryItem::SetCost(unsigned cost)
+{
+	m_cost = cost;
+	NET_Packet		P;
+	object().u_EventGen(P, GE_UPDATE_SERVER_ENTRY_IAI, object().ID());
+	P.w_float(m_weight);
+	P.w_u32(m_cost);
+	object().u_EventSend(P);
+
+}
+
+void CInventoryItem::SetWeight(float weight)
+{
+	clamp(weight, 0.0f, 10000.0f);
+	m_weight = weight;
+	NET_Packet		P;
+	object().u_EventGen(P, GE_UPDATE_SERVER_ENTRY_IAI, object().ID());
+	P.w_float(m_weight);
+	P.w_u32(m_cost);
+	object().u_EventSend(P);
 }
 
 u16 CInventoryItem::bone_count_to_synchronize	() const

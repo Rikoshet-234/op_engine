@@ -55,6 +55,7 @@ private:
 	std::string descriptionVar;
 	luabind::functor<LPCSTR> scriptDescriptionFunctor;
 	bool m_bUsefulFromConfig;
+	bool m_bDisposableItem;
 protected:
 	enum EIIFlags{				FdropManual			=(1<<0),
 								FCanTake			=(1<<1),
@@ -128,7 +129,9 @@ public:
 
 			BOOL				IsQuestItem			()	const	{return m_flags.test(FIsQuestItem);}			
 			u32					Cost				() const	{ return m_cost; }
-	virtual float				Weight				() 			{ return m_weight;}		
+	void SetCost(u32 cost);
+	virtual float				Weight				() 			{ return m_weight;}
+	virtual void SetWeight(float weight);
 
 	bool GetVisibleForUI() { return m_bVisibleForUI; }
 	void SetVisibleForUI(bool value) { m_bVisibleForUI=value; }
@@ -198,7 +201,10 @@ public:
 	virtual void				PH_A_CrPr			(); // actions & operations after phisic correction-prediction steps
 
 	virtual void				net_Import			(NET_Packet& P);					// import from server
+	void importWoodooMagic(NET_Packet& P);
+
 	virtual void				net_Export			(NET_Packet& P);					// export to server
+	void exportWoodooMagic(NET_Packet& P);
 
 public:
 	virtual void				activate_physic_shell		();
