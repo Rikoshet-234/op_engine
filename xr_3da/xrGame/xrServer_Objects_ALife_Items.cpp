@@ -558,6 +558,11 @@ u16	 CSE_ALifeItemWeapon::get_ammo_elapsed	()
 	return						((u16)a_elapsed);
 }
 
+u8	CSE_ALifeItemWeapon::get_addon_state()
+{
+	return m_addon_flags.get();
+}
+
 u16	 CSE_ALifeItemWeapon::get_ammo_magsize	()
 {
 	if (pSettings->line_exist(s_name,"ammo_mag_size"))

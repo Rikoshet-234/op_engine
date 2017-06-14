@@ -203,11 +203,9 @@ public:
 //			void		UpdateSleep			();
 
 	//свойства артефактов
-	virtual void		UpdateArtefactsOnBelt	();
-	virtual void		UpdtateOutfitInSlot	(); 
+	virtual void		UpdateActivePropertys();
 	virtual void		MoveArtefactBelt		(const CArtefact* artefact, bool on_belt);
 	virtual float		HitArtefactsOnBelt		(float hit_power, ALife::EHitType hit_type);
-	const xr_vector<const CArtefact*>& ArtefactsOnBelt() {return m_ArtefactsOnBelt;}
 protected:
 	//звук тяжелого дыхания
 	ref_sound			m_HeavyBreathSnd;
@@ -259,6 +257,9 @@ protected:
 private:
 	void					SwitchOutBorder(bool new_border_state);
 public:
+	void SetDropPower(float value) { f_DropPower = value; }
+	float GetDropPower() const { return f_DropPower; }
+	void SetDropActivated(BOOL value) { b_DropActivated = value; }
 	bool					m_bAllowDeathRemove;
 //	u32						m_u32RespawnTime;
 	

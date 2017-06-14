@@ -22,6 +22,15 @@ protected	:
 	bool			bEmptyArgsHandled;
 
 	IC	bool		EQ(LPCSTR S1, LPCSTR S2) { return xr_strcmp(S1,S2)==0; }
+	IC bool stateArg(LPCSTR args)
+	{
+		if (EQ(args, "on"))		return true;
+		if (EQ(args, "1"))		return true;
+		if (EQ(args, "off"))	return false;
+		if (EQ(args, "0"))		return false;
+		InvalidSyntax();
+		return false;
+	}
 public		:
 	IConsole_Command		(LPCSTR N) : 
 	  cName				(N),
@@ -162,11 +171,10 @@ protected	:
 	Flags32*	value;
 	u32			mask;
 public		:
-	CCC_Mask(LPCSTR N, Flags32* V, u32 M) :
-	  IConsole_Command(N),
-	  value(V),
-	  mask(M)
-	{};
+	CCC_Mask(LPCSTR N, Flags32* V, u32 M) :  IConsole_Command(N),  value(V), mask(M)
+	{
+	
+	}
 	  const BOOL GetValue()const{ return value->test(mask); }
 	virtual void	Execute	(LPCSTR args)
 	{
@@ -180,6 +188,31 @@ public		:
 	{	strcpy_s(S,value->test(mask)?"on":"off"); }
 	virtual void	Info	(TInfo& I)
 	{	strcpy_s(I,"'on/off' or '1/0'"); }
+};
+
+class ENGINE_API CCC_MaskStat :public CCC_Mask
+{
+public:
+	CCC_MaskStat(LPCSTR N, Flags32* V, u32 M) : CCC_Mask(N, V, M)
+	{
+	}
+
+	void	Execute(LPCSTR args) override
+	{
+		bool state = stateArg(args);
+		if (mask == rsStatistic && state)
+			value->set(rsStatisticFPS, FALSE);
+		else if (mask == rsStatisticFPS && state)
+			value->set(rsStatistic, FALSE);
+		if (!state)
+		{
+			value->set(rsStatistic, FALSE);
+			value->set(rsStatisticFPS, FALSE);
+			return;
+		}
+		value->set(mask, state ? TRUE : FALSE);
+		//CCC_Mask::Execute(args);
+	}
 };
 
 class ENGINE_API	CCC_ToggleMask : public IConsole_Command

@@ -23,7 +23,8 @@
 #include "level.h"
 #include "../../xrNetServer/net_utils.h"
 #include "script_callback_ex.h"
-#include "MathUtils.h"
+#include "alife_simulator.h"
+#include "alife_object_registry.h"
 #include "game_cl_base_weapon_usage_statistic.h"
 #include "game_level_cross_table.h"
 #include "animation_movement_controller.h"
@@ -71,6 +72,47 @@ CGameObject::~CGameObject		()
 	xr_delete					(m_callbacks_bool);
 }
 
+CSE_ALifeDynamicObject* CGameObject::alife_object() const
+{
+	const CALifeSimulator *sim = ai().get_alife();
+	if (sim)
+		return sim->objects().object(ID(), true);
+	return nullptr;
+}
+
+void	CGameObject::UpdateXFORM(const Fmatrix &upd)
+{
+	XFORM() = upd;
+	IRender_Visual *pV = Visual();
+	CKinematics *pK = PKinematics(pV);
+	if (pK)
+	{
+		pK->vis.sphere.P = upd.c;
+		pK->CalculateBones_Invalidate();	 // позволит объекту быстрее объ€витьс€ в новой точке			
+	}
+	// OnChangePosition processing
+	spatial_move();
+}
+
+void CGameObject::ChangePosition(const Fvector &pos)
+{
+	NET_Packet						PP;
+	CGameObject::u_EventGen(PP, GE_CHANGE_POS, ID());
+	PP.w_vec3(pos);
+	CGameObject::u_EventSend(PP);
+	// alpet: €вное перемещение визуалов объектов
+	Fmatrix m = XFORM();
+	m.translate_over(pos);
+	UpdateXFORM(m);
+
+	// alpet: сохранение позиции в серверный экземпл€р
+	CSE_ALifeDynamicObject* se_obj = alife_object();
+	if (se_obj)
+	{
+		se_obj->position()=pos;
+		se_obj->synchronize_location();
+	}
+}
 void CGameObject::init			()
 {
 	m_lua_game_object			= 0;

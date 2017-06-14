@@ -22,7 +22,7 @@ ENGINE_API CRenderDevice Device;
 ENGINE_API BOOL g_bRendering = FALSE; 
 
 BOOL		g_bLoaded = FALSE;
-ref_light	precache_light = 0;
+ref_light	precache_light = nullptr;
 
 BOOL CRenderDevice::Begin	()
 {
@@ -57,7 +57,7 @@ BOOL CRenderDevice::Begin	()
 
 void CRenderDevice::Clear	()
 {
-	CHK_DX(HW.pDevice->Clear(0,0,
+	CHK_DX(HW.pDevice->Clear(0,nullptr,
 		D3DCLEAR_ZBUFFER|
 		(psDeviceFlags.test(rsClearBB)?D3DCLEAR_TARGET:0)|
 		(HW.Caps.bStencil?D3DCLEAR_STENCIL:0),
@@ -68,7 +68,7 @@ void CRenderDevice::Clear	()
 extern void CheckPrivilegySlowdown();
 #include "resourcemanager.h"
 
-void CRenderDevice::End		(void)
+void CRenderDevice::End		()
 {
 #ifndef DEDICATED_SERVER
 
@@ -107,7 +107,7 @@ void CRenderDevice::End		(void)
 	Memory.dbg_check		();
 	CHK_DX				(HW.pDevice->EndScene());
 
-	HRESULT _hr		= HW.pDevice->Present( NULL, NULL, NULL, NULL );
+	HRESULT _hr		= HW.pDevice->Present(nullptr, nullptr, nullptr, nullptr );
 	if				(D3DERR_DEVICELOST==_hr)	return;			// we will handle this later
 	//R_ASSERT2		(SUCCEEDED(_hr),	"Presentation failed. Driver upgrade needed?");
 #endif
@@ -196,7 +196,7 @@ void CRenderDevice::Run			()
 	Timer_MM_Delta				= 0;
 	{
 		u32 time_mm			= timeGetTime	();
-		while (timeGetTime()==time_mm);			// wait for next tick
+		while (timeGetTime()==time_mm) {};			// wait for next tick
 		u32 time_system		= timeGetTime	();
 		u32 time_local		= TimerAsync	();
 		Timer_MM_Delta		= time_system-time_local;
@@ -207,18 +207,18 @@ void CRenderDevice::Run			()
 //	InitializeCriticalSection	(&mt_csLeave);
 	mt_csEnter.Enter			();
 	mt_bMustExit				= FALSE;
-	thread_spawn				(mt_Thread,"X-RAY Secondary thread",0,0);
+	thread_spawn				(mt_Thread,"X-RAY Secondary thread",0,nullptr);
 
 	// Message cycle
-	PeekMessage					( &msg, NULL, 0U, 0U, PM_NOREMOVE );
+	PeekMessage					( &msg, nullptr, 0U, 0U, PM_NOREMOVE );
 
 	seqAppStart.Process			(rp_AppStart);
 
-	CHK_DX(HW.pDevice->Clear(0,0,D3DCLEAR_TARGET,D3DCOLOR_XRGB(0,0,0),1,0));
+	CHK_DX(HW.pDevice->Clear(0,nullptr,D3DCLEAR_TARGET,D3DCOLOR_XRGB(0,0,0),1,0));
 
 	while( WM_QUIT != msg.message  )
 	{
-		bGotMsg = PeekMessage( &msg, NULL, 0U, 0U, PM_REMOVE );
+		bGotMsg = PeekMessage( &msg, nullptr, 0U, 0U, PM_REMOVE );
 		if( bGotMsg )
 		{
 			  TranslateMessage	( &msg );
@@ -231,9 +231,10 @@ void CRenderDevice::Run			()
 #ifdef DEDICATED_SERVER
 				u32 FrameStartTime = TimerGlobal.GetElapsed_ms();
 #endif
-
-				if (psDeviceFlags.test(rsStatistic))	g_bEnableStatGather	= TRUE;
-				else									g_bEnableStatGather	= FALSE;
+				if (psDeviceFlags.test(rsStatistic) || psDeviceFlags.test(rsStatisticFPS))	
+					g_bEnableStatGather	= TRUE;
+				else									
+					g_bEnableStatGather	= FALSE;
 				if(g_loading_events.size())
 				{
 					if( g_loading_events.front() () )
@@ -260,7 +261,7 @@ void CRenderDevice::Run			()
 				mFullTransform.mul			( mProject,mView	);
 				RCache.set_xform_view		( mView				);
 				RCache.set_xform_project	( mProject			);
-				D3DXMatrixInverse			( (D3DXMATRIX*)&mInvFullTransform, 0, (D3DXMATRIX*)&mFullTransform);
+				D3DXMatrixInverse			( (D3DXMATRIX*)&mInvFullTransform, nullptr, (D3DXMATRIX*)&mFullTransform);
 
 				// *** Resume threads
 				// Capture end point - thread must run only ONE cycle
@@ -290,7 +291,7 @@ void CRenderDevice::Run			()
 					if (Begin())				{
 
 						seqRender.Process						(rp_Render);
-						if (psDeviceFlags.test(rsCameraPos) || psDeviceFlags.test(rsStatistic) || Statistic->errors.size())	
+						if (psDeviceFlags.test(rsCameraPos) || psDeviceFlags.test(rsStatisticFPS) || psDeviceFlags.test(rsStatistic) || Statistic->errors.size())
 							Statistic->Show						();
 						End										();
 					}
@@ -467,7 +468,7 @@ BOOL CRenderDevice::Paused()
 void CRenderDevice::OnWM_Activate(WPARAM wParam, LPARAM lParam)
 {
 	u16 fActive						= LOWORD(wParam);
-	BOOL fMinimized					= (BOOL) HIWORD(wParam);
+	BOOL fMinimized					= static_cast<BOOL>(HIWORD(wParam));
 	BOOL bActive					= ((fActive!=WA_INACTIVE) && (!fMinimized))?TRUE:FALSE;
 
 	if (bActive!=Device.b_is_Active)

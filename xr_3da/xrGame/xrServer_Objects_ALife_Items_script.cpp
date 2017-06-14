@@ -77,6 +77,7 @@ void CSE_ALifeItemWeapon::script_register(lua_State *L)
 			"cse_alife_item_weapon",
 			CSE_ALifeItem
 		)
+		.def("get_addon_state", &CSE_ALifeItemWeapon::get_addon_state)
 	];
 }
 

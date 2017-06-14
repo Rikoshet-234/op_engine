@@ -111,6 +111,8 @@ public:
 	TIItemContainer			m_ruck, m_belt;
 	TISlotArr				m_slots;
 
+	TIItemContainer			m_apItems;
+
 	//возвращает все кроме PDA в слоте и болта
 	void				AddAvailableItems			(TIItemContainer& items_container, bool for_trade,bool useBelt=true,bool useSlots=true,bool checkVisibility=true) const;
 

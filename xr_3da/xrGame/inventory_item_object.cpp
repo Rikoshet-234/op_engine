@@ -100,6 +100,9 @@ void CInventoryItemObject::OnH_A_Chield		()
 
 void CInventoryItemObject::UpdateCL			()
 {
+	/*auto *pobj = H_Parent();
+	if (pobj && 0 == pobj->ID() && Position().distance_to(pobj->Position()) > 1.f)
+		ChangePosition(pobj->Position());*/
 	CPhysicItem::UpdateCL				();
 	CInventoryItem::UpdateCL			();
 }

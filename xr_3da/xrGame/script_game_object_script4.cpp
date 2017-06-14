@@ -643,7 +643,7 @@ class_<CScriptGameObject> &script_register_game_object3(class_<CScriptGameObject
 		.def("has_scope", &CScriptGameObject::has_scope)
 		.def("has_silencer", &CScriptGameObject::has_silencer)
 		.def("has_grenadelauncher", &CScriptGameObject::has_grenadelauncher)
-		.def("weapon_addon_state", &CScriptGameObject::GetWeaponAddonState)
+		.def("get_addon_state", &CScriptGameObject::GetWeaponAddonState)
 
 		.def("full_unload_weapon", &CScriptGameObject::FullUnloadWeapon)
 		.def("current_ammo_section", &CScriptGameObject::GetCurrentAmmoSection)

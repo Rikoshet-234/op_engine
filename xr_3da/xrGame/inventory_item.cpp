@@ -147,6 +147,8 @@ CInventoryItem::CInventoryItem()
 	m_bDisposableItem = true;
 	m_weight = -1;
 	m_cost = static_cast<unsigned int>(-1);
+	m_fActivePropertyRadiation = 0;
+//	m_dropTarget.set(0, 0, 0);
 }
 
 CInventoryItem::~CInventoryItem() 
@@ -190,7 +192,7 @@ void CInventoryItem::Load(LPCSTR section)
 	m_cost = pSettings->r_u32(section, "cost");
 
 	m_slot = READ_IF_EXISTS(pSettings, r_u32, section, "slot", NO_ACTIVE_SLOT);
-
+	m_fActivePropertyRadiation= READ_IF_EXISTS(pSettings, r_float, section, "inventory_radiation", 0);
 
 	// Description
 	if (pSettings->line_exist(section, "description"))
@@ -314,12 +316,18 @@ void CInventoryItem::Deactivate()
 
 void CInventoryItem::OnH_B_Independent(bool just_before_destroy)
 {
+	/*if (m_dropTarget.x && m_dropTarget.z)
+		object().ChangePosition (m_dropTarget);
+	m_dropTarget.set(0, 0, 0);*/
 	UpdateXForm();
 	m_eItemPlace = eItemPlaceUndefined ;
 }
 
 void CInventoryItem::OnH_A_Independent()
 {
+	/*if (m_dropTarget.x && m_dropTarget.z)
+		object().ChangePosition (m_dropTarget);
+	m_dropTarget.set(0, 0, 0);*/
 	m_dwItemIndependencyTime	= Level().timeServer();
 	m_eItemPlace				= eItemPlaceUndefined;	
 	inherited::OnH_A_Independent();
@@ -391,7 +399,7 @@ void CInventoryItem::OnEvent (NET_Packet& P, u16 type)
 		{
 			Fvector p; 
 			P.r_vec3(p);
-			CPHSynchronize* pSyncObj = NULL;
+			CPHSynchronize* pSyncObj = nullptr;
 			pSyncObj = object().PHGetSyncItem(0);
 			if (!pSyncObj) return;
 			SPHNetState state;

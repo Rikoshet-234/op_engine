@@ -142,7 +142,7 @@ public:
 	shared_str					m_nameShort;
 	shared_str					m_nameComplex;
 	EItemPlace					m_eItemPlace;
-
+//	Fvector						m_dropTarget;
 	virtual void				OnMoveToSlot		() {};
 	virtual void				OnMoveToBelt		() {};
 	virtual void				OnMoveToRuck		() {};
@@ -176,6 +176,8 @@ public:
 			bool				CanTrade			() const;
 	virtual bool 				IsNecessaryItem	    (CInventoryItem* item);
 	virtual bool				IsNecessaryItem	    (const shared_str& item_sect){return false;};
+
+	float GetAPRadiation() const { return m_fActivePropertyRadiation; };
 protected:
 	
 	u32							m_slot;
@@ -183,6 +185,7 @@ protected:
 	float						m_weight;
 	float						m_fCondition;
 	shared_str					m_Description;
+	float m_fActivePropertyRadiation;
 
 	ALife::_TIME_ID				m_dwItemRemoveTime;
 	ALife::_TIME_ID				m_dwItemIndependencyTime;

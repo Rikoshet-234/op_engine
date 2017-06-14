@@ -198,7 +198,8 @@ IC	const GameGraph::SLevel &GameGraph::CHeader::level				(LPCSTR level_name) con
 		if (!xr_strcmp((*I).second.name(),level_name))
 			return				((*I).second);
 	ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "! ERROR there is no specified level in the game graph : %s", level_name);
-	FATAL("ENGINE Crush. See log for details.");
+	FATAL("ENGINE Crush. See log for details."); 
+	return levels().begin()->second;
 
 #ifdef DEBUG
 	Msg							("! There is no specified level %s in the game graph!",level_name);

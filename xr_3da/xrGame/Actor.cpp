@@ -115,9 +115,9 @@ CActor::CActor() : CEntityAlive()
 	vPrevCamDir.set			(0.f,0.f,1.f);
 	fCurAVelocity			= 0.0f;
 	// эффекторы
-	pCamBobbing				= 0;
-	m_pSleepEffector		= NULL;
-	m_pSleepEffectorPP		= NULL;
+	pCamBobbing				= nullptr;
+	m_pSleepEffector		= nullptr;
+	m_pSleepEffectorPP		= nullptr;
 
 
 	r_torso.yaw				= 0;
@@ -139,11 +139,11 @@ CActor::CActor() : CEntityAlive()
 	m_fFallTime				=	s_fFallTime;
 	m_bAnimTorsoPlayed		=	false;
 
-	m_pPhysicsShell			=	NULL;
+	m_pPhysicsShell			= nullptr;
 
 
 
-	m_holder				=	NULL;
+	m_holder				= nullptr;
 	m_holderID				=	u16(-1);
 
 
@@ -154,33 +154,32 @@ CActor::CActor() : CEntityAlive()
 	//разрешить использование пояса в inventory
 	inventory().SetBeltUseful(true);
 
-	m_pPersonWeLookingAt	= NULL;
-	m_pVehicleWeLookingAt	= NULL;
-	m_pObjectWeLookingAt	= NULL;
+	m_pPersonWeLookingAt	= nullptr;
+	m_pVehicleWeLookingAt	= nullptr;
+	m_pObjectWeLookingAt	= nullptr;
 	m_bPickupMode			= false;
 
-	pStatGraph				= NULL;
-
-	m_pActorEffector		= NULL;
+	pStatGraph				= nullptr;
+	m_pActorEffector		= nullptr;
 
 	m_bZoomAimingMode		= false;
 
-	m_sDefaultObjAction		= NULL;
+	m_sDefaultObjAction		= nullptr;
 
 	m_fSprintFactor			= 4.f;
 
 	hFriendlyIndicator.create(FVF::F_LIT,RCache.Vertex.Buffer(),RCache.QuadIB);
 
-	m_pUsableObject			= NULL;
+	m_pUsableObject			= nullptr;
 
 
 	m_anims					= xr_new<SActorMotions>();
 	m_vehicle_anims			= xr_new<SActorVehicleAnims>();
-	m_entity_condition		= NULL;
+	m_entity_condition		= nullptr;
 	m_iLastHitterID			= u16(-1);
 	m_iLastHittingWeaponID	= u16(-1);
-	m_game_task_manager		= NULL;
-	m_statistic_manager		= NULL;
+	m_game_task_manager		= nullptr;
+	m_statistic_manager		= nullptr;
 	//-----------------------------------------------------------------------------------
 	m_memory				= g_dedicated_server ? 0 : xr_new<CActorMemory>(this);
 	m_bOutBorder			= false;
@@ -234,11 +233,11 @@ void CActor::reinit	()
 	character_physics_support()->in_Init		();
 	material().reinit							();
 
-	m_pUsableObject								= NULL;
+	m_pUsableObject								= nullptr;
 	if (!g_dedicated_server)
 		memory().reinit							();
 	
-	set_input_external_handler					(0);
+	set_input_external_handler					(nullptr);
 	m_time_lock_accel							= 0;
 	g_activate_time								= 0;
 }
@@ -351,9 +350,9 @@ void CActor::Load	(LPCSTR section )
 if(!g_dedicated_server)
 {
 	LPCSTR hit_snd_sect = pSettings->r_string(section,"hit_sounds");
-	for(int hit_type=0; hit_type<(int)ALife::eHitTypeMax; ++hit_type)
+	for(int hit_type=0; hit_type<static_cast<int>(ALife::eHitTypeMax); ++hit_type)
 	{
-		LPCSTR hit_name = ALife::g_cafHitType2String((ALife::EHitType)hit_type);
+		LPCSTR hit_name = ALife::g_cafHitType2String(static_cast<ALife::EHitType>(hit_type));
 		LPCSTR hit_snds = READ_IF_EXISTS(pSettings, r_string, hit_snd_sect, hit_name, "");
 		int cnt = _GetItemCount(hit_snds);
 		string128		tmp;
@@ -623,7 +622,7 @@ void CActor::HitMark	(float P,
 		HUD().Hit(0, P, dir);
 
 	{
-		CEffectorCam* ce = Cameras().GetCamEffector((ECamEffectorType)effFireHit);
+		CEffectorCam* ce = Cameras().GetCamEffector(static_cast<ECamEffectorType>(effFireHit));
 		if(!ce)
 			{
 			int id						= -1;
@@ -843,7 +842,7 @@ void CActor::g_Physics(Fvector& _accel, float jump, float dt)
 
 			hdir.y = 0;
 
-			SetHitInfo(this, NULL, 0, Fvector().set(0, 0, 0), hdir);
+			SetHitInfo(this, nullptr, 0, Fvector().set(0, 0, 0), hdir);
 			//				Hit	(m_PhysicMovementControl->gcontact_HealthLost,hdir,di->DamageInitiator(),m_PhysicMovementControl->ContactBone(),di->HitPos(),0.f,ALife::eHitTypeStrike);//s16(6 + 2*::Random.randI(0,2))
 			if (Level().CurrentControlEntity() == this)
 			{
@@ -894,7 +893,7 @@ void CActor::UpdateCL	()
 {
 	if(m_feel_touch_characters>0)
 	{
-		for(xr_vector<CObject*>::iterator it = feel_touch.begin(); it != feel_touch.end(); it++)
+		for(xr_vector<CObject*>::iterator it = feel_touch.begin(); it != feel_touch.end(); ++it)
 		{
 			CPhysicsShellHolder	*sh = smart_cast<CPhysicsShellHolder*>(*it);
 			if(sh&&sh->character_physics_support())
@@ -986,45 +985,45 @@ void CActor::UpdateCL	()
 }
 
 float	NET_Jump = 0;
-void CActor::shedule_Update	(u32 DT)
+void CActor::shedule_Update(u32 DT)
 {
 	setSVU(OnServer());
 
 	//установить режим показа HUD для текущего активного слота
-	CHudItem* pHudItem = smart_cast<CHudItem*>(inventory().ActiveItem());	
-	if(pHudItem) 
+	CHudItem* pHudItem = smart_cast<CHudItem*>(inventory().ActiveItem());
+	if (pHudItem)
 		pHudItem->SetHUDmode(HUDview());
 
 	//обновление инвентаря
-	UpdateInventoryOwner			(DT);
+	UpdateInventoryOwner(DT);
 	if (GameID() == GAME_SINGLE)
-		GameTaskManager().UpdateTasks	();
+		GameTaskManager().UpdateTasks();
 
-	if(m_holder || !getEnabled() || !Ready())
+	if (m_holder || !getEnabled() || !Ready())
 	{
-		m_sDefaultObjAction				= NULL;
-		inherited::shedule_Update		(DT);
+		m_sDefaultObjAction = nullptr;
+		inherited::shedule_Update(DT);
 
-/*		if (OnServer())
-		{
-			Check_Weapon_ShowHideState();
-		};	
-*/
+		/*		if (OnServer())
+				{
+					Check_Weapon_ShowHideState();
+				};
+		*/
 		return;
 	}
 
 	// 
-	clamp					(DT,0u,100u);
-	float	dt	 			=  float(DT)/1000.f;
+	clamp(DT, 0u, 100u);
+	float	dt = float(DT) / 1000.f;
 
 	// Check controls, create accel, prelimitary setup "mstate_real"
-	
+
 	//----------- for E3 -----------------------------
 //	if (Local() && (OnClient() || Level().CurrentEntity()==this))
 	if (Level().CurrentControlEntity() == this && (!Level().IsDemoPlay() || Level().IsServerDemo()))
-	//------------------------------------------------
+		//------------------------------------------------
 	{
-		g_cl_CheckControls		(mstate_wishful,NET_SavedAccel,NET_Jump,dt);
+		g_cl_CheckControls(mstate_wishful, NET_SavedAccel, NET_Jump, dt);
 		{
 			/*
 			if (mstate_real & mcJump)
@@ -1037,67 +1036,69 @@ void CActor::shedule_Update	(u32 DT)
 			}
 			*/
 		}
-		g_cl_Orientate			(mstate_real,dt);
-		g_Orientate				(mstate_real,dt);
+		g_cl_Orientate(mstate_real, dt);
+		g_Orientate(mstate_real, dt);
 
-		g_Physics				(NET_SavedAccel,NET_Jump,dt);
-		
-		g_cl_ValidateMState		(dt,mstate_wishful);
-		g_SetAnimation			(mstate_real);
-		
+		g_Physics(NET_SavedAccel, NET_Jump, dt);
+
+		g_cl_ValidateMState(dt, mstate_wishful);
+		g_SetAnimation(mstate_real);
+
 		// Check for game-contacts
-		Fvector C; float R;		
+		Fvector C; float R;
 		//m_PhysicMovementControl->GetBoundingSphere	(C,R);
-		
+
 		Center(C);
-		R=Radius();
-		feel_touch_update		(C,R);
+		R = Radius();
+		feel_touch_update(C, R);
 
 		// Dropping
-		if (b_DropActivated)	{
-			f_DropPower			+= dt*0.1f;
-			clamp				(f_DropPower,0.f,1.f);
-		} else {
-			f_DropPower			= 0.f;
+		if (b_DropActivated) {
+			f_DropPower += dt*0.1f;
+			clamp(f_DropPower, 0.f, 1.f);
+		}
+		else
+		{
+			f_DropPower = 0.f;
 		}
 		if (!Level().IsDemoPlay())
-		{		
-		//-----------------------------------------------------
-		mstate_wishful &=~mcAccel;
-		mstate_wishful &=~mcLStrafe;
-		mstate_wishful &=~mcRStrafe;
-		mstate_wishful &=~mcLLookout;
-		mstate_wishful &=~mcRLookout;
-		mstate_wishful &=~mcFwd;
-		mstate_wishful &=~mcBack;
-		if (g_bAutoClearCrouch && !g_bForceCrouch)
-			mstate_wishful &=~mcCrouch;
-		if (g_bForceCrouch)
-			mstate_wishful |=mcCrouch;
-		if (g_bForceCreep)
 		{
-			mstate_wishful |=mcCrouch;
-			mstate_wishful |=mcAccel;
-		}
-		//-----------------------------------------------------
+			//-----------------------------------------------------
+			mstate_wishful &= ~mcAccel;
+			mstate_wishful &= ~mcLStrafe;
+			mstate_wishful &= ~mcRStrafe;
+			mstate_wishful &= ~mcLLookout;
+			mstate_wishful &= ~mcRLookout;
+			mstate_wishful &= ~mcFwd;
+			mstate_wishful &= ~mcBack;
+			if (g_bAutoClearCrouch && !g_bForceCrouch)
+				mstate_wishful &= ~mcCrouch;
+			if (g_bForceCrouch)
+				mstate_wishful |= mcCrouch;
+			if (g_bForceCreep)
+			{
+				mstate_wishful |= mcCrouch;
+				mstate_wishful |= mcAccel;
+			}
+			//-----------------------------------------------------
 		}
 	}
-	else 
+	else
 	{
 		make_Interpolation();
-	
+
 		if (NET.size())
 		{
-			
-//			NET_SavedAccel = NET_Last.p_accel;
-//			mstate_real = mstate_wishful = NET_Last.mstate;
 
-			g_sv_Orientate				(mstate_real,dt			);
-			g_Orientate					(mstate_real,dt			);
-			g_Physics					(NET_SavedAccel,NET_Jump,dt	);			
+			//			NET_SavedAccel = NET_Last.p_accel;
+			//			mstate_real = mstate_wishful = NET_Last.mstate;
+
+			g_sv_Orientate(mstate_real, dt);
+			g_Orientate(mstate_real, dt);
+			g_Physics(NET_SavedAccel, NET_Jump, dt);
 			if (!m_bInInterpolation)
-				g_cl_ValidateMState			(dt,mstate_wishful);
-			g_SetAnimation				(mstate_real);
+				g_cl_ValidateMState(dt, mstate_wishful);
+			g_SetAnimation(mstate_real);
 
 			if (NET_Last.mstate & mcCrouch)
 			{
@@ -1106,91 +1107,97 @@ void CActor::shedule_Update	(u32 DT)
 				else
 					character_physics_support()->movement()->ActivateBox(2, true);
 			}
-			else 
+			else
 				character_physics_support()->movement()->ActivateBox(0, true);
-		}	
+		}
 		mstate_old = mstate_real;
 	}
 
 	if (this == Level().CurrentViewEntity())
 	{
-		UpdateMotionIcon		(mstate_real);
+		UpdateMotionIcon(mstate_real);
 	};
 
 	NET_Jump = 0;
 
 
-	inherited::shedule_Update	(DT);
+	inherited::shedule_Update(DT);
 
 	//эффектор включаемый при ходьбе
 	if (!pCamBobbing)
 	{
-		pCamBobbing = xr_new<CEffectorBobbing>	();
-		Cameras().AddCamEffector			(pCamBobbing);
+		pCamBobbing = xr_new<CEffectorBobbing>();
+		Cameras().AddCamEffector(pCamBobbing);
 	}
-	pCamBobbing->SetState						(mstate_real, conditions().IsLimping(), IsZoomAimingMode());
+	pCamBobbing->SetState(mstate_real, conditions().IsLimping(), IsZoomAimingMode());
 
 	//звук тяжелого дыхания при уталости и хромании
-	if(this==Level().CurrentControlEntity() && !g_dedicated_server )
+	if (this == Level().CurrentControlEntity() && !g_dedicated_server)
 	{
-		if(conditions().IsLimping() && g_Alive())
+		if (conditions().IsLimping() && g_Alive())
 		{
-			if(!m_HeavyBreathSnd._feedback())
+			if (!m_HeavyBreathSnd._feedback())
 			{
-				m_HeavyBreathSnd.play_at_pos(this, Fvector().set(0,ACTOR_HEIGHT,0), sm_Looped | sm_2D);
-			}else{
-				m_HeavyBreathSnd.set_position(Fvector().set(0,ACTOR_HEIGHT,0));
+				m_HeavyBreathSnd.play_at_pos(this, Fvector().set(0, ACTOR_HEIGHT, 0), sm_Looped | sm_2D);
 			}
-		}else if(m_HeavyBreathSnd._feedback()){
-			m_HeavyBreathSnd.stop		();
+			else
+			{
+				m_HeavyBreathSnd.set_position(Fvector().set(0, ACTOR_HEIGHT, 0));
+			}
+		}
+		else if (m_HeavyBreathSnd._feedback())
+		{
+			m_HeavyBreathSnd.stop();
 		}
 
 		float bs = conditions().BleedingSpeed();
-		if(bs>0.6f)
+		if (bs > 0.6f)
 		{
 			Fvector snd_pos;
-			snd_pos.set(0,ACTOR_HEIGHT,0);
-			if(!m_BloodSnd._feedback())
+			snd_pos.set(0, ACTOR_HEIGHT, 0);
+			if (!m_BloodSnd._feedback())
 				m_BloodSnd.play_at_pos(this, snd_pos, sm_Looped | sm_2D);
 			else
 				m_BloodSnd.set_position(snd_pos);
 
-			float v = bs+0.25f;
+			float v = bs + 0.25f;
 
-			m_BloodSnd.set_volume	(v);
-		}else{
-			if(m_BloodSnd._feedback())
+			m_BloodSnd.set_volume(v);
+		}
+		else
+		{
+			if (m_BloodSnd._feedback())
 				m_BloodSnd.stop();
 		}
 
-		if(!g_Alive()&&m_BloodSnd._feedback())
-				m_BloodSnd.stop();
+		if (!g_Alive() && m_BloodSnd._feedback())
+			m_BloodSnd.stop();
 	}
-	
+
 	//если в режиме HUD, то сама модель актера не рисуется
-	if(!character_physics_support()->IsRemoved())
-										setVisible				(!HUDview	());
+	if (!character_physics_support()->IsRemoved())
+		setVisible(!HUDview());
 	//что актер видит перед собой
 	collide::rq_result& RQ = HUD().GetCurrentRayQuery();
-	
 
-	if(!input_external_handler_installed() && RQ.O &&  RQ.range<inventory().GetTakeDist()) 
+
+	if (!input_external_handler_installed() && RQ.O &&  RQ.range < inventory().GetTakeDist())
 	{
-		m_pObjectWeLookingAt			= smart_cast<CGameObject*>(RQ.O);
-		
+		m_pObjectWeLookingAt = smart_cast<CGameObject*>(RQ.O);
+
 		CGameObject						*game_object = smart_cast<CGameObject*>(RQ.O);
-		m_pUsableObject					= smart_cast<CUsableScriptObject*>(game_object);
-		m_pInvBoxWeLookingAt			= smart_cast<CInventoryBox*>(game_object);
-		inventory().m_pTarget			= smart_cast<PIItem>(game_object);
-		m_pPersonWeLookingAt			= smart_cast<CInventoryOwner*>(game_object);
-		m_pVehicleWeLookingAt			= smart_cast<CHolderCustom*>(game_object);
-		CEntityAlive* pEntityAlive		= smart_cast<CEntityAlive*>(game_object);
-		
-		if (GameID() == GAME_SINGLE )
+		m_pUsableObject = smart_cast<CUsableScriptObject*>(game_object);
+		m_pInvBoxWeLookingAt = smart_cast<CInventoryBox*>(game_object);
+		inventory().m_pTarget = smart_cast<PIItem>(game_object);
+		m_pPersonWeLookingAt = smart_cast<CInventoryOwner*>(game_object);
+		m_pVehicleWeLookingAt = smart_cast<CHolderCustom*>(game_object);
+		CEntityAlive* pEntityAlive = smart_cast<CEntityAlive*>(game_object);
+
+		if (GameID() == GAME_SINGLE)
 		{
 			if (m_pUsableObject && m_pUsableObject->tip_text())
 			{
-				m_sDefaultObjAction = CStringTable().translate( m_pUsableObject->tip_text() );
+				m_sDefaultObjAction = CStringTable().translate(m_pUsableObject->tip_text());
 			}
 			else
 			{
@@ -1199,44 +1206,44 @@ void CActor::shedule_Update	(u32 DT)
 
 				else if (pEntityAlive && !pEntityAlive->g_Alive())
 				{
-					bool b_allow_drag = !!pSettings->line_exist("ph_capture_visuals",pEntityAlive->cNameVisual());
-				
-					if(b_allow_drag)
+					bool b_allow_drag = !!pSettings->line_exist("ph_capture_visuals", pEntityAlive->cNameVisual());
+
+					if (b_allow_drag)
 						m_sDefaultObjAction = m_sDeadCharacterUseOrDragAction;
 					else
 						m_sDefaultObjAction = m_sDeadCharacterUseAction;
 
-				}else if (m_pVehicleWeLookingAt)
+				}
+				else if (m_pVehicleWeLookingAt)
 					m_sDefaultObjAction = m_sCarCharacterUseAction;
 
-				else if (inventory().m_pTarget && inventory().m_pTarget->CanTake() )
+				else if (inventory().m_pTarget && inventory().m_pTarget->CanTake())
 					m_sDefaultObjAction = m_sInventoryItemUseAction;
-//.				else if (m_pInvBoxWeLookingAt)
-//.					m_sDefaultObjAction = m_sInventoryBoxUseAction;
-				else 
-					m_sDefaultObjAction = NULL;
+				//.				else if (m_pInvBoxWeLookingAt)
+				//.					m_sDefaultObjAction = m_sInventoryBoxUseAction;
+				else
+					m_sDefaultObjAction = nullptr;
 			}
 		}
 	}
-	else 
+	else
 	{
-		inventory().m_pTarget	= NULL;
-		m_pPersonWeLookingAt	= NULL;
-		m_sDefaultObjAction		= NULL;
-		m_pUsableObject			= NULL;
-		m_pObjectWeLookingAt	= NULL;
-		m_pVehicleWeLookingAt	= NULL;
-		m_pInvBoxWeLookingAt	= NULL;
+		inventory().m_pTarget = nullptr;
+		m_pPersonWeLookingAt = nullptr;
+		m_sDefaultObjAction = nullptr;
+		m_pUsableObject = nullptr;
+		m_pObjectWeLookingAt = nullptr;
+		m_pVehicleWeLookingAt = nullptr;
+		m_pInvBoxWeLookingAt = nullptr;
 	}
 
-//	UpdateSleep									();
+	//	UpdateSleep									();
 
-	//для свойст артефактов, находящихся на поясе
-	UpdateArtefactsOnBelt						();
-	UpdtateOutfitInSlot			    			();
-	m_pPhysics_support->in_shedule_Update		(DT);
-	Check_for_AutoPickUp						();
-};
+		//для свойст артефактов, находящихся на поясе
+	UpdateActivePropertys();
+	m_pPhysics_support->in_shedule_Update(DT);
+	Check_for_AutoPickUp();
+}
 #include "debug_renderer.h"
 void CActor::renderable_Render	()
 {
@@ -1254,21 +1261,15 @@ BOOL CActor::renderable_ShadowGenerate	()
 	return inherited::renderable_ShadowGenerate();
 }
 
-
-
 void CActor::g_PerformDrop	( )
 {
 	b_DropActivated			= FALSE;
-
-	PIItem pItem			= inventory().ActiveItem();
-	if (0==pItem)			return;
-
-	u32 s					= inventory().GetActiveSlot();
-	if(inventory().m_slots[s].m_bPersistent)	return;
-
-	pItem->SetDropManual	(TRUE);
+	PIItem pItem = inventory().ActiveItem();
+	if (0 == pItem)			return;
+	u32 s = inventory().GetActiveSlot();
+	if (inventory().m_slots[s].m_bPersistent)	return;
+	pItem->SetDropManual(TRUE);
 }
-
 
 #ifdef DEBUG
 extern	BOOL	g_ShowAnimationInfo		;
@@ -1543,13 +1544,10 @@ void CActor::MoveArtefactBelt(const CArtefact* artefact, bool on_belt)
 }
 
 #define ARTEFACTS_UPDATE_TIME 0.100f
-
-void CActor::UpdateArtefactsOnBelt()
+void CActor::UpdateActivePropertys()
 {
 	static float update_time = 0;
-
 	float f_update_time = 0;
-
 	if(update_time<ARTEFACTS_UPDATE_TIME)
 	{
 		update_time += conditions().fdelta_time();
@@ -1561,8 +1559,8 @@ void CActor::UpdateArtefactsOnBelt()
 		update_time		= 0.0f;
 	}
 
-	for(TIItemContainer::iterator it = inventory().m_belt.begin(); 
-		inventory().m_belt.end() != it; ++it) 
+	//update active propertys from artefacts
+	for(TIItemContainer::iterator it = inventory().m_belt.begin();inventory().m_belt.end() != it; ++it) 
 	{
 		CArtefact*	artefact = smart_cast<CArtefact*>(*it);
 		if(artefact)
@@ -1574,14 +1572,35 @@ void CActor::UpdateArtefactsOnBelt()
 			conditions().ChangeRadiation		(artefact->m_fRadiationRestoreSpeed*f_update_time);
 		}
 	}
+	//update active propertys from outfit
+	CCustomOutfit* outfit = GetOutfit();
+	if (outfit)
+	{
+		float outfitCondition = outfit->GetCondition();
+		conditions().ChangeBleeding(outfit->m_fBleedingRestoreSpeed*outfitCondition*f_update_time);
+		conditions().ChangeHealth(outfit->m_fHealthRestoreSpeed*outfitCondition*f_update_time);
+		conditions().ChangePower(outfit->m_fPowerRestoreSpeed*outfitCondition*f_update_time);
+		conditions().ChangeSatiety(outfit->m_fSatietyRestoreSpeed*outfitCondition*f_update_time);
+		conditions().ChangeRadiation(outfit->m_fRadiationRestoreSpeed*outfitCondition*f_update_time);
+	}
+	//update active propertys from all places
+	if (inventory().m_apItems.size()>0)
+	{
+		std::for_each(inventory().m_apItems.begin(), inventory().m_apItems.end(), [&](CInventoryItem* pItem)
+		{
+			float ap_r = pItem->GetAPRadiation();
+			if (ap_r != 0)
+				conditions().ChangeRadiation(ap_r*f_update_time);
+		});
+	}
 }
+
 
 float	CActor::HitArtefactsOnBelt		(float hit_power, ALife::EHitType hit_type)
 {
 	float res_hit_power_k		= 1.0f;
 	float _af_count				= 0.0f;
-	for(TIItemContainer::iterator it = inventory().m_belt.begin(); 
-		inventory().m_belt.end() != it; ++it) 
+	for(TIItemContainer::iterator it = inventory().m_belt.begin();inventory().m_belt.end() != it; ++it) 
 	{
 		CArtefact*	artefact = smart_cast<CArtefact*>(*it);
 		if(artefact){
@@ -1594,36 +1613,6 @@ float	CActor::HitArtefactsOnBelt		(float hit_power, ALife::EHitType hit_type)
 	return					res_hit_power_k * hit_power;
 }
 
-
-void CActor::UpdtateOutfitInSlot()
-{
-	static float update_time = 0;
-
-	float f_update_time = 0;
-
-	if(update_time<ARTEFACTS_UPDATE_TIME)
-	{
-		update_time += conditions().fdelta_time();
-		return;
-	}
-	else
-	{
-		f_update_time	= update_time;
-		update_time		= 0.0f;
-	}
-
-	CCustomOutfit* outfit = GetOutfit();
-		if(outfit)
-		{
-			float outfitCondition=outfit->GetCondition();
-			conditions().ChangeBleeding(outfit->m_fBleedingRestoreSpeed*outfitCondition*f_update_time);
-			conditions().ChangeHealth(outfit->m_fHealthRestoreSpeed*outfitCondition*f_update_time);
-			conditions().ChangePower(outfit->m_fPowerRestoreSpeed*outfitCondition*f_update_time);
-			conditions().ChangeSatiety(outfit->m_fSatietyRestoreSpeed*outfitCondition*f_update_time);
-			conditions().ChangeRadiation		(outfit->m_fRadiationRestoreSpeed*outfitCondition*f_update_time);
-		}
-
-}
 
 void	CActor::SetZoomRndSeed		(s32 Seed)
 {
