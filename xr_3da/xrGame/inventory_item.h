@@ -128,10 +128,15 @@ public:
 			BOOL				IsInvalid			() const;
 
 			BOOL				IsQuestItem			()	const	{return m_flags.test(FIsQuestItem);}			
-			u32					Cost				() const	{ return m_cost; }
+	
+	u32 Cost() const { return m_cost; }
 	void SetCost(u32 cost);
-	virtual float				Weight				() 			{ return m_weight;}
+
+	virtual float Weight() const { return m_weight;}
 	virtual void SetWeight(float weight);
+
+	float AP_Radiation() const { return m_fActivePropertyRadiation; }
+	void SetAP_Radiation(float value);
 
 	bool GetVisibleForUI() { return m_bVisibleForUI; }
 	void SetVisibleForUI(bool value) { m_bVisibleForUI=value; }

@@ -149,8 +149,13 @@ public:
 	shared_str			cName() const;
 	LPCSTR				Section() const;
 #pragma region CInventoryItem
-	u32					Cost() const;
+	u32	Cost() const;
 	void SetCost(u32 cost);
+	float Weight() const;
+	void SetWeight(float weight) const;
+	float AP_Radiation() const;
+	void SetAP_Radiation(float value) const;
+
 	float				GetCondition() const;
 	void				SetCondition(float val);
 	void				DropItem(CScriptGameObject* pItem);
@@ -607,8 +612,6 @@ public:
 	void				invulnerable(bool invulnerable);
 
 	float				GetTotalWeight() const;
-	float				Weight() const;
-	void SetWeight(float weight) const;
 	u32					GetSlot() const;
 
 	LPCSTR				GetVisualName() const;

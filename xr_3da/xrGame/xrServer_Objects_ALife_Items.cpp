@@ -34,6 +34,9 @@ CSE_ALifeInventoryItem::CSE_ALifeInventoryItem(LPCSTR caSection)
 
 	m_fMass						= pSettings->r_float(caSection, "inv_weight");
 	m_dwCost					= pSettings->r_u32(caSection, "cost");
+	m_fRadiation = 0;
+	if (pSettings->line_exist(caSection, "inventory_radiation"))
+		m_fRadiation= pSettings->r_float(caSection, "inventory_radiation");
 
 	if (pSettings->line_exist(caSection, "condition"))
 		m_fCondition			= pSettings->r_float(caSection, "condition");
@@ -78,6 +81,7 @@ void CSE_ALifeInventoryItem::STATE_Write	(NET_Packet &tNetPacket)
 	tNetPacket.w_float			(m_fCondition);
 	tNetPacket.w_float(m_fMass);
 	tNetPacket.w_u32(m_dwCost);
+	tNetPacket.w_float(m_fRadiation);
 	State.position				= base()->o_Position;
 }
 
@@ -91,6 +95,8 @@ void CSE_ALifeInventoryItem::STATE_Read		(NET_Packet &tNetPacket, u16 size)
 		tNetPacket.r_float(m_fMass);
 		tNetPacket.r_u32(m_dwCost);
 	}
+	if (m_wVersion > 121)
+		tNetPacket.r_float(m_fRadiation);
 	State.position				= base()->o_Position;
 }
 

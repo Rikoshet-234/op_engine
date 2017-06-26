@@ -38,16 +38,33 @@ void xrServer::Process_event	(NET_Packet& P, ClientID sender)
 
 	switch		(type)
 	{
-	case GE_UPDATE_SERVER_ENTRY_IAI:
+	case GE_UPDATE_SERVER_ENTRY_IAI_WEIGHT:
 		{
 			CSE_ALifeInventoryItem* item = smart_cast<CSE_ALifeInventoryItem*>(receiver); 
 			if (item)
 			{
 				item->m_fMass = P.r_float();
-				item->m_dwCost = P.r_u32();
 			}
 		}
 		break;
+	case GE_UPDATE_SERVER_ENTRY_IAI_COST:
+	{
+		CSE_ALifeInventoryItem* item = smart_cast<CSE_ALifeInventoryItem*>(receiver);
+		if (item)
+		{
+			item->m_dwCost = P.r_u32();
+		}
+	}
+	break;
+	case GE_UPDATE_SERVER_ENTRY_IAI_RADIATION:
+	{
+		CSE_ALifeInventoryItem* item = smart_cast<CSE_ALifeInventoryItem*>(receiver);
+		if (item)
+		{
+			item->m_fRadiation = P.r_float();
+		}
+	}
+	break;
 	case GE_GAME_EVENT:
 		{
 			u16		game_event_type;

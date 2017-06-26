@@ -44,6 +44,7 @@ public:
 	s32								m_iHealthValue;
 	s32								m_iFoodValue;
 	float							m_fDeteriorationValue;
+	float m_fRadiation;
 	CSE_ALifeObject					*m_self;
 	u32								m_last_update_time;
 

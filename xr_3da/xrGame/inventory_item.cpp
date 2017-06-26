@@ -481,11 +481,11 @@ BOOL CInventoryItem::net_Spawn(CSE_Abstract* DC)
 	m_fCondition = pSE_InventoryItem->m_fCondition;
 	m_weight= pSE_InventoryItem->m_fMass;
 	m_cost = pSE_InventoryItem->m_dwCost;
+	m_fActivePropertyRadiation = pSE_InventoryItem->m_fRadiation;
 	if (GameID() != GAME_SINGLE)
 		object().processing_activate();
 
 	m_dwItemIndependencyTime = 0;
-
 	return							TRUE;
 }
 
@@ -502,6 +502,7 @@ void CInventoryItem::save(NET_Packet &packet)
 	packet.w_float			(m_fCondition);
 	packet.w_float(m_weight);
 	packet.w_u32(m_cost);
+	packet.w_float(m_fActivePropertyRadiation);
 	if (object().H_Parent()) {
 		packet.w_u8			(0);
 		return;
@@ -683,7 +684,11 @@ void CInventoryItem::load(IReader &packet)
 		m_weight=packet.r_float();
 		m_cost= packet.r_u32();
 	}
-
+	if (ai().get_alife()->header().version() > 0x0005)
+	{
+		m_fActivePropertyRadiation = packet.r_float();
+	}
+	
 	u8						tmp = packet.r_u8();
 	if (!tmp)
 		return;
@@ -1281,8 +1286,7 @@ void CInventoryItem::SetCost(unsigned cost)
 {
 	m_cost = cost;
 	NET_Packet		P;
-	object().u_EventGen(P, GE_UPDATE_SERVER_ENTRY_IAI, object().ID());
-	P.w_float(m_weight);
+	object().u_EventGen(P, GE_UPDATE_SERVER_ENTRY_IAI_COST, object().ID());
 	P.w_u32(m_cost);
 	object().u_EventSend(P);
 
@@ -1293,9 +1297,30 @@ void CInventoryItem::SetWeight(float weight)
 	clamp(weight, 0.0f, 10000.0f);
 	m_weight = weight;
 	NET_Packet		P;
-	object().u_EventGen(P, GE_UPDATE_SERVER_ENTRY_IAI, object().ID());
+	object().u_EventGen(P, GE_UPDATE_SERVER_ENTRY_IAI_WEIGHT, object().ID());
 	P.w_float(m_weight);
-	P.w_u32(m_cost);
+	object().u_EventSend(P);
+}
+
+void CInventoryItem::SetAP_Radiation(float value)
+{
+	m_fActivePropertyRadiation = value;
+	if (m_fActivePropertyRadiation!=0 && m_pCurrentInventory)
+	{
+		TIItemContainer::iterator	apItem = std::find(m_pCurrentInventory->m_apItems.begin(), m_pCurrentInventory->m_apItems.end(), this);
+		if (apItem== m_pCurrentInventory->m_apItems.end())
+			m_pCurrentInventory->m_apItems.push_back(this);
+	}
+	else if (m_fActivePropertyRadiation == 0 && m_pCurrentInventory)
+	{
+		TIItemContainer::iterator	apItem = std::find(m_pCurrentInventory->m_apItems.begin(), m_pCurrentInventory->m_apItems.end(), this);
+		if (apItem != m_pCurrentInventory->m_apItems.end())
+			m_pCurrentInventory->m_apItems.erase(apItem);
+	}
+
+	NET_Packet		P;
+	object().u_EventGen(P, GE_UPDATE_SERVER_ENTRY_IAI_RADIATION, object().ID());
+	P.w_float(m_fActivePropertyRadiation);
 	object().u_EventSend(P);
 }
 

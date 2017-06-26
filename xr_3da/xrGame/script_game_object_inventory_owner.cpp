@@ -561,7 +561,12 @@ LPCSTR CScriptGameObject::CharacterCommunity	()
 
 	if (!pInventoryOwner) {
 		ai().script_engine().script_log		(ScriptStorage::eLuaMessageTypeError,"CharacterCommunity available only for InventoryOwner");
-		return NULL;
+		return nullptr;
+	}
+	if (pInventoryOwner->CharacterInfo().Community().index() == NO_COMMUNITY_INDEX)
+	{
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "! ERROR CharacterCommunity call for non CCharacterInfo valid member");
+		return nullptr;
 	}
 	return *pInventoryOwner->CharacterInfo().Community().id();
 }

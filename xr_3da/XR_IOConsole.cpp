@@ -77,11 +77,16 @@ void CConsole::Initialize()
 		CInifile::Sect& data	= pSettings->r_section("allowed_param_names");
 		if (data.Data.size() > 0)
 		{
-			std::string params("- Create user - defined param [");
+			std::string params("- Create user-defined param [");
 			std::for_each(data.Data.begin(), data.Data.end(), [&](CInifile::Item item)
 			{
 				params += " ";
 				params+=item.first.c_str();
+				if (xr_strlen(params.c_str()) > 128)
+				{
+					Msg(params.c_str());
+					params.clear();
+				}
 				Commands.insert(mk_pair(item.first.c_str(), xr_new<CCC_UserParam>(item.first.c_str(), "")));
 				userDefinedNames.push_back(item.first);
 			});

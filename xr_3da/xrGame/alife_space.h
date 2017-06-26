@@ -12,7 +12,8 @@
 // ALife objects, events and tasks
 //0x0004 - CInventoryItem::m_bVisibleForUI put to save
 //0x0005 - CInventoryItem::m_cost && CInventoryItem::m_weight put to save
-#define ALIFE_VERSION				0x0005
+//0x0006 - CInventoryItem::m_fActivePropertyRadiation put to save
+#define ALIFE_VERSION				0x0006
 #define ALIFE_CHUNK_DATA			0x0000
 #define SPAWN_CHUNK_DATA			0x0001
 #define OBJECT_CHUNK_DATA			0x0002
