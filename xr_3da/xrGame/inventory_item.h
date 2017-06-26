@@ -55,6 +55,7 @@ private:
 	std::string descriptionVar;
 	luabind::functor<LPCSTR> scriptDescriptionFunctor;
 	bool m_bUsefulFromConfig;
+	bool m_bDisposableItem;
 protected:
 	enum EIIFlags{				FdropManual			=(1<<0),
 								FCanTake			=(1<<1),
@@ -127,8 +128,15 @@ public:
 			BOOL				IsInvalid			() const;
 
 			BOOL				IsQuestItem			()	const	{return m_flags.test(FIsQuestItem);}			
-			u32					Cost				() const	{ return m_cost; }
-	virtual float				Weight				() 			{ return m_weight;}		
+	
+	u32 Cost() const { return m_cost; }
+	void SetCost(u32 cost);
+
+	virtual float Weight() const { return m_weight;}
+	virtual void SetWeight(float weight);
+
+	float AP_Radiation() const { return m_fActivePropertyRadiation; }
+	void SetAP_Radiation(float value);
 
 	bool GetVisibleForUI() { return m_bVisibleForUI; }
 	void SetVisibleForUI(bool value) { m_bVisibleForUI=value; }
@@ -139,7 +147,7 @@ public:
 	shared_str					m_nameShort;
 	shared_str					m_nameComplex;
 	EItemPlace					m_eItemPlace;
-
+//	Fvector						m_dropTarget;
 	virtual void				OnMoveToSlot		() {};
 	virtual void				OnMoveToBelt		() {};
 	virtual void				OnMoveToRuck		() {};
@@ -173,6 +181,8 @@ public:
 			bool				CanTrade			() const;
 	virtual bool 				IsNecessaryItem	    (CInventoryItem* item);
 	virtual bool				IsNecessaryItem	    (const shared_str& item_sect){return false;};
+
+	float GetAPRadiation() const { return m_fActivePropertyRadiation; };
 protected:
 	
 	u32							m_slot;
@@ -180,6 +190,7 @@ protected:
 	float						m_weight;
 	float						m_fCondition;
 	shared_str					m_Description;
+	float m_fActivePropertyRadiation;
 
 	ALife::_TIME_ID				m_dwItemRemoveTime;
 	ALife::_TIME_ID				m_dwItemIndependencyTime;
@@ -198,7 +209,10 @@ public:
 	virtual void				PH_A_CrPr			(); // actions & operations after phisic correction-prediction steps
 
 	virtual void				net_Import			(NET_Packet& P);					// import from server
+	void importWoodooMagic(NET_Packet& P);
+
 	virtual void				net_Export			(NET_Packet& P);					// export to server
+	void exportWoodooMagic(NET_Packet& P);
 
 public:
 	virtual void				activate_physic_shell		();

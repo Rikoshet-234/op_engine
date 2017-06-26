@@ -19,6 +19,9 @@ void CSE_ALifeInventoryItem::script_register(lua_State *L)
 		class_<CSE_ALifeInventoryItem>
 			("cse_alife_inventory_item")
 //			.def(		constructor<LPCSTR>())
+			.def_readwrite("cost", &CSE_ALifeInventoryItem::m_dwCost)
+			.def_readwrite("weight", &CSE_ALifeInventoryItem::m_fMass)
+			.def_readwrite("radiation", &CSE_ALifeInventoryItem::m_fRadiation)
 	];
 }
 
@@ -77,6 +80,7 @@ void CSE_ALifeItemWeapon::script_register(lua_State *L)
 			"cse_alife_item_weapon",
 			CSE_ALifeItem
 		)
+		.def("get_addon_state", &CSE_ALifeItemWeapon::get_addon_state)
 	];
 }
 

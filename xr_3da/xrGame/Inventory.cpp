@@ -103,7 +103,7 @@ void CInventory::Clear()
 	m_all.clear							();
 	m_ruck.clear						();
 	m_belt.clear						();
-	
+	m_apItems.clear();
 	for(u32 i=0; i<m_slots.size(); i++)
 	{
 		m_slots[i].m_pIItem				= nullptr;
@@ -140,6 +140,8 @@ void CInventory::Take(CGameObject *pObj, bool bNotActivate, bool strict_placemen
 	pIItem->SetDropManual				(FALSE);
 
 	m_all.push_back						(pIItem);
+	if (pIItem->GetAPRadiation() != 0)
+		m_apItems.push_back(pIItem);
 
 	if(!strict_placement)
 		pIItem->m_eItemPlace			= eItemPlaceUndefined;
@@ -233,8 +235,10 @@ bool CInventory::DropItem(CGameObject *pObj)
 		     Msg("! #ERROR: item %s place==belt, but m_belt not contains item", obj.Name_script());
 		}break;
 	case eItemPlaceRuck:{
-	if (InRuck(pIItem))
+		if (InRuck(pIItem))
+		{
 			m_ruck.erase(std::find(m_ruck.begin(), m_ruck.end(), pIItem));
+		}
 		else
 			Msg("! #ERROR: item %s place==ruck, but m_ruck not contains item", obj.Name_script());
 		}break;
@@ -250,6 +254,10 @@ bool CInventory::DropItem(CGameObject *pObj)
 		NODEFAULT;
 	};
 
+	TIItemContainer::iterator	apItem = std::find(m_apItems.begin(), m_apItems.end(), pIItem);
+	if (apItem != m_apItems.end())
+		m_apItems.erase(apItem);
+			
 	TIItemContainer::iterator	it = std::find(m_all.begin(), m_all.end(), pIItem);
 	if ( it != m_all.end())
 		m_all.erase				(it);
@@ -311,6 +319,7 @@ bool CInventory::Slot(PIItem pIItem, bool bNotActivate)
 			m_ruck.erase(it);
 			callMovingCallback(pIItem,InventoryPlaceChange::removeFromRuck);
 	}
+
 	it = std::find(m_belt.begin(), m_belt.end(), pIItem);
 	if(m_belt.end() != it) 
 	{
@@ -385,8 +394,7 @@ bool CInventory::Belt(PIItem pIItem)
 
 bool CInventory::Ruck(PIItem pIItem) 
 {
-	if(!CanPutInRuck(pIItem)) return false;
-	
+	if(!CanPutInRuck(pIItem)) return false;	
 	bool in_slot = InSlot(pIItem);
 	//גושü בûכא ג סכמעו
 	if(in_slot) 
@@ -408,7 +416,6 @@ bool CInventory::Ruck(PIItem pIItem)
 	
 
 	m_ruck.insert									(m_ruck.end(), pIItem); 
-	
 	CalcTotalWeight									();
 	InvalidateState									();
 
@@ -795,6 +802,9 @@ void CInventory::UpdateDropTasks()
 			{
 				Msg("! ERROR: unassigned item in inventory.%s", (i == 0 ? "belt" : "slot"));
 				list.erase(_it);
+				TIItemContainer::iterator	apItem = std::find(m_apItems.begin(), m_apItems.end(), *_it);
+				if (apItem != m_apItems.end())
+					m_apItems.erase(apItem);
 			}
 		}
 
@@ -809,6 +819,12 @@ void CInventory::UpdateDropTasks()
 
 void CInventory::UpdateDropItem(PIItem pIItem)
 {
+	if (!pIItem->m_object)
+	{
+		LPCSTR name = pIItem->Name();
+		Msg("!ERROR invalid CPhysicsShellHolder data for [%s]", name? name : "unknown");
+		FATAL("ENGINE crash! See log for detail!");
+	}
 	if(pIItem->m_object && pIItem->GetDropManual() )
 	{
 		pIItem->SetDropManual(FALSE);
@@ -818,6 +834,27 @@ void CInventory::UpdateDropItem(PIItem pIItem)
 			pIItem->object().u_EventGen	(P, GE_OWNERSHIP_REJECT, pIItem->object().H_Parent()->ID());
 			P.w_u16						(u16(pIItem->object().ID()));
 			pIItem->object().u_EventSend(P);
+
+			//CObject *parent = pIItem->object().H_Parent();
+			//Fvector &pos = parent->Position();
+			//Fvector  dir = parent->Direction();
+			//dir.y = 0;
+			//dir.normalize();
+			//static float coef = 4.0f;
+			//CActor *owner = smart_cast<CActor*>(parent);
+			//if (owner)
+			//{
+			//	auto &R = owner->Orientation();
+			//	dir.setHP(R.yaw, R.pitch);
+			//	float dist = 0.9f;// owner->GetDropPower() * coef + 0.5f;
+			//	dir.mul(dist);
+			//}
+			//if (pIItem->object().Visual())
+			//	dir.mul(0.7f + pIItem->object().Radius() /** 2.0f*/);
+			//pos.add(dir);
+			//pos.y = pos.y + 0.3f;
+			//pIItem->object().ChangePosition(pos);
+			//pIItem->m_dropTarget = pos;
 		}
 	}// dropManual
 }
@@ -1021,7 +1058,7 @@ bool CInventory::Eat(PIItem pIItem)
 	if(IsGameTypeSingle() && Actor()->m_inventory == this)
 		Actor()->callback(GameObject::eUseObject)((smart_cast<CGameObject*>(pIItem))->lua_game_object());
 
-	if(pItemToEat->Empty() && entity_alive->Local())
+	if(pItemToEat->m_bDisposableItem && pItemToEat->Empty() && entity_alive->Local())
 	{
 		NET_Packet					P;
 		CGameObject::u_EventGen		(P,GE_OWNERSHIP_REJECT,entity_alive->ID());

@@ -149,7 +149,13 @@ public:
 	shared_str			cName() const;
 	LPCSTR				Section() const;
 #pragma region CInventoryItem
-	u32					Cost() const;
+	u32	Cost() const;
+	void SetCost(u32 cost);
+	float Weight() const;
+	void SetWeight(float weight) const;
+	float AP_Radiation() const;
+	void SetAP_Radiation(float value) const;
+
 	float				GetCondition() const;
 	void				SetCondition(float val);
 	void				DropItem(CScriptGameObject* pItem);
@@ -421,6 +427,7 @@ public:
 	u32	 GetAmmoElapsed();
 	void SetAmmoElapsed(int ammo_elapsed);
 	u32	 GetAmmoCurrent() const;
+	u8 GetWeaponAddonState() const;
 	void SetQueueSize(u32 queue_size);
 	bool has_scope() const;
 	bool has_silencer() const;
@@ -430,6 +437,7 @@ public:
 	LPCSTR detach_scope(luabind::object const &param);
 	LPCSTR detach_silencer(luabind::object const &param);
 	LPCSTR detach_grenadelauncher(luabind::object const &param);
+
 #pragma endregion
 #pragma region Callbacks			
 	void				SetCallback(GameObject::ECallbackType type, const luabind::functor<void> &functor);
@@ -604,7 +612,6 @@ public:
 	void				invulnerable(bool invulnerable);
 
 	float				GetTotalWeight() const;
-	float				Weight() const;
 	u32					GetSlot() const;
 
 	LPCSTR				GetVisualName() const;

@@ -249,6 +249,16 @@ float CScriptGameObject::GetTotalWeight() const
 	return				(inventory_owner->inventory().TotalWeight());
 }
 
+void CScriptGameObject::SetWeight(float weight) const
+{
+	CInventoryItem		*inventory_item = smart_cast<CInventoryItem*>(&object());
+	if (!inventory_item) {
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CSciptEntity : cannot access class member SetWeight!");
+		return;
+	}
+	inventory_item->SetWeight(weight);
+}
+
 float CScriptGameObject::Weight() const
 {
 	CInventoryItem		*inventory_item = smart_cast<CInventoryItem*>(&object());
@@ -257,6 +267,36 @@ float CScriptGameObject::Weight() const
 		return			(false);
 	}
 	return				(inventory_item->Weight());
+}
+
+void CScriptGameObject::SetCost(u32 cost)
+{
+	CInventoryItem		*inventory_item = smart_cast<CInventoryItem*>(&object());
+	if (!inventory_item) {
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CSciptEntity : cannot access class member SetCost!");
+		return;
+	}
+	inventory_item->SetCost(cost);
+}
+
+float CScriptGameObject::AP_Radiation() const
+{
+	CInventoryItem		*inventory_item = smart_cast<CInventoryItem*>(&object());
+	if (!inventory_item) {
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CSciptEntity : cannot access class member AP_Radiation!");
+		return			(false);
+	}
+	return				(inventory_item->AP_Radiation());
+}
+
+void CScriptGameObject::SetAP_Radiation(float value) const
+{
+	CInventoryItem		*inventory_item = smart_cast<CInventoryItem*>(&object());
+	if (!inventory_item) {
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CSciptEntity : cannot access class member SetAP_Radiation!");
+		return;
+	}
+	inventory_item->SetAP_Radiation(value);
 }
 #pragma endregion
 
@@ -551,6 +591,15 @@ void CScriptGameObject::FullUnloadWeapon()
 	}
 	ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "call [full_unload_weapon] for non-CWeaponMagazined object!");
 }
+
+u8 CScriptGameObject::GetWeaponAddonState() const
+{
+	CWeapon		*weapon = smart_cast<CWeapon*>(&object());
+	if (weapon)
+		return weapon->GetAddonsState();
+	ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "call [weapon_addon_state] for non-CWeapon object!");
+	return 0;
+}
 #pragma endregion
 
 class_<CScriptGameObject> &script_register_game_object3(class_<CScriptGameObject> &instance)
@@ -565,6 +614,11 @@ class_<CScriptGameObject> &script_register_game_object3(class_<CScriptGameObject
 		.def("max_weight", &CScriptGameObject::GetActorMaxWeight)
 		.def("total_weight", &CScriptGameObject::GetTotalWeight)
 		.def("item_weight", &CScriptGameObject::Weight)
+		.def("item_weight", &CScriptGameObject::SetWeight)
+		.def("item_cost", &CScriptGameObject::SetCost)
+		.def("item_cost", &CScriptGameObject::Cost)
+		.def("item_radiation", &CScriptGameObject::AP_Radiation)
+		.def("item_radiation", &CScriptGameObject::SetAP_Radiation)
 		.def("is_crouch", &CScriptGameObject::actor_is_crouch)
 		.def("set_crouch", &CScriptGameObject::actor_set_crouch)
 		.def("get_visual_name", &CScriptGameObject::GetVisualName)
@@ -611,6 +665,7 @@ class_<CScriptGameObject> &script_register_game_object3(class_<CScriptGameObject
 		.def("has_scope", &CScriptGameObject::has_scope)
 		.def("has_silencer", &CScriptGameObject::has_silencer)
 		.def("has_grenadelauncher", &CScriptGameObject::has_grenadelauncher)
+		.def("get_addon_state", &CScriptGameObject::GetWeaponAddonState)
 
 		.def("full_unload_weapon", &CScriptGameObject::FullUnloadWeapon)
 		.def("current_ammo_section", &CScriptGameObject::GetCurrentAmmoSection)

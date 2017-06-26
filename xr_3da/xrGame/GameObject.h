@@ -112,6 +112,7 @@ public:
 	static void				u_EventSend			(NET_Packet& P, u32 dwFlags = DPNSEND_GUARANTEED	);
 	
 	// Methods
+	virtual void			ChangePosition(const Fvector &pos);
 	virtual void			Load				(LPCSTR section);
 	virtual BOOL			net_Spawn			(CSE_Abstract* DC);
 	virtual void			net_Destroy			();
@@ -302,7 +303,8 @@ public:
 
 	virtual float GetHealth() const  { return -1;} 
 	virtual void SetHealth(float health) {}	
-
+	CSE_ALifeDynamicObject* CGameObject::alife_object() const;
+	void	CGameObject::UpdateXFORM(const Fmatrix &upd);
 };
 
 #endif // !defined(AFX_GAMEOBJECT_H__3DA72D03_C759_4688_AEBB_89FA812AA873__INCLUDED_)

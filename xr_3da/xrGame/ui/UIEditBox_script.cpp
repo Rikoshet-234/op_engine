@@ -38,7 +38,9 @@ void CUIEditBox::script_register(lua_State *L)
 		.def("GetTextAlignment",	&CUICustomEdit::GetTextAlignment)
 		.def("SetTextPosX",			&CUICustomEdit::SetTextPosX)
 		.def("SetTextPosY",			&CUICustomEdit::SetTextPosY)
-		.def("SetNumbersOnly",		&CUICustomEdit::SetNumbersOnly),
+		.def("SetNumbersOnly",		&CUICustomEdit::SetNumbersOnly)
+		.def("LoadSettings",		&CUICustomEdit::LoadSettings),
+
 
 		class_<CUIEditBox, CUICustomEdit>("CUIEditBox")
 		.def(						constructor<>())

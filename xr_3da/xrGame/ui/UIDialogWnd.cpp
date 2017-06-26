@@ -63,14 +63,16 @@ bool CUIDialogWnd::IR_OnKeyboardHold(int dik)
 
 bool CUIDialogWnd::IR_OnKeyboardPress(int dik)
 {
-	if(!IR_process()) return false;
+	bool ir_process = IR_process();
+	//Msg("CUIDialogWnd::IR_OnKeyboardPress ir_process[%s] dik [%d]", ir_process?"true":"false", dik);
+	if(!ir_process) return false;
 	//mouse click
 	if(dik==MOUSE_1 || dik==MOUSE_2 || dik==MOUSE_3)
 	{
 		Fvector2 cp = GetUICursor()->GetCursorPosition();
 		EUIMessages action = (dik==MOUSE_1)?WINDOW_LBUTTON_DOWN :(dik==MOUSE_2)?WINDOW_RBUTTON_DOWN:WINDOW_CBUTTON_DOWN;
 		if (OnMouse(cp.x,cp.y, action))
-            return true;
+			return true;
 	}
 
 	if (OnKeyboard(dik,	WINDOW_KEY_PRESSED))
@@ -98,7 +100,7 @@ bool CUIDialogWnd::IR_OnKeyboardRelease(int dik)
 		Fvector2 cp = GetUICursor()->GetCursorPosition();
 		EUIMessages action = (dik==MOUSE_1)?WINDOW_LBUTTON_UP :(dik==MOUSE_2)?WINDOW_RBUTTON_UP:WINDOW_CBUTTON_UP;
 		if (OnMouse(cp.x, cp.y, action))
-            return true;
+			return true;
 	}
 
 	if (OnKeyboard(dik,	WINDOW_KEY_RELEASED))

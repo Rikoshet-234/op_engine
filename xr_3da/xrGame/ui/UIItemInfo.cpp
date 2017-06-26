@@ -182,7 +182,23 @@ void CUIItemInfo::InitItem(CInventoryItem* pInvItem)
 		TryAddWpnInfo						(pInvItem->object().cNameSect());
 		TryAddArtefactInfo					(pInvItem->object().cNameSect());
 		TryAddOutfitInfo					(pInvItem);
-
+		if (pInvItem->GetAPRadiation()!=0)
+		{
+			float actorVal = pSettings->r_float("actor_condition", "radiation_v");
+			float value = pInvItem->GetAPRadiation() / actorVal;
+			CUIStatic* apRad = xr_new<CUIStatic>();
+			apRad->SetFont(m_desc_info.pDescFont);
+			apRad->SetWidth(UIDesc->GetDesiredChildWidth());
+			string256 buf;
+			LPCSTR color = (value > 0) ? "%c[red]" : "%c[green]";
+			LPCSTR units = CStringTable().translate("ui_inv_radiation_units").c_str();
+			LPCSTR desc= CStringTable().translate("ui_inv_radiation_irr").c_str();
+			sprintf_s(buf, "%s %s%+3.0f%s", desc, color, value, units);
+			apRad->SetText(buf);
+			apRad->SetTextComplexMode(true);
+			apRad->AdjustHeightToText();
+			UIDesc->AddWindow(apRad, true);
+		}
 		if (Actor())
 			Actor()->callback(GameObject::ECallbackType::OnPrepareItemInfo)(UIDesc);
 		

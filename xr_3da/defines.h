@@ -40,6 +40,8 @@ enum {
 	rsR2							= (1ul<<19ul),
 
 	// 20-32 bit - reserved to Editor
+	//from editor core - 29 bit last
+	rsStatisticFPS = (1ul << 30ul),
 };
 
 

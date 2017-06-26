@@ -84,44 +84,52 @@ void setIconedItem(xr_map<shared_str ,shared_str> iconIDs,CUIListItemIconed* ite
 	if (!fsimilar(column2Value, 0.0f))
 	{
 		string128 buff_column2;
-		switch(column2Type)
+		switch (column2Type)
 		{
-		case 0:
-				sprintf_s	(buff_column2,"%s%+3.0f%%", (column2Value>0.0f)?"%c[green]":"%c[red]", column2Value*100.0f);
-			break;
-		case 1:
-			{
-				LPCSTR color = (column2Value<0)?"%c[red]":"%c[green]";
-				if ((column2Value>0 && column2Value<1) || (column2Value<0 && column2Value>-1))
+			case 0:
+				sprintf_s(buff_column2, "%s%+3.0f%%", (column2Value > 0.0f) ? "%c[green]" : "%c[red]", column2Value*100.0f);
+				break;
+			case 1:
 				{
-					column2Value=column2Value*1000;
-					sprintf_s	(buff_column2,"%s%+3.0f%s", color, column2Value,CStringTable().translate("ui_inv_aw_gr").c_str());
-				}
-				else
-					sprintf_s	(buff_column2,"%s%+3.0f%s", color, column2Value,CStringTable().translate("ui_inv_aw_kg").c_str());
-			}
-			break;
-		case 2:
-			{
-				LPCSTR color=(column2Value>0.0f)?"%c[green]":"%c[red]";
-				if (addParam==BLEEDING_RESTORE_ID||addParam==RADIATION_RESTORE_ID)
-					color = (column2Value>0)?"%c[red]":"%c[green]";
-				if (column2Value>9999)
-				{
-					column2Value/=10000;
-					sprintf_s	(buff_column2,"%s%+3.0fk%%", color, column2Value);
-				}
-				else
-					if (addParam == JUMP_SPEED_DELTA_ID)
-						sprintf_s(buff_column2, "%s%+.1fm", color, column2Value);
+					LPCSTR color = (column2Value < 0) ? "%c[red]" : "%c[green]";
+					if ((column2Value > 0 && column2Value < 1) || (column2Value<0 && column2Value>-1))
+					{
+						column2Value = column2Value * 1000;
+						sprintf_s(buff_column2, "%s%+3.0f%s", color, column2Value, CStringTable().translate("ui_inv_aw_gr").c_str());
+					}
 					else
-						sprintf_s(buff_column2,"%s%+3.0f%%", color, column2Value);
-			}
-			break;
-		default:NODEFAULT;
+						sprintf_s(buff_column2, "%s%+3.0f%s", color, column2Value, CStringTable().translate("ui_inv_aw_kg").c_str());
+				}
+				break;
+			case 2:
+				{
+					LPCSTR color = (column2Value > 0.0f) ? "%c[green]" : "%c[red]";
+					xr_string units = "%";
+					xr_string mult = "";
+					if (addParam == BLEEDING_RESTORE_ID || addParam == RADIATION_RESTORE_ID)
+					{
+						color = (column2Value > 0) ? "%c[red]" : "%c[green]";
+						if (addParam == RADIATION_RESTORE_ID)
+							units = CStringTable().translate("ui_inv_radiation_units").c_str();
+					}
+					if (column2Value > 9999)
+					{
+						column2Value /= 1000;
+						mult = "k";
+					}
+					if (addParam == JUMP_SPEED_DELTA_ID)
+					{
+						units = "m";
+						sprintf_s(buff_column2, "%s%+.1f%s%s", color, column2Value, mult.c_str(), units.c_str());
+					}
+					else
+						sprintf_s(buff_column2, "%s%+3.0f%s%s", color, column2Value, mult.c_str(), units.c_str());
+				}
+				break;
+			default:NODEFAULT;
 		}
-		item->SetFieldText(2,buff_column2);
-		column2ValuePresent=true;
+		item->SetFieldText(2, buff_column2);
+		column2ValuePresent = true;
 	}
 	item->SetVisibility(2,column2ValuePresent);
 	bool column3ValuePresent=false;
@@ -148,18 +156,27 @@ void setIconedItem(xr_map<shared_str ,shared_str> iconIDs,CUIListItemIconed* ite
 		case 2:
 			{
 				LPCSTR color=(column3Value>0.0f)?"%c[green]":"%c[red]";
-				if (addParam==BLEEDING_RESTORE_ID||addParam==RADIATION_RESTORE_ID)
-					color = (column3Value>0)?"%c[red]":"%c[green]";
+				xr_string units = "%";
+				xr_string mult = "";
+				if (addParam == BLEEDING_RESTORE_ID || addParam == RADIATION_RESTORE_ID)
+				{
+					color = (column3Value > 0) ? "%c[red]" : "%c[green]";
+					if (addParam == RADIATION_RESTORE_ID)
+						units = CStringTable().translate("ui_inv_radiation_units").c_str();
+				}
 				if (column3Value > 9999)
 				{
 					column3Value /= 1000;
-					sprintf_s(buff_column3, "%s%+3.0fk%%", color, column3Value);
+					mult = "k";
+				}
+				if (addParam == JUMP_SPEED_DELTA_ID)
+				{
+					units = "m";
+					sprintf_s(buff_column3, "%s%+.1f%s%s", color, column3Value, mult.c_str(),units.c_str());
 				}
 				else
-					if (addParam == JUMP_SPEED_DELTA_ID)
-						sprintf_s(buff_column3, "%s%+.1fm", color, column3Value);
-					else
-						sprintf_s(buff_column3, "%s%+3.0f%%", color, column3Value);
+					sprintf_s(buff_column3, "%s%+3.0f%s%s", color, column3Value,mult.c_str(), units.c_str());
+
 			}
 			break;
 		default:NODEFAULT;

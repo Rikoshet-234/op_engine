@@ -54,8 +54,8 @@ CUICustomEdit::CUICustomEdit()
 
 		//! Get keyboard layouts from system
 		xr_vector<HKL> hklList;
-		hklList.resize(GetKeyboardLayoutList(0, NULL));
-		GetKeyboardLayoutList(static_cast<int>(hklList.size()), &hklList[0]);
+		hklList.resize(GetKeyboardLayoutList(0, nullptr));
+		GetKeyboardLayoutList(static_cast<unsigned int>(hklList.size()), &hklList[0]);
 		
 		//! Create list of input languages
 		CURRENT_SELECTED_LANGUAGE = 0;
@@ -153,12 +153,24 @@ void CUICustomEdit::SetTextColorD(u32 color){
 	m_textColor[1] = color;
 }
 
+#include "../ai_space.h"
+#include "../script_storage_space.h"
+#include "../script_engine.h"
+
+
 void CUICustomEdit::LoadSettings(LPCSTR path)
 {
+	if (!path)
+	{
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "! ERROR invalid input for LoadSettings!");
+		m_path = "";
+		return;
+	}
 	m_path = path;
+
 	std::replace(m_path.begin(), m_path.end(), ':', '_');
 	
-	IReader* fr = (FS.exist("$game_settings$","ceb.settings") == NULL) ? NULL : FS.r_open("$game_settings$","ceb.settings");
+	IReader* fr = (FS.exist("$game_settings$","ceb.settings") == nullptr) ? NULL : FS.r_open("$game_settings$","ceb.settings");
 	if (fr)
 	{
 		CInifile cebSettings(fr);
@@ -177,6 +189,7 @@ void CUICustomEdit::LoadSettings(LPCSTR path)
 				{
 					CURRENT_SELECTED_LANGUAGE = i;
 					m_languageIcon.SetText(!m_bNumbersOnly ? gs_langNames[CURRENT_SELECTED_LANGUAGE].c_str() : "");
+					ActivateKeyboardLayout(gs_hklList[CURRENT_SELECTED_LANGUAGE], KLF_SETFORPROCESS);
 					break;
 				}
 			}
@@ -220,6 +233,7 @@ void CUICustomEdit::SetPasswordMode(bool mode){
 
 void CUICustomEdit::OnFocusLost(){
 	CUIWindow::OnFocusLost();
+	Msg("OnFocusLost[%s]",m_path.c_str());
 /*	//only for CDKey control
 	if(m_bInputFocus)
 	{
@@ -268,10 +282,12 @@ bool CUICustomEdit::OnMouse(float x, float y, EUIMessages mouse_action)
 
 	if(mouse_action == WINDOW_LBUTTON_DOWN && !m_bInputFocus)
 	{
+		Msg("OnFocusReceive[%s]", m_path.c_str());
 		GetParent()->SetKeyboardCapture(this, true);
 		m_bInputFocus = true;
 		m_iKeyPressAndHold = 0;
 		m_languageIcon.SetText(!m_bNumbersOnly ? gs_langNames[CURRENT_SELECTED_LANGUAGE].c_str() : "");
+		ActivateKeyboardLayout(gs_hklList[CURRENT_SELECTED_LANGUAGE], KLF_SETFORPROCESS);
 		m_lines.MoveCursorToEnd();
 	}
 	return true;
@@ -280,6 +296,7 @@ bool CUICustomEdit::OnMouse(float x, float y, EUIMessages mouse_action)
 
 bool CUICustomEdit::OnKeyboard(int dik, EUIMessages keyboard_action)
 {	
+	Msg("m_bInputFocus[%s] dik [%d]", m_bInputFocus?"true":"false",dik);
 	if(!m_bInputFocus) 
 		return false;
 	if(keyboard_action == WINDOW_KEY_PRESSED)	
@@ -351,7 +368,7 @@ bool CUICustomEdit::KeyPressed(int dik)
 		GetParent()->SetKeyboardCapture(this, false);
 		m_bInputFocus = false;
 		m_iKeyPressAndHold = 0;
-		GetMessageTarget()->SendMessage(this,EDIT_TEXT_COMMIT,NULL);
+		GetMessageTarget()->SendMessage(this,EDIT_TEXT_COMMIT, nullptr);
 		break;
 	case DIK_BACKSPACE:
 		m_lines.DelLeftChar();
@@ -396,7 +413,7 @@ bool CUICustomEdit::KeyPressed(int dik)
 		}
 
 		if(bChanged)
-			GetMessageTarget()->SendMessage(this,EDIT_TEXT_CHANGED,NULL);
+			GetMessageTarget()->SendMessage(this,EDIT_TEXT_CHANGED, nullptr);
 
 		return true;
 }
@@ -562,7 +579,7 @@ void CUICustomEdit::ChangeInputLanguage()
 {
 	CURRENT_SELECTED_LANGUAGE = (CURRENT_SELECTED_LANGUAGE + 1) % gs_hklList.size();
 	m_languageIcon.SetText(!m_bNumbersOnly ? gs_langNames[CURRENT_SELECTED_LANGUAGE].c_str() : "");
-
+	ActivateKeyboardLayout(gs_hklList[CURRENT_SELECTED_LANGUAGE], KLF_SETFORPROCESS);
 	if (!m_bNumbersOnly)
 	{
 		string_path fname; 

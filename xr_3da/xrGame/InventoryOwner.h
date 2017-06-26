@@ -139,6 +139,7 @@ public:
 	//игровые характеристики персонажа
 public:
 	CCharacterInfo&						CharacterInfo		() const {VERIFY(m_pCharacterInfo); return *m_pCharacterInfo;}
+	CCharacterInfo* pCharacterInfo() { return m_pCharacterInfo; }
 	IC const CSpecificCharacter&		SpecificCharacter	() const {return CharacterInfo().m_SpecificCharacter;};
 	bool								InfinitiveMoney		()	{return CharacterInfo().m_SpecificCharacter.MoneyDef().inf_money;}
 

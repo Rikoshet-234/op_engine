@@ -5,6 +5,7 @@
 #include "UIWindow.h"
 #include "../UICursor.h"
 #include "../MainMenu.h"
+#include "UICustomEdit.h"
 
 poolSS< _12b, 128>	ui_allocator;
 
@@ -451,14 +452,24 @@ void CUIWindow::SetCapture(CUIWindow *pChildWindow, bool capture_status)
 
 
 //реакция на клавиатуру
+void dumpCapturer(CUIWindow* cap,xr_string addon)
+{
+	CUICustomEdit* edit = smart_cast<CUICustomEdit*>(cap);
+	if (edit)
+	{
+		Msg("%s dumpCapturer %s", addon,edit->GetmPath());
+	}
+}
 bool CUIWindow::OnKeyboard(int dik, EUIMessages keyboard_action)
 {
 	bool result;
 
 	//если есть дочернее окно,захватившее клавиатуру, то
 	//сообщение направляем ему сразу
+
 	if(NULL!=m_pKeyboardCapturer)
 	{
+		dumpCapturer(m_pKeyboardCapturer,"CAPTURER");
 		result = m_pKeyboardCapturer->OnKeyboard(dik, keyboard_action);
 		
 		if(result) return true;
@@ -468,8 +479,10 @@ bool CUIWindow::OnKeyboard(int dik, EUIMessages keyboard_action)
 
 	for(; it!=m_ChildWndList.rend(); ++it)
 	{
+		dumpCapturer(*it, "CHILD");
 		if((*it)->IsEnabled())
 		{
+			dumpCapturer(*it, "CHILD IsEnabled");
 			result = (*it)->OnKeyboard(dik, keyboard_action);
 			
 			if(result)	return true;

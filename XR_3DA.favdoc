@@ -275,6 +275,74 @@
         </Favorite>
       </favorites>
     </Folder>
+    <Folder>
+      <name>need to rewrite </name>
+      <folders />
+      <favorites>
+        <Favorite>
+          <name>x_ray.cpp</name>
+          <path>xr_3da\x_ray.cpp</path>
+          <absolutePath>S:\xr_3da\x_ray.cpp</absolutePath>
+          <position>
+            <line>136</line>
+            <column>35</column>
+            <lineHash>0Qfn+4Ah80ZIzegQbpfZCDF6zvki5AVrhxUDswpMYRU=</lineHash>
+          </position>
+        </Favorite>
+        <Favorite>
+          <name>GameFont.cpp</name>
+          <path>xr_3da\GameFont.cpp</path>
+          <absolutePath>S:\xr_3da\GameFont.cpp</absolutePath>
+          <position>
+            <line>1</line>
+            <column>1</column>
+            <lineHash>OLPYjwdm9wN2xCl26hRFXSMcB/CAPDWnpsBbkvT4pcM=</lineHash>
+          </position>
+        </Favorite>
+        <Favorite>
+          <name>CMultiFonts.cpp</name>
+          <path>xr_3da\CMultiFonts.cpp</path>
+          <absolutePath>S:\xr_3da\CMultiFonts.cpp</absolutePath>
+          <position>
+            <line>2</line>
+            <column>25</column>
+            <lineHash>jeLrZEMQ7bFVo5F5fL018UVx3Sc2gX4OyRO5ZDsWW2s=</lineHash>
+          </position>
+        </Favorite>
+        <Favorite>
+          <name>CMultiFonts.h</name>
+          <path>xr_3da\CMultiFonts.h</path>
+          <absolutePath>S:\xr_3da\CMultiFonts.h</absolutePath>
+          <viewKind>7651a701-06e5-11d1-8ebd-00a0c90f26ea</viewKind>
+          <position>
+            <line>12</line>
+            <column>2</column>
+            <lineHash>UmAXnUJi0SZFJrSqbtnSGhjbIeV1pD7aUNQrlyRDMOc=</lineHash>
+          </position>
+        </Favorite>
+        <Favorite>
+          <name>CMultiHUDs.cpp</name>
+          <path>xr_3da\CMultiHUDs.cpp</path>
+          <absolutePath>S:\xr_3da\CMultiHUDs.cpp</absolutePath>
+          <position>
+            <line>1</line>
+            <column>1</column>
+            <lineHash>OLPYjwdm9wN2xCl26hRFXSMcB/CAPDWnpsBbkvT4pcM=</lineHash>
+          </position>
+        </Favorite>
+        <Favorite>
+          <name>CMultiHUDs.h</name>
+          <path>xr_3da\CMultiHUDs.h</path>
+          <absolutePath>S:\xr_3da\CMultiHUDs.h</absolutePath>
+          <viewKind>7651a701-06e5-11d1-8ebd-00a0c90f26ea</viewKind>
+          <position>
+            <line>18</line>
+            <column>1</column>
+            <lineHash>1FZ8wSbjfx1Q9Q6CC2SlA5G0MliMfTcNtjj1U6soCCU=</lineHash>
+          </position>
+        </Favorite>
+      </favorites>
+    </Folder>
   </folders>
   <favorites />
 </Favorites>

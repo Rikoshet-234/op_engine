@@ -504,6 +504,9 @@
     <ClInclude Include="CMultiHUDs.h">
       <Filter>Game API\HUD</Filter>
     </ClInclude>
+    <ClInclude Include="CMultiFonts.h">
+      <Filter>Render\Font output</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="defines.cpp">
@@ -880,6 +883,9 @@
     </ClCompile>
     <ClCompile Include="CMultiHUDs.cpp">
       <Filter>Game API\HUD</Filter>
+    </ClCompile>
+    <ClCompile Include="CMultiFonts.cpp">
+      <Filter>Render\Font output</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

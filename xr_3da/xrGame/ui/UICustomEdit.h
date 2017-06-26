@@ -39,6 +39,7 @@ public:
 			void	SetLightAnim			(LPCSTR lanim);
 
 			void	LoadSettings(LPCSTR path);
+			xr_string GetmPath() const { return m_path; }
 protected:
 	bool KeyPressed(int dik);
 	bool KeyReleased(int dik);
@@ -49,7 +50,7 @@ protected:
 	void CheckSwitchInputLanguage();
 	void ChangeInputLanguage();
 
-	void SaveSettings();
+	//void SaveSettings();
 
 protected:
 	bool m_bInputFocus;
