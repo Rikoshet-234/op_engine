@@ -269,6 +269,7 @@ void xrServer::Process_event	(NET_Packet& P, ClientID sender)
 #	endif
 		}break;
 	case GEG_PLAYER_ACTIVATE_SLOT:
+	case GEG_PLAYER_ITEM_USE:
 	case GEG_PLAYER_ITEM_EAT:
 		{
 			SendTo(SV_Client->ID, P, net_flags(TRUE, TRUE));

@@ -469,7 +469,7 @@ bool CUIWindow::OnKeyboard(int dik, EUIMessages keyboard_action)
 
 	if(NULL!=m_pKeyboardCapturer)
 	{
-		dumpCapturer(m_pKeyboardCapturer,"CAPTURER");
+//		dumpCapturer(m_pKeyboardCapturer,"CAPTURER");
 		result = m_pKeyboardCapturer->OnKeyboard(dik, keyboard_action);
 		
 		if(result) return true;
@@ -479,10 +479,10 @@ bool CUIWindow::OnKeyboard(int dik, EUIMessages keyboard_action)
 
 	for(; it!=m_ChildWndList.rend(); ++it)
 	{
-		dumpCapturer(*it, "CHILD");
+//		dumpCapturer(*it, "CHILD");
 		if((*it)->IsEnabled())
 		{
-			dumpCapturer(*it, "CHILD IsEnabled");
+//			dumpCapturer(*it, "CHILD IsEnabled");
 			result = (*it)->OnKeyboard(dik, keyboard_action);
 			
 			if(result)	return true;

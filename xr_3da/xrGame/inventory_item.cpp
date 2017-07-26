@@ -144,7 +144,6 @@ CInventoryItem::CInventoryItem()
 	m_Description		= "";
 	scriptDescriptionFunctorName="";
 	m_bUsefulFromConfig = false;
-	m_bDisposableItem = true;
 	m_weight = -1;
 	m_cost = static_cast<unsigned int>(-1);
 	m_fActivePropertyRadiation = 0;
@@ -206,7 +205,6 @@ void CInventoryItem::Load(LPCSTR section)
 		m_Description = CStringTable().translate(descriptionVar.c_str());
 	}
 
-	m_bDisposableItem = !!READ_IF_EXISTS(pSettings, r_bool, section, "disposable", TRUE);
 
 	m_flags.set(Fbelt, READ_IF_EXISTS(pSettings, r_bool, section, "belt", FALSE));
 	m_flags.set(FRuckDefault, READ_IF_EXISTS(pSettings, r_bool, section, "default_to_ruck", TRUE));

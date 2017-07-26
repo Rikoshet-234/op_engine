@@ -33,6 +33,7 @@
 #include "NightVisionDevice.h"
 #include "OPFuncs/utils.h"
 #include "xrServer_Objects_ALife_Items.h"
+#include "gbox.h"
 
 using namespace luabind;
 
@@ -41,6 +42,7 @@ void CInventoryItem::script_register(lua_State *L)
 	module(L)
 		[
 			class_<CInventoryItem>("CInventoryItem")
+			.def(constructor<>())
 			.def("Name",				&CInventoryItem::Name)
 			.def("GetGameObject",		&CInventoryItem::GetGameObject)
 		];
@@ -602,9 +604,26 @@ u8 CScriptGameObject::GetWeaponAddonState() const
 }
 #pragma endregion
 
+LPCSTR get_obj_class_name(CGameObject *obj)
+{
+	return obj->CppClassName();
+}
+
+CGBox* CScriptGameObject::GetGameBox() const
+{
+	CGBox		*gbox = smart_cast<CGBox*>(&object());
+	if (!gbox) {
+		log_script_error("! Cannot cast %s to CGBox ", object().CppClassName());
+		return nullptr;
+	}
+	return gbox;
+}
+
 class_<CScriptGameObject> &script_register_game_object3(class_<CScriptGameObject> &instance)
 {
 	instance
+		.def("get_gbox",&CScriptGameObject::GetGameBox)
+		.def("get_obj_class_name",&get_obj_class_name)
 		.def("get_slot", &CScriptGameObject::GetSlot)
 		.def("get_inventory_wnd", &get_inventory_wnd)
 		.def("get_carbody_wnd", &get_carbody_wnd)

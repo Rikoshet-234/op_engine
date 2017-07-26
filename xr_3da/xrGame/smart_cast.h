@@ -308,6 +308,15 @@
 #	undef cast_type_list
 #	define cast_type_list save_cast_list	(CSE_ALifeItemPDA,			CSE_Abstract)
 
+
+	DECLARE_SPECIALIZATION(CSE_ALifeItemGameBox, CSE_Abstract, cast_item_gbox);
+#	undef cast_type_list
+#	define cast_type_list save_cast_list	(CSE_ALifeItemGameBox,			CSE_Abstract)
+
+	DECLARE_SPECIALIZATION(CGBox, CInventoryItem, cast_gbox_object);
+#		undef cast_type_list
+#		define cast_type_list save_cast_list	(CGBox,			CInventoryItem)
+
 #	ifndef DO_NOT_DECLARE_TYPE_LIST
 #		include "smart_cast_impl1.h"
 #	endif

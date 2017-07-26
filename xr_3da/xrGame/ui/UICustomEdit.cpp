@@ -233,7 +233,6 @@ void CUICustomEdit::SetPasswordMode(bool mode){
 
 void CUICustomEdit::OnFocusLost(){
 	CUIWindow::OnFocusLost();
-	Msg("OnFocusLost[%s]",m_path.c_str());
 /*	//only for CDKey control
 	if(m_bInputFocus)
 	{
@@ -282,7 +281,6 @@ bool CUICustomEdit::OnMouse(float x, float y, EUIMessages mouse_action)
 
 	if(mouse_action == WINDOW_LBUTTON_DOWN && !m_bInputFocus)
 	{
-		Msg("OnFocusReceive[%s]", m_path.c_str());
 		GetParent()->SetKeyboardCapture(this, true);
 		m_bInputFocus = true;
 		m_iKeyPressAndHold = 0;
@@ -296,7 +294,6 @@ bool CUICustomEdit::OnMouse(float x, float y, EUIMessages mouse_action)
 
 bool CUICustomEdit::OnKeyboard(int dik, EUIMessages keyboard_action)
 {	
-	Msg("m_bInputFocus[%s] dik [%d]", m_bInputFocus?"true":"false",dik);
 	if(!m_bInputFocus) 
 		return false;
 	if(keyboard_action == WINDOW_KEY_PRESSED)	

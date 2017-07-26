@@ -30,6 +30,7 @@
 #include "UITradeWnd.h"
 #include "../OPFuncs/utils.h"
 #include "../string_table.h"
+#include "../gbox.h"
 
 #define				CAR_BODY_XML		"carbody_new.xml"
 #define				CARBODY_ITEM_XML	"carbody_item.xml"
@@ -574,6 +575,7 @@ void CUICarBodyWnd::ActivatePropertiesBox()
 	CMedkit*				pMedkit			= smart_cast<CMedkit*>			(CurrentIItem());
 	CAntirad*				pAntirad		= smart_cast<CAntirad*>			(CurrentIItem());
 	CBottleItem*			pBottleItem		= smart_cast<CBottleItem*>		(CurrentIItem());
+	CGBox*			pBox = smart_cast<CGBox*>			(CurrentIItem());
 	bool					b_show			= false;
 	
 	if (pWeapon)
@@ -616,6 +618,7 @@ void CUICarBodyWnd::ActivatePropertiesBox()
 		}
 	}
 	LPCSTR _action				= nullptr;
+	
 	if(pMedkit || pAntirad)
 	{
 		_action						= "st_use";
@@ -671,8 +674,12 @@ void CUICarBodyWnd::EatItem()
 					CurrentIItem()->object().ID());
 	}
 
+	CGBox*	pBox = smart_cast<CGBox*>(CurrentIItem());
 	NET_Packet					P;
-	CGameObject::u_EventGen		(P, GEG_PLAYER_ITEM_EAT, Actor()->ID());
+	if (pBox)
+		CGameObject::u_EventGen(P, GEG_PLAYER_ITEM_USE, Actor()->ID());
+	else
+		CGameObject::u_EventGen(P, GEG_PLAYER_ITEM_EAT, Actor()->ID());
 	P.w_u16						(CurrentIItem()->object().ID());
 	CGameObject::u_EventSend	(P);
 

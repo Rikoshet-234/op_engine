@@ -3,7 +3,7 @@
 
 VertexCache::VertexCache()
 {
-  VertexCache(16);
+	entries.assign(16, -1);
 }
 
 

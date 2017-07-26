@@ -20,6 +20,7 @@
 #include "../script_game_object.h"
 #include "xrUIXmlParser.h"
 #include "UIXmlInit.h"
+#include "UICellItemFactory.h"
 
 
 CUIDragItem* CUIDragDropListEx::m_drag_item = NULL;
@@ -61,12 +62,15 @@ CUIDragDropListEx::CUIDragDropListEx()
 	AddCallback					("cell_item",	WINDOW_FOCUS_LOST,				CUIWndCallback::void_function		(this, &CUIDragDropListEx::OnItemFocusLost)			);
 	m_i_scroll_pos=-1;
 	cacheData.initialized=false;
+	m_callbacks = xr_new<callback_map>();
+	m_bEnableDragDrop = true;
+
 }
 
 CUIDragDropListEx::~CUIDragDropListEx()
 {
+	xr_delete(m_callbacks);
 	DestroyDragItem		();
-
 	delete_data					(m_container);
 }
 
@@ -147,6 +151,9 @@ Fvector2 CUIDragDropListEx::GetDragItemPosition()
 void CUIDragDropListEx::OnItemStartDragging(CUIWindow* w, void* pData)
 {
 	OnItemSelected						(w, pData);
+	if (!m_bEnableDragDrop)
+		return;
+
 	CUICellItem* itm		= smart_cast<CUICellItem*>(w);
 
 	if(itm!=m_selected_item)	return;
@@ -159,6 +166,8 @@ void CUIDragDropListEx::OnItemStartDragging(CUIWindow* w, void* pData)
 void CUIDragDropListEx::OnItemDrop(CUIWindow* w, void* pData)
 { 
 	OnItemSelected						(w, pData);
+	if (!m_bEnableDragDrop)
+		return;
 	CUICellItem*		itm				= smart_cast<CUICellItem*>(w);
 	VERIFY								(itm->OwnerList() == itm->OwnerList());
 
@@ -188,7 +197,11 @@ void CUIDragDropListEx::OnItemDrop(CUIWindow* w, void* pData)
 void CUIDragDropListEx::OnItemDBClick(CUIWindow* w, void* pData)
 {
 	OnItemSelected						(w, pData);
-	CUICellItem*		itm				= smart_cast<CUICellItem*>(w);
+	CUICellItem*		itm = smart_cast<CUICellItem*>(w);
+	callback(GameObject::OnDragDropListDBLClickCell)(itm);
+	if (!m_bEnableDragDrop)
+		return;
+
 
 	if(m_f_item_db_click && m_f_item_db_click(itm) ){
 		DestroyDragItem						();
@@ -210,22 +223,51 @@ void CUIDragDropListEx::OnItemDBClick(CUIWindow* w, void* pData)
 
 void CUIDragDropListEx::OnItemFocusReceived(CUIWindow* w, void* pData)
 {
+	CUICellItem* itm = smart_cast<CUICellItem*>(w);
 	if(m_f_item_focus_received)
-	{
-		CUICellItem* itm				= smart_cast<CUICellItem*>(w);
 		m_f_item_focus_received			(itm);
-	}
+	callback(GameObject::OnDragDropListCellFocusReceive)(itm);
 
 }
 
 void CUIDragDropListEx::OnItemFocusLost(CUIWindow* w, void* pData)
 {
+	CUICellItem* itm = smart_cast<CUICellItem*>(w);
 	if(m_f_item_focus_lost)
-	{
-		CUICellItem* itm				= smart_cast<CUICellItem*>(w);
 		m_f_item_focus_lost				(itm);
-	}
+	callback(GameObject::OnDragDropListCellFocusLost)(itm);
+}
 
+CScriptCallbackEx<void>& CUIDragDropListEx::callback(GameObject::ECallbackType type) const
+{
+	return ((*m_callbacks)[type]);
+}
+
+void CUIDragDropListEx::SetCallback(GameObject::ECallbackType type, const luabind::functor<void>& functor)
+{
+	if (functor.is_valid())
+		callback(type).set(functor);
+	else
+		callback(type).clear();
+}
+
+void CUIDragDropListEx::SetCallback(GameObject::ECallbackType type, const luabind::functor<void>& functor, const luabind::object& object)
+{
+	if (functor.is_valid())
+		callback(type).set(functor,object);
+	else
+		callback(type).clear();
+}
+
+void CUIDragDropListEx::SetCallback(GameObject::ECallbackType type)
+{
+	callback(type).clear();
+}
+
+CUICellItem* CUIDragDropListEx::CreateCellItemSimple(LPCSTR itemSection)
+{
+	auto cell= create_cell_item(itemSection);
+	return cell;
 }
 
 void CUIDragDropListEx::SetShowConditionBar(bool state)
@@ -284,12 +326,24 @@ void CUIDragDropListEx::SetShowConditionBar(bool state)
 	}
 }
 
+CUICellItem* CUIDragDropListEx::GetSelectedCell()
+{
+	return m_selected_item;
+}
+
+bool CUIDragDropListEx::HasFreeSpace() const
+{
+	return m_container->HasFreeSpace(Ivector2().set(1,1));
+}
+
 void CUIDragDropListEx::OnItemSelected(CUIWindow* w, void* pData)
 {
-	m_selected_item						= smart_cast<CUICellItem*>(w);
-	VERIFY								(m_selected_item);
+	CUICellItem* selected_item= smart_cast<CUICellItem*>(w);
+	callback(GameObject::OnDragDropListCellSelected)(selected_item);
+	m_selected_item = selected_item;
 	if(m_f_item_selected)
 		m_f_item_selected(m_selected_item);
+
 }
 
 void CUIDragDropListEx::OnItemRButtonClick(CUIWindow* w, void* pData)
@@ -571,6 +625,24 @@ void CUIDragDropListEx::SetCellsCapacity(const Ivector2 c)
 	m_container->SetCellsCapacity(c);
 }
 
+void CUIDragDropListEx::SetCellsRows(int rows)
+{
+	Ivector2 c_cap = m_container->CellsCapacity();
+	c_cap.y = rows;
+	m_container->SetCellsCapacity(c_cap);
+}
+void CUIDragDropListEx::SetCellsColumns(int columns)
+{
+	Ivector2 c_cap = m_container->CellsCapacity();
+	c_cap.x = columns;
+	m_container->SetCellsCapacity(c_cap);
+}
+
+void CUIDragDropListEx::SetCellsCapacity(int rows, int columns)
+{
+	m_container->SetCellsCapacity(Ivector2().set(rows,columns));
+}
+
 const Ivector2& CUIDragDropListEx::CellSize()
 {
 	return m_container->CellSize();
@@ -579,6 +651,25 @@ const Ivector2& CUIDragDropListEx::CellSize()
 void CUIDragDropListEx::SetCellSize(const Ivector2 new_sz)			
 {
 	m_container->SetCellSize(new_sz);
+}
+
+void CUIDragDropListEx::SetCellSize(int x, int y)
+{
+	m_container->SetCellSize(Ivector2().set(x,y));
+}
+
+void CUIDragDropListEx::SetCellWidth(int width)
+{
+	Ivector2 c_size = m_container->CellSize();
+	c_size.x = width;
+	m_container->SetCellSize(c_size);
+}
+
+void CUIDragDropListEx::SetCellHeight(int height)
+{
+	Ivector2 c_size = m_container->CellSize();
+	c_size.y = height;
+	m_container->SetCellSize(c_size);
 }
 
 int CUIDragDropListEx::ScrollPos()
@@ -674,10 +765,18 @@ CUICellItem* CUIDragDropListEx::GetItemIdx(u32 idx)
 	return smart_cast<CUICellItem*>(*it);
 }
 
+void CUICellContainer::SetCellTexture(LPCSTR texture)
+{
+	if (!texture)
+		texture = "ui\\ui_grid";
+	m_sCellTexture = texture;
+	hShader.create("hud\\fog_of_war", m_sCellTexture);
+}
 CUICellContainer::CUICellContainer(CUIDragDropListEx* parent)
 {
 	m_pParentDragDropList		= parent;
-	hShader.create				("hud\\fog_of_war","ui\\ui_grid");
+	SetCellTexture(nullptr);
+	//hShader.create				("hud\\fog_of_war", "ui\\ui_grid");
 	hGeom.create				(FVF::F_TL, RCache.Vertex.Buffer(), 0);
 	m_anim_mSec=0;
 	m_suitable_color.set(0xFFFFFFFF);

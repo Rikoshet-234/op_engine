@@ -40,7 +40,8 @@ CALifeSimulator *alife				()
 CSE_ALifeDynamicObject *alife_object		(const CALifeSimulator *pself, ALife::_OBJECT_ID object_id)
 {
 	VERIFY			(pself);
-	return			(pself->objects().object(object_id,true));
+	CSE_ALifeDynamicObject * obj = pself->objects().object(object_id, true);
+	return			obj;
 }
 
 CSE_ALifeDynamicObject *alife_object		(const CALifeSimulator *pself, CScriptGameObject* object)

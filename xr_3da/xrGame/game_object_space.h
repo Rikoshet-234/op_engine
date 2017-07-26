@@ -65,6 +65,10 @@ namespace GameObject {
 		OnKeyboardPress,
 		OnPrepareItemInfo,
 		OnDisableInfoPortion,
+		OnDragDropListCellFocusReceive,
+		OnDragDropListCellFocusLost,
+		OnDragDropListCellSelected,
+		OnDragDropListDBLClickCell,
 		eDummy = u32(-1),
 	};
 };

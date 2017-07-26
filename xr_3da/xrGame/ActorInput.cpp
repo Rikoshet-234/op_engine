@@ -29,6 +29,7 @@
 #include "CustomOutfit.h"
 #include "ui/UIInventoryWnd.h"
 #include "WeaponMagazinedWGrenade.h"
+#include "QuickSlots.h"
 
 bool g_bAutoClearCrouch = true;
 bool g_bForceCrouch = false;
@@ -240,6 +241,12 @@ void CActor::IR_OnKeyboardPress(int cmd)
 				}
 			}
 		}break;
+	case kUSE_QUICK_SLOT0:
+	case kUSE_QUICK_SLOT1:
+	case kUSE_QUICK_SLOT2:
+	case kUSE_QUICK_SLOT3:
+		QuickSlotManager->UseSlot(cmd);
+		break;
 	}
 }
 void CActor::IR_OnMouseWheel(int direction)

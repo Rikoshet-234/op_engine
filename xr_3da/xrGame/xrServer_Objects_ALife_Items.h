@@ -12,7 +12,7 @@
 #include "xrServer_Objects_ALife.h"
 #include "PHSynchronize.h"
 #include "inventory_space.h"
-
+#include "../xrNetServer/NET_utils.h"
 #include "character_info_defs.h"
 #include "infoportiondefs.h"
 
@@ -21,6 +21,7 @@
 
 class CSE_ALifeItemAmmo;
 
+#pragma region CSE_ALifeInventoryItem
 SERVER_ENTITY_DECLARE_BEGIN0(CSE_ALifeInventoryItem)
 public:
 	enum {
@@ -75,6 +76,9 @@ SERVER_ENTITY_DECLARE_END
 add_to_type_list(CSE_ALifeInventoryItem)
 #define script_type_list save_type_list(CSE_ALifeInventoryItem)
 
+#pragma endregion
+
+#pragma region CSE_ALifeItem
 SERVER_ENTITY_DECLARE_BEGIN2(CSE_ALifeItem,CSE_ALifeDynamicObjectVisual,CSE_ALifeInventoryItem)
 	bool							m_physics_disabled;
 
@@ -90,7 +94,9 @@ SERVER_ENTITY_DECLARE_BEGIN2(CSE_ALifeItem,CSE_ALifeDynamicObjectVisual,CSE_ALif
 SERVER_ENTITY_DECLARE_END
 add_to_type_list(CSE_ALifeItem)
 #define script_type_list save_type_list(CSE_ALifeItem)
+#pragma endregion
 
+#pragma region CSE_ALifeItemTorch
 SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemTorch,CSE_ALifeItem)
 //флаги
 	enum EStats{
@@ -108,7 +114,9 @@ SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemTorch,CSE_ALifeItem)
 SERVER_ENTITY_DECLARE_END
 add_to_type_list(CSE_ALifeItemTorch)
 #define script_type_list save_type_list(CSE_ALifeItemTorch)
+#pragma endregion
 
+#pragma region CSE_ALifeItemNVDevice
 SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemNVDevice, CSE_ALifeItem)
 	enum EStats{
 		eEnabled					= (1<<0),
@@ -121,12 +129,31 @@ SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemNVDevice, CSE_ALifeItem)
 									CSE_ALifeItemNVDevice	(LPCSTR caSection);
 	virtual							~CSE_ALifeItemNVDevice	();
 	BOOL					Net_Relevant			() override;
-SERVER_ENTITY_DECLARE_END
-		add_to_type_list(CSE_ALifeItemNVDevice)
+	SERVER_ENTITY_DECLARE_END
+add_to_type_list(CSE_ALifeItemNVDevice)
 #define script_type_list save_type_list(CSE_ALifeItemNVDevice)
+#pragma endregion
 
+#pragma region CSE_ALifeItemGameBox
+SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemGameBox, CSE_ALifeItem)
+	NET_Packet m_user_data;
+	CSE_ALifeItemGameBox(LPCSTR caSection);
+	virtual	~CSE_ALifeItemGameBox();
+	BOOL Net_Relevant() override;
+	void set_user_data(NET_Packet* data);
+	void get_user_data(NET_Packet* data);
+	void clear_user_data();
+	CSE_ALifeItemGameBox		*cast_item_gbox() override { return this; };
+#pragma region unused now, but working, exec after client script binder net_spawn/net_destroy
+	/*void add_online(const bool &update_registries) override;
+	void add_offline(const xr_vector<ALife::_OBJECT_ID> &saved_children, const bool &update_registries) override;*/
+#pragma endregion 
+SERVER_ENTITY_DECLARE_END
+add_to_type_list(CSE_ALifeItemGameBox)
+#define script_type_list save_type_list(CSE_ALifeItemGameBox)
+#pragma endregion
 
-
+#pragma region CSE_ALifeItemAmmo
 SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemAmmo,CSE_ALifeItem)
 	u16								a_elapsed;
 	u16								m_boxSize;
@@ -139,7 +166,9 @@ SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemAmmo,CSE_ALifeItem)
 SERVER_ENTITY_DECLARE_END
 add_to_type_list(CSE_ALifeItemAmmo)
 #define script_type_list save_type_list(CSE_ALifeItemAmmo)
+#pragma endregion
 
+#pragma region CSE_ALifeItemWeapon
 SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemWeapon,CSE_ALifeItem)
 
 	//возможность подключения аддонов
@@ -194,7 +223,9 @@ SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemWeapon,CSE_ALifeItem)
 SERVER_ENTITY_DECLARE_END
 add_to_type_list(CSE_ALifeItemWeapon)
 #define script_type_list save_type_list(CSE_ALifeItemWeapon)
+#pragma endregion
 
+#pragma region CSE_ALifeItemWeaponMagazined
 SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemWeaponMagazined,CSE_ALifeItemWeapon)
 u8			m_u8CurFireMode;
 CSE_ALifeItemWeaponMagazined(LPCSTR caSection);
@@ -204,7 +235,9 @@ virtual CSE_ALifeItemWeapon		*cast_item_weapon	() {return this;}
 SERVER_ENTITY_DECLARE_END
 add_to_type_list(CSE_ALifeItemWeaponMagazined)
 #define script_type_list save_type_list(CSE_ALifeItemWeaponMagazined)
+#pragma endregion
 
+#pragma region CSE_ALifeItemWeaponMagazinedWGL
 SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemWeaponMagazinedWGL, CSE_ALifeItemWeaponMagazined)
 bool			m_bGrenadeMode;
 CSE_ALifeItemWeaponMagazinedWGL(LPCSTR caSection);
@@ -214,7 +247,9 @@ virtual CSE_ALifeItemWeapon		*cast_item_weapon	() {return this;}
 SERVER_ENTITY_DECLARE_END
 add_to_type_list(CSE_ALifeItemWeaponMagazinedWGL)
 #define script_type_list save_type_list(CSE_ALifeItemWeaponMagazinedWGL)
+#pragma endregion
 
+#pragma region CSE_ALifeItemWeaponShotGun
 SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemWeaponShotGun,CSE_ALifeItemWeaponMagazined)
 	xr_vector<u8>				m_AmmoIDs;
 								CSE_ALifeItemWeaponShotGun(LPCSTR caSection);
@@ -224,8 +259,9 @@ virtual CSE_ALifeItemWeapon		*cast_item_weapon	() {return this;}
 SERVER_ENTITY_DECLARE_END
 add_to_type_list(CSE_ALifeItemWeaponShotGun)
 #define script_type_list save_type_list(CSE_ALifeItemWeaponShotGun)
+#pragma endregion
 
-
+#pragma region CSE_ALifeItemDetector
 SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemDetector,CSE_ALifeItem)
 	u32								m_ef_detector_type;
 									CSE_ALifeItemDetector(LPCSTR caSection);
@@ -235,7 +271,9 @@ SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemDetector,CSE_ALifeItem)
 SERVER_ENTITY_DECLARE_END
 add_to_type_list(CSE_ALifeItemDetector)
 #define script_type_list save_type_list(CSE_ALifeItemDetector)
+#pragma endregion
 
+#pragma region CSE_ALifeItemArtefact
 SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemArtefact,CSE_ALifeItem)
 	float							m_fAnomalyValue;
 									CSE_ALifeItemArtefact	(LPCSTR caSection);
@@ -244,7 +282,9 @@ SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemArtefact,CSE_ALifeItem)
 SERVER_ENTITY_DECLARE_END
 add_to_type_list(CSE_ALifeItemArtefact)
 #define script_type_list save_type_list(CSE_ALifeItemArtefact)
+#pragma endregion
 
+#pragma region CSE_ALifeItemPDA
 SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemPDA,CSE_ALifeItem)
 	u16								m_original_owner;
 	shared_str						m_specific_character;
@@ -256,7 +296,9 @@ SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemPDA,CSE_ALifeItem)
 SERVER_ENTITY_DECLARE_END
 add_to_type_list(CSE_ALifeItemPDA)
 #define script_type_list save_type_list(CSE_ALifeItemPDA)
+#pragma endregion
 
+#pragma region CSE_ALifeItemDocument
 SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemDocument,CSE_ALifeItem)
 	shared_str							m_wDoc;
 									CSE_ALifeItemDocument(LPCSTR caSection);
@@ -264,7 +306,9 @@ SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemDocument,CSE_ALifeItem)
 SERVER_ENTITY_DECLARE_END
 add_to_type_list(CSE_ALifeItemDocument)
 #define script_type_list save_type_list(CSE_ALifeItemDocument)
+#pragma endregion
 
+#pragma region CSE_ALifeItemGrenade
 SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemGrenade,CSE_ALifeItem)
 	u32								m_ef_weapon_type;
 									CSE_ALifeItemGrenade	(LPCSTR caSection);
@@ -273,14 +317,18 @@ SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemGrenade,CSE_ALifeItem)
 SERVER_ENTITY_DECLARE_END
 add_to_type_list(CSE_ALifeItemGrenade)
 #define script_type_list save_type_list(CSE_ALifeItemGrenade)
+#pragma endregion
 
+#pragma region CSE_ALifeItemExplosive
 SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemExplosive,CSE_ALifeItem)
 									CSE_ALifeItemExplosive(LPCSTR caSection);
 	virtual							~CSE_ALifeItemExplosive();
 SERVER_ENTITY_DECLARE_END
 add_to_type_list(CSE_ALifeItemExplosive)
 #define script_type_list save_type_list(CSE_ALifeItemExplosive)
+#pragma endregion
 
+#pragma region CSE_ALifeItemBolt
 SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemBolt,CSE_ALifeItem)
 	u32								m_ef_weapon_type;
 									CSE_ALifeItemBolt	(LPCSTR caSection);
@@ -291,7 +339,9 @@ SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemBolt,CSE_ALifeItem)
 SERVER_ENTITY_DECLARE_END
 add_to_type_list(CSE_ALifeItemBolt)
 #define script_type_list save_type_list(CSE_ALifeItemBolt)
+#pragma endregion
 
+#pragma region CSE_ALifeItemCustomOutfit
 SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemCustomOutfit,CSE_ALifeItem)
 	u32								m_ef_equipment_type;
 									CSE_ALifeItemCustomOutfit	(LPCSTR caSection);
@@ -301,7 +351,7 @@ SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemCustomOutfit,CSE_ALifeItem)
 SERVER_ENTITY_DECLARE_END
 add_to_type_list(CSE_ALifeItemCustomOutfit)
 #define script_type_list save_type_list(CSE_ALifeItemCustomOutfit)
-
+#pragma endregion
 #pragma warning(pop)
 
 #endif

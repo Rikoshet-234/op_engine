@@ -15,6 +15,7 @@
 #include "character_info_defs.h"
 #include "inventory_space.h"
 
+
 enum EPdaMsg;
 enum ESoundTypes;
 enum ETaskState;
@@ -79,6 +80,7 @@ class CHolderCustom;
 struct ScriptCallbackInfo;
 struct STasks;
 class CCar;
+class CGBox;
 class CDangerObject;
 class CScriptGameObject;
 class CNightVisionDevice;
@@ -382,6 +384,7 @@ public:
 	void IterateInventory(luabind::functor<void> functor, luabind::object object);
 	void IterateInventoryOnlyFunctor(luabind::functor<void> functor);
 	void IterateInventorySimple(luabind::functor<void> functor);
+	void IterateInventorySimpleBool(luabind::functor<bool> functor);
 	void MarkItemDropped(CScriptGameObject *item);
 	bool MarkedDropped(CScriptGameObject *item);
 	void ForEachInventoryItems(const luabind::functor<void> &functor);
@@ -613,7 +616,7 @@ public:
 
 	float				GetTotalWeight() const;
 	u32					GetSlot() const;
-
+	CGBox* GetGameBox() const;
 	LPCSTR				GetVisualName() const;
 	
 

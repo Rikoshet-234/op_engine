@@ -166,4 +166,5 @@
 #	include "item_place_change_enum.h"
 #	include "inventory_slots_script_enum.h"
 #	include	"ui/UIListItemIconed.h"
+#include "gbox.h"
 #endif

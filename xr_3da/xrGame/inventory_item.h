@@ -55,7 +55,6 @@ private:
 	std::string descriptionVar;
 	luabind::functor<LPCSTR> scriptDescriptionFunctor;
 	bool m_bUsefulFromConfig;
-	bool m_bDisposableItem;
 protected:
 	enum EIIFlags{				FdropManual			=(1<<0),
 								FCanTake			=(1<<1),
@@ -279,6 +278,7 @@ public:
 	virtual CHudItem			*cast_hud_item				()	{return 0;}
 	virtual CWeaponAmmo			*cast_weapon_ammo			()	{return 0;}
 	virtual CGameObject			*cast_game_object			()  {return 0;};
+	virtual CGBox				*cast_gbox_object() { return 0; };
 
 	DECLARE_SCRIPT_REGISTER_FUNCTION
 };

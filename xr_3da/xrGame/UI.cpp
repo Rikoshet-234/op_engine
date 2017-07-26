@@ -10,6 +10,7 @@
 #include "ui/UIMainIngameWnd.h"
 #include "ui/UIMessagesWindow.h"
 #include "ui/UIPdaWnd.h"
+#include "QuickSlots.h"
 
 CUI::CUI(CHUDManager* p)
 {

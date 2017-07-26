@@ -1,4 +1,4 @@
-#include "pch_script.h"
+#include "../pch_script.h"
 #include "UIInventoryWnd.h"
 
 #include "UIXmlInit.h"
@@ -16,9 +16,12 @@
 
 #include "UIInventoryUtilities.h"
 #include "../OPFuncs/utils.h"
+#include "../QuickSlots.h"
+#include "../gbox.h"
 using namespace InventoryUtilities;
 
-
+#include "../xr_level_controller.h"
+#include <dinput.h>
 #include "../InfoPortion.h"
 #include "../level.h"
 #include "../game_base_space.h"
@@ -549,7 +552,11 @@ void	CUIInventoryWnd::SendEvent_Item_Eat			(PIItem	pItem)
 {
 	R_ASSERT						(pItem->m_pCurrentInventory==m_pInv);
 	NET_Packet						P;
-	pItem->object().u_EventGen		(P, GEG_PLAYER_ITEM_EAT, pItem->object().H_Parent()->ID());
+	CGBox* pBox = smart_cast<CGBox*>(pItem);
+	if (pBox)
+		pItem->object().u_EventGen(P, GEG_PLAYER_ITEM_USE, pItem->object().H_Parent()->ID());
+	else
+		pItem->object().u_EventGen(P, GEG_PLAYER_ITEM_EAT, pItem->object().H_Parent()->ID());
 	P.w_u16							(pItem->object().ID());
 	pItem->object().u_EventSend		(P);
 };
@@ -566,10 +573,7 @@ void CUIInventoryWnd::BindDragDropListEvents(CUIDragDropListEx* lst)
 	lst->m_f_item_focus_received	= CUIDragDropListEx::DRAG_DROP_EVENT(this,&CUIInventoryWnd::OnItemFocusReceive);
 }
 
-
-#include "../xr_level_controller.h"
-#include <dinput.h>
-
+#include "../../xr_input.h"
 bool CUIInventoryWnd::OnKeyboard(int dik, EUIMessages keyboard_action)
 {
 	if(m_b_need_reinit)
@@ -585,15 +589,29 @@ bool CUIInventoryWnd::OnKeyboard(int dik, EUIMessages keyboard_action)
 		return true;
 	}
 
+	if (keyboard_action==WINDOW_KEY_RELEASED)
+	{
+		if (dik == DIK_LCONTROL || dik == DIK_RCONTROL)
+		{
+			m_bKeyControlPress = false;
+		}
+	}
+
 	if (WINDOW_KEY_PRESSED == keyboard_action)
 	{
+		if (dik == DIK_LCONTROL || dik == DIK_RCONTROL)
+		{
+			m_bKeyControlPress = true;
+		}
+
 //#ifdef DEBUG
-		if (DIK_NUMPAD1 == dik && CurrentIItem())
+		/*if (DIK_NUMPAD1 == dik && CurrentIItem())
 		{
 			CurrentIItem()->SetVisibleForUI(false);
 			Msg("Hide current selected item from UI [%s]",CurrentIItem()->GetGameObject()->Section());
 		} 
-		else if(DIK_NUMPAD7 == dik && CurrentIItem())
+		else */
+		if(DIK_NUMPAD7 == dik && CurrentIItem())
 		{
 			CurrentIItem()->ChangeCondition(-0.05f);
 			UIItemInfo.InitItem(CurrentIItem());
@@ -605,6 +623,23 @@ bool CUIInventoryWnd::OnKeyboard(int dik, EUIMessages keyboard_action)
 		}
 //#endif
 	}
+	
+	
+	EGameActions action = get_binded_action(dik);
+	//if (action != kNOTBINDED)
+	//{
+	//	if (action==kUSE_QUICK_SLOT0)
+
+	//	if (m_bKeyControlPress && CurrentIItem())
+	//	{
+	//		QuickSlotManager->SetSlot()
+	//	}
+	//}
+	std::string test = "not_binded";
+	if (action != kNOTBINDED)
+		test = "binded to";
+	LPCSTR an = id_to_action_name(action);
+	//Msg("m_bKeyControlPress [%s] %s [%s]", m_bKeyControlPress?"true":"false",test.c_str(),an?an:"unknown");
 	if( inherited::OnKeyboard(dik,keyboard_action) )return true;
 
 	return false;

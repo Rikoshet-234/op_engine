@@ -138,7 +138,7 @@
 
 #	include "torch.h"
 #	include "pda.h"
-
+#include "gbox.h"
 #	include "searchlight.h"
 
 #	include "HangingLamp.h"
@@ -354,6 +354,9 @@ void CObjectFactory::register_classes	()
 	ADD(CTorch					,CSE_ALifeItemTorch				,CLSID_DEVICE_TORCH				,"device_torch");
 	ADD(CPda					,CSE_ALifeItemPDA				,CLSID_DEVICE_PDA				,"device_pda");
 	ADD(CNightVisionPortable	,CSE_ALifeItemNVDevice			,CLSID_DEVICE_NVP				,"device_nvp");
+
+	ADD(CGBox, CSE_ALifeItemGameBox, CLSID_GAME_BOX, "game_box");
+
 	// objects
 	ADD(CProjector				,CSE_ALifeObjectProjector		,CLSID_OBJECT_PROJECTOR			,"projector");
 	ADD(CWeaponMounted			,CSE_ALifeMountedWeapon			,CLSID_OBJECT_W_MOUNTED			,"wpn_mounted");

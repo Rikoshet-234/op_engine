@@ -24,6 +24,7 @@
 #include "../igame_persistent.h"
 #include "OPFuncs/ExpandedCmdParams.h"
 #include "OPFuncs/utils.h"
+#include "QuickSlots.h"
 
 using namespace ALife;
 
@@ -60,7 +61,7 @@ void CALifeStorageManager::save	(LPCSTR save_name, bool update_name)
 		objects().save			(stream);
 		registry().save			(stream);
 		keyvals().save			(stream);	
-
+		QuickSlotManager->saveSlots(stream);
 		source_count			= stream.tell();
 		void					*source_data = stream.pointer();
 		dest_count				= rtc_csize(source_count);
@@ -117,6 +118,7 @@ void CALifeStorageManager::load	(void *buffer, const u32 &buffer_size, LPCSTR fi
 		register_object			((*I).second,false);
 	} 
 	registry().load				(source);
+	QuickSlotManager->loadSlots(source);
 	OPFuncs::runAlifeCallback("after_regs_load_callback");	
 	can_register_objects		(true);
 	

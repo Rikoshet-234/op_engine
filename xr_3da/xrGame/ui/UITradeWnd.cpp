@@ -32,6 +32,7 @@
 #include "../medkit.h"
 #include "../antirad.h"
 #include "../bottleitem.h"
+#include "../gbox.h"
 
 
 #define				TRADE_XML			"trade.xml"
@@ -844,10 +845,14 @@ void CUITradeWnd::ProcessPropertiesBoxClicked	()
 				CInventoryItem* itm=CurrentIItem();
 				SetCurrentItem							(nullptr);
 				if(!itm->Useful())						return;
+				CGBox*			pBox = smart_cast<CGBox*>			(itm);
 				NET_Packet						P;
-				itm->object().u_EventGen		(P, GEG_PLAYER_ITEM_EAT, itm->object().H_Parent()->ID());
-				P.w_u16							(itm->object().ID());
-				itm->object().u_EventSend		(P);
+				if (pBox)
+					itm->object().u_EventGen(P, GEG_PLAYER_ITEM_USE, itm->object().H_Parent()->ID());
+				else
+					itm->object().u_EventGen(P, GEG_PLAYER_ITEM_EAT, itm->object().H_Parent()->ID());
+				P.w_u16(itm->object().ID());
+				itm->object().u_EventSend(P);
 				PlaySnd									(eInvItemUse);
 			}
 			break;
@@ -870,7 +875,7 @@ void CUITradeWnd::ActivatePropertiesBox()
 		CAntirad*			pAntirad			= smart_cast<CAntirad*>			(CurrentIItem());
 		CEatableItem*		pEatableItem		= smart_cast<CEatableItem*>		(CurrentIItem());
 		CBottleItem*		pBottleItem			= smart_cast<CBottleItem*>		(CurrentIItem());
-
+		CGBox*			pBox = smart_cast<CGBox*>			(CurrentIItem());
 		if (pWeapon)
 		{
 			if(pWeapon->GrenadeLauncherAttachable() && pWeapon->IsGrenadeLauncherAttached())
@@ -911,7 +916,7 @@ void CUITradeWnd::ActivatePropertiesBox()
 			}
 		}
 		LPCSTR _action = nullptr;
-		if(pMedkit || pAntirad)
+		if(pMedkit || pAntirad || pBox)
 			_action					= "st_use";
 		else if(pEatableItem)
 			if(pBottleItem)

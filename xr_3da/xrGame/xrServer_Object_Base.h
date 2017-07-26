@@ -33,6 +33,7 @@ class CSE_ALifeCreatureAbstract;
 class CSE_ALifeSmartZone;
 class CSE_ALifeOnlineOfflineGroup;
 class CSE_ALifeItemPDA;
+class CSE_ALifeItemGameBox;
 
 #pragma warning(push)
 #pragma warning(disable:4005)
@@ -159,6 +160,7 @@ public:
 	virtual CSE_ALifeSmartZone			*cast_smart_zone			() {return 0;};
 	virtual CSE_ALifeOnlineOfflineGroup	*cast_online_offline_group	() {return 0;};
 	virtual CSE_ALifeItemPDA			*cast_item_pda				() {return 0;};
+	virtual CSE_ALifeItemGameBox			*cast_item_gbox() { return 0; };
 };
 add_to_type_list(CSE_Abstract)
 #define script_type_list save_type_list(CSE_Abstract)

@@ -21,6 +21,7 @@
 #include "ui/UIMMShniaga.h"
 #include "ui/UIScrollView.h"
 #include "ui/UIProgressBar.h"
+#include "ui/UIDragDropListEx.h"
 #include "ai_space.h"
 #include "script_engine.h"
 
@@ -56,6 +57,15 @@ void CScriptXmlInit::InitWindow(LPCSTR path, int index, CUIWindow* pWnd){
 	CUIXmlInit::InitWindow(m_xml, path, index, pWnd);
 }
 
+CUIDragDropListEx* CScriptXmlInit::InitDragDropListEx(LPCSTR path, CUIWindow* parent)
+{
+	CUIDragDropListEx* pList= xr_new<CUIDragDropListEx>();
+	pList->m_bEnableDragDrop = false;
+	CUIXmlInit::InitDragDropListEx(m_xml, path, 0, pList);
+	pList->SetAutoDelete(true);
+	_attach_child(pList, parent);
+	return pList;
+}
 
 CUIFrameWindow*	CScriptXmlInit::InitFrame(LPCSTR path, CUIWindow* parent){
 	CUIFrameWindow* pWnd = xr_new<CUIFrameWindow>();
@@ -342,43 +352,43 @@ luabind::object CScriptXmlInit::TryReadTable(LPCSTR tablePath)
 	return resultTable;
 }
 #pragma optimize("s",on)
-void CScriptXmlInit::script_register(lua_State *L){
+void CScriptXmlInit::script_register(lua_State *L) {
 	module(L)
-	[
-		class_<CScriptXmlInit>			("CScriptXmlInit")
-		.def(							constructor<>())
-		.def("TryReadTable",			&CScriptXmlInit::TryReadTable)
-		.def("InitIconedColumns",		&CScriptXmlInit::InitIconedColumns)
-		.def("ParseFile",				&CScriptXmlInit::ParseFile)
-		.def("ParseShTexInfo",			&CScriptXmlInit::ParseShTexInfo)
-		.def("InitWindow",				&CScriptXmlInit::InitWindow)
-		.def("InitFrame",				&CScriptXmlInit::InitFrame)
-		.def("InitFrameLine",			&CScriptXmlInit::InitFrameLine)
-		.def("InitLabel",				&CScriptXmlInit::InitLabel)
-		.def("InitEditBox",				&CScriptXmlInit::InitEditBox)		
-		.def("InitStatic",				&CScriptXmlInit::InitStatic)
-		.def("InitAnimStatic",			&CScriptXmlInit::InitAnimStatic)		
-		.def("InitCheck",				&CScriptXmlInit::InitCheck)
-		.def("InitSpinNum",				&CScriptXmlInit::InitSpinNum)
-		.def("InitSpinFlt",				&CScriptXmlInit::InitSpinFlt)
-		.def("InitSpinText",			&CScriptXmlInit::InitSpinText)
-		.def("InitSpinTextCustom",		&CScriptXmlInit::InitSpinTextCustom)
-		.def("InitComboBox",			&CScriptXmlInit::InitComboBox)		
-		.def("InitComboBoxCustom",		&CScriptXmlInit::InitComboBoxCustom)		
-		.def("InitButton",				&CScriptXmlInit::InitButton)
-		.def("Init3tButton",			&CScriptXmlInit::Init3tButton)
-		.def("InitList",				&CScriptXmlInit::InitList)
-		.def("InitTab",					&CScriptXmlInit::InitTab)
-		.def("InitServerList",			&CScriptXmlInit::InitServerList)
-		.def("InitMapList",				&CScriptXmlInit::InitMapList)
-		.def("InitMapInfo",				&CScriptXmlInit::InitMapInfo)
-		.def("InitTrackBar",			&CScriptXmlInit::InitTrackBar)
-		.def("InitTrackBarCustom",		&CScriptXmlInit::InitTrackBarCustom)
-		.def("InitKeyBinding",			&CScriptXmlInit::InitKeyBinding)
-		.def("InitMMShniaga",			&CScriptXmlInit::InitMMShniaga)
-		.def("InitScrollView",			&CScriptXmlInit::InitScrollView)
-		.def("InitAutoStaticGroup",		&CScriptXmlInit::InitAutoStaticGroup)
-		.def("InitProgressBar",			&CScriptXmlInit::InitProgressBar)
-	];
-
+		[
+			class_<CScriptXmlInit>("CScriptXmlInit")
+			.def(constructor<>())
+		.def("TryReadTable", &CScriptXmlInit::TryReadTable)
+		.def("InitIconedColumns", &CScriptXmlInit::InitIconedColumns)
+		.def("ParseFile", &CScriptXmlInit::ParseFile)
+		.def("ParseShTexInfo", &CScriptXmlInit::ParseShTexInfo)
+		.def("InitWindow", &CScriptXmlInit::InitWindow)
+		.def("InitFrame", &CScriptXmlInit::InitFrame)
+		.def("InitFrameLine", &CScriptXmlInit::InitFrameLine)
+		.def("InitLabel", &CScriptXmlInit::InitLabel)
+		.def("InitEditBox", &CScriptXmlInit::InitEditBox)
+		.def("InitStatic", &CScriptXmlInit::InitStatic)
+		.def("InitAnimStatic", &CScriptXmlInit::InitAnimStatic)
+		.def("InitCheck", &CScriptXmlInit::InitCheck)
+		.def("InitSpinNum", &CScriptXmlInit::InitSpinNum)
+		.def("InitSpinFlt", &CScriptXmlInit::InitSpinFlt)
+		.def("InitSpinText", &CScriptXmlInit::InitSpinText)
+		.def("InitSpinTextCustom", &CScriptXmlInit::InitSpinTextCustom)
+		.def("InitComboBox", &CScriptXmlInit::InitComboBox)
+		.def("InitComboBoxCustom", &CScriptXmlInit::InitComboBoxCustom)
+		.def("InitButton", &CScriptXmlInit::InitButton)
+		.def("Init3tButton", &CScriptXmlInit::Init3tButton)
+		.def("InitList", &CScriptXmlInit::InitList)
+		.def("InitTab", &CScriptXmlInit::InitTab)
+		.def("InitServerList", &CScriptXmlInit::InitServerList)
+		.def("InitMapList", &CScriptXmlInit::InitMapList)
+		.def("InitMapInfo", &CScriptXmlInit::InitMapInfo)
+		.def("InitTrackBar", &CScriptXmlInit::InitTrackBar)
+		.def("InitTrackBarCustom", &CScriptXmlInit::InitTrackBarCustom)
+		.def("InitKeyBinding", &CScriptXmlInit::InitKeyBinding)
+		.def("InitMMShniaga", &CScriptXmlInit::InitMMShniaga)
+		.def("InitScrollView", &CScriptXmlInit::InitScrollView)
+		.def("InitAutoStaticGroup", &CScriptXmlInit::InitAutoStaticGroup)
+		.def("InitProgressBar", &CScriptXmlInit::InitProgressBar)
+		.def("InitDragDropListEx", &CScriptXmlInit::InitDragDropListEx)
+		];
 }

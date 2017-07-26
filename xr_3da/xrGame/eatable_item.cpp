@@ -100,8 +100,9 @@ void CEatableItem::UseBy (CEntityAlive* entity_alive)
 	
 	entity_alive->conditions().SetMaxPower( entity_alive->conditions().GetMaxPower()+m_fMaxPowerUpInfluence );
 	
+	//dirty hack for noneatablemultiusable items :)
 	//уменьшить количество порций
-	if(m_iPortionsNum > 0)
+	if (m_iPortionsNum > 0)
 		--(m_iPortionsNum);
 	else
 		m_iPortionsNum = 0;

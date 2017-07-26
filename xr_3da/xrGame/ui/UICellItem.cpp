@@ -11,7 +11,9 @@
 #include "../../defines.h"
 #include "../smart_cast.h"
 #include "UITradeWnd.h"
+#include "../physic_item.h"
 #include "../OPFuncs/utils.h"
+#include "UICellCustomItems.h"
 
 CUICellItem::CUICellItem()
 {
@@ -39,6 +41,20 @@ CUICellItem::~CUICellItem()
 		delete_data	(m_childs);
 
 	delete_data		(m_custom_draw);
+}
+
+
+LPCSTR CUICellItem::GetCellSection()
+{
+	if (m_pData)
+	{
+		PIItem itm = static_cast<PIItem>(m_pData);
+		if (itm)
+			return itm->object().cNameSect().c_str();
+	}
+	if (m_sSection.size() > 0)
+		return m_sSection.c_str();
+	return nullptr;
 }
 
 void CUICellItem::Draw()
@@ -99,6 +115,8 @@ void CUICellItem::SetOwnerList(CUIDragDropListEx* p)
 {
 	m_pParentList=p;
 	if (!m_pParentList)
+		return;
+	if (!m_pData)
 		return;
 	PIItem itm = static_cast<PIItem>(m_pData);
 	CWeapon* pWeapon = smart_cast<CWeapon*>(itm);
@@ -338,6 +356,19 @@ void CUICellItem::RestoreColors()
 {
 	SetTextureColor(m_preAnimTexColor.get());
 	SetTextColor(m_preAnimTextColor.get());
+}
+
+void CUICellItem::SetSelected(bool value)
+{
+	m_selected = value;
+	if (m_selected)
+	{
+		if (m_pParentList && m_pParentList->GetSelectedCell() != this)
+			m_pParentList->SetSelectedCell(this);
+	}
+	else
+		if (m_pParentList && m_pParentList->GetSelectedCell() == this)
+			m_pParentList->SetSelectedCell(nullptr);
 }
 
 CUIDragItem::CUIDragItem(CUICellItem* parent)

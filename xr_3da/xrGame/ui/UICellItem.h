@@ -83,6 +83,12 @@ public:
 	Fcolor					m_preAnimTextColor;
 	void					SaveColors();
 	void					RestoreColors();
+	void SetFocused(bool value) { m_focused = value; }
+	void SetSelected(bool value);
+
+	LPCSTR GetCellSection();
+	UIIconInfo m_iconInfo;
+	shared_str m_sSection;
 };
 
 class CUIDragItem: public CUIWindow, public pureRender, public pureFrame

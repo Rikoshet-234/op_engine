@@ -20,6 +20,7 @@
 #define GAME_TIME_CHUNK_DATA		0x0005
 #define REGISTRY_CHUNK_DATA			0x0009
 #define KEYVAL_CHUNK_DATA			0x000a
+#define QUICKSLOTS_CHUNK_DATA		0x000b
 #define SECTION_HEADER				"location_"
 #define SAVE_EXTENSION				".sav"
 #define SPAWN_NAME					"game.spawn"

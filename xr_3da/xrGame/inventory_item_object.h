@@ -30,6 +30,7 @@ public:
 	virtual CHudItem		*cast_hud_item					()	{return 0;}
 	virtual CWeaponAmmo		*cast_weapon_ammo				()	{return 0;}
 	virtual CGameObject		*cast_game_object				()  {return this;};
+	virtual CGBox				*cast_gbox_object() { return 0; };
 
 public:
 	virtual void	Load					(LPCSTR section);

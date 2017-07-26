@@ -32,6 +32,7 @@ private:
 	typedef CUIDialogWnd	inherited;
 	bool					m_b_need_reinit;
 	void PaintItemFromSlot(u32 slotId);
+	bool m_bKeyControlPress;
 public:
 							CUIInventoryWnd				();
 	virtual					~CUIInventoryWnd			();

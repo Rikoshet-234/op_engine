@@ -69,6 +69,12 @@ void key_binding_registrator::script_register(lua_State *L)
 				value("kCREEP",						int(kCREEP)),
 				value("kSCOPE_OPS", int(kWPN_SCOPE_OPS)),
 				value("kGL_OPS", int(kWPN_GL_OPS)),
+
+				value("kUSE_QUICK_SLOT0", int(kUSE_QUICK_SLOT0)),
+				value("kUSE_QUICK_SLOT1", int(kUSE_QUICK_SLOT1)),
+				value("kUSE_QUICK_SLOT2", int(kUSE_QUICK_SLOT2)),
+				value("kUSE_QUICK_SLOT3", int(kUSE_QUICK_SLOT3)),
+
 				value("kNOTBINDED",					int(kNOTBINDED))
 			],
 		class_<key_binding_registrator >("DIK_keys")
