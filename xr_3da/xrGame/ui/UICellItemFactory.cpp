@@ -15,3 +15,10 @@ CUICellItem*	create_cell_item(CInventoryItem* itm)
 
 	return xr_new<CUIInventoryCellItem>(itm);
 }
+
+CUICellItem* create_cell_item(shared_str itemSection)
+{
+	return xr_new<CUISectionCellItem>(itemSection);
+}
+
+

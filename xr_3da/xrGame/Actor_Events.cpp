@@ -141,6 +141,7 @@ void CActor::OnEvent		(NET_Packet& P, u16 type)
 	case GEG_PLAYER_ITEM2BELT:
 	case GEG_PLAYER_ITEM2RUCK:
 	case GEG_PLAYER_ITEM_EAT:
+	case GEG_PLAYER_ITEM_USE:
 	case GEG_PLAYER_ACTIVATEARTEFACT:
 		{
 			P.r_u16		(id);
@@ -167,6 +168,12 @@ void CActor::OnEvent		(NET_Packet& P, u16 type)
 			case GEG_PLAYER_ITEM_EAT:	 
 				inventory().Eat(smart_cast<CInventoryItem*>(O)); 
 				break;
+			case GEG_PLAYER_ITEM_USE:
+				{
+				if (IsGameTypeSingle())
+					Actor()->callback(GameObject::eUseObject)((smart_cast<CGameObject*>(O))->lua_game_object());
+
+				}break;
 			case GEG_PLAYER_ACTIVATEARTEFACT:
 				{
 					CArtefact* pArtefact		= smart_cast<CArtefact*>(O);

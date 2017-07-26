@@ -2314,6 +2314,12 @@
     <Filter Include="AI\AScript\ScriptClasses\ScriptMultiHUDs">
       <UniqueIdentifier>{188b13ee-7412-49fb-bbc1-0f6a72b4a0e7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="OPFuncs\QuickSlots">
+      <UniqueIdentifier>{96adaf79-237f-44f5-86e6-07a658fe9ee8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Client\Objects\items &amp; weapons\GameBox">
+      <UniqueIdentifier>{5efa9941-5e1b-4259-b1dc-a0bfd49f42db}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mt_config.h">
@@ -6618,6 +6624,12 @@
     <ClInclude Include="multihuds_registrator.h">
       <Filter>AI\AScript\ScriptClasses\ScriptMultiHUDs</Filter>
     </ClInclude>
+    <ClInclude Include="QuickSlots.h">
+      <Filter>OPFuncs\QuickSlots</Filter>
+    </ClInclude>
+    <ClInclude Include="gbox.h">
+      <Filter>Core\Client\Objects\items &amp; weapons\GameBox</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -9820,6 +9832,12 @@
     </ClCompile>
     <ClCompile Include="multihuds_registrator_script.cpp">
       <Filter>AI\AScript\ScriptClasses\ScriptMultiHUDs</Filter>
+    </ClCompile>
+    <ClCompile Include="QuickSlots.cpp">
+      <Filter>OPFuncs\QuickSlots</Filter>
+    </ClCompile>
+    <ClCompile Include="gbox.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\GameBox</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

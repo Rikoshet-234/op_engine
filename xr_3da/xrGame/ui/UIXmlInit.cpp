@@ -494,7 +494,11 @@ bool CUIXmlInit::InitDragDropListEx(CUIXml& xml_doc, const char* path, int index
 		pWnd->GetCellContainer()->m_suitable_color.set(GetColor	(xml_doc, buf, index, 0xff));
 		pWnd->GetCellContainer()->m_anim_mSec=xml_doc.ReadAttribInt(buf, index, "anim_time", 0);
 	}
-
+	strconcat(sizeof(buf), buf, path, ":cell_texture");
+	if (xml_doc.NavigateToNode(buf, 0))
+	{
+		pWnd->GetCellContainer()->SetCellTexture(xml_doc.Read(buf, index, nullptr));
+	}
 	pWnd->m_b_adjustCells=xml_doc.ReadAttribInt(path, index, "adjust_cells",0)?true:false;
 	pWnd->SetShowConditionBar(xml_doc.ReadAttribInt(path, index, "show_condition_bar",0)?true:false);
 

@@ -17,6 +17,8 @@
 #include "../Level.h"
 #include "../UIGameCustom.h"
 #include "../UIGameSP.h"
+#include "UICellItemFactory.h"
+#include "UICellCustomItems.h"
 
 #pragma region Font manager
 CFontManager& mngr(){
@@ -73,6 +75,80 @@ LPCSTR	get_texture_name(LPCSTR icon_name)
 TEX_INFO	get_texture_info(LPCSTR name, LPCSTR def_name)
 {
 	return CUITextureMaster::FindItem(name, def_name);
+}
+
+CUICellItem* DragDropListRemoveItem(CUIDragDropListEx* self, CUICellItem* item)
+{
+	if (!self)
+	{
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "RemoveItem : invalid self object value!");
+		return nullptr;
+	}
+	if (!item)
+	{
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "RemoveItem : invalid input cellitem object!");
+		return nullptr;
+	}
+	return self->RemoveItem(item, false);
+}
+
+void DragDropListSetItem(CUIDragDropListEx* self, CUICellItem* item)
+{
+	if (!self)
+	{
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "SetItem : invalid self object value!");
+		return;
+	}
+	if (!item)
+	{
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "SetItem : invalid input cellitem object!");
+		return;
+	}
+	self->SetItem(item);
+}
+
+void DragDropListSetItem(CUIDragDropListEx* self, CScriptGameObject* item)
+{
+	if (!self)
+	{
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "SetItem : invalid self object value!");
+		return;
+	}
+	if (!item)
+	{
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "SetItem : invalid input game object!");
+		return;
+	}
+
+	CInventoryItem *inventory_item = smart_cast<CInventoryItem*>(&item->object());
+	if (!inventory_item)
+	{
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "SetItem : invalid input inventory_item object!");
+		return;
+
+	}
+	CUICellItem* itm = create_cell_item(inventory_item);
+	self->SetItem(itm);
+}
+
+void DragDropListCompact(CUIDragDropListEx* self)
+{
+	if (!self)
+	{
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "Compact : invalid self object value!");
+		return;
+	}
+	self->Compact();
+}
+
+void DragDropListClearAll(CUIDragDropListEx* self)
+{
+	if (!self)
+	{
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "ClearAll : invalid self object value!");
+		return;
+	}
+	self->ClearAll(true);
 }
 
 using namespace luabind;
@@ -181,7 +257,10 @@ void CUIWindow::script_register(lua_State *L)
 		.def("Child",			&CUICellItem::Child)
 		.def("HasChilds",		&CUICellItem::HasChilds)
 		.def("OwnerList",		&CUICellItem::OwnerList)
-		.def("GetInventoryItem",		&CUICellItem::GetInventoryItem),
+		.def("SetFocused",		&CUICellItem::SetFocused)
+		.def("SetSelected",		&CUICellItem::SetSelected)
+		.def("GetInventoryItem",		&CUICellItem::GetInventoryItem)
+		.def("GetCellSection", &CUICellItem::GetCellSection),
 		
 
 		class_<CUIMMShniaga, CUIWindow>("CUIMMShniaga")
@@ -225,7 +304,31 @@ void CUIWindow::script_register(lua_State *L)
 		.def("SetSuitableBySectionInList",	static_cast<void (CUICarBodyWnd::*)(IWListTypes,luabind::object const& )>	(&CUICarBodyWnd::SetSuitableBySectionInList)),
 
 		class_<CUIDragDropListEx, CUIWindow,CUIWndCallback>("CUIDragDropListEx")
-		.def("GetUIListId",				&CUIDragDropListEx::GetUIListId),
+			.def(constructor<>())
+			.def("GetUIListId",				&CUIDragDropListEx::GetUIListId)
+			.def("SetUIListId", &CUIDragDropListEx::SetUIListId)
+			.def("SetCellHeight", static_cast<void (CUIDragDropListEx::*)(int)>(&CUIDragDropListEx::SetCellHeight))
+			.def("SetCellWidth", static_cast<void (CUIDragDropListEx::*)(int)>(&CUIDragDropListEx::SetCellWidth))
+			.def("SetCellSize", static_cast<void (CUIDragDropListEx::*)(const Ivector2)>(&CUIDragDropListEx::SetCellSize))
+			.def("SetCellSize",static_cast<void (CUIDragDropListEx::*)(int,int)>(&CUIDragDropListEx::SetCellSize))
+			.def("SetCellsRows", static_cast<void (CUIDragDropListEx::*)(int)>(&CUIDragDropListEx::SetCellsRows))
+			.def("SetCellsColumns", static_cast<void (CUIDragDropListEx::*)(int)>(&CUIDragDropListEx::SetCellsColumns))
+			.def("SetCellsCapacity", static_cast<void (CUIDragDropListEx::*)(const Ivector2)>(&CUIDragDropListEx::SetCellsCapacity))
+			.def("SetCellsCapacity", static_cast<void (CUIDragDropListEx::*)(int, int)>(&CUIDragDropListEx::SetCellsCapacity))
+		
+			.def("SetItem", static_cast<void(*)(CUIDragDropListEx*, CScriptGameObject*)>(&DragDropListSetItem))
+			.def("SetItem", static_cast<void(*)(CUIDragDropListEx*, CUICellItem*)>(&DragDropListSetItem))
+			.def("Compact", static_cast<void(*)(CUIDragDropListEx*)>(&DragDropListCompact))
+			.def("ClearAll", static_cast<void(*)(CUIDragDropListEx*)>(&DragDropListClearAll))
+			.def("HasFreeSpace", &CUIDragDropListEx::HasFreeSpace)
+			.def("RemoveItem", &DragDropListRemoveItem)
+			.def("CreateCellItemSimple", &CUIDragDropListEx::CreateCellItemSimple)
+		
+			.def("GetSelectedCell",&CUIDragDropListEx::GetSelectedCell)
+			.def("set_callback", static_cast<void (CUIDragDropListEx::*)(GameObject::ECallbackType, const luabind::functor<void>&)>(&CUIDragDropListEx::SetCallback))
+			.def("set_callback", static_cast<void (CUIDragDropListEx::*)(GameObject::ECallbackType, const luabind::functor<void>&, const luabind::object&)>(&CUIDragDropListEx::SetCallback))
+			.def("set_callback", static_cast<void (CUIDragDropListEx::*)(GameObject::ECallbackType)>(&CUIDragDropListEx::SetCallback))
+			,
 
 		class_<CUIScrollView, CUIWindow>("CUIScrollView")
 		.def(							constructor<>())

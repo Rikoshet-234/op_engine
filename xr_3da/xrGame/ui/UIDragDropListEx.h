@@ -3,8 +3,10 @@
 #include "UIWindow.h"
 #include "UIWndCallback.h"
 #include "../inventory_space.h"
+#include "../game_object_space.h"
 #include "UIProgressBar.h"
-
+#include <luabind/luabind.hpp>
+#include "../script_callback_ex.h"
 
 class CInventoryItem;
 class CUICellContainer;
@@ -124,11 +126,24 @@ protected:
 	void	__stdcall		OnItemFocusLost			(CUIWindow* w, void* pData);
 
 	IWListTypes				listId;
+
+	typedef xr_map<GameObject::ECallbackType, CScriptCallbackEx<void>> callback_map;
+	callback_map *m_callbacks;
+
 public:
+	CScriptCallbackEx<void> &callback(GameObject::ECallbackType type) const;
+	void SetCallback(GameObject::ECallbackType type, const luabind::functor<void> &functor);
+	void SetCallback(GameObject::ECallbackType type, const luabind::functor<void> &functor, const luabind::object &object);
+	void SetCallback(GameObject::ECallbackType type);
+
+	CUICellItem* CreateCellItemSimple(LPCSTR itemSection);
+
 	TCachedData cacheData;
 	bool					GetShowConditionBar() const {return m_b_showConditionBar;}
 	void SetShowConditionBar(bool state);
-	
+	CUICellItem* GetSelectedCell();
+	void SetSelectedCell(CUICellItem* value) { m_selected_item = value; }
+	bool HasFreeSpace() const;
 	IWListTypes				GetUIListId() const			{return listId; };
 	void					SetUIListId(IWListTypes id)	{listId=id; };
 	bool					m_b_adjustCells;
@@ -154,13 +169,21 @@ public:
 	bool			select_weapons_by_ammo(CInventoryItem* ammoItem);
 	bool			select_items_by_section(shared_str section);
 
+	bool m_bEnableDragDrop;
 
 	const	Ivector2&		CellsCapacity		();
 			void			SetCellsCapacity	(const Ivector2 c);
 			void			SetStartCellsCapacity(const Ivector2 c){m_orig_cell_capacity=c;SetCellsCapacity(c);};
 			void			ResetCellsCapacity	(){VERIFY(ItemsCount()==0);SetCellsCapacity(m_orig_cell_capacity);};
-	 const	Ivector2&		CellSize			();
+			void SetCellsRows(int num);
+			void SetCellsColumns(int num);
+			void SetCellsCapacity(int rows, int columns);
+
+			const	Ivector2&		CellSize			();
 			void			SetCellSize			(const Ivector2 new_sz);
+			void			SetCellSize(int x, int y);
+			void SetCellWidth(int width);
+			void SetCellHeight(int height);
 			int				ScrollPos			();
 			void			SetScrollPos		(int iPos);
 			void			ReinitScroll		();
@@ -173,7 +196,6 @@ public:
 			bool			IsGrouping			();
 			void			SetCustomPlacement	(bool b);
 			bool			GetCustomPlacement	();
-public:
 			// items management
 			virtual void	SetItem				(CUICellItem* itm); //auto
 			virtual void	SetItem				(CUICellItem* itm, Fvector2 abs_pos);  // start at cursor pos
@@ -189,7 +211,6 @@ public:
 			void			ClearAll			(bool bDestroy);	
 			void			Compact				();
 			bool			IsOwner				(CUICellItem* itm);
-public:
 	//UIWindow overriding
 	virtual		void		Draw				();
 	virtual		void		Update				();
@@ -208,6 +229,7 @@ private:
 	ref_shader					hShader;  //ownerDraw
 	ref_geom					hGeom;	
 	UI_CELLS_VEC				m_cells_to_draw;
+	LPCSTR	m_sCellTexture;
 protected:
 	CUIDragDropListEx*			m_pParentDragDropList;
 
@@ -225,10 +247,13 @@ public:
 	CUICellItem*				GetFocusedCellItem		();
 	void						clear_select_suitables();
 
+	void SetCellTexture(LPCSTR texture);
 	Fcolor				m_focused_color;
 	Fcolor				m_selected_color;
 	Fcolor				m_suitable_color;
 	s32					m_anim_mSec;
+	
+
 
 protected:
 	virtual		void			Draw				();

@@ -156,7 +156,8 @@
 // 120 - CSE_ALifeItemNVDevice - change type from config for exists pnv, for backward compability
 // 121 - CSE_ALifeInventoryItem - add weight and cost store in SE
 // 122 - CSE_ALifeInventoryItem - add radiation store in SE
-#define SPAWN_VERSION	u16(122)
+// 123 - CSE_ALifeItemGameBox - store userdata 
+#define SPAWN_VERSION	u16(123)
 
 SERVER_ENTITY_DECLARE_BEGIN2(CSE_Shape,ISE_Shape,CShapeData)
 public:

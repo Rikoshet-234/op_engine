@@ -234,7 +234,26 @@ void CScriptGameObject::IterateBeltOnlyFunctor(luabind::functor<void> functor)
 		functor				((*I)->object().lua_game_object());
 }
 
-
+void CScriptGameObject::IterateInventorySimpleBool(luabind::functor<bool> functor)
+{
+	CInventoryOwner			*inventory_owner = smart_cast<CInventoryOwner*>(&this->object());
+	if (!inventory_owner) {
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CScriptGameObject::IterateInventory non-CInventoryOwner object !!!");
+		return;
+	}
+	if (!functor.is_valid())
+	{
+		Msg("! ERROR invalid functor for bool iterator!");
+		return;
+	}
+	TIItemContainer::iterator	B = inventory_owner->inventory().m_all.begin();
+	TIItemContainer::iterator	E = inventory_owner->inventory().m_all.end();
+	for (; B != E; ++B)
+	{
+		if (!functor((*B)->object().lua_game_object()))
+			return;
+	}
+}
 
 void CScriptGameObject::IterateInventorySimple	(luabind::functor<void> functor)
 {

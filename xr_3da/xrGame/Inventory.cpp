@@ -1058,7 +1058,7 @@ bool CInventory::Eat(PIItem pIItem)
 	if(IsGameTypeSingle() && Actor()->m_inventory == this)
 		Actor()->callback(GameObject::eUseObject)((smart_cast<CGameObject*>(pIItem))->lua_game_object());
 
-	if(pItemToEat->m_bDisposableItem && pItemToEat->Empty() && entity_alive->Local())
+	if(pItemToEat->Empty() && entity_alive->Local())
 	{
 		NET_Packet					P;
 		CGameObject::u_EventGen		(P,GE_OWNERSHIP_REJECT,entity_alive->ID());

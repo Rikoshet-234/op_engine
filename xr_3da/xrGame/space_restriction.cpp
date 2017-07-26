@@ -196,7 +196,8 @@ CSpaceRestriction::CBaseRestrictionPtr CSpaceRestriction::merge	(CBaseRestrictio
 	RESTRICTIONS::const_iterator	I = temp_restrictions.begin();
 	RESTRICTIONS::const_iterator	E = temp_restrictions.end();
 	for ( ; I != E; ++I)
-		temp						= strconcat(sizeof(S),S,*temp,",",*(*I)->name());
+#pragma todo ("->winsor check in future ! restrictors!")
+		temp						= strconcat(strlen(S),S,*temp,",",*(*I)->name());
 
 	xr_free							(S);
 

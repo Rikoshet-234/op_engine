@@ -253,6 +253,7 @@ class_<CScriptGameObject> &script_register_game_object2(class_<CScriptGameObject
 		.def("iterate_inventory",			&CScriptGameObject::IterateInventory)
 		.def("iterate_inventory",			&CScriptGameObject::IterateInventoryOnlyFunctor)
 		.def("iterate_inventory_simple",	&CScriptGameObject::IterateInventorySimple)
+		.def("iterate_inventory_bool", &CScriptGameObject::IterateInventorySimpleBool)
 		.def("mark_item_dropped",			&CScriptGameObject::MarkItemDropped)
 		.def("marked_dropped",				&CScriptGameObject::MarkedDropped)
 		.def("unload_magazine",				&CScriptGameObject::UnloadMagazine)

@@ -6,10 +6,37 @@
 #define INV_GRID_WIDTHF			50.0f
 #define INV_GRID_HEIGHTF		50.0f
 
+CUISectionCellItem::CUISectionCellItem(shared_str section)
+{
+	m_pData = nullptr;
+	m_sSection = section;
+	inherited::SetShader(InventoryUtilities::GetEquipmentIconsShader());
+	m_iconInfo.Load(section, true);
+	m_grid_size.set(m_iconInfo.getWidth(), m_iconInfo.getHeight());
+	m_grid_size_start.set(m_grid_size);
+	inherited::SetOriginalRect(m_iconInfo.getOriginalRect());
+	inherited::SetStretchTexture(true);
+}
+
+bool CUISectionCellItem::EqualTo(CUICellItem* itm)
+{
+	CUISectionCellItem* ci = smart_cast<CUISectionCellItem*>(itm);
+	if (!ci) 
+		return false;
+	if (xr_strcmp(m_sSection, ci->m_sSection) != 0) 
+		return false;
+	return true;
+}
+
+void CUISectionCellItem::Update()
+{
+	inherited::Update();
+}
+
 CUIInventoryCellItem::CUIInventoryCellItem(CInventoryItem* itm)
 {
 	m_pData											= (void*)itm;
-
+	m_sSection = "";
 	inherited::SetShader							(InventoryUtilities::GetEquipmentIconsShader());
 
 	m_grid_size.set									(itm->GetGridWidth(),itm->GetGridHeight());
@@ -21,7 +48,7 @@ CUIInventoryCellItem::CUIInventoryCellItem(CInventoryItem* itm)
 bool CUIInventoryCellItem::EqualTo(CUICellItem* itm)
 {
 	CUIInventoryCellItem* ci = smart_cast<CUIInventoryCellItem*>(itm);
-	if(!itm)				return false;
+	if(!ci)				return false;
 	return					(
 								fsimilar(object()->GetCondition(), ci->object()->GetCondition(), 0.01f) &&
 								(object()->object().cNameSect() == ci->object()->object().cNameSect())

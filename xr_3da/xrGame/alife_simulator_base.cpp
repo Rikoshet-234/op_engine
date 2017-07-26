@@ -21,6 +21,7 @@
 #include "alife_keyval_registry.h"
 #include "xrserver.h"
 #include "level_graph.h"
+#include "QuickSlots.h"
 
 #pragma warning(push)
 #pragma warning(disable:4995)
@@ -44,6 +45,7 @@ CALifeSimulatorBase::CALifeSimulatorBase	(xrServer *server, LPCSTR section)
 	m_groups					= 0;
 	m_registry_container		= 0;
 	m_keyval_registry			= 0;
+	QuickSlotManager = nullptr;
 	random().seed				(u32(CPU::QPC() & 0xffffffff));
 	m_can_register_objects		= true;
 }
@@ -71,6 +73,7 @@ void CALifeSimulatorBase::unload			()
 	xr_delete					(m_groups);
 	xr_delete					(m_registry_container);
 	xr_delete					(m_keyval_registry);
+	xr_delete(QuickSlotManager);
 	m_initialized				= false;
 }
 
@@ -87,6 +90,7 @@ void CALifeSimulatorBase::reload			(LPCSTR section)
 	m_groups					= xr_new<CALifeGroupRegistry>		();
 	m_registry_container		= xr_new<CALifeRegistryContainer>	();
 	m_keyval_registry			= xr_new<CALifeKeyvalRegistry>		();
+	QuickSlotManager = xr_new<CQuickSlots>();
 	m_initialized				= true;
 }
 

@@ -102,6 +102,10 @@ _action  actions[] = {
 	{ "creep",				kCREEP					,_sp},
 	{ "wpn_scope_ops",		kWPN_SCOPE_OPS			,_sp },
 	{ "wpn_gl_ops",			kWPN_GL_OPS				,_sp },
+	{ "use_quick_slot0",	kUSE_QUICK_SLOT0		,_sp },
+	{ "use_quick_slot1",	kUSE_QUICK_SLOT1		,_sp },
+	{ "use_quick_slot2",	kUSE_QUICK_SLOT2		,_sp },
+	{ "use_quick_slot3",	kUSE_QUICK_SLOT3		,_sp },
 	{nullptr, 				kLASTACTION				,_both}
 };
 
@@ -220,7 +224,7 @@ void remap_keys()
 	}
 }
 
-LPCSTR id_to_action_name(int _id)
+LPCSTR id_to_action_name(EGameActions _id,bool quiet)
 {
 	int idx				= 0;
 	while( actions[idx].action_name )
@@ -229,7 +233,8 @@ LPCSTR id_to_action_name(int _id)
 			return actions[idx].action_name;
 		++idx;
 	}
-	Msg				("! cant find corresponding [action_name] for id[%d]", _id);
+	if (!quiet)
+		Msg				("! cant find corresponding [action_name] for id[%d]", _id);
 	return nullptr;
 }
 

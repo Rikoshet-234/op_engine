@@ -105,7 +105,11 @@ void CScriptGameObject::script_register(lua_State *L)
 				value("on_item_place_change",		int(GameObject::OnInventoryItemPlaceChange)),
 				value("on_keyboard_press",			int(GameObject::OnKeyboardPress)),
 				value("on_prepare_item_info",		int(GameObject::OnPrepareItemInfo)),
-				value("infoportion_disable",		int(GameObject::OnDisableInfoPortion))
+				value("infoportion_disable",		int(GameObject::OnDisableInfoPortion)),
+				value("cell_focus_receive",			int(GameObject::OnDragDropListCellFocusReceive)),
+				value("cell_focus_lost",			int(GameObject::OnDragDropListCellFocusLost)),
+				value("cell_selected",				int(GameObject::OnDragDropListCellSelected)),
+				value("cell_dbl_click", int(GameObject::OnDragDropListDBLClickCell))
 				//value("on_inv_prop_show",		int(GameObject::eOnInventoryShowPropBox))
 
 			],

@@ -60,6 +60,18 @@ void CSE_ALifeItemNVDevice::script_register(lua_State *L)
 	];
 }
 
+void CSE_ALifeItemGameBox::script_register(lua_State *L)
+{
+	module(L)[
+		luabind_class_item1(
+			CSE_ALifeItemGameBox,
+			"cse_alife_item_game_box",
+			CSE_ALifeItem
+		)
+			.def("set_user_data", &CSE_ALifeItemGameBox::set_user_data)
+			.def("get_user_data", &CSE_ALifeItemGameBox::get_user_data)
+	];
+}
 
 void CSE_ALifeItemAmmo::script_register(lua_State *L)
 {

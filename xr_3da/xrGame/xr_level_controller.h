@@ -97,6 +97,10 @@ enum	EGameActions
 	kWPN_SCOPE_OPS,
 	kWPN_GL_OPS,
 
+	kUSE_QUICK_SLOT0,
+	kUSE_QUICK_SLOT1,
+	kUSE_QUICK_SLOT2,
+	kUSE_QUICK_SLOT3,
 	kLASTACTION,
 	kNOTBINDED,
 	kFORCEDWORD		= u32(-1)
@@ -130,7 +134,7 @@ int				keyname_to_dik			(LPCSTR _name);
 _keyboard*		keyname_to_ptr			(LPCSTR _name);
 _keyboard*		dik_to_ptr				(int _dik, bool bSafe);
 
-LPCSTR			id_to_action_name		(EGameActions _id);
+LPCSTR			id_to_action_name		(EGameActions _id, bool quiet=true);
 EGameActions	action_name_to_id		(LPCSTR _name);
 _action*		action_name_to_ptr		(LPCSTR _name);
 

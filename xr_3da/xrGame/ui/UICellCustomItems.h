@@ -3,6 +3,17 @@
 #include "../Weapon.h"
 
 
+class CUISectionCellItem:public CUICellItem
+{
+private:
+	typedef  CUICellItem	inherited;
+public:
+	CUISectionCellItem(shared_str section);
+	bool			EqualTo(CUICellItem* itm) override;
+	void			Update() override;
+	CInventoryItem* object() const { return nullptr; }
+};
+
 class CUIInventoryCellItem :public CUICellItem
 {
 	typedef  CUICellItem	inherited;

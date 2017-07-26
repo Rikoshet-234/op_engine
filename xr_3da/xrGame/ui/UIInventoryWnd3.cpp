@@ -23,7 +23,7 @@
 #include "../script_callback_ex.h"
 #include "../script_game_object.h"
 #include "../OPFuncs/utils.h"
-
+#include "../gbox.h"
 
 
 void CUIInventoryWnd::EatItem(PIItem itm)
@@ -83,6 +83,7 @@ void CUIInventoryWnd::ActivatePropertiesBox()
 
 	CMedkit*			pMedkit				= smart_cast<CMedkit*>			(CurrentIItem());
 	CAntirad*			pAntirad			= smart_cast<CAntirad*>			(CurrentIItem());
+	CGBox*			pBox = smart_cast<CGBox*>			(CurrentIItem());
 	CEatableItem*		pEatableItem		= smart_cast<CEatableItem*>		(CurrentIItem());
 	CCustomOutfit*		pOutfit				= smart_cast<CCustomOutfit*>	(CurrentIItem());
 	CWeapon*			pWeapon				= smart_cast<CWeapon*>			(CurrentIItem());
@@ -205,7 +206,7 @@ void CUIInventoryWnd::ActivatePropertiesBox()
 #pragma endregion
 	LPCSTR _action = nullptr;
 
-	if(pMedkit || pAntirad)
+	if(pMedkit || pAntirad || pBox)
 	{
 		_action					= "st_use";
 	}
@@ -347,8 +348,9 @@ bool CUIInventoryWnd::TryUseItem(PIItem itm)
 	CMedkit*			pMedkit				= smart_cast<CMedkit*>			(itm);
 	CAntirad*			pAntirad			= smart_cast<CAntirad*>			(itm);
 	CEatableItem*		pEatableItem		= smart_cast<CEatableItem*>		(itm);
+	CGBox*			pBox = smart_cast<CGBox*>			(CurrentIItem());
 
-	if(pMedkit || pAntirad || pEatableItem || pBottleItem)
+	if(pMedkit || pAntirad || pEatableItem || pBottleItem || pBox)
 	{
 		EatItem(itm);
 		return true;
