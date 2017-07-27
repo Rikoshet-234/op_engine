@@ -50,10 +50,10 @@ void CGBox::net_Relcase(CObject* O)
 
 void CGBox::SetUserData(NET_Packet* inputPacket)
 {
-	CSE_ALifeDynamicObject* se_obj = ai().alife().objects().object(ID());
+	CSE_ALifeDynamicObject* se_obj = ai().alife().objects().object(ID(),true);
 	if (!se_obj)
 	{
-		Msg("! WARNING cannot find server entry for [%s]. data not stored!",Name());
+		//Msg("! WARNING cannot find server entry for [%s]. data not stored!",Name());
 		return;
 	}
 	CSE_ALifeItemGameBox* se_gbox = smart_cast<CSE_ALifeItemGameBox*>(se_obj);
