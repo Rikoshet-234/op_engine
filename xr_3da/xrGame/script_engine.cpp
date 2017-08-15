@@ -234,36 +234,104 @@ void CScriptEngine::load_common_scripts()
 	xr_delete			(l_tpIniFile);
 }
 
-void CScriptEngine::process_file_if_exists	(LPCSTR file_name, bool warn_if_not_exist)
+LPCSTR ExtractFileName(LPCSTR fname) //from alpet code ported, support for recursive script names
+{
+	LPCSTR result = fname;
+	for (size_t c = 0; c < xr_strlen(fname); c++)
+		if (fname[c] == '\\') result = &fname[c + 1];
+	return result;
+}
+
+void CScriptEngine::CollectScriptFiles(td_SCRIPT_MAP &map, LPCSTR path)
+{
+	if (xr_strlen(path) == 0)
+		return;
+	string_path fname;
+	xr_vector<char*> *folders = FS.file_list_open(path, FS_ListFolders);
+	if (folders)
+	{
+		std::for_each(folders->begin(), folders->end(), [&](LPCSTR folder)
+		{
+			if (strstr(folder,".")!=nullptr)
+			{
+				strconcat(sizeof(fname), fname, path, folder);
+				CollectScriptFiles(map, fname);
+			}
+		});
+		FS.file_list_close(folders);
+	}
+
+	string_path buff;
+	xr_vector<char*> *files = FS.file_list_open(path, FS_ListFiles);
+	if (!files) 
+		return;
+	std::for_each(files->begin(), files->end(), [&](LPCSTR file)
+	{
+		strconcat(sizeof(fname), fname, path, file);
+		if ((strstr(fname, ".script") || strstr(fname, ".lua")) && FS.exist(fname))
+		{
+			LPCSTR fstart = ExtractFileName(fname);
+			strcpy_s(buff, sizeof(buff), fstart);
+			_strlwr_s(buff, sizeof(buff));
+			LPCSTR nspace = strtok(buff, ".");
+			map.insert(mk_pair(nspace, fname));
+		}
+	});
+	FS.file_list_close(files);
+}
+
+bool CScriptEngine::LookupScript(string_path &fname, LPCSTR base)
+{
+	string_path lc_base;
+	Memory.mem_fill(fname, 0, sizeof(fname));
+
+	if (0 == m_mScriptFiles.size())
+	{
+		FS.update_path(lc_base, "$game_scripts$", "");
+		CollectScriptFiles(m_mScriptFiles, lc_base);
+	}
+	strcpy_s(lc_base, sizeof(lc_base), base);
+	_strlwr_s(lc_base, sizeof(lc_base));
+	auto it = m_mScriptFiles.find(lc_base);
+	if (it != m_mScriptFiles.end())
+	{
+		strcpy_s(fname, sizeof(fname), *it->second);
+		return true;
+	}
+	return false;
+}
+
+void CScriptEngine::process_file_if_exists(LPCSTR file_name, bool warn_if_not_exist)
 {
 	u32						string_length = xr_strlen(file_name);
-	if (!warn_if_not_exist && no_file_exists(file_name,string_length))
+	if (!warn_if_not_exist && no_file_exists(file_name, string_length))
 		return;
 
-	string_path				S,S1;
-	if (m_reload_modules || (*file_name && !namespace_loaded(file_name))) {
-		FS.update_path		(S,"$game_scripts$",strconcat(sizeof(S1),S1,file_name,".script"));
-		if (!warn_if_not_exist && !FS.exist(S) ) {
+	string_path				S, S1;
+	if (m_reload_modules || (*file_name && !namespace_loaded(file_name)))
+	{
+		LookupScript(S, file_name);
+		if (!warn_if_not_exist && !FS.exist(S)) {
 #	ifndef XRSE_FACTORY_EXPORTS
-		#	ifdef DEBUG
+#	ifdef DEBUG
 			if (psAI_Flags.test(aiNilObjectAccess))
-		#endif
+#endif
 #	endif
 			{
 				if (OPFuncs::Dumper->isParamSet(OPFuncs::ExpandedCmdParams::KnownParams::dScriptNotExistsVariable))
 				{
-					print_stack			();
-					Msg					("* trying to access variable %s, which doesn't exist, or to load script %s, which doesn't exist too",file_name,S1);
+					print_stack();
+					Msg("* trying to access variable %s, which doesn't exist, or to load script %s, which doesn't exist too", file_name, S1);
 				}
-				m_stack_is_ready	= true;
+				m_stack_is_ready = true;
 			}
-			add_no_file		(file_name,string_length);
+			add_no_file(file_name, string_length);
 			return;
 		}
 		if (OPFuncs::Dumper->isParamSet(OPFuncs::ExpandedCmdParams::KnownParams::dScriptLoad))
-			Msg("CScriptEngine::process_file_if_exists, loading script %s",S1);
-		m_reload_modules	= false;
-		load_file_into_namespace(S,*file_name ? file_name : "_G");
+			Msg("CScriptEngine::process_file_if_exists, loading script %s", S1);
+		m_reload_modules = false;
+		load_file_into_namespace(S, *file_name ? file_name : "_G");
 	}
 }
 
