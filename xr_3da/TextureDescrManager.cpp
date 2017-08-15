@@ -174,9 +174,11 @@ void CTextureDescrMngr::Load()
 	TT.Start				();
 
 	LoadLTX					();
+	Msg("load time LTX=%d ms", TT.GetElapsed_ms());
+	TT.Start();
 	LoadTHM					();
 
-	Msg("load time=%d ms",TT.GetElapsed_ms());
+	Msg("load time THM=%d ms",TT.GetElapsed_ms());
 }
 
 void CTextureDescrMngr::UnLoad()

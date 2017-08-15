@@ -42,7 +42,10 @@ public:
 
 private:
 	bool						m_reload_modules;
-
+	typedef xr_map<shared_str, shared_str> td_SCRIPT_MAP;
+	td_SCRIPT_MAP m_mScriptFiles;
+	void CollectScriptFiles(td_SCRIPT_MAP &map, LPCSTR path);
+	bool LookupScript(string_path &fname, LPCSTR base);
 protected:
 	CScriptProcessStorage		m_script_processes;
 	int							m_stack_level;
