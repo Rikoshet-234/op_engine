@@ -59,6 +59,7 @@
 
 #include <tlhelp32.h>
 #include "ui/UIDebugFonts.h"
+#include "../CBlinker.h"
 
 string_path		g_last_saved_game;
 
@@ -386,9 +387,27 @@ public:
 		string_path		fn;
 		FS.update_path	(fn, "$game_saves$", fn_);
 
-		g_pGameLevel->Cameras().AddCamEffector(xr_new<CDemoRecord> (fn));
+		//g_pGameLevel->Cameras().AddCamEffector(xr_new<CDemoRecord> (fn));
 	}
 };
+
+
+class CCC_Blinker : public IConsole_Command
+{
+public:
+
+	CCC_Blinker(LPCSTR N) : IConsole_Command(N) {};
+	virtual void Execute(LPCSTR args) {
+		if (GameID() != GAME_SINGLE)
+		{
+			Msg("For this game type Blinker is disabled.");
+			return;
+		}; 
+		Console->Hide();
+		g_pGameLevel->Cameras().AddCamEffector(xr_new<CBlinker>());
+	}
+};
+
 class CCC_DemoPlay : public IConsole_Command
 {
 public:
@@ -1637,6 +1656,7 @@ void CCC_RegisterCommands()
 
 	CMD1(CCC_DemoPlay,			"demo_play"				);
 	CMD1(CCC_DemoRecord,		"demo_record"			);
+	CMD1(CCC_Blinker, "blinker");
 	CMD1(CCC_PHFps,				"ph_frequency"																					);
 	CMD1(CCC_PHIterations,		"ph_iterations"																					);
 	CMD1(CCC_SetGodMode,		"g_god"					);
@@ -1679,6 +1699,11 @@ void CCC_RegisterCommands()
 	CMD1(CCC_ScriptCommand,		"run_string"			);
 
 	CMD1(CCC_Crash,		"crash"						);
+
+	// adjust mode support
+	CMD4(CCC_Integer, "hud_adjust_mode", &g_bHudAdjustMode, 0, 5);
+	CMD4(CCC_Float, "hud_adjust_value", &g_fHudAdjustValue, 0.0f, 1.0f);
+
 #ifndef MASTER_GOLD
 	CMD1(CCC_ALifeTimeFactor,		"al_time_factor"		);		// set time factor
 	CMD1(CCC_ALifeSwitchDistance,	"al_switch_distance"	);		// set switch distance
@@ -1760,10 +1785,6 @@ void CCC_RegisterCommands()
 	CMD1(CCC_ShowMonsterInfo,	"ai_monster_info");
 	CMD1(CCC_DebugFonts,		"debug_fonts");
 	CMD1(CCC_TuneAttachableItem,"dbg_adjust_attachable_item");
-
-	// adjust mode support
-	CMD4(CCC_Integer,			"hud_adjust_mode",		&g_bHudAdjustMode,	0, 5);
-	CMD4(CCC_Float,				"hud_adjust_value",		&g_fHudAdjustValue,	0.0f, 1.0f);
 
 	CMD1(CCC_ShowAnimationStats,"ai_show_animation_stats");
 	CMD1(CCC_PHGravity,			"ph_gravity"																					);

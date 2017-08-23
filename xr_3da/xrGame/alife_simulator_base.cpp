@@ -94,6 +94,46 @@ void CALifeSimulatorBase::reload			(LPCSTR section)
 	m_initialized				= true;
 }
 
+CSE_Abstract *CALifeSimulatorBase::spawn_item(LPCSTR section, const Fvector &position, u32 level_vertex_id, GameGraph::_GRAPH_ID game_vertex_id, u16 parent_id, float distance,bool registration)
+{
+	CSE_Abstract				*abstract = F_entity_Create(section);
+	R_ASSERT3(abstract, "Cannot find item with section", section);
+
+	abstract->s_name = section;
+	abstract->s_gameid = u8(GAME_SINGLE); // GameID()
+	abstract->s_RP = 0xff;
+	abstract->ID = server().PerformIDgen(0xffff);
+	abstract->ID_Parent = parent_id;
+	abstract->ID_Phantom = 0xffff;
+	abstract->o_Position = position;
+	abstract->m_wVersion = SPAWN_VERSION;
+
+	string256					s_name_replace;
+	strcpy(s_name_replace, *abstract->s_name);
+	if (abstract->ID < 1000)
+		strcat(s_name_replace, "0");
+	if (abstract->ID < 100)
+		strcat(s_name_replace, "0");
+	if (abstract->ID < 10)
+		strcat(s_name_replace, "0");
+	string16					S1;
+	strcat(s_name_replace, _itoa(abstract->ID, S1, 10));
+	abstract->set_name_replace(s_name_replace);
+	CSE_ALifeDynamicObject		*dynamic_object = smart_cast<CSE_ALifeDynamicObject*>(abstract);
+	VERIFY(dynamic_object);
+	CSE_ALifeItemWeapon* weapon = smart_cast<CSE_ALifeItemWeapon*>(dynamic_object);
+	if (weapon)
+		weapon->a_elapsed = weapon->get_ammo_magsize();
+	dynamic_object->m_tNodeID = level_vertex_id;
+	dynamic_object->m_tGraphID = game_vertex_id;
+	dynamic_object->m_fDistance = distance;
+	dynamic_object->m_tSpawnID = u16(-1);
+	if (registration)
+		register_object(dynamic_object, true);
+	dynamic_object->spawn_supplies();
+	dynamic_object->on_spawn();
+	return						(dynamic_object);
+}
 CSE_Abstract *CALifeSimulatorBase::spawn_item	(LPCSTR section, const Fvector &position, u32 level_vertex_id, GameGraph::_GRAPH_ID game_vertex_id, u16 parent_id, bool registration)
 {
 	CSE_Abstract				*abstract = F_entity_Create(section);

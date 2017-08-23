@@ -44,6 +44,15 @@ Fvector CVertex__game_point				(const CGameGraph::CVertex *vertex)
 	return				(vertex->game_point());
 }
 
+LPCSTR get_level_name_by_graph_id(GameGraph::_GRAPH_ID graph_id)
+{
+	auto level = ai().game_graph().header().levels().find(ai().game_graph().vertex(graph_id)->level_id());
+	if (level!= ai().game_graph().header().levels().end())
+	{
+		return level->second.name().c_str();
+	}
+	return "";
+}
 #pragma optimize("s",on)
 void CGameGraph::script_register		(lua_State *L)
 {
@@ -56,7 +65,8 @@ void CGameGraph::script_register		(lua_State *L)
 			.def("accessible",		&get_accessible2)
 			.def("valid_vertex_id",	&CGameGraph::valid_vertex_id)
 			.def("vertex",			&CGameGraph::vertex)
-			.def("vertex_id",		&CGameGraph::vertex_id),
+			.def("vertex_id",		&CGameGraph::vertex_id)
+			.def("level_name_by_gvid",&get_level_name_by_graph_id),
 
 		class_<CVertex>("GameGraph__CVertex")
 			.def("level_point",		&CVertex__level_point)

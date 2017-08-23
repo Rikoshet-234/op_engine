@@ -315,6 +315,43 @@ bool CUICustomEdit::OnKeyboard(int dik, EUIMessages keyboard_action)
 	return false;
 }
 
+void putToClipboard(LPCSTR text)
+{
+	int size = xr_strlen(text);
+	if (size == 0)
+		return;
+	if (OpenClipboard(nullptr))
+	{
+		EmptyClipboard();
+		HGLOBAL hg = GlobalAlloc(GMEM_MOVEABLE, size + 1);
+		if (!hg) {
+			CloseClipboard();
+			return;
+		}
+		memcpy(GlobalLock(hg), text, size + 1);
+		GlobalUnlock(hg);
+		SetClipboardData(CF_TEXT, hg);
+		CloseClipboard();
+		return;
+	}
+}
+
+LPCSTR getFromClipboard()
+{
+	LPCSTR result="";
+	if (OpenClipboard(nullptr))
+	{
+		HGLOBAL hmem = GetClipboardData(CF_TEXT);
+		if (hmem)
+		{
+			result = static_cast<LPCSTR>(GlobalLock(hmem));
+			GlobalUnlock(hmem);
+			CloseClipboard();
+		}
+	}
+	return result;
+}
+
 bool CUICustomEdit::KeyPressed(int dik)
 {
 	char out_me = 0;
@@ -376,6 +413,40 @@ bool CUICustomEdit::KeyPressed(int dik)
 		m_lines.DelChar();
 		bChanged = true;
 		break;
+
+	case DIK_INSERT:
+		if (m_bControl)
+		{
+			putToClipboard(GetText());
+			break;
+		}
+		if (m_bShift)
+		{
+			LPCSTR text = getFromClipboard();
+			if (xr_strlen(text) > 0)
+			{
+				SetText(text);
+				bChanged = true;
+				break;
+			}
+		}
+	case DIK_C:
+	case DIK_V:
+		if (m_bControl)
+		{
+			if (dik == DIK_C)
+			{
+				putToClipboard(GetText());
+				break;
+			}
+			LPCSTR text = getFromClipboard();
+			if (xr_strlen(text) > 0)
+			{
+				SetText(text);
+				bChanged = true;
+				break;
+			}
+		}
 	default:
 		{
 			gs_KBState[VK_SHIFT] = m_bShift ? 0x80 : 0x00;

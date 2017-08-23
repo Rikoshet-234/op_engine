@@ -179,6 +179,12 @@ CSE_ALifeDynamicObject *CALifeSimulator__create	(CALifeSimulator *pself, ALife::
 	return								(object);
 }
 
+CSE_Abstract *CALifeSimulator__spawn_item3(CALifeSimulator *pself, LPCSTR section, const Fvector &position, u32 level_vertex_id, GameGraph::_GRAPH_ID game_vertex_id,float distance)
+{
+	THROW(pself);
+	return								(pself->spawn_item(section, position, level_vertex_id, game_vertex_id, ALife::_OBJECT_ID(-1), distance));
+}
+
 CSE_Abstract *CALifeSimulator__spawn_item		(CALifeSimulator *pself, LPCSTR section, const Fvector &position, u32 level_vertex_id, GameGraph::_GRAPH_ID game_vertex_id)
 {
 	THROW								(pself);
@@ -420,6 +426,7 @@ void CALifeSimulator::script_register			(lua_State *L)
 			.def("create",					&CALifeSimulator__create)
 			.def("create",					&CALifeSimulator__spawn_item2)
 			.def("create",					&CALifeSimulator__spawn_item)
+			.def("create_dist", &CALifeSimulator__spawn_item3)
 			.def("create_ammo",				&CALifeSimulator__spawn_ammo)
 			.def("release",					&CALifeSimulator__release)
 			.def("release",					&CALifeSimulator___release)

@@ -66,7 +66,7 @@ CMultiHUDs::CMultiHUDs()
 {
 	psCurrentHUDProfileIndex=static_cast<u32>(-1);
 	FS_FileSet				flist;
-	FS.file_list(flist, HUDS_PATH, FS_ListFolders| FS_RootOnly);
+	FS.file_list(flist, HUDS_PATH, FS_ListFolders);
 	std::for_each(flist.begin(), flist.end(), [&](FS_File file)
 	{
 		if (checkFile(file.name, "description.txt").size() > 0)

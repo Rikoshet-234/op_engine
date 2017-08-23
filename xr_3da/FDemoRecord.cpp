@@ -235,53 +235,60 @@ BOOL CDemoRecord::Process(Fvector &P, Fvector &D, Fvector &N, float& fFov, float
 {
 	if (0==file)	return TRUE;
 
-	if (m_bMakeScreenshot){
+	if (m_bMakeScreenshot)
+	{
 		MakeScreenshotFace();
 		// update camera
 		N.set(m_Camera.j);
 		D.set(m_Camera.k);
 		P.set(m_Camera.c);
-	}else if (m_bMakeLevelMap){
+	}
+	else if (m_bMakeLevelMap)
+	{
 			MakeLevelMapProcess();
-	}else if (m_bMakeCubeMap){
+	}
+	else if (m_bMakeCubeMap)
+	{
 		MakeCubeMapFace(D,N);
 		P.set(m_Camera.c);
 		fAspect = 1.f;
-	}else{
-		if (psHUD_Flags.test(HUD_DRAW)){
-			if ((Device.dwTimeGlobal/750)%3!=0) {
-//				pApp->pFontSystem->SetSizeI	(0.02f);
-				pApp->pFontSystem->SetColor	(color_rgba(255,0,0,255));
+	}
+	else
+	{
+		if (psHUD_Flags.test(HUD_DRAW)) {
+			if ((Device.dwTimeGlobal / 750) % 3 != 0) {
+				//				pApp->pFontSystem->SetSizeI	(0.02f);
+				pApp->pFontSystem->SetColor(color_rgba(255, 0, 0, 255));
 				pApp->pFontSystem->SetAligment(CGameFont::alCenter);
-				pApp->pFontSystem->OutSetI	(0,-.05f);
-				pApp->pFontSystem->OutNext	("%s","RECORDING");
-				pApp->pFontSystem->OutNext	("Key frames count: %d",iCount);
+				pApp->pFontSystem->OutSetI(0, -.05f);
+				pApp->pFontSystem->OutNext("%s", "RECORDING");
+				pApp->pFontSystem->OutNext("Key frames count: %d", iCount);
 				pApp->pFontSystem->SetAligment(CGameFont::alLeft);
-				pApp->pFontSystem->OutSetI	(-0.2f,+.05f);
-				pApp->pFontSystem->OutNext	("SPACE");
-				pApp->pFontSystem->OutNext	("BACK");
-				pApp->pFontSystem->OutNext	("ESC");
-				pApp->pFontSystem->OutNext	("F11");
-				pApp->pFontSystem->OutNext	("F12");
+				pApp->pFontSystem->OutSetI(-0.2f, +.05f);
+				pApp->pFontSystem->OutNext("SPACE");
+				pApp->pFontSystem->OutNext("BACK");
+				pApp->pFontSystem->OutNext("ESC");
+				pApp->pFontSystem->OutNext("F11");
+				pApp->pFontSystem->OutNext("F12");
 				pApp->pFontSystem->SetAligment(CGameFont::alLeft);
-				pApp->pFontSystem->OutSetI	(0,+.05f);
-				pApp->pFontSystem->OutNext	("= Append Key");
-				pApp->pFontSystem->OutNext	("= Cube Map");
-				pApp->pFontSystem->OutNext	("= Quit");
-				pApp->pFontSystem->OutNext	("= Level Map ScreenShot");
-				pApp->pFontSystem->OutNext	("= ScreenShot");
+				pApp->pFontSystem->OutSetI(0, +.05f);
+				pApp->pFontSystem->OutNext("= Append Key");
+				pApp->pFontSystem->OutNext("= Cube Map");
+				pApp->pFontSystem->OutNext("= Quit");
+				pApp->pFontSystem->OutNext("= Level Map ScreenShot");
+				pApp->pFontSystem->OutNext("= ScreenShot");
 			}
 		}
 
-		m_vVelocity.lerp		(m_vVelocity,m_vT,0.3f);
-		m_vAngularVelocity.lerp	(m_vAngularVelocity,m_vR,0.3f);
+		m_vVelocity.lerp(m_vVelocity, m_vT, 0.3f);
+		m_vAngularVelocity.lerp(m_vAngularVelocity, m_vR, 0.3f);
 
 		float speed = m_fSpeed1, ang_speed = m_fAngSpeed1;
-		if (Console->IR_GetKeyState(DIK_LSHIFT))		{ speed=m_fSpeed0; ang_speed=m_fAngSpeed0;}
-		else if (Console->IR_GetKeyState(DIK_LALT))		{ speed=m_fSpeed2; ang_speed=m_fAngSpeed2;}
-		else if (Console->IR_GetKeyState(DIK_LCONTROL)) { speed=m_fSpeed3; ang_speed=m_fAngSpeed3;}
-		m_vT.mul				(m_vVelocity, Device.fTimeDelta * speed);
-		m_vR.mul				(m_vAngularVelocity, Device.fTimeDelta * ang_speed);
+		if (Console->IR_GetKeyState(DIK_LSHIFT)) { speed = m_fSpeed0; ang_speed = m_fAngSpeed0; }
+		else if (Console->IR_GetKeyState(DIK_LALT)) { speed = m_fSpeed2; ang_speed = m_fAngSpeed2; }
+		else if (Console->IR_GetKeyState(DIK_LCONTROL)) { speed = m_fSpeed3; ang_speed = m_fAngSpeed3; }
+		m_vT.mul(m_vVelocity, Device.fTimeDelta * speed);
+		m_vR.mul(m_vAngularVelocity, Device.fTimeDelta * ang_speed);
 
 		m_HPB.x -= m_vR.y;
 		m_HPB.y -= m_vR.x;
@@ -290,33 +297,33 @@ BOOL CDemoRecord::Process(Fvector &P, Fvector &D, Fvector &N, float& fFov, float
 		// move
 		Fvector vmove;
 
-		vmove.set				(m_Camera.k);
-		vmove.normalize_safe	();
-		vmove.mul				(m_vT.z);
-		m_Position.add			(vmove);
+		vmove.set(m_Camera.k);
+		vmove.normalize_safe();
+		vmove.mul(m_vT.z);
+		m_Position.add(vmove);
 
-		vmove.set				(m_Camera.i);
-		vmove.normalize_safe	();
-		vmove.mul				(m_vT.x);
-		m_Position.add			(vmove);
+		vmove.set(m_Camera.i);
+		vmove.normalize_safe();
+		vmove.mul(m_vT.x);
+		m_Position.add(vmove);
 
-		vmove.set				(m_Camera.j);
-		vmove.normalize_safe	();
-		vmove.mul				(m_vT.y);
-		m_Position.add			(vmove);
+		vmove.set(m_Camera.j);
+		vmove.normalize_safe();
+		vmove.mul(m_vT.y);
+		m_Position.add(vmove);
 
-		m_Camera.setHPB			(m_HPB.x,m_HPB.y,m_HPB.z);
-		m_Camera.translate_over	(m_Position);
+		m_Camera.setHPB(m_HPB.x, m_HPB.y, m_HPB.z);
+		m_Camera.translate_over(m_Position);
 
 		// update camera
 		N.set(m_Camera.j);
 		D.set(m_Camera.k);
 		P.set(m_Camera.c);
 
-		fLifeTime-=Device.fTimeDelta;
+		fLifeTime -= Device.fTimeDelta;
 
-		m_vT.set(0,0,0);
-		m_vR.set(0,0,0);
+		m_vT.set(0, 0, 0);
+		m_vR.set(0, 0, 0);
 	}
 	return TRUE;
 }

@@ -648,6 +648,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CBlinker.h" />
     <ClInclude Include="CMultiFonts.h" />
     <ClInclude Include="CMultiHUDs.h" />
     <ClInclude Include="_d3d_extensions.h" />
@@ -772,6 +773,7 @@
     <ClInclude Include="perlin.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CBlinker.cpp" />
     <ClCompile Include="CMultiFonts.cpp" />
     <ClCompile Include="CMultiHUDs.cpp" />
     <ClCompile Include="defines.cpp" />

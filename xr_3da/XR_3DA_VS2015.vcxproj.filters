@@ -507,6 +507,9 @@
     <ClInclude Include="CMultiFonts.h">
       <Filter>Render\Font output</Filter>
     </ClInclude>
+    <ClInclude Include="CBlinker.h">
+      <Filter>Game API\Demo</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="defines.cpp">
@@ -886,6 +889,9 @@
     </ClCompile>
     <ClCompile Include="CMultiFonts.cpp">
       <Filter>Render\Font output</Filter>
+    </ClCompile>
+    <ClCompile Include="CBlinker.cpp">
+      <Filter>Game API\Demo</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
