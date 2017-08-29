@@ -166,7 +166,7 @@ void CObjectSpace::Load	()
 	CDB::TRI*	tris			= (CDB::TRI*)(verts+H.vertcount);
 	R_ASSERT					(CFORM_CURRENT_VERSION==H.version);
 
-	if (Fcache && Fcache->r_u32() == crc)
+	if (Fcache && Fcache->length() > 4 && Fcache->r_u32() == crc)
 	{
 		Static.build(verts, H.vertcount, tris, H.facecount, *Fcache, build_callback);
 		FS.r_close(Fcache);
