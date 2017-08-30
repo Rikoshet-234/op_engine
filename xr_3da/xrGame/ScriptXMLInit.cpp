@@ -17,6 +17,7 @@
 #include "ui/UIAnimatedStatic.h"
 #include "ui/UITrackBar.h"
 #include "ui/UIListItemIconed.h"
+#include "ui/UIEditBoxEx.h"
 #include "ui/UIMapInfo.h"
 #include "ui/UIMMShniaga.h"
 #include "ui/UIScrollView.h"
@@ -102,6 +103,15 @@ CUIEditBox* CScriptXmlInit::InitEditBox(LPCSTR path, CUIWindow* parent){
 	pWnd->SetAutoDelete(true);
 	_attach_child(pWnd, parent);
 //.	if(parent) parent->AttachChild(pWnd);
+	return pWnd;
+}
+
+CUIEditBoxEx* CScriptXmlInit::InitEditBoxEx(LPCSTR path, CUIWindow* parent) {
+	CUIEditBoxEx* pWnd = xr_new<CUIEditBoxEx>();
+	CUIXmlInit::InitEditBoxEx(m_xml, path, 0, pWnd);
+	pWnd->SetAutoDelete(true);
+	_attach_child(pWnd, parent);
+	//.	if(parent) parent->AttachChild(pWnd);
 	return pWnd;
 }
 
@@ -366,6 +376,7 @@ void CScriptXmlInit::script_register(lua_State *L) {
 		.def("InitFrameLine", &CScriptXmlInit::InitFrameLine)
 		.def("InitLabel", &CScriptXmlInit::InitLabel)
 		.def("InitEditBox", &CScriptXmlInit::InitEditBox)
+		.def("InitEditBoxEx", &CScriptXmlInit::InitEditBoxEx)
 		.def("InitStatic", &CScriptXmlInit::InitStatic)
 		.def("InitAnimStatic", &CScriptXmlInit::InitAnimStatic)
 		.def("InitCheck", &CScriptXmlInit::InitCheck)

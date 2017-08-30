@@ -1156,7 +1156,7 @@ bool SetBoneVisible(CKinematics* model,LPCSTR bone_name,BOOL visibility,BOOL sil
 		R_ASSERT2(0, make_string("! ERROR model [%s] has no bone [%s]", model->dbg_name.c_str(), bone_name).c_str());
 	}
 	BOOL bVisibleNow = model->LL_GetBoneVisible(bone_id);
-	if (bVisibleNow != visibility)
+	//if (bVisibleNow != visibility)
 		model->LL_SetBoneVisible(bone_id, visibility, TRUE);
 	return true;
 }
@@ -1289,6 +1289,9 @@ bool CWeapon::Activate()
 
 void CWeapon::InitAddons()
 {
+	float totalWeight = CWeapon::Weight();
+	if (totalWeight != this->m_weight)
+		SetWeight(totalWeight);
 }
 
 float CWeapon::CurrentZoomFactor	()
@@ -1616,7 +1619,7 @@ LPCSTR	CWeapon::GetCurrentAmmo_ShortName	()
 
 float CWeapon::Weight()
 {
-	float res = CInventoryItemObject::Weight();
+	float res = OriginalWeight();
 	if(IsGrenadeLauncherAttached()&&GetGrenadeLauncherName().size()){
 		res += pSettings->r_float(GetGrenadeLauncherName(),"inv_weight");
 	}

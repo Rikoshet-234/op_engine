@@ -132,6 +132,7 @@ public:
 	void SetCost(u32 cost);
 
 	virtual float Weight() const { return m_weight;}
+	float OriginalWeight() const { return m_fOriginalWeight; };
 	virtual void SetWeight(float weight);
 
 	float AP_Radiation() const { return m_fActivePropertyRadiation; }
@@ -187,6 +188,7 @@ protected:
 	u32							m_slot;
 	u32							m_cost;
 	float						m_weight;
+	float m_fOriginalWeight;
 	float						m_fCondition;
 	shared_str					m_Description;
 	float m_fActivePropertyRadiation;

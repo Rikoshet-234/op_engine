@@ -8,7 +8,7 @@
 CUIEditBoxEx::CUIEditBoxEx()
 {
 	m_pFrameWindow = xr_new<CUIFrameWindow>();
-	AttachChild(m_pFrameWindow);
+	CUIWindow::AttachChild(m_pFrameWindow);
 	m_lines.SetTextComplexMode(true);
 	m_lines.SetCutWordsMode(true);
 	m_lines.SetUseNewLineMode(false);

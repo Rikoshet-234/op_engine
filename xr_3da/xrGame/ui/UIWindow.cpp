@@ -466,7 +466,7 @@ bool CUIWindow::OnKeyboard(int dik, EUIMessages keyboard_action)
 
 	//если есть дочернее окно,захватившее клавиатуру, то
 	//сообщение направляем ему сразу
-
+	//Msg("CUIWindow::OnKeyboard m_pKeyboardCapturer %s", m_pKeyboardCapturer!=nullptr ? "true" : "false");
 	if(NULL!=m_pKeyboardCapturer)
 	{
 //		dumpCapturer(m_pKeyboardCapturer,"CAPTURER");

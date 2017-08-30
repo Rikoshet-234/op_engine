@@ -584,7 +584,6 @@ u32	CSE_ALifeItemWeapon::ef_weapon_type() const
 void CSE_ALifeItemWeapon::UPDATE_Read(NET_Packet	&tNetPacket)
 {
 	inherited::UPDATE_Read		(tNetPacket);
-
 	tNetPacket.r_float_q8		(m_fCondition,0.0f,1.0f);
 	tNetPacket.r_u8				(wpn_flags);
 	tNetPacket.r_u16			(a_elapsed);

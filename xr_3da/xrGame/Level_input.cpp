@@ -373,6 +373,9 @@ void CLevel::IR_OnKeyboardRelease(int key)
 	bool b_ui_exist = (pHUD && pHUD->GetUI());
 
 	if (g_bDisableAllInput	) return;
+	if (g_actor)
+		Actor()->callback(GameObject::ECallbackType::OnKeyboardRelease)(key, get_binded_action(key));
+
 	if ( b_ui_exist && pHUD->GetUI()->IR_OnKeyboardRelease(key)) return;
 	if (Device.Paused()		) return;
 	if (game && Game().OnKeyboardRelease(get_binded_action(key)) ) return;

@@ -63,6 +63,7 @@ namespace GameObject {
 
 		OnInventoryItemPlaceChange,
 		OnKeyboardPress,
+		OnKeyboardRelease,
 		OnPrepareItemInfo,
 		OnDisableInfoPortion,
 		OnDragDropListCellFocusReceive,

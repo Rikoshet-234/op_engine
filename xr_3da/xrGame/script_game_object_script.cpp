@@ -104,6 +104,7 @@ void CScriptGameObject::script_register(lua_State *L)
 				value("on_cell_item_drop",			int(GameObject::eOnCellItemDrop)),
 				value("on_item_place_change",		int(GameObject::OnInventoryItemPlaceChange)),
 				value("on_keyboard_press",			int(GameObject::OnKeyboardPress)),
+				value("on_keyboard_release",		int(GameObject::OnKeyboardRelease)),
 				value("on_prepare_item_info",		int(GameObject::OnPrepareItemInfo)),
 				value("infoportion_disable",		int(GameObject::OnDisableInfoPortion)),
 				value("cell_focus_receive",			int(GameObject::OnDragDropListCellFocusReceive)),

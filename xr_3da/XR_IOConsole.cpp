@@ -693,7 +693,7 @@ xr_token* CConsole::GetXRToken(LPCSTR cmd)
 			return cf->GetToken();
 		CCC_VectorToken* cfv = dynamic_cast<CCC_VectorToken*>(C);
 		if (cfv)
-			return cfv->GetToken();
+			return &(cfv->GetVectorTokens()->front());
 
 	}
 	return nullptr;

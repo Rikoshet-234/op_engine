@@ -186,6 +186,7 @@ void CInventoryItem::Load(LPCSTR section)
 
 	//.	NameComplex			();
 	m_weight = pSettings->r_float(section, "inv_weight");
+	m_fOriginalWeight = m_weight;
 	R_ASSERT(m_weight >= 0.f);
 
 	m_cost = pSettings->r_u32(section, "cost");
