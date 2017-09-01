@@ -192,6 +192,26 @@ void CUIGameCustom::reset_ui()
 		g_tutorial->Destroy	();
 		xr_delete(g_tutorial);
 	}
+
+	xr_vector<shared_str> ids;
+	std::for_each(m_custom_statics.begin(), m_custom_statics.end(), [&](SDrawStaticStruct data)
+	{
+		ids.push_back(data.m_name);
+	});
+	if (ids.size() > 0) {
+		std::for_each(ids.begin(), ids.end(), [&](shared_str id)
+		{
+			RemoveCustomStatic(id.c_str());
+		});
+		delete_data(m_custom_statics);
+	}
+	delete_data(m_msgs_xml);
+	m_msgs_xml = xr_new<CUIXml>();
+	m_msgs_xml->Init(CONFIG_PATH, UI_PATH, "ui_custom_msgs.xml");
+	std::for_each(ids.begin(), ids.end(), [&](shared_str id)
+	{
+		AddCustomStatic(id.c_str(),false);
+	});
 }
 SDrawStaticStruct::SDrawStaticStruct	()
 {

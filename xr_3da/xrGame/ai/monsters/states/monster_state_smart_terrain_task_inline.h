@@ -53,7 +53,7 @@ bool CStateMonsterSmartTerrainTaskAbstract::check_start_conditions()
 	CSE_ALifePsyDogPhantom			*phantom = smart_cast<CSE_ALifePsyDogPhantom*>(monster);
 	if (phantom)					return false;
 	
-
+	if (!monster) return false;
 	monster->brain().select_task	();
 	
 	// there is no any available smart terrains
@@ -70,7 +70,7 @@ bool CStateMonsterSmartTerrainTaskAbstract::check_completion()
 {
 	CSE_ALifeMonsterAbstract		*monster = smart_cast<CSE_ALifeMonsterAbstract*>(ai().alife().objects().object(object->ID()));
 	VERIFY							(monster);
-
+	if (!monster) return false;
 	if (monster->m_smart_terrain_id == 0xffff) return true;
 
 	// if we already reach the task
@@ -147,6 +147,8 @@ void CStateMonsterSmartTerrainTaskAbstract::check_force_state()
 	// check smart terrain became busy
 	CSE_ALifeMonsterAbstract		*monster = smart_cast<CSE_ALifeMonsterAbstract*>(ai().alife().objects().object(object->ID()));
 	VERIFY							(monster);
+
+	if (!monster) return;
 
 	if ((monster->m_smart_terrain_id == 0xffff) || monster->m_task_reached) {
 		select_state(eStateSmartTerrainTaskWaitCapture);

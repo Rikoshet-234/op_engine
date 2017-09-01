@@ -35,7 +35,7 @@ CharInfoStrings		*charInfoGoodwillStrings	= nullptr;
 
 void InventoryUtilities::CreateShaders()
 {
-	g_tmpWMShader.create("effects\\wallmark",  "wm\\wm_grenade");
+	g_tmpWMShader.create("effects\\wallmark",  "decal\\decal_wm_grenade");
 }
 
 void InventoryUtilities::DestroyShaders()

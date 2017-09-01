@@ -30,7 +30,6 @@ bool CXml::ReInit(LPCSTR path_alias, LPCSTR path, LPCSTR xml_filename)
 void ParseFile(LPCSTR path, CMemoryWriter& W, IReader *F, CXml* xml )
 {
 	string4096	str;
-	
 	while( !F->eof() ){
 		F->r_string		(str,sizeof(str));
 
