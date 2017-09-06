@@ -25,6 +25,7 @@ private:
 
 public:
 			void			process			(CInifile &ini_file, LPCSTR section, CInventoryOwner &owner);
+			bool InList(LPCSTR item_section);
 
 public:
 	IC		void			deficit			(const shared_str &section, const float &deficit);

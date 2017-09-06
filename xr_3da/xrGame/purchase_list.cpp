@@ -12,6 +12,8 @@
 #include "gameobject.h"
 #include "ai_object_location.h"
 #include "level.h"
+#include "xrserver_objects_alife.h"
+#include "xrServer_Objects_ALife_Items.h"
 
 static float min_deficit_factor = .3f;
 
@@ -39,6 +41,15 @@ void CPurchaseList::process	(CInifile &ini_file, LPCSTR section, CInventoryOwner
 	}
 }
 
+bool CPurchaseList::InList(LPCSTR item_section)
+{
+	if (!item_section)
+		return false;
+	DEFICITS::const_iterator	iItem = m_deficits.find(item_section);
+	return iItem != m_deficits.end();
+
+}
+
 void CPurchaseList::process	(const CGameObject &owner, const shared_str &name, const u32 &count, const float &probability)
 {
 	VERIFY3					(count,"Invalid count for section in the purchase list",*name);
@@ -55,6 +66,16 @@ void CPurchaseList::process	(const CGameObject &owner, const shared_str &name, c
 
 		++j;
 		Level().spawn_item		(*name,position,level_vertex_id,id,false);
+
+		/*CSE_Abstract* abstract =Level().spawn_item(*name, position, level_vertex_id, id, true);
+		CSE_ALifeObject	*alife_object = smart_cast<CSE_ALifeObject*>(abstract);
+		if (alife_object)
+			alife_object->m_flags.set(CSE_ALifeObject::flVisibleForAI, FALSE);
+
+		NET_Packet				P;
+		abstract->Spawn_Write(P, TRUE);
+		Level().Send(P, net_flags(TRUE));
+		F_entity_Destroy(abstract);*/
 	}
 
 	DEFICITS::const_iterator	I = m_deficits.find(name);

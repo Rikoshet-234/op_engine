@@ -69,28 +69,6 @@ LPCSTR CScriptGameObject::GetVisualName() const
 
 }
 
-bool CScriptGameObject::GetVisibleForUI()
-{
-	CInventoryItem* item = smart_cast<CInventoryItem*>(&object());
-	if (!item)
-	{
-		Msg("! ERROR CScriptGameObject::GetVisibleForUI cannot cast to CInventoryItem");
-		return true;
-	}
-	return item->GetVisibleForUI();
-}
-
-void CScriptGameObject::SetVisisbeForUI(bool value)
-{
-	CInventoryItem* item = smart_cast<CInventoryItem*>(&object());
-	if (!item)
-	{
-		Msg("! ERROR CScriptGameObject::GetVisibleForUI cannot cast to CInventoryItem");
-		return ;
-	}
-	item->SetVisibleForUI(value);
-}
-
 bool CScriptGameObject::InventoryMoveItem(CScriptGameObject* item,u32 to,bool force) const
 {
 	if (to==NO_ACTIVE_SLOT || !item)
@@ -691,8 +669,6 @@ class_<CScriptGameObject> &script_register_game_object3(class_<CScriptGameObject
 		.def("detach_scope", &CScriptGameObject::detach_scope)
 		.def("detach_silencer", &CScriptGameObject::detach_silencer)
 		.def("detach_grenadelauncher", &CScriptGameObject::detach_grenadelauncher)
-		.def("visible_for_ui", static_cast<bool (CScriptGameObject::*)		() >	(&CScriptGameObject::GetVisibleForUI))
-		.def("visible_for_ui", static_cast<void (CScriptGameObject::*)		(bool)>		(&CScriptGameObject::SetVisisbeForUI))
 		;
 
 	return	(instance);

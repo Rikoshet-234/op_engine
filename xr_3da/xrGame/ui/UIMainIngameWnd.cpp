@@ -279,6 +279,8 @@ void CUIMainIngameWnd::Init()
 	{
 		m_artefactPanel->InitFromXML		(uiXml, "artefact_panel", 0);
 		this->AttachChild					(m_artefactPanel);	
+		if (Actor() && Level().CurrentViewEntity() && Level().CurrentViewEntity() == Actor())
+			m_artefactPanel->InitIcons(Actor()->GetArtifactsOnBelt());
 	}
 
 	AttachChild								(&UIStaticDiskIO);
@@ -345,6 +347,15 @@ void CUIMainIngameWnd::SetMPChatLog(CUIWindow* pChat, CUIWindow* pLog){
 	m_pMPLogWnd  = pLog;
 }
 
+float get_current_kx()
+{
+	float h = float(Device.dwHeight);
+	float w = float(Device.dwWidth);
+
+	float res = (h / w) / (UI_BASE_HEIGHT / UI_BASE_WIDTH);
+	return res;
+
+}
 void CUIMainIngameWnd::SetAmmoIcon (const shared_str& sect_name)
 {
 	if ( !sect_name.size() )
@@ -362,14 +373,25 @@ void CUIMainIngameWnd::SetAmmoIcon (const shared_str& sect_name)
 
 	// now perform only width scale for ammo, which (W)size >2
 	// all others ammo (1x1, 1x2) will be not scaled (original picture)
-	float iconWidth = (iconInfo.getWidth()>2 ? 1.6f : iconInfo.getWidth())*INV_GRID_WIDTH*0.8f;
-	float iconHeight = INV_GRID_HEIGHT*0.8f;//1 cell
-	
-	float xr=(UIWeaponIcon_rect.width()-iconWidth)/2.0f;
-	float yr=(UIWeaponIcon_rect.height()-iconHeight)/2.0f;
-	UIWeaponIcon.SetWndPos	(UIWeaponIcon_rect.x1+xr, UIWeaponIcon_rect.y1+yr);
-	UIWeaponIcon.SetWidth	(iconWidth);
-	UIWeaponIcon.SetHeight	(iconHeight);
+
+#if 0
+	if (iconInfo.getWidth() > 1)
+	{
+		UIWeaponIcon.SetWndRect(UIWeaponIcon_rect);
+		UIWeaponIcon.SetStretchTexture(true);
+	}
+	else
+	{
+		float iconWidth = INV_GRID_WIDTH;// (iconInfo.getWidth() > 2 ? 1.6f : iconInfo.getWidth())*INV_GRID_WIDTH*0.8f;
+		float iconHeight = INV_GRID_HEIGHT;// INV_GRID_HEIGHT*0.8f;//1 cell
+		float xr = (UIWeaponIcon_rect.width() - iconWidth) / 2.0f;
+		float yr = (UIWeaponIcon_rect.height() - iconHeight) / 2.0f;
+		UIWeaponIcon.SetWndPos	(UIWeaponIcon_rect.x1+xr, UIWeaponIcon_rect.y1+yr);
+		UIWeaponIcon.SetWidth	(iconWidth);
+		UIWeaponIcon.SetHeight	(iconHeight);
+		UIWeaponIcon.SetStretchTexture(false);
+	}
+#endif
 };
 
 void CUIMainIngameWnd::Update()

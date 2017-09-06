@@ -162,8 +162,6 @@ public:
 	void				SetCondition(float val);
 	void				DropItem(CScriptGameObject* pItem);
 	void				DropItemAndTeleport(CScriptGameObject* pItem, Fvector position);
-	bool GetVisibleForUI();
-	void SetVisisbeForUI(bool value);
 #pragma endregion
 #pragma region CEntity
 	_DECLARE_FUNCTION10(DeathTime, u32);

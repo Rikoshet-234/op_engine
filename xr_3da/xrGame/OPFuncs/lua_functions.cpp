@@ -48,6 +48,11 @@ namespace OPFuncs
 		return GetOPEngineVersion();
 	}
 
+	LPCSTR lua_GetOPEngineVersionShort()
+	{
+		return GetOPEngineVersionShort();
+	}
+
 	bool lua_IsOPEngine()
 	{
 		return true;
@@ -62,7 +67,8 @@ namespace OPFuncs
 				luabind::def("get_actor_slots_count",&get_actor_slots_count),
 				luabind::def("IsOPEngine", &lua_IsOPEngine),
 				luabind::def("engine_log", static_cast<void(*)(LPCSTR)>(&Log)),
-				luabind::def("GetOPEngineVersion",&lua_GetOPEngineVersion)
+				luabind::def("GetOPEngineVersion",&lua_GetOPEngineVersion),
+				luabind::def("GetOPEngineVersionShort", &lua_GetOPEngineVersionShort)
 			];
 	}
 }

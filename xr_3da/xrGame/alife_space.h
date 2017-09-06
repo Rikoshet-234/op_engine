@@ -10,7 +10,7 @@
 #define XRAY_ALIFE_SPACE
 
 // ALife objects, events and tasks
-//0x0004 - CInventoryItem::m_bVisibleForUI put to save
+
 //0x0005 - CInventoryItem::m_cost && CInventoryItem::m_weight put to save
 //0x0006 - CInventoryItem::m_fActivePropertyRadiation put to save
 #define ALIFE_VERSION				0x0006

@@ -6,6 +6,7 @@
 namespace OPFuncs
 {
 	XRCORE_API LPCSTR GetOPEngineVersion();
+	XRCORE_API LPCSTR GetOPEngineVersionShort();
 }
 
 #endif

@@ -18,10 +18,25 @@
 
 #define PATCH_DESCRIPTION "patch"
 #define PATCH_MINOR "0"
-#define PATCH_MAJOR "2" 
+#define PATCH_MAJOR "4" 
 
 namespace OPFuncs
 {
+	XRCORE_API LPCSTR GetOPEngineVersionShort()
+	{
+		static string1024 engineVersion = "";
+		if (engineVersion[0] == 0)
+		{
+#ifdef PATCH_INFO_PRESENT
+			sprintf_s(engineVersion, "Engine %s.%s p.%s.%s"
+				, ENGINE_MINOR, ENGINE_MAJOR
+				, PATCH_MINOR, PATCH_MAJOR);
+#else
+			sprintf_s(engineVersion, "Engine %s.%s", ENGINE_MINOR, ENGINE_MAJOR);
+#endif
+		}
+		return engineVersion;
+	}
 
 	XRCORE_API LPCSTR GetOPEngineVersion()
 	{

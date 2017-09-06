@@ -206,6 +206,7 @@ public:
 	virtual void		UpdateActivePropertys();
 	virtual void		MoveArtefactBelt		(const CArtefact* artefact, bool on_belt);
 	virtual float		HitArtefactsOnBelt		(float hit_power, ALife::EHitType hit_type);
+	xr_vector<const CArtefact*> GetArtifactsOnBelt() const { return m_ArtefactsOnBelt;}
 protected:
 	//звук тяжелого дыхания
 	ref_sound			m_HeavyBreathSnd;

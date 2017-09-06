@@ -135,7 +135,6 @@ CInventoryItem::CInventoryItem()
 	m_flags.set			(FCanTake,TRUE);
 	m_flags.set			(FCanTrade,TRUE);
 	m_flags.set			(FUsingCondition,FALSE);
-	m_bVisibleForUI = true;
 	m_fCondition		= 1.0f;
 
 	m_name = m_nameShort = nullptr;
@@ -212,8 +211,7 @@ void CInventoryItem::Load(LPCSTR section)
 	m_flags.set(FCanTake, READ_IF_EXISTS(pSettings, r_bool, section, "can_take", TRUE));
 	m_flags.set(FCanTrade, READ_IF_EXISTS(pSettings, r_bool, section, "can_trade", TRUE));
 	m_flags.set(FIsQuestItem, READ_IF_EXISTS(pSettings, r_bool, section, "quest_item", FALSE));
-	if (pSettings->line_exist(section, "visible_for_ui"))
-		m_bVisibleForUI = !!pSettings->r_bool(section, "visible_for_ui");
+
 	if (pSettings->line_exist(section, "useful_for_npc"))
 	{
 		m_flags.set(Fuseful_for_NPC, pSettings->r_bool(section, "useful_for_npc"));
@@ -496,7 +494,6 @@ void CInventoryItem::net_Destroy		()
 
 void CInventoryItem::save(NET_Packet &packet)
 {
-	packet.w_u8(m_bVisibleForUI ? 1 : 0);
 	packet.w_u8				(static_cast<u8>(m_eItemPlace));
 	packet.w_float			(m_fCondition);
 	packet.w_float(m_weight);
@@ -672,10 +669,6 @@ void CInventoryItem::net_Export			(NET_Packet& P)
 
 void CInventoryItem::load(IReader &packet)
 {
-	if (ai().get_alife()->header().version() > 0x0003)
-	{
-		m_bVisibleForUI= packet.r_u8() == 1 ? true : false;
-	}
 	m_eItemPlace			= static_cast<EItemPlace>(packet.r_u8());
 	m_fCondition			= packet.r_float();
 	if (ai().get_alife()->header().version() > 0x0004)

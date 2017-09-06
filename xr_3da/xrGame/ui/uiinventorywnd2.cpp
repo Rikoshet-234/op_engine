@@ -88,11 +88,8 @@ void CUIInventoryWnd::PaintItemFromSlot(u32 slotId)
 	PIItem _itm = m_pInv->m_slots[slotId].m_pIItem;
 	if (_itm && destList)
 	{
-		if (_itm->GetVisibleForUI())
-		{
-			CUICellItem* itm = create_cell_item(_itm);
-			destList->SetItem(itm);
-		}
+		CUICellItem* itm = create_cell_item(_itm);
+		destList->SetItem(itm);
 	}
 }
 
@@ -120,7 +117,7 @@ void CUIInventoryWnd::InitInventory()
 	PaintItemFromSlot(SHOTGUN_SLOT);
 
 	PIItem _outfit						= m_pInv->m_slots[OUTFIT_SLOT].m_pIItem;
-	CUICellItem* outfit					= (_outfit && _outfit->GetVisibleForUI())?create_cell_item(_outfit):NULL;
+	CUICellItem* outfit					= (_outfit ? create_cell_item(_outfit):NULL);
 	m_pUIOutfitList->SetItem			(outfit);
 #pragma endregion
 
@@ -128,11 +125,8 @@ void CUIInventoryWnd::InitInventory()
 	TIItemContainer::iterator it, it_e;
 	for(it=m_pInv->m_belt.begin(),it_e=m_pInv->m_belt.end(); it!=it_e; ++it) 
 	{
-		if ((*it)->GetVisibleForUI())
-		{
 			CUICellItem* itm = create_cell_item(*it);
 			m_pUIBeltList->SetItem(itm);
-		}
 	}
 
 #pragma endregion
@@ -142,13 +136,10 @@ void CUIInventoryWnd::InitInventory()
 	std::sort		(ruck_list.begin(),ruck_list.end(),InventoryUtilities::GreaterRoomInRuck);
 
 	int i=1;
-	for(it=ruck_list.begin(),it_e=ruck_list.end(); it!=it_e; ++it,++i) 
+	for (it = ruck_list.begin(), it_e = ruck_list.end(); it != it_e; ++it, ++i)
 	{
-		if ((*it)->GetVisibleForUI())
-		{
-			CUICellItem* itm = create_cell_item(*it);
-			m_pUIBagList->SetItem(itm);
-		}
+		CUICellItem* itm = create_cell_item(*it);
+		m_pUIBagList->SetItem(itm);
 	}
 	//fake grenade slot
 	PIItem _itm								= m_pInv->m_slots[GRENADE_SLOT].m_pIItem;

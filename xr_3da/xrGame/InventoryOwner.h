@@ -201,6 +201,8 @@ private:
 	BOOL						m_need_osoznanie_mode;
 
 public:
+	CPurchaseList* GetPurchaseList() const { return m_purchase_list; };
+
 	IC		CTradeParameters	&trade_parameters		() const;
 	virtual	LPCSTR				trade_section			() const;
 			float				deficit_factor			(const shared_str &section) const;

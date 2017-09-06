@@ -71,7 +71,6 @@ protected:
 	};
 
 	Flags16						m_flags;
-	bool m_bVisibleForUI;
 public:
 								CInventoryItem		();
 	virtual						~CInventoryItem		();
@@ -138,8 +137,6 @@ public:
 	float AP_Radiation() const { return m_fActivePropertyRadiation; }
 	void SetAP_Radiation(float value);
 
-	bool GetVisibleForUI() { return m_bVisibleForUI; }
-	void SetVisibleForUI(bool value) { m_bVisibleForUI=value; }
 public:
 	CInventory*					m_pCurrentInventory;
 
