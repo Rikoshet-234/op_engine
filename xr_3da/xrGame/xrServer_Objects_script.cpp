@@ -96,6 +96,9 @@ void CPureServerObject::script_register(lua_State *L)
 	];
 }
 
+void cse_set_position(CSE_Abstract* O, float x, float y, float z) { O->o_Position.set(x, y, z); }
+void cse_set_direction(CSE_Abstract* O, float x, float y, float z) { O->o_Angle.set(x, y, z); }
+
 void CSE_Abstract::script_register(lua_State *L)
 {
 	typedef CWrapperBase<CSE_Abstract> WrapType;
@@ -106,6 +109,7 @@ void CSE_Abstract::script_register(lua_State *L)
 			.def_readonly	("parent_id",		&BaseType::ID_Parent)
 			.def_readonly	("script_version",	&BaseType::m_script_version)
 			.def_readwrite	("position",		&BaseType::o_Position)
+			.def_readwrite	("direction", &BaseType::o_Angle)
 			.def			("section_name",	&get_section_name)
 			.def			("name",			&get_name)
 			.def			("clsid",			&BaseType::script_clsid)
@@ -114,6 +118,8 @@ void CSE_Abstract::script_register(lua_State *L)
 			.def			("STATE_Write",		&BaseType::STATE_Write, &WrapType::STATE_Write_static)
 			.def			("UPDATE_Read",		&BaseType::UPDATE_Read, &WrapType::UPDATE_Read_static)
 			.def			("UPDATE_Write",		&BaseType::UPDATE_Write, &WrapType::UPDATE_Write_static)
+			.def("set_position", &cse_set_position)
+			.def("set_direction", &cse_set_direction)
 //			.def(		constructor<LPCSTR>())
 	];
 }
