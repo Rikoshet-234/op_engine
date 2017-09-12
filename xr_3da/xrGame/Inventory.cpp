@@ -1224,10 +1224,7 @@ void  CInventory::AddAvailableItems(TIItemContainer& items_container, bool for_t
 			const CInventorySlot& S = *slot_it;
 			if (S.m_pIItem)
 			{
-				bool trade = !for_trade || S.m_pIItem->CanTrade();
-				//if (m_pOwner!=g_actor)
-				//	Msg("[%s] validate [%s][%s][%s]", m_pOwner->Name(),S.m_pIItem->Name(), for_trade ? "true" : "false", S.m_pIItem->CanTrade() ? "true" : "false");
-				if (trade)
+				if ((!for_trade || S.m_pIItem->CanTrade())) 
 				{
 					if ((!S.m_bPersistent || S.m_pIItem->GetSlot() == GRENADE_SLOT))
 						items_container.push_back(S.m_pIItem);

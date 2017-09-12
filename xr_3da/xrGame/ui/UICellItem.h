@@ -79,6 +79,7 @@ public:
 	bool					m_selected;
 	bool					m_suitable;
 
+	bool m_bIgnoreItemPlace;
 	Fcolor					m_preAnimTexColor;
 	Fcolor					m_preAnimTextColor;
 	void					SaveColors();

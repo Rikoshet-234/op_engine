@@ -253,7 +253,11 @@ void ui_core::RenderFont()
 //16:10 - 1,6
 //21:9 - 2
 //check value 1,34(3)
+static	bool	is_16_10_mode()
+{
 
+	return false;
+}
 bool ui_core::is_16_9_mode()
 {
 	float standartRatio=UI_BASE_WIDTH/UI_BASE_HEIGHT +0.01f;
@@ -293,6 +297,7 @@ shared_str	ui_core::get_xml_name(LPCSTR fn)
 {
 	
 	std::string file;
+	float currRation = float(Device.dwWidth) / float(Device.dwHeight);
 	if (is_16_9_mode())
 	{
 		file=createFileName(fn,"_16");

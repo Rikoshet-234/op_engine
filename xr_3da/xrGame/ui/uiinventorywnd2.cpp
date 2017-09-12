@@ -117,7 +117,7 @@ void CUIInventoryWnd::InitInventory()
 	PaintItemFromSlot(SHOTGUN_SLOT);
 
 	PIItem _outfit						= m_pInv->m_slots[OUTFIT_SLOT].m_pIItem;
-	CUICellItem* outfit					= (_outfit ? create_cell_item(_outfit):NULL);
+	CUICellItem* outfit					= _outfit ? create_cell_item(_outfit):NULL;
 	m_pUIOutfitList->SetItem			(outfit);
 #pragma endregion
 

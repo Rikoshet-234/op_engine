@@ -95,7 +95,14 @@ void CSpaceRestrictor::net_Destroy	()
 bool CSpaceRestrictor::inside	(const Fsphere &sphere) const
 {
 	if (!actual())
-		prepare	();
+	{
+		if (isinf(m_selfbounds.P.x) || isinf(m_selfbounds.P.y) || isinf(m_selfbounds.P.z) 
+			||
+			isnan(m_selfbounds.P.x) || isnan(m_selfbounds.P.y) || isnan(m_selfbounds.P.z)
+			)
+			return false;
+		prepare();
+	}
 	if (!m_selfbounds.intersect(sphere))
 		return	(false);
 	

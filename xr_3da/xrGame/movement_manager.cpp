@@ -33,7 +33,7 @@ CMovementManager::CMovementManager	(CCustomMonster *object)
 {
 	VERIFY						(object);
 	m_object					= object;
-
+	m_bShowFailedPath = true;
 	m_restricted_object			= xr_new<CRestrictedObject>		 (m_object);
 	m_location_manager			= xr_new<CLocationManager>		 (m_object);
 

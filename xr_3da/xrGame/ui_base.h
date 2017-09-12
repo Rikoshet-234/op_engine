@@ -81,6 +81,7 @@ public:
 
 	virtual void	OnDeviceReset					();
 	static	bool	is_16_9_mode					();
+	static	bool	is_16_10_mode();
 	static	bool	is_21_9_mode					();
 	shared_str		get_xml_name					(LPCSTR fn);
 };

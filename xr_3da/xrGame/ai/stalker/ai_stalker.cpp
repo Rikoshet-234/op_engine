@@ -1096,22 +1096,3 @@ void CAI_Stalker::on_after_change_team			()
 }
 
 
-bool CAI_Stalker::CanPutInSlot(PIItem item, u32 slot)
-{
-	/*bool sell_item = false;
-	CPurchaseList* list = GetPurchaseList();
-	if (list)
-	{
-		sell_item = list->InList(item->object().cNameSect().c_str());
-		if (sell_item)
-		{
-			Level().spawn_item(item->object().cNameSect().c_str(), Position(), ai_location().level_vertex_id(), ID(), false);
-			sell_item = false;
-
-		}
-	}
-	auto b = cNameSect().c_str();
-	auto a = GetPurchaseList()->InList(item->object().cNameSect().c_str());*/
-	//Msg("[%s][%s] verified [%s]", cName().c_str(), Name(), item->object().cNameSect().c_str()); 
-	return(slot != OUTFIT_SLOT)/* && !sell_item*/;
-};

@@ -8,7 +8,7 @@
 //! Keep this defines here so you don't have to rebuild cpps when you change version
 #define ENGINE_DESCRIPTION "OP 2.1 Engine"
 #define ENGINE_MINOR "0"
-#define ENGINE_MAJOR "57n"
+#define ENGINE_MAJOR "57m"
 
 #ifdef DEBUG
 	#define ENGINE_BUILD_TYPE "debug"
@@ -18,7 +18,7 @@
 
 #define PATCH_DESCRIPTION "patch"
 #define PATCH_MINOR "0"
-#define PATCH_MAJOR "4" 
+#define PATCH_MAJOR "1" 
 
 namespace OPFuncs
 {

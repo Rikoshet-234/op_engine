@@ -1289,9 +1289,9 @@ bool CWeapon::Activate()
 
 void CWeapon::InitAddons()
 {
-	float totalWeight = CWeapon::Weight();
+	/*float totalWeight = CWeapon::Weight();
 	if (totalWeight != this->m_weight)
-		SetWeight(totalWeight);
+		SetWeight(totalWeight);*/
 }
 
 float CWeapon::CurrentZoomFactor	()
@@ -1619,7 +1619,7 @@ LPCSTR	CWeapon::GetCurrentAmmo_ShortName	()
 
 float CWeapon::Weight()
 {
-	float res = OriginalWeight();
+	float res = CInventoryItemObject::Weight();
 	if(IsGrenadeLauncherAttached()&&GetGrenadeLauncherName().size()){
 		res += pSettings->r_float(GetGrenadeLauncherName(),"inv_weight");
 	}

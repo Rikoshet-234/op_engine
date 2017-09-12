@@ -358,7 +358,9 @@ void CUITradeWnd::AddSingleItemToList(CUICellItem* itm,CUIDragDropListEx* to)
 		else
 		{
 			itm->SetAllowedGrouping(true);
+			itm->m_bIgnoreItemPlace = iitem->m_pCurrentInventory->GetOwner() != g_actor;
 			to->SetItem(itm);
+
 		}
 }
 

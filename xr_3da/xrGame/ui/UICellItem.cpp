@@ -31,6 +31,7 @@ CUICellItem::CUICellItem()
 	m_suitable=false;
 	p_ConditionProgressBar=xr_new<CUIProgressBar>();
 	p_ConditionProgressBar->SetAutoDelete(true);
+	m_bIgnoreItemPlace = false;
 	CUIWindow::AttachChild(p_ConditionProgressBar);
 }
 
