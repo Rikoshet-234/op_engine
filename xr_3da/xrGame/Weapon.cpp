@@ -459,6 +459,30 @@ void CWeapon::LoadZoomOffset (LPCSTR section, LPCSTR prefix)
 	if(pSettings->line_exist(hud_sect, "zoom_rotate_time"))
 		m_fZoomRotateTime = pSettings->r_float(hud_sect,"zoom_rotate_time");
 }
+
+float CWeapon::Weight() 
+{
+	float res = CInventoryItemObject::Weight();
+	if (IsGrenadeLauncherAttached() && GetGrenadeLauncherName().size()) {
+		res += pSettings->r_float(GetGrenadeLauncherName(), "inv_weight");
+	}
+	if (IsScopeAttached() && GetScopeName().size()) {
+		res += pSettings->r_float(GetScopeName(), "inv_weight");
+	}
+	if (IsSilencerAttached() && GetSilencerName().size()) {
+		res += pSettings->r_float(GetSilencerName(), "inv_weight");
+	}
+
+	if (iAmmoElapsed)
+	{
+		float w = pSettings->r_float(*m_ammoTypes[m_ammoType], "inv_weight");
+		float bs = pSettings->r_float(*m_ammoTypes[m_ammoType], "box_size");
+
+		res += w*(iAmmoElapsed / bs);
+	}
+	return res;
+}
+
 /*
 void CWeapon::animGet	(MotionSVec& lst, LPCSTR prefix)
 {
@@ -1617,28 +1641,6 @@ LPCSTR	CWeapon::GetCurrentAmmo_ShortName	()
 	return *(l_cartridge.m_InvShortName);
 }
 
-float CWeapon::Weight()
-{
-	float res = CInventoryItemObject::Weight();
-	if(IsGrenadeLauncherAttached()&&GetGrenadeLauncherName().size()){
-		res += pSettings->r_float(GetGrenadeLauncherName(),"inv_weight");
-	}
-	if(IsScopeAttached()&&GetScopeName().size()){
-		res += pSettings->r_float(GetScopeName(),"inv_weight");
-	}
-	if(IsSilencerAttached()&&GetSilencerName().size()){
-		res += pSettings->r_float(GetSilencerName(),"inv_weight");
-	}
-	
-	/*if(iAmmoElapsed)
-	{
-		float w		= pSettings->r_float(*m_ammoTypes[m_ammoType],"inv_weight");
-		float bs	= pSettings->r_float(*m_ammoTypes[m_ammoType],"box_size");
-
-		res			+= w*(iAmmoElapsed/bs);
-	}*/
-	return res;
-}
 void CWeapon::Hide		()
 {
 	if(IsGameTypeSingle())

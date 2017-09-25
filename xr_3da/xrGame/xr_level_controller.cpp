@@ -106,6 +106,18 @@ _action  actions[] = {
 	{ "use_quick_slot1",	kUSE_QUICK_SLOT1		,_sp },
 	{ "use_quick_slot2",	kUSE_QUICK_SLOT2		,_sp },
 	{ "use_quick_slot3",	kUSE_QUICK_SLOT3		,_sp },
+
+	{ "use_user_action0",	kUSE_USER_ACTION0		,_sp },
+	{ "use_user_action1",	kUSE_USER_ACTION1		,_sp },
+	{ "use_user_action2",	kUSE_USER_ACTION2		,_sp },
+	{ "use_user_action3",	kUSE_USER_ACTION3		,_sp },
+	{ "use_user_action4",	kUSE_USER_ACTION4		,_sp },
+	{ "use_user_action5",	kUSE_USER_ACTION5		,_sp },
+	{ "use_user_action6",	kUSE_USER_ACTION6		,_sp },
+	{ "use_user_action7",	kUSE_USER_ACTION7		,_sp },
+	{ "use_user_action8",	kUSE_USER_ACTION8		,_sp },
+	{ "use_user_action9",	kUSE_USER_ACTION9		,_sp },
+
 	{nullptr, 				kLASTACTION				,_both}
 };
 

@@ -9,13 +9,18 @@ int dik_to_bind(int dik){
 	return get_binded_action(dik);
 }
 
+LPCSTR id_to_action(EGameActions _id)
+{
+	return id_to_action_name(_id);
+}
+
 #pragma optimize("s",on)
 void key_binding_registrator::script_register(lua_State *L)
 {
 	module(L)
 	[
 		def("dik_to_bind",		&dik_to_bind),
-
+		def("id_to_action_name",&id_to_action),
 		class_<enum_exporter<EGameActions> >("key_bindings")
 			.enum_("commands")
 			[
@@ -74,6 +79,17 @@ void key_binding_registrator::script_register(lua_State *L)
 				value("kUSE_QUICK_SLOT1", int(kUSE_QUICK_SLOT1)),
 				value("kUSE_QUICK_SLOT2", int(kUSE_QUICK_SLOT2)),
 				value("kUSE_QUICK_SLOT3", int(kUSE_QUICK_SLOT3)),
+
+				value("kUSE_USER_ACTION0", int(kUSE_USER_ACTION0)),
+				value("kUSE_USER_ACTION1", int(kUSE_USER_ACTION1)),
+				value("kUSE_USER_ACTION2", int(kUSE_USER_ACTION2)),
+				value("kUSE_USER_ACTION3", int(kUSE_USER_ACTION3)),
+				value("kUSE_USER_ACTION4", int(kUSE_USER_ACTION4)),
+				value("kUSE_USER_ACTION5", int(kUSE_USER_ACTION5)),
+				value("kUSE_USER_ACTION6", int(kUSE_USER_ACTION6)),
+				value("kUSE_USER_ACTION7", int(kUSE_USER_ACTION7)),
+				value("kUSE_USER_ACTION8", int(kUSE_USER_ACTION8)),
+				value("kUSE_USER_ACTION9", int(kUSE_USER_ACTION9)),
 
 				value("kNOTBINDED",					int(kNOTBINDED))
 			],

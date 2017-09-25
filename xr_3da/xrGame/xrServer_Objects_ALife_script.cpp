@@ -87,6 +87,8 @@ void CSE_ALifeDynamicObjectVisual::script_register(lua_State *L)
 			CSE_ALifeDynamicObject,
 			CSE_Visual
 		)
+		.def("get_visual_name", &CSE_ALifeDynamicObjectVisual::get_visual_name)
+		.def("set_visual_name", &CSE_ALifeDynamicObjectVisual::set_visual_name)
 	];
 }
 

@@ -616,6 +616,7 @@ public:
 	u32					GetSlot() const;
 	CGBox* GetGameBox() const;
 	LPCSTR				GetVisualName() const;
+	void				SetVisualName(LPCSTR);
 	
 
 	DECLARE_SCRIPT_REGISTER_FUNCTION

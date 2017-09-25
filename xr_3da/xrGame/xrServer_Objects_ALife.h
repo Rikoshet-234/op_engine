@@ -294,6 +294,8 @@ SERVER_ENTITY_DECLARE_BEGIN2(CSE_ALifeDynamicObjectVisual,CSE_ALifeDynamicObject
 									CSE_ALifeDynamicObjectVisual(LPCSTR caSection);
 	virtual							~CSE_ALifeDynamicObjectVisual();
 	virtual CSE_Visual* __stdcall	visual					();
+	LPCSTR get_visual_name();
+	void set_visual_name(LPCSTR visual_name);
 SERVER_ENTITY_DECLARE_END
 add_to_type_list(CSE_ALifeDynamicObjectVisual)
 #define script_type_list save_type_list(CSE_ALifeDynamicObjectVisual)

@@ -130,7 +130,7 @@ public:
 	u32 Cost() const { return m_cost; }
 	void SetCost(u32 cost);
 
-	virtual float Weight() const { return m_weight;}
+	virtual float Weight() { return m_weight;}
 	float OriginalWeight() const { return m_fOriginalWeight; };
 	virtual void SetWeight(float weight);
 

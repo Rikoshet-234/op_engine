@@ -44,6 +44,13 @@ void CStepManager::reload(LPCSTR section)
 	string16			cur_elem;
 
 	CKinematicsAnimated	*skeleton_animated = smart_cast<CKinematicsAnimated*>(m_object->Visual());
+	if (!skeleton_animated)
+	{
+		LPCSTR visual_name = m_object->renderable.visual ?
+			m_object->renderable.visual->dbg_name != nullptr ? m_object->renderable.visual->dbg_name.c_str() : "unknown_model_name" : "unknown_visual";
+		Msg("! ERROR Model[%s] for[%s] cant cast to CKinematicsAnimated in CStepManager::reload! Maybe invalid 'Motions/Motion reference' part for model?", visual_name,section);
+		FATAL("ENGINE Crush. See log for details.");
+	}
 
 	for (u32 i=0; pSettings->r_line(anim_section,i,&anim_name,&val); ++i) {
 		_GetItem (val,0,cur_elem);

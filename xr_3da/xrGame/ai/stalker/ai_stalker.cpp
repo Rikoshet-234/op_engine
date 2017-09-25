@@ -330,6 +330,7 @@ void CAI_Stalker::Load				(LPCSTR section)
 	m_can_select_items				= !!pSettings->r_bool(section,"can_select_items");
 }
 #include "../xrCore/FTimerStat.h"
+
 BOOL CAI_Stalker::net_Spawn			(CSE_Abstract* DC)
 {
 	TSP_SCOPED(_, "CAI_Stalker::net_Spawn", "spawn");

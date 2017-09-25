@@ -58,6 +58,42 @@ u32 CScriptGameObject::GetSlot() const
 	return				(inventory_item->GetSlot());
 }
 
+#include "../skeletonanimated.h"
+void CScriptGameObject::SetVisualName(LPCSTR str)
+{
+	if (!g_pGameLevel)
+	{
+		Msg("Error! CScriptGameObject::SetVisualName : game level doesn't exist.");
+		return;
+	}
+
+	shared_str visual_name = str;
+	if (!visual_name.size() || object().cNameVisual() == visual_name)
+		return;
+
+	CActor *actor = smart_cast<CActor*>(&object());
+	if (actor)
+		return actor->ChangeVisual(visual_name);
+
+	object().cNameVisual_set(visual_name);
+
+	CWeapon *wpn = smart_cast<CWeapon*>(&object());
+	if (wpn)
+		return wpn->UpdateAddonsVisibility();
+
+	// Обновление костей.
+	IRender_Visual *visual = object().Visual();
+	if (visual)
+	{
+		CKinematics *kinematics = visual->dcast_PKinematics();
+		if (kinematics)
+		{
+			kinematics->CalculateBones_Invalidate();
+			kinematics->CalculateBones();
+		}
+	}
+}
+
 LPCSTR CScriptGameObject::GetVisualName() const
 {
 	if (!g_pGameLevel)
@@ -619,6 +655,7 @@ class_<CScriptGameObject> &script_register_game_object3(class_<CScriptGameObject
 		.def("is_crouch", &CScriptGameObject::actor_is_crouch)
 		.def("set_crouch", &CScriptGameObject::actor_set_crouch)
 		.def("get_visual_name", &CScriptGameObject::GetVisualName)
+		.def("set_visual_name", &CScriptGameObject::SetVisualName)
 		.def("get_immunities_from_belt", &CScriptGameObject::GetImmunitiesFromBeltTable)
 		.def("get_immunities", &CScriptGameObject::GetImmunitiesTable)
 

@@ -866,7 +866,8 @@ void CUITradeWnd::ProcessPropertiesBoxClicked	()
 
 void CUITradeWnd::ActivatePropertiesBox()
 {
-	bool oppLists=CurrentItem()->OwnerList()==&UIOthersTradeList || CurrentItem()->OwnerList()==&UIOthersBagList;
+	IWListTypes wtype = CurrentItem()->OwnerList()->GetUIListId();
+	bool oppLists= wtype ==IWListTypes::ltTradeOurTrade || wtype == IWListTypes::ltTradeOurBag;
 	UIPropertiesBox.RemoveAll();
 
 	bool b_show=false;
@@ -933,7 +934,7 @@ void CUITradeWnd::ActivatePropertiesBox()
 
 		if(!CurrentIItem()->IsQuestItem())
 		{
-			if (CurrentItem()->GetMoveableToOther())
+			if (CurrentItem()->GetMoveableToOther() && CanMoveToOther(CurrentIItem()))
 			{
 				UIPropertiesBox.AddItem("ui_carbody_move_single", CurrentItem(), INVENTORY_CB_MOVE_SINGLE);
 				if (CurrentItem()->ChildsCount())
@@ -951,7 +952,7 @@ void CUITradeWnd::ActivatePropertiesBox()
 	}
 	else
 	{
-		if (CurrentItem()->GetMoveableToOther())
+		if (CurrentItem()->GetMoveableToOther() && CanMoveToOther(CurrentIItem()))
 		{
 			UIPropertiesBox.AddItem("ui_carbody_move_single", CurrentItem(), INVENTORY_CB_MOVE_SINGLE);
 			if (CurrentItem()->ChildsCount())

@@ -307,7 +307,7 @@ public:
 
 			void			LoadZoomOffset		(LPCSTR section, LPCSTR prefix);
 
-	virtual float				Weight			();		
+	float				Weight			()  override;		
 
 public:
 	virtual EHandDependence		HandDependence		()	const		{	return eHandDependence;}

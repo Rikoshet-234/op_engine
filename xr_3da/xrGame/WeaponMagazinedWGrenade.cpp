@@ -246,7 +246,6 @@ bool CWeaponMagazinedWGrenade::SwitchMode(bool switchOnLoad)
 		return false;
 
 	m_bPending				= true;
-
 	PerformSwitchGL			(switchOnLoad);
 	if (m_bGrenadeMode)
 		m_fBackupZoom = m_fRTZoomFactor;
@@ -1118,6 +1117,18 @@ void CWeaponMagazinedWGrenade::load(IReader &input_packet)
 	while (sz > m_magazine2.size())
 		m_magazine2.push_back(l_cartridge);
 	
+}
+
+float CWeaponMagazinedWGrenade::Weight()
+{
+	float res = inherited::Weight();
+	if (IsGrenadeLauncherAttached() && !m_magazine2.empty())
+	{
+		float w = pSettings->r_float(*m_ammoTypes2[m_ammoType2], "inv_weight");
+		float bs = pSettings->r_float(*m_ammoTypes2[m_ammoType2], "box_size");
+		res += w*(m_magazine2.size() / bs);
+	}
+	return res;
 }
 
 void CWeaponMagazinedWGrenade::net_Export	(NET_Packet& P)
