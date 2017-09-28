@@ -27,10 +27,12 @@ protected:
 	bool					m_moveableToOther; //Enable(false) not receive any input from mouse 
 	bool					m_allowedGrouping;
 	CUIDragDropListEx*		m_pParentList;
+	bool					m_focused;
 	Ivector2				m_grid_size;
 	Ivector2				m_grid_size_start;
 	ICustomDrawCell*		m_custom_draw;
 	int						m_accelerator;
+	bool					m_selected;
 	CUIProgressBar*			p_ConditionProgressBar;
 	virtual void			UpdateItemText			();
 
@@ -73,12 +75,10 @@ public:
 				void*		m_pData;
 	CInventoryItem*			GetInventoryItem() const {return	static_cast<PIItem>(m_pData);}
 				int			m_index;
+	bool					m_suitable;
 				bool		m_b_already_drawn;
 	bool					m_b_destroy_childs;
-	bool					m_focused;
-	bool					m_selected;
-	bool					m_suitable;
-
+	
 	bool m_bIgnoreItemPlace;
 	Fcolor					m_preAnimTexColor;
 	Fcolor					m_preAnimTextColor;
