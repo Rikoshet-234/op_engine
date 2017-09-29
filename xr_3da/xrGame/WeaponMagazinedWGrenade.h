@@ -14,6 +14,7 @@ protected:
 		bool ZoomInc() override;
 		bool ZoomDec() override;
 		float m_fBackupZoom;
+		float m_fBackupFakeZoom;
 
 public:
 					CWeaponMagazinedWGrenade	(LPCSTR name="AK74",ESoundTypes eSoundType=SOUND_TYPE_WEAPON_SUBMACHINEGUN);

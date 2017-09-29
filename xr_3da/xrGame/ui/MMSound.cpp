@@ -4,6 +4,7 @@
 #include "xrUIXmlParser.h"
 
 CMMSound::CMMSound(){
+	current_index_played = 0;
 }
 
 CMMSound::~CMMSound(){
@@ -56,16 +57,22 @@ void CMMSound::whell_UpdateMoving(float frequency){
 	m_whell.set_frequency(frequency);
 }
 
-void CMMSound::music_Play(){
-	if (m_play_list.empty())
+void CMMSound::music_Play(int index)
+{
+	if (m_play_list.empty() || !pMMMusic)
 		return;
-
-	int i = Random.randI(m_play_list.size());
+	if (index == -1)
+		current_index_played = Random.randI(m_play_list.size());
+	else
+	{
+		clamp(index, 0, static_cast<int>(m_play_list.size()-1));
+		current_index_played = index;
+	}
 
 	string_path		_path;
 	string_path		_path2;
-	strconcat		(sizeof(_path),_path, m_play_list[i].c_str(), "_l.ogg");
-	strconcat		(sizeof(_path2),_path2, m_play_list[i].c_str(), "_r.ogg");
+	strconcat		(sizeof(_path),_path, m_play_list[current_index_played].c_str(), "_l.ogg");
+	strconcat		(sizeof(_path2),_path2, m_play_list[current_index_played].c_str(), "_r.ogg");
 	VERIFY			(FS.exist("$game_sounds$", _path ));	
 	VERIFY			(FS.exist("$game_sounds$", _path2 ));
 
@@ -91,4 +98,26 @@ void CMMSound::all_Stop(){
 	music_Stop();
 	m_whell.stop();
 	m_whell_click.stop();
+}
+
+void CMMSound::IncCIP(int step)
+{
+	current_index_played += step;
+	if (current_index_played > static_cast<int>(m_play_list.size()-1))
+	{
+		current_index_played = 0;
+	}
+	music_Stop();
+	music_Play(current_index_played);
+}
+
+void CMMSound::DecCIP(int step)
+{
+	current_index_played -= step;
+	if (current_index_played < 0)
+	{
+		current_index_played = m_play_list.size()-1;
+	}
+	music_Stop();
+	music_Play(current_index_played);
 }

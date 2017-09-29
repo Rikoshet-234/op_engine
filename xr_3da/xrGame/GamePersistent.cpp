@@ -261,6 +261,7 @@ void CGamePersistent::WeathersUpdate()
 					pos.z				= _sin(angle);
 					pos.normalize		().mul(env_amb->get_rnd_sound_dist()).add(Device.vCameraPosition);
 					pos.y				+= 10.f;
+//					Msg("Try to play env_amb[%s] pos(%f,%f,%f)", snd->_handle()->file_name(),pos.x,pos.y,pos.z);
 					snd->play_at_pos	(0,pos);
 				}
 			}

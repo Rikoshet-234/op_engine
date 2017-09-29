@@ -555,6 +555,8 @@ void CCC_Register()
 	CMD4(CCC_Float,		"ls_text_offset_y",		&lpLoadScreenTextOffsetY,0.0f,	768.0f);
 	CMD2(CCC_Bool,		"ls_show_progress",		&lpLoadScreenEnableProgressBar);
 
+	CMD2(CCC_Bool, "mm_music", &pMMMusic);
+
 #if 1//defined DEBUG
 //	CMD1(CCC_Crash,		"crash"					);
 

@@ -20,3 +20,4 @@
 	float lpLoadScreenTextOffsetX = 0;
 	float lpLoadScreenTextOffsetY = 0;
 	bool lpLoadScreenEnableProgressBar = true;
+	bool pMMMusic = true;

@@ -1070,6 +1070,14 @@ bool CWeaponMagazined::AttachScopeSection(const char* item_section_name, bool si
 	return false;
 }
 
+bool is_fake_scope(LPCSTR section)
+{
+	if (pSettings->line_exist(section, "scope_texture"))
+		return xr_strlen(pSettings->r_string(section, "scope_texture")) == 0;
+	return false;
+}
+
+
 bool CWeaponMagazined::Attach(PIItem pIItem, bool b_send_event)
 {
 	bool result = false;
@@ -1083,6 +1091,10 @@ bool CWeaponMagazined::Attach(PIItem pIItem, bool b_send_event)
 	   (m_flagsAddOnState&CSE_ALifeItemWeapon::eWeaponAddonScope) == 0 &&
 	   (m_sScopeName == pIItem->object().cNameSect()))
 	{
+		if (IsGrenadeLauncherAttached() && is_fake_scope(m_sGrenadeLauncherName.c_str()))
+		{
+			Detach(m_sGrenadeLauncherName.c_str(), true);
+		}
 		m_flagsAddOnState |= CSE_ALifeItemWeapon::eWeaponAddonScope;
 		result = true;
 	}

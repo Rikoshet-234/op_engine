@@ -114,7 +114,7 @@ void CBlender_default_aref::Compile(CBlender_Compile& C)
 			{
 				C.r_Pass		("lmap_spot","add_spot",FALSE,TRUE,FALSE,TRUE,D3DBLEND_ONE,D3DBLEND_ONE,TRUE,oAREF.value);
 				C.r_Sampler		("s_base",	C.L_textures[0]);
-				C.r_Sampler_clf	("s_lmap",	"internal\\internal_light_att",		true);
+				C.r_Sampler_clf	("s_lmap",	"pfx\\pfx_internal_light_att",		true);
 				C.r_Sampler_clf	("s_att",	TEX_SPOT_ATT		);
 				C.r_End			();
 			}

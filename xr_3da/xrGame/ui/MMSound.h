@@ -13,11 +13,15 @@ public:
 	void 			whell_Click	();
 	void 			whell_UpdateMoving(float frequency);
 
-	void 			music_Play	();
+	void 			music_Play	(int index=-1);
 	void 			music_Stop	();
 	void 			music_Update();
 
 	void 			all_Stop	();
+	int GetCIP() { return current_index_played;}
+	void IncCIP(int step = 1);
+
+	void DecCIP(int step = 1);
 protected:
 
 	IC	bool		check_file			(LPCSTR fname);
@@ -27,4 +31,5 @@ protected:
 	ref_sound		m_whell_click;
 	bool			m_bRandom;
 	xr_vector<xr_string>m_play_list;
+	int current_index_played;
 };

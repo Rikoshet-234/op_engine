@@ -228,4 +228,6 @@ private:
 	void PlayPreviewAmmoSound() override;
 };
 
+bool is_fake_scope(LPCSTR section);
+
 #endif //__XR_WEAPON_MAG_H__

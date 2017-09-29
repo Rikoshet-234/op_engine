@@ -145,6 +145,7 @@ protected:
 	bool *value;
 public:
 	CCC_Bool(LPCSTR N, bool* value): IConsole_Command(N), value(value) {}
+	const BOOL GetValue()const { return *value; }
 	void Execute(LPCSTR args) override 
 	{
 		if (EQ(args,"on"))			*value=true;

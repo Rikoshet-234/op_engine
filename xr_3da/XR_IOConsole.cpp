@@ -591,12 +591,19 @@ BOOL CConsole::GetBool(LPCSTR cmd, BOOL& val)
 	vecCMD_IT I = Commands.find(cmd);
 	if (I!=Commands.end()) {
 		IConsole_Command* C = I->second;
-		CCC_Mask* cf = dynamic_cast<CCC_Mask*>(C);
-		if(cf){
-			val = cf->GetValue();
-		}else{
-			CCC_Integer* cf1 = dynamic_cast<CCC_Integer*>(C);
-			val = !!cf1->GetValue();
+		CCC_Bool* bc = dynamic_cast<CCC_Bool*>(C);
+		if (bc)
+			val = bc->GetValue();
+		else
+		{
+			CCC_Mask* cf = dynamic_cast<CCC_Mask*>(C);
+			if (cf) 
+				val = cf->GetValue();
+			else 
+			{
+				CCC_Integer* cf1 = dynamic_cast<CCC_Integer*>(C);
+				val = !!cf1->GetValue();
+			}
 		}
 	}
 	return val;

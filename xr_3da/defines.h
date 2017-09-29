@@ -81,6 +81,7 @@ enum E_COMMON_FLAGS
 ENGINE_API extern	float			lpLoadScreenTextOffsetX;
 ENGINE_API extern	float			lpLoadScreenTextOffsetY;
 ENGINE_API extern	bool			lpLoadScreenEnableProgressBar;
+ENGINE_API extern bool pMMMusic;
 
 // game path definition
 #define _game_data_				"$game_data$"

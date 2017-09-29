@@ -253,11 +253,7 @@ void ui_core::RenderFont()
 //16:10 - 1,6
 //21:9 - 2
 //check value 1,34(3)
-static	bool	is_16_10_mode()
-{
 
-	return false;
-}
 bool ui_core::is_16_9_mode()
 {
 	float standartRatio=UI_BASE_WIDTH/UI_BASE_HEIGHT +0.01f;
@@ -265,7 +261,6 @@ bool ui_core::is_16_9_mode()
 	bool state=(currRation>standartRatio) && (currRation<1.8f);
 	return state;
 }
-
 
 bool ui_core::is_21_9_mode()
 {
@@ -294,11 +289,36 @@ std::string createFileName(std::string oldFileName,std::string postfix)
 }
 
 shared_str	ui_core::get_xml_name(LPCSTR fn)
-{
-	
+{	
 	std::string file;
-	float currRation = float(Device.dwWidth) / float(Device.dwHeight);
-	if (is_16_9_mode())
+	string_path path;
+	file = createFileName(fn, "_"+ std::to_string(Device.dwWidth)+"x"+ std::to_string(Device.dwHeight));
+	if (FS.exist(path, "$game_config$", "ui\\", file.c_str()))
+	{
+		return file.c_str();
+	}
+	float currRatio = float(Device.dwWidth) / float(Device.dwHeight);
+	if (currRatio>1.8f)
+	{
+		file = createFileName(fn, "_21");
+	}
+	else if (std::isgreaterequal(currRatio,1.6f) && std::islessequal(currRatio,1.8f))
+	{
+		if (fsimilar(currRatio,1.6f))
+		{
+			file = createFileName(fn, "_16x10");
+		}
+		else
+			file = createFileName(fn, "_16x9");
+		if (!FS.exist(path, "$game_config$", "ui\\", file.c_str()))
+			file = createFileName(fn, "_16");
+	}
+	if (!FS.exist(path, "$game_config$", "ui\\", file.c_str()))
+		file = createFileName(fn, "");
+	return file.c_str();
+
+
+	/*if (is_16_9_mode())
 	{
 		file=createFileName(fn,"_16");
 	}
@@ -309,8 +329,7 @@ shared_str	ui_core::get_xml_name(LPCSTR fn)
 	else
 	{
 		file=createFileName(fn,"");
-	}
-	string_path path;
+	}*/
 	if (!FS.exist(path,"$game_config$", "ui\\" ,file.c_str()))
 		file=createFileName(fn,"");
 	return file.c_str();

@@ -12,6 +12,7 @@
 #include <math.h>
 #include "../Actor.h"
 #include "../saved_game_wrapper.h"
+#include "../../defines.h"
 
 extern string_path g_last_saved_game;
 
@@ -99,7 +100,7 @@ void CUIMMShniaga::Init(CUIXml& xml_doc, LPCSTR path)
 			CreateList		(m_buttons, xml_doc, "menu_main_mm");
 	}
 
-    ShowMain				();
+	ShowMain				();
 
 	m_sound->Init(xml_doc, "menu_sound");
 	m_sound->music_Play();
@@ -112,6 +113,10 @@ void CUIMMShniaga::Init(CUIXml& xml_doc, LPCSTR path)
 
 void CUIMMShniaga::OnDeviceReset()
 {
+	if (pMMMusic)
+		m_sound->music_Play();
+	else
+		m_sound->music_Stop();
 	if(UI()->is_16_9_mode())
 	{
 		m_anims[0]->SetWndSize(m_wheel_size[1]);
@@ -182,7 +187,7 @@ void CUIMMShniaga::ShowMain(){
 
 void CUIMMShniaga::ShowNewGame(){
 	m_page = 1;
-    m_view->Clear();
+	m_view->Clear();
 	for (u32 i = 0; i<m_buttons_new.size(); i++)
 		m_view->AddWindow(m_buttons_new[i], false);
 
@@ -216,7 +221,7 @@ void CUIMMShniaga::SendMessage(CUIWindow* pWnd, s16 msg, void* pData){
 void CUIMMShniaga::SelectBtn(int btn){
 	R_ASSERT(btn >= 0);
 	if (0 ==m_page)
-        m_selected = m_buttons[btn];
+		m_selected = m_buttons[btn];
 	else
 		m_selected = m_buttons_new[btn];
 	m_selected_btn = btn;
@@ -279,23 +284,30 @@ void CUIMMShniaga::Update(){
 bool CUIMMShniaga::OnMouse(float x, float y, EUIMessages mouse_action){
 	
 	Fvector2 pos = UI()->GetUICursor()->GetCursorPosition();
-    Frect r;
+	Frect r;
 	m_magnifier->GetAbsoluteRect(r);
 	if (WINDOW_LBUTTON_DOWN == mouse_action && r.in(pos.x, pos.y))
 	{
 		OnBtnClick();
+	} 
+	if (mouse_action == WINDOW_MOUSE_WHEEL_UP)
+	{
+		m_sound->IncCIP();
 	}
-
+	if (mouse_action == WINDOW_MOUSE_WHEEL_DOWN)
+	{
+		m_sound->DecCIP();
+	}
 	return CUIWindow::OnMouse(x,y,mouse_action);
 }
 
 void CUIMMShniaga::OnBtnClick(){
 	if (0 == xr_strcmp("btn_new_game", m_selected->WindowName()))
-            ShowNewGame();
+			ShowNewGame();
 		else if (0 == xr_strcmp("btn_new_back", m_selected->WindowName()))
-            ShowMain();
+			ShowMain();
 		else
-            GetMessageTarget()->SendMessage(m_selected, BUTTON_CLICKED);
+			GetMessageTarget()->SendMessage(m_selected, BUTTON_CLICKED);
 }
 
 #include <dinput.h>
@@ -329,7 +341,7 @@ bool CUIMMShniaga::OnKeyboard(int dik, EUIMessages keyboard_action){
 int CUIMMShniaga::BtnCount(){
 	R_ASSERT(-1);
 	if (m_page == 0)
-        return (int)m_buttons.size();
+		return (int)m_buttons.size();
 	else if (m_page == 1)
 		return (int)m_buttons_new.size();
 	else 
@@ -339,8 +351,8 @@ int CUIMMShniaga::BtnCount(){
 float CUIMMShniaga::pos(float x1, float x2, u32 t){
 	float x = 0;
 
-    if (t>=0 && t<=m_run_time)
-        x = log(1 + (t*10.0f)/m_run_time)/log(11.0f);
+	if (t>=0 && t<=m_run_time)
+		x = log(1 + (t*10.0f)/m_run_time)/log(11.0f);
 	else if (t<=0)
 		x = 0;
 	else if (t>m_run_time)
@@ -351,7 +363,7 @@ float CUIMMShniaga::pos(float x1, float x2, u32 t){
 	if (x2 - x1 < 0)
 		return x1 - x;
 	else
-        return x1 + x;
+		return x1 + x;
 }
 
 bool b_shniaganeed_pp = true;
@@ -373,7 +385,7 @@ void CUIMMShniaga::ProcessEvent(EVENT ev){
 				// init whell sound
 				m_sound->whell_Play();
 
-                // calculate moving params
+				// calculate moving params
 				m_start_time = Device.dwTimeContinual;
 				m_origin = m_shniaga->GetWndPos().y;
 //				float border = GetHeight() - m_shniaga->GetHeight();
@@ -385,7 +397,7 @@ void CUIMMShniaga::ProcessEvent(EVENT ev){
 				if (m_run_time < 100)
 					m_run_time = 100;
 
-                // reset flags
+				// reset flags
 				m_flags.set(fl_SoundFinalized,	FALSE);
 				m_flags.set(fl_MovingStoped,	FALSE);
 			}	break;
@@ -406,7 +418,7 @@ void CUIMMShniaga::ProcessEvent(EVENT ev){
 				pos.y = m_destination;
 				m_shniaga->SetWndPos(pos);		
 
-                m_flags.set(fl_MovingStoped, TRUE);
+				m_flags.set(fl_MovingStoped, TRUE);
 			}	break;
 		case E_Update:		m_sound->music_Update();
 			break;

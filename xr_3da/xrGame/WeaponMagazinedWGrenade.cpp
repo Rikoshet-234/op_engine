@@ -40,6 +40,7 @@ CWeaponMagazinedWGrenade::CWeaponMagazinedWGrenade(LPCSTR name,ESoundTypes eSoun
 	m_ammoType2 = 0;
 	m_bGrenadeMode = false;
 	m_bforceReloadAfterIdle=false;
+	m_fBackupFakeZoom = 0.0f;
 }
 
 CWeaponMagazinedWGrenade::~CWeaponMagazinedWGrenade(void)
@@ -234,6 +235,7 @@ void CWeaponMagazinedWGrenade::OnShot		()
 //переход в режим подствольника или выход из него
 //если мы в режиме стрельбы очередями, переключиться
 //на одиночные, а уже потом на подствольник
+
 bool CWeaponMagazinedWGrenade::SwitchMode(bool switchOnLoad) 
 {
 	SHOW_WEAPON_STATE(GetState());
@@ -242,9 +244,10 @@ bool CWeaponMagazinedWGrenade::SwitchMode(bool switchOnLoad)
 	if(!bUsefulStateToSwitch)
 		return false;
 
-	if(!IsGrenadeLauncherAttached()) 
+	if(!IsGrenadeLauncherAttached())
 		return false;
-
+	if (IsGrenadeLauncherAttached() && is_fake_scope(m_sGrenadeLauncherName.c_str()))
+		return false;
 	m_bPending				= true;
 	PerformSwitchGL			(switchOnLoad);
 	if (m_bGrenadeMode)
@@ -284,13 +287,10 @@ void  CWeaponMagazinedWGrenade::PerformSwitchGL(bool switchOnLoad)
 			LoadZoomOffset(*hud_sect, "grenade_");
 		else 
 		{
-			if(GrenadeLauncherAttachable())
+			if(GrenadeLauncherAttachable() && IsGrenadeLauncherAttached())
 				LoadZoomOffset(*hud_sect, "grenade_normal_");
 			else
-				if (m_bEmptyScopeTexture && IsScopeAttached())
-					LoadZoomOffset(*hud_sect, "scope_");
-				else
-					LoadZoomOffset(*hud_sect, "");
+				LoadZoomOffset(*hud_sect, m_bEmptyScopeTexture && IsScopeAttached() ? "scope_" : "");
 		}
 	}
 	if (m_bGrenadeMode)
@@ -667,6 +667,12 @@ bool CWeaponMagazinedWGrenade::CanDetach(const char* item_section_name)
 
 bool CWeaponMagazinedWGrenade::Attach(PIItem pIItem, bool b_send_event)
 {
+	LPCSTR addon_section = pIItem->object().cNameSect().c_str();
+	bool fake_scope = is_fake_scope(addon_section);
+	if (fake_scope && IsScopeAttached())
+	{
+		Detach(GetScopeName().c_str(), true);
+	}
 	CGrenadeLauncher* pGrenadeLauncher = smart_cast<CGrenadeLauncher*>(pIItem);
 	
 	if(pGrenadeLauncher &&
@@ -687,6 +693,14 @@ bool CWeaponMagazinedWGrenade::Attach(PIItem pIItem, bool b_send_event)
 		}
 		UpdateAddonsVisibility	();
 		InitAddons();
+		if (fake_scope)
+		{
+			if (pSettings->line_exist(addon_section, "scope_zoom_factor"))
+			{
+				m_fBackupFakeZoom = m_fIronSightZoomFactor;
+				m_fIronSightZoomFactor = pSettings->r_float(addon_section, "scope_zoom_factor");
+			}
+		}
 		return					true;
 	}
 	else
@@ -699,6 +713,9 @@ bool CWeaponMagazinedWGrenade::Detach(const char* item_section_name, bool b_spaw
 	   0 != (m_flagsAddOnState&CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher) &&
 	   !xr_strcmp(*m_sGrenadeLauncherName, item_section_name))
 	{
+		if (is_fake_scope(item_section_name) && !fis_zero(m_fBackupFakeZoom))
+			m_fIronSightZoomFactor = m_fBackupFakeZoom;
+
 		m_flagsAddOnState &= ~CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher;
 		if(!m_bGrenadeMode)
 			PerformSwitchGL();
@@ -713,7 +730,7 @@ bool CWeaponMagazinedWGrenade::Detach(const char* item_section_name, bool b_spaw
 }
 
 
-
+//m_fScopeZoomFactor = pSettings->r_float(cNameSect(), "scope_zoom_factor");
 
 void CWeaponMagazinedWGrenade::InitAddons()
 {	
@@ -732,13 +749,10 @@ void CWeaponMagazinedWGrenade::InitAddons()
 				LoadZoomOffset(*hud_sect, "grenade_");
 			else 
 			{
-				if(IsGrenadeLauncherAttached())
+				if(GrenadeLauncherAttachable() && IsGrenadeLauncherAttached())
 					LoadZoomOffset(*hud_sect, "grenade_normal_");
 				else
-					if (m_bEmptyScopeTexture && IsScopeAttached())
-						LoadZoomOffset(*hud_sect, "scope_");
-					else
-						LoadZoomOffset(*hud_sect, "");
+					LoadZoomOffset(*hud_sect, m_bEmptyScopeTexture && IsScopeAttached() ? "scope_" : "");
 			}
 		}
 	}
@@ -753,7 +767,8 @@ bool	CWeaponMagazinedWGrenade::UseScopeTexture()
 
 float	CWeaponMagazinedWGrenade::CurrentZoomFactor	()
 {
-	if (IsGrenadeLauncherAttached() && m_bGrenadeMode) return m_fIronSightZoomFactor;
+	if (IsGrenadeLauncherAttached() && (m_bGrenadeMode || is_fake_scope(GetGrenadeLauncherName().c_str())))
+		return m_fIronSightZoomFactor;
 	return inherited::CurrentZoomFactor();
 }
 
