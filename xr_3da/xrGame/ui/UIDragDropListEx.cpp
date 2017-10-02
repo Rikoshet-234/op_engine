@@ -23,7 +23,7 @@
 #include "UICellItemFactory.h"
 
 
-CUIDragItem* CUIDragDropListEx::m_drag_item = NULL;
+CUIDragItem* CUIDragDropListEx::m_drag_item = nullptr;
 
 
 
@@ -41,7 +41,7 @@ CUIDragDropListEx::CUIDragDropListEx()
 	m_container					= xr_new<CUICellContainer>(this);
 	m_vScrollBar				= xr_new<CUIScrollBar>();
 	m_vScrollBar->SetAutoDelete	(true);
-	m_selected_item				= nullptr;
+	SetSelectedCell(nullptr);
 	m_b_showConditionBar		= false;
 
 	SetCellSize					(Ivector2().set(50,50));
@@ -134,12 +134,21 @@ void CUIDragDropListEx::CreateDragItem(CUICellItem* itm)
 
 void CUIDragDropListEx::DestroyDragItem()
 {
-	if(m_selected_item && m_drag_item && m_drag_item->ParentItem()==m_selected_item)
+	if(GetSelectedCell() && m_drag_item && m_drag_item->ParentItem()== GetSelectedCell())
 	{
 		VERIFY(GetParent()->GetMouseCapturer()==m_drag_item);
-		GetParent()->SetCapture				(NULL, false);
-
+		GetParent()->SetCapture				(nullptr, false);
 		delete_data							(m_drag_item);
+	}
+}
+
+void CUIDragDropListEx::DestroyDragItem(CUICellItem* pre_selected_item)
+{
+	if (pre_selected_item && m_drag_item && m_drag_item->ParentItem() == pre_selected_item)
+	{
+		VERIFY(GetParent()->GetMouseCapturer() == m_drag_item);
+		GetParent()->SetCapture(nullptr, false);
+		delete_data(m_drag_item);
 	}
 }
 
@@ -156,7 +165,7 @@ void CUIDragDropListEx::OnItemStartDragging(CUIWindow* w, void* pData)
 
 	CUICellItem* itm		= smart_cast<CUICellItem*>(w);
 
-	if(itm!=m_selected_item)	return;
+	if(itm!= GetSelectedCell())	return;
 	
 	if(m_f_item_start_drag && m_f_item_start_drag(itm) ) return;
 
@@ -170,9 +179,10 @@ void CUIDragDropListEx::OnItemDrop(CUIWindow* w, void* pData)
 		return;
 	CUICellItem*		itm				= smart_cast<CUICellItem*>(w);
 	VERIFY								(itm->OwnerList() == itm->OwnerList());
-
-	if(m_f_item_drop && m_f_item_drop(itm) ){
-		DestroyDragItem						();
+	CUICellItem* pre_selected_item = GetSelectedCell();
+	if(m_f_item_drop && m_f_item_drop(itm))
+	{
+		DestroyDragItem(pre_selected_item);
 		return;
 	}
 
@@ -191,7 +201,7 @@ void CUIDragDropListEx::OnItemDrop(CUIWindow* w, void* pData)
 		}
 		new_owner->SetItem				(i,old_owner->GetDragItemPosition());
 	}
-	DestroyDragItem						();
+	DestroyDragItem(pre_selected_item);
 }
 
 void CUIDragDropListEx::OnItemDBClick(CUIWindow* w, void* pData)
@@ -217,7 +227,6 @@ void CUIDragDropListEx::OnItemDBClick(CUIWindow* w, void* pData)
 		CUICellItem* i					= old_owner->RemoveItem(itm, true);
 		old_owner->SetItem				(i);
 	}
-
 	DestroyDragItem						();
 }
 
@@ -331,6 +340,11 @@ CUICellItem* CUIDragDropListEx::GetSelectedCell()
 	return m_selected_item;
 }
 
+void CUIDragDropListEx::SetSelectedCell(CUICellItem* value)
+{
+	m_selected_item = value;
+}
+
 bool CUIDragDropListEx::HasFreeSpace() const
 {
 	return m_container->HasFreeSpace(Ivector2().set(1,1));
@@ -340,9 +354,9 @@ void CUIDragDropListEx::OnItemSelected(CUIWindow* w, void* pData)
 {
 	CUICellItem* selected_item= smart_cast<CUICellItem*>(w);
 	callback(GameObject::OnDragDropListCellSelected)(selected_item);
-	m_selected_item = selected_item;
+	SetSelectedCell( selected_item);
 	if(m_f_item_selected)
-		m_f_item_selected(m_selected_item);
+		m_f_item_selected(GetSelectedCell());
 
 }
 
@@ -365,7 +379,7 @@ void CUIDragDropListEx::ClearAll(bool bDestroy)
 {
 	DestroyDragItem			();
 	m_container->ClearAll	(bDestroy);
-	m_selected_item			= nullptr;
+	SetSelectedCell(nullptr);
 	m_container->SetWndPos	(0,0);
 	ResetCellsCapacity		();
 }
@@ -463,9 +477,11 @@ bool CUIDragDropListEx::OnMouse(float x, float y, EUIMessages mouse_action)
 
 bool CUIDragDropListEx::select_suitables_by_selected()
 {
-	if (m_selected_item==nullptr)
+	if (GetSelectedCell()==nullptr)
 		return false;
-	CInventoryItem*	item = static_cast<CInventoryItem*>(m_selected_item->m_pData);
+	if (GetSelectedCell()->m_pData == nullptr)
+		return false;
+	CInventoryItem*	item = static_cast<CInventoryItem*>(GetSelectedCell()->m_pData);
 	return select_suitables_by_item(item);
 }
 
@@ -478,7 +494,6 @@ bool CUIDragDropListEx::select_suitables_by_item(CInventoryItem* item)
 	CWeapon* pWeapon = smart_cast<CWeapon*>(item);
 	if (pWeapon)
 	{
-		weaponSections.clear_not_free();
 		weaponSections.assign( pWeapon->m_ammoTypes.begin(), pWeapon->m_ammoTypes.end() );
 		CWeaponMagazinedWGrenade* wg = smart_cast<CWeaponMagazinedWGrenade*>(item);
 		if (wg &&  wg->m_ammoTypes2.size() && wg->GrenadeLauncherAttachable())
@@ -506,7 +521,6 @@ bool CUIDragDropListEx::select_suitables_by_item(CInventoryItem* item)
 			CInventoryItem* listItem = static_cast<CInventoryItem*>(cellItem->m_pData);
 			if ( !listItem )
 				continue;
-			xr_vector<shared_str>::iterator fi=weaponSections.begin();
 			if (std::find(weaponSections.begin(), weaponSections.end(), listItem->object().cNameSect()) != weaponSections.end())
 			{
 				cellItem->m_suitable=true;
@@ -844,7 +858,7 @@ CUICellItem* CUICellContainer::GetFocusedCellItem()
 	for(WINDOW_LIST_it it = m_ChildWndList.begin(); m_ChildWndList.end()!=it; ++it)
 	{
 		CUICellItem* i = smart_cast<CUICellItem*>(*it);
-		if (i->m_focused)
+		if (i->GetFocused())
 			return i;
 	}
 	return nullptr;
@@ -1134,13 +1148,13 @@ void CUICellContainer::Draw()
 			u32 back_color=0xFFFFFFFF;
 			if (!ui_cell.Empty() )
 			{
-				if ( ui_cell.m_item->m_focused && g_uCommonFlags.test(E_COMMON_FLAGS::uiShowFocused))
+				if ( ui_cell.m_item->GetFocused() && g_uCommonFlags.test(E_COMMON_FLAGS::uiShowFocused))
 				{
 					back_color=m_focused_color.get();
 					select_mode = back_color==0xFFFFFFFF ? 0 : 1;
 					//ui_cell.m_item->SetClrLightAnim(nullptr, true, false, false, true);
 				} 
-				else if ( ui_cell.m_item->m_selected && g_uCommonFlags.test(E_COMMON_FLAGS::uiShowSelected))
+				else if ( ui_cell.m_item->GetSelected() && g_uCommonFlags.test(E_COMMON_FLAGS::uiShowSelected))
 				{
 					back_color=m_selected_color.get();
 					select_mode = back_color==0xFFFFFFFF ? 0 : 2;

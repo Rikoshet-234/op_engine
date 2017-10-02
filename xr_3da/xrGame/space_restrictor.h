@@ -47,6 +47,9 @@ private:
 			bool				prepared_inside		(const Fsphere &sphere) const;
 
 public:
+	BOXES* getBoxes() const { return &m_boxes; }
+	SPHERES* getSpheres() const { return &m_spheres; }
+
 	IC							CSpaceRestrictor	();
 	virtual						~CSpaceRestrictor	();
 	virtual	BOOL				net_Spawn			(CSE_Abstract* data);

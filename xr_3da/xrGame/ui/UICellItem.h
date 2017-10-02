@@ -90,6 +90,8 @@ public:
 	LPCSTR GetCellSection();
 	UIIconInfo m_iconInfo;
 	shared_str m_sSection;
+	bool GetFocused() {return m_focused;}
+	bool GetSelected() {return m_selected;}
 };
 
 class CUIDragItem: public CUIWindow, public pureRender, public pureFrame

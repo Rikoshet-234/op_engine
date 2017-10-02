@@ -2,6 +2,7 @@
 #include "UIOptionsItem.h"
 #include "UIOptionsManager.h"
 #include "../../xr_ioconsole.h"
+#include "../GamePersistent.h"
 
 CUIOptionsManager CUIOptionsItem::m_optionsManager;
 
@@ -102,6 +103,8 @@ void CUIOptionsItem::SaveOptTokenValue(const char* val){
 	SaveOptStringValue(val);
 }
 
+extern bool IsMainMenuActive();
+
 void CUIOptionsItem::SaveValue() {
 	if (m_entry == "vid_mode" ||
 		m_entry == "_preset" ||
@@ -120,6 +123,7 @@ void CUIOptionsItem::SaveValue() {
 
 	if (/*m_entry == "snd_freq" ||*/ m_entry == "snd_efx")
 		m_optionsManager.DoSndRestart();
+
 }
 
 

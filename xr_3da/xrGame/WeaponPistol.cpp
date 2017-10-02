@@ -21,6 +21,7 @@ void CWeaponPistol::net_Destroy()
 
 	// sounds
 	HUD_SOUND::DestroySound(sndClose);
+	HUD_SOUND::DestroySound(sndReloadEmpty);
 }
 
 
@@ -29,6 +30,9 @@ void CWeaponPistol::Load	(LPCSTR section)
 	inherited::Load		(section);
 
 	HUD_SOUND::LoadSound(section, "snd_close", sndClose, m_eSoundClose);
+	HUD_SOUND::LoadSound(section, "snd_reload_empty", sndReloadEmpty, m_eSoundClose,false);
+	if (sndReloadEmpty.sounds.empty())
+		HUD_SOUND::LoadSound(section, "snd_reload", sndReloadEmpty, m_eSoundClose);
 
 	animGet				(mhud_pistol.mhud_empty,		pSettings->r_string(*hud_sect, "anim_empty"));
 	animGet				(mhud_pistol.mhud_shot_l,		pSettings->r_string(*hud_sect, "anim_shot_last"));
@@ -118,10 +122,14 @@ void CWeaponPistol::PlayAnimIdle	()
 void CWeaponPistol::PlayAnimReload	()
 {	
 	VERIFY(GetState()==eReload);
-	if(m_opened){ 
+	if(m_opened)
+	{ 
+		PlaySound(sndReloadEmpty, get_LastFP());
 		CWeaponPistol::WWPMotions& m = wwpm_current();
 		m_pHUD->animPlay(random_anim(m.mhud_reload_empty), TRUE, this, GetState());
-	}else{
+	}
+	else
+	{
 		CWeaponMagazined::SWMmotions& m = swm_current();
 		m_pHUD->animPlay(random_anim(m.mhud_reload), TRUE, this, GetState());
 	}
@@ -206,6 +214,7 @@ void CWeaponPistol::UpdateSounds()
 	inherited::UpdateSounds();
 
 	if (sndClose.playing()) sndClose.set_position	(get_LastFP());
+	if (sndReloadEmpty.playing()) sndReloadEmpty.set_position(get_LastFP());
 }
 
 CWeaponPistol::WWPMotions&	 CWeaponPistol::wwpm_current	()

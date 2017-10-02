@@ -94,10 +94,6 @@ void CSpaceRestrictor::net_Destroy	()
 
 bool CSpaceRestrictor::inside	(const Fsphere &sphere) const
 {
-	if (!this)
-	{
-		Msg("! CSpaceRestrictor::inside this unassigned!");
-	}
 	if (!actual())
 	{
 		prepare();

@@ -141,8 +141,8 @@ public:
 	TCachedData cacheData;
 	bool					GetShowConditionBar() const {return m_b_showConditionBar;}
 	void SetShowConditionBar(bool state);
-	CUICellItem* GetSelectedCell();
-	void SetSelectedCell(CUICellItem* value) { m_selected_item = value; }
+	CUICellItem* GetSelectedCell();;
+	void SetSelectedCell(CUICellItem* value);
 	bool HasFreeSpace() const;
 	IWListTypes				GetUIListId() const			{return listId; };
 	void					SetUIListId(IWListTypes id)	{listId=id; };
@@ -208,6 +208,7 @@ public:
 			void			CreateDragItem		(CUICellItem* itm);
 
 			void			DestroyDragItem		();
+			void			DestroyDragItem(CUICellItem* pre_selected_item);
 			void			ClearAll			(bool bDestroy);	
 			void			Compact				();
 			bool			IsOwner				(CUICellItem* itm);

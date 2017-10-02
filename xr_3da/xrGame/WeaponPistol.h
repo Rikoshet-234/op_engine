@@ -31,6 +31,9 @@ protected:
 
 	HUD_SOUND			sndClose;
 	ESoundTypes			m_eSoundClose;
+
+	HUD_SOUND sndReloadEmpty;
+
 	struct WWPMotions{
 		MotionSVec		mhud_show_empty;
 		MotionSVec		mhud_empty;

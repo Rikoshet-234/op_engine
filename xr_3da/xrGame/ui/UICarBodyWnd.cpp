@@ -485,10 +485,10 @@ PIItem CUICarBodyWnd::CurrentIItem()
 void CUICarBodyWnd::SetItemSelected(CUICellItem* itm)
 {
 	CUICellItem* curr=CurrentItem();
-	if (curr  && curr->m_selected)
-		curr->m_selected=false;
-	if (itm!=nullptr && !itm->m_selected)	
-		itm->m_selected=true;
+	if (curr  && curr->GetSelected())
+		curr->SetSelected(false);
+	if (itm!=nullptr && !itm->GetSelected())	
+		itm->SetSelected(true);
 }
 
 void CUICarBodyWnd::SetCurrentItem(CUICellItem* itm)
@@ -789,14 +789,14 @@ bool CUICarBodyWnd::OnItemRButtonClick(CUICellItem* itm)
 bool CUICarBodyWnd::OnItemFocusLost(CUICellItem* itm) const
 {
 	if (itm)
-		itm->m_focused=false;
+		itm->SetFocused(false);
 	return						false;
 }
 
 bool CUICarBodyWnd::OnItemFocusReceive(CUICellItem* itm) const
 {
 	if (itm)
-		itm->m_focused=true;
+		itm->SetFocused(true);
 	return						false;
 }
 

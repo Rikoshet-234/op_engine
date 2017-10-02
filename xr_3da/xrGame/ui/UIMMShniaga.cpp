@@ -9,10 +9,11 @@
 #include "../game_base_space.h"
 #include "../level.h"
 #include "../object_broker.h"
-#include <math.h>
+#include "../GamePersistent.h"
 #include "../Actor.h"
 #include "../saved_game_wrapper.h"
 #include "../../defines.h"
+
 
 extern string_path g_last_saved_game;
 
@@ -42,7 +43,9 @@ CUIMMShniaga::CUIMMShniaga(){
 	m_page			= -1;
 }
 
-CUIMMShniaga::~CUIMMShniaga(){
+CUIMMShniaga::~CUIMMShniaga()
+{
+	xr_delete(m_sound);
 	xr_delete(m_magnifier);
 	xr_delete(m_shniaga);
 	xr_delete(m_anims[0]);
@@ -50,7 +53,7 @@ CUIMMShniaga::~CUIMMShniaga(){
 	xr_delete(m_gratings[0]);
 	xr_delete(m_gratings[1]);
 	xr_delete(m_view);
-	xr_delete(m_sound);
+
 
 	delete_data(m_buttons);
 	delete_data(m_buttons_new);
@@ -103,7 +106,7 @@ void CUIMMShniaga::Init(CUIXml& xml_doc, LPCSTR path)
 	ShowMain				();
 
 	m_sound->Init(xml_doc, "menu_sound");
-	m_sound->music_Play();
+	m_sound->music_Play(-1);
 
 	m_wheel_size[0]		= m_anims[0]->GetWndSize();
 	
@@ -113,10 +116,10 @@ void CUIMMShniaga::Init(CUIXml& xml_doc, LPCSTR path)
 
 void CUIMMShniaga::OnDeviceReset()
 {
-	if (pMMMusic)
-		m_sound->music_Play();
-	else
-		m_sound->music_Stop();
+	m_sound->music_Stop();
+	if (g_pGamePersistent && g_pGamePersistent->m_pMainMenu && g_pGamePersistent->m_pMainMenu->IsActive())
+		if (pMMMusic)
+			m_sound->music_Play();
 	if(UI()->is_16_9_mode())
 	{
 		m_anims[0]->SetWndSize(m_wheel_size[1]);
@@ -126,6 +129,11 @@ void CUIMMShniaga::OnDeviceReset()
 		m_anims[0]->SetWndSize(m_wheel_size[0]);
 		m_anims[1]->SetWndSize(m_wheel_size[0]);
 	}
+}
+
+void CUIMMShniaga::Show(bool state)
+{
+	CUIWindow::Show(state);
 }
 
 extern CActor*		g_actor;
@@ -301,7 +309,8 @@ bool CUIMMShniaga::OnMouse(float x, float y, EUIMessages mouse_action){
 	return CUIWindow::OnMouse(x,y,mouse_action);
 }
 
-void CUIMMShniaga::OnBtnClick(){
+void CUIMMShniaga::OnBtnClick()
+{//btn_ret
 	if (0 == xr_strcmp("btn_new_game", m_selected->WindowName()))
 			ShowNewGame();
 		else if (0 == xr_strcmp("btn_new_back", m_selected->WindowName()))

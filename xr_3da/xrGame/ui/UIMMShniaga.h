@@ -26,6 +26,7 @@ public:
 	virtual void 		SendMessage				(CUIWindow* pWnd, s16 msg, void* pData = 0);
 			void 		SetVisibleMagnifier		(bool f);
 	virtual void		OnDeviceReset			();
+	void Show(bool state) override;
 protected:
 	typedef enum {
 		E_Begin = 0,

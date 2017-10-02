@@ -577,14 +577,14 @@ bool CUITradeWnd::OnItemRButtonClick(CUICellItem* itm)
 bool CUITradeWnd::OnItemFocusLost(CUICellItem* itm)
 {
 	if (itm)
-		itm->m_focused=false;
+		itm->SetFocused(false);
 	return						false;
 }
 
 bool CUITradeWnd::OnItemFocusReceive(CUICellItem* itm)
 {
 	if (itm)
-		itm->m_focused=true;
+		itm->SetFocused(true);
 	return						false;
 }
 
@@ -715,10 +715,10 @@ void CUITradeWnd::SetCurrentItem(CUICellItem* itm)
 void CUITradeWnd::SetItemSelected(CUICellItem* itm)
 {
 	CUICellItem* curr=CurrentItem();
-	if (curr!=nullptr  && curr->m_selected)
-		curr->m_selected=false;
-	if (itm!=nullptr && !itm->m_selected)	
-		itm->m_selected=true;
+	if (curr!=nullptr  && curr->GetSelected())
+		curr->SetSelected(false);
+	if (itm!=nullptr && !itm->GetSelected())	
+		itm->SetSelected(true);
 }
 
 void CUITradeWnd::SwitchToTalk()

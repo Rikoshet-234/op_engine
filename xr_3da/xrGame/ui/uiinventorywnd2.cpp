@@ -37,10 +37,10 @@ PIItem CUIInventoryWnd::CurrentIItem()
 void CUIInventoryWnd::SetItemSelected (CUICellItem* itm)
 {
 	auto curr=CurrentItem();
-	if (curr!=nullptr  && curr->m_selected)
-		curr->m_selected=false;
-	if (itm!=nullptr && !itm->m_selected)	
-		itm->m_selected=true;
+	if (curr!=nullptr  && curr->GetSelected())
+		curr->SetSelected(false);
+	if (itm!=nullptr && !itm->GetSelected())	
+		itm->SetSelected(true);
 }
 
 void CUIInventoryWnd::SetCurrentItem(CUICellItem* itm)
@@ -497,14 +497,14 @@ bool CUIInventoryWnd::OnItemDbClick(CUICellItem* itm)
 bool CUIInventoryWnd::OnItemFocusReceive(CUICellItem* itm)
 {
 	if (itm)
-		itm->m_focused=true;
+		itm->SetFocused(true);
 	return						false;
 }
 
 bool CUIInventoryWnd::OnItemFocusLost(CUICellItem* itm)
 {
 	if (itm)
-		itm->m_focused=false;
+		itm->SetFocused(false);
 	return						false;
 }
 

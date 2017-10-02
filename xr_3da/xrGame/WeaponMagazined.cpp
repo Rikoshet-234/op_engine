@@ -1072,6 +1072,8 @@ bool CWeaponMagazined::AttachScopeSection(const char* item_section_name, bool si
 
 bool is_fake_scope(LPCSTR section)
 {
+	if (!section)
+		return false;
 	if (pSettings->line_exist(section, "scope_texture"))
 		return xr_strlen(pSettings->r_string(section, "scope_texture")) == 0;
 	return false;
