@@ -39,20 +39,22 @@ void move_item (u16 from_id, u16 to_id, u16 what_id);
 
 CUICarBodyWnd::CUICarBodyWnd()
 {
-	m_pInventoryBox		= nullptr;
-	m_pCurrentCellItem=nullptr;
-	CUICarBodyWnd::Init				();
-	CUICarBodyWnd::Hide				();
-	m_b_need_update		= false;
+	m_pInventoryBox = nullptr;
+	m_pCurrentCellItem = nullptr;
+	CUICarBodyWnd::Init();
+	CUICarBodyWnd::Hide();
+	m_b_need_update = false;
 }
 
 CUICarBodyWnd::~CUICarBodyWnd()
 {
+	m_pCurrentCellItem = nullptr;
 	std::for_each(sourceDragDropLists.begin(),sourceDragDropLists.end(),[](CUIDragDropListEx* list){list->ClearAll(true);});
 }
 
 void CUICarBodyWnd::re_init()
 {
+	m_pCurrentCellItem = nullptr;
 	sourceDragDropLists.clear();
 	m_pUIOurIcon->DetachAll();
 	m_pUIOthersIcon->DetachAll();
@@ -265,6 +267,7 @@ void CUICarBodyWnd::Hide()
 {
 	PlaySnd								(eInvSndClose);
 	InventoryUtilities::SendInfoToActor			("ui_car_body_hide");
+	SetCurrentItem(nullptr);
 	std::for_each(sourceDragDropLists.begin(),sourceDragDropLists.end(),[](CUIDragDropListEx* list){list->ClearAll(true);});
 	inherited::Hide								();
 	m_pUIPropertiesBox->Hide();

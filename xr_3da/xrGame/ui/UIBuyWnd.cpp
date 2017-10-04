@@ -64,12 +64,13 @@ CUIBuyWnd::CUIBuyWnd()
 	m_propertiesBox.Init	(0,0,300,300);
 	m_propertiesBox.Hide	();
 
-	m_pCurrentCellItem		= NULL;
+	m_pCurrentCellItem		= nullptr;
 }
 
 CUIBuyWnd::~CUIBuyWnd()
 {
-    DestroyAllItems			();	
+	m_pCurrentCellItem = nullptr;
+	DestroyAllItems			();	
 }
 
 void CUIBuyWnd::ResetItems()
@@ -90,7 +91,7 @@ void CUIBuyWnd::Show()
 	
 	CActor *pActor			= smart_cast<CActor*>(Level().CurrentEntity());
 	if(pActor) 
-        pActor->SetWeaponHideState(INV_STATE_BUY_MENU, true);
+		pActor->SetWeaponHideState(INV_STATE_BUY_MENU, true);
 
 	m_tab.SetActiveState	();
 
@@ -101,10 +102,10 @@ void CUIBuyWnd::Show()
 void CUIBuyWnd::Hide()
 {
 	inherited::Hide			();
-
+	SetCurrentItem(nullptr);
 	CActor *pActor			= smart_cast<CActor*>(Level().CurrentEntity());
 	if(pActor)
-        pActor->SetWeaponHideState(INV_STATE_BUY_MENU, false);
+		pActor->SetWeaponHideState(INV_STATE_BUY_MENU, false);
 }
 
 void CUIBuyWnd::DestroyAllItems()
@@ -231,7 +232,7 @@ void CUIBuyWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData){
 	switch (msg)
 	{
 	case TAB_CHANGED:
-        OnTabChange();	
+		OnTabChange();	
 		break;
 
 	case XR_MENU_LEVEL_CHANGED:
@@ -259,8 +260,8 @@ void CUIBuyWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData){
 			OnBtnRifleGrenade();
 		}break;
 	case PROPERTY_CLICKED:
-        if(pWnd == &m_propertiesBox)
-            ProcessPropertiesBoxClicked();
+		if(pWnd == &m_propertiesBox)
+			ProcessPropertiesBoxClicked();
 		break;
 	case MP_MONEY_CHANGE:
 		OnMoneyChange		();
@@ -334,7 +335,7 @@ void CUIBuyWnd::OnBtnRifleGrenade()
 
 		if (wpn->IsGrenadeLauncherAttached())
 		{
-            shared_str	itemsList; 
+			shared_str	itemsList; 
 			string256	single_item;
 
 			itemsList	= pSettings->r_string(*wpn->cNameSect(), "grenade_class");
@@ -383,7 +384,7 @@ void CUIBuyWnd::Highlight(int slot)
 	int c			= _GetItemCount(itemsList.c_str());
 	for (int i = 0; i<c; i++)
 	{
-        _GetItem				(itemsList.c_str(), i, single_item);
+		_GetItem				(itemsList.c_str(), i, single_item);
 		m_bag.HightlightAmmo	(single_item);
 	}
 }
@@ -482,7 +483,7 @@ bool CUIBuyWnd::ClearTooExpensiveItems()
 	bool f			= false;
 	bool res;
 
-    res				= ClearSlot_ifTooExpensive(MP_SLOT_PISTOL);
+	res				= ClearSlot_ifTooExpensive(MP_SLOT_PISTOL);
 	f				= (f)? true : res;
 	res				= ClearSlot_ifTooExpensive(MP_SLOT_RIFLE);
 	f				= (f)? true : res;
@@ -570,7 +571,7 @@ bool CUIBuyWnd::SlotToSection(int slot)
 
 void CUIBuyWnd::OnBtnClear()
 {
-    if (ClearTooExpensiveItems())
+	if (ClearTooExpensiveItems())
 		return;
 
 	SlotToSection					(MP_SLOT_PISTOL);
@@ -803,7 +804,7 @@ void CUIBuyWnd::ActivatePropertiesBox()
 	CScope* pScope						= smart_cast<CScope*>			(CurrentIItem());
 	CSilencer* pSilencer				= smart_cast<CSilencer*>		(CurrentIItem());
 	CGrenadeLauncher* pGrenadeLauncher	= smart_cast<CGrenadeLauncher*>	(CurrentIItem());
-    
+	
 
 
 	if((pWeapon || pOutfit ) && m_bag.IsInBag(CurrentItem()) && m_bag.CanBuy(CurrentItem()) /*&& m_list[GetLocalSlot(CurrentIItem()->GetSlot())]->ItemsCount()*/)
@@ -833,18 +834,18 @@ void CUIBuyWnd::ActivatePropertiesBox()
 		if(pWeapon->GrenadeLauncherAttachable())
 		{
 			if (pWeapon->IsGrenadeLauncherAttached())
-                m_propertiesBox.AddItem("st_detach_gl", GetRifle(), INVENTORY_DETACH_GRENADE_LAUNCHER_ADDON);
+				m_propertiesBox.AddItem("st_detach_gl", GetRifle(), INVENTORY_DETACH_GRENADE_LAUNCHER_ADDON);
 			else if (m_list[MP_SLOT_RIFLE]->IsOwner(CurrentItem())){
 
 				if (m_bag.CanBuy(*pWeapon->GetGrenadeLauncherName()))
-                    m_propertiesBox.AddItem("st_attach_gl_to_rifle", CurrentItem(), INVENTORY_ATTACH_GRENADE_LAUNCHER_ADDON);
+					m_propertiesBox.AddItem("st_attach_gl_to_rifle", CurrentItem(), INVENTORY_ATTACH_GRENADE_LAUNCHER_ADDON);
 			}
 
 		}
 		if(pWeapon->ScopeAttachable())
 		{
 			if (pWeapon->IsScopeAttached())
-                m_propertiesBox.AddItem("st_detach_scope",  NULL, INVENTORY_DETACH_SCOPE_ADDON);
+				m_propertiesBox.AddItem("st_detach_scope",  NULL, INVENTORY_DETACH_SCOPE_ADDON);
 			else{
 
 				if (m_bag.CanBuy(*pWeapon->GetScopeName()))
@@ -859,7 +860,7 @@ void CUIBuyWnd::ActivatePropertiesBox()
 		if(pWeapon->SilencerAttachable())
 		{
 			if (pWeapon->IsSilencerAttached())
-                m_propertiesBox.AddItem("st_detach_silencer",  NULL, INVENTORY_DETACH_SILENCER_ADDON);
+				m_propertiesBox.AddItem("st_detach_silencer",  NULL, INVENTORY_DETACH_SILENCER_ADDON);
 			else {
 
 				if (m_bag.CanBuy(*pWeapon->GetSilencerName()))
@@ -984,7 +985,7 @@ CWeapon* CUIBuyWnd::GetPistol()
 
 CWeapon* CUIBuyWnd::GetRifle()
 {
-    if (m_list[MP_SLOT_RIFLE]->ItemsCount() > 0)
+	if (m_list[MP_SLOT_RIFLE]->ItemsCount() > 0)
 	{
 		CWeapon* rifle			= (CWeapon*) (m_list[MP_SLOT_RIFLE]->GetItemIdx(0)->m_pData);
 		VERIFY					(rifle);
@@ -1216,7 +1217,7 @@ const u8 CUIBuyWnd::GetItemIndex(u32 slotNum, u32 idx, u8 &sectionNum)
 	CUICellItem *itm			= NULL;
 
 	if (m_list[GetLocalSlot(slotNum)]->ItemsCount())
-        itm						= m_list[GetLocalSlot(slotNum)]->GetItemIdx(idx);
+		itm						= m_list[GetLocalSlot(slotNum)]->GetItemIdx(idx);
 
 	return m_bag.GetItemIndex	(itm, sectionNum);	
 }
@@ -1454,13 +1455,13 @@ void CUIBuyWnd::CheckAddons(CUICellItem* itm)
 	if (witm)	
 	{
 		if (wpn->ScopeAttachable() && wpn->IsScopeAttached())
-            UpdAddon(witm, CSE_ALifeItemWeapon::eWeaponAddonScope);
+			UpdAddon(witm, CSE_ALifeItemWeapon::eWeaponAddonScope);
 
 		if (wpn->SilencerAttachable() && wpn->IsSilencerAttached())
-            UpdAddon(witm, CSE_ALifeItemWeapon::eWeaponAddonSilencer);
+			UpdAddon(witm, CSE_ALifeItemWeapon::eWeaponAddonSilencer);
 
 		if (wpn->GrenadeLauncherAttachable() && wpn->IsGrenadeLauncherAttached())
-            UpdAddon(witm, CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher);
+			UpdAddon(witm, CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher);
 	}
 }
 

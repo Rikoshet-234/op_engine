@@ -45,16 +45,13 @@ CUIInventoryWnd*	g_pInvWnd = nullptr;
 
 CUIInventoryWnd::CUIInventoryWnd()
 {
-	m_iCurrentActiveSlot				= NO_ACTIVE_SLOT;
-	
-	UIRank								= nullptr;
-
-	CUIInventoryWnd::Init								();
-	m_pCurrentCellItem=nullptr;
-
-	g_pInvWnd							= this;	
-	m_b_need_reinit						= false;
-	CUIInventoryWnd::Hide								();	
+	m_iCurrentActiveSlot = NO_ACTIVE_SLOT;
+	UIRank = nullptr;
+	CUIInventoryWnd::Init();
+	m_pCurrentCellItem = nullptr;
+	g_pInvWnd = this;
+	m_b_need_reinit = false;
+	CUIInventoryWnd::Hide();
 	SetUIWindowType(EAWindowType::wtInventory);
 }
 
@@ -351,6 +348,7 @@ ref_sound* CUIInventoryWnd::GetSound(eInventorySndAction a)
 CUIInventoryWnd::~CUIInventoryWnd()
 {
 //.	ClearDragDrop(m_vDragDropItems);
+	m_pCurrentCellItem = nullptr;
 	ClearAllLists						();
 }
 
@@ -467,6 +465,7 @@ void CUIInventoryWnd::Hide()
 	inherited::Hide						();
 
 	SendInfoToActor						("ui_inventory_hide");
+	SetCurrentItem(nullptr);
 	ClearAllLists						();
 
 	//достать вещь в активный слот

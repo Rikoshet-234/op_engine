@@ -30,13 +30,13 @@ CUICellItem* CUIInventoryWnd::CurrentItem()
 
 PIItem CUIInventoryWnd::CurrentIItem()
 {
-	return	(m_pCurrentCellItem)?static_cast<PIItem>(m_pCurrentCellItem->m_pData) : NULL;
+	return	m_pCurrentCellItem?static_cast<PIItem>(m_pCurrentCellItem->m_pData) : nullptr;
 }
 
 
 void CUIInventoryWnd::SetItemSelected (CUICellItem* itm)
 {
-	auto curr=CurrentItem();
+	CUICellItem* curr=CurrentItem();
 	if (curr!=nullptr  && curr->GetSelected())
 		curr->SetSelected(false);
 	if (itm!=nullptr && !itm->GetSelected())	
@@ -99,11 +99,10 @@ void CUIInventoryWnd::InitInventory()
 	if(!pInvOwner)				return;
 
 	m_pInv						= &pInvOwner->inventory();
-
+	SetCurrentItem(nullptr);
 	UIPropertiesBox.Hide		();
 	ClearAllLists				();
 	m_pMouseCapturer			= nullptr;
-	SetCurrentItem				(nullptr);
 
 #pragma region put items to slots
 	PaintItemFromSlot(DETECTOR_ARTS_SLOT);
@@ -396,8 +395,9 @@ bool CUIInventoryWnd::OnItemDrop(CUICellItem* itm)
 			Actor()->callback(GameObject::ECallbackType::eOnCellItemDrop)(this,old_owner,new_owner,itm,focusedCellItem,processed);
 	return true;
 }
-void CUIInventoryWnd::hideInventoryWnd(CInventoryItem* weapon) const
+void CUIInventoryWnd::hideInventoryWnd(CInventoryItem* weapon) 
 {
+	SetCurrentItem(nullptr);
 	CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
 	pGameSP->InventoryMenu->GetHolder()->StartStopMenu(pGameSP->InventoryMenu,true);
 	m_pInv->m_bForceRecalcAmmos=true;

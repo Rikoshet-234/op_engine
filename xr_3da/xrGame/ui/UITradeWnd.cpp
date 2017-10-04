@@ -40,9 +40,9 @@
 #define				TRADE_ITEM_XML		"trade_item.xml"
 
 
-CUITradeWnd::CUITradeWnd() : bStarted(false),m_bDealControlsVisible	(false),m_pTrade(nullptr),m_pOthersTrade(nullptr)
+CUITradeWnd::CUITradeWnd() : bStarted(false), m_bDealControlsVisible(false), m_pTrade(nullptr), m_pOthersTrade(nullptr)
 {
-	m_pCurrentCellItem=nullptr;
+	m_pCurrentCellItem = nullptr;
 	CUITradeWnd::Init();
 	CUITradeWnd::Hide();
 	SetUIWindowType(EAWindowType::wtTrade);
@@ -50,6 +50,7 @@ CUITradeWnd::CUITradeWnd() : bStarted(false),m_bDealControlsVisible	(false),m_pT
 
 CUITradeWnd::~CUITradeWnd()
 {
+	m_pCurrentCellItem = nullptr;
 	std::for_each(sourceDragDropLists.begin(),sourceDragDropLists.end(),[](CUIDragDropListEx* list){list->ClearAll(true);});
 }
 
@@ -298,6 +299,7 @@ void CUITradeWnd::Hide()
 	}
 	UIPropertiesBox.RemoveAll();
 	UIPropertiesBox.Hide();
+	SetCurrentItem(nullptr);
 	std::for_each(sourceDragDropLists.begin(),sourceDragDropLists.end(),[](CUIDragDropListEx* list){list->ClearAll(true);});
 }
 
@@ -663,7 +665,7 @@ CUICellItem* CUITradeWnd::CurrentItem()
 
 PIItem CUITradeWnd::CurrentIItem()
 {
-	return	(m_pCurrentCellItem)?static_cast<PIItem>(m_pCurrentCellItem->m_pData) : NULL;
+	return	(m_pCurrentCellItem)?static_cast<PIItem>(m_pCurrentCellItem->m_pData) : nullptr;
 }
 
 void CUITradeWnd::UpdateItemUICost(CUICellItem* cellItem)
