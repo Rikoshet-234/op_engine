@@ -621,6 +621,10 @@ void CWeaponMagazined::UpdateSounds()
 	if (sndZoomDec.playing())	sndZoomDec.set_position(get_LastFP());
 }
 
+LPCSTR bstr(bool value)
+{
+	return value ? "true" : "false";
+}
 
 void CWeaponMagazined::state_Fire	(float dt)
 {
@@ -651,6 +655,7 @@ void CWeaponMagazined::state_Fire	(float dt)
 		
 	VERIFY(!m_magazine.empty());
 	//Msg("%d && %d && (%d || %d) && (%d || %d)", !m_magazine.empty(), fTime<=0, IsWorking(), m_bFireSingleShot, m_iQueueSize < 0, m_iShotNum < m_iQueueSize);
+	//Msg("fTime[%f] IsWorking[%s] m_bFireSingleShot[%s] m_iQueueSize[%i]",fTime, bstr(!!IsWorking()), bstr(m_bFireSingleShot),m_iQueueSize);
 	while (!m_magazine.empty() && fTime<=0 && (IsWorking() || m_bFireSingleShot) && (m_iQueueSize < 0 || m_iShotNum < m_iQueueSize))
 	{
 		m_bFireSingleShot = false;

@@ -407,4 +407,5 @@ void CObjectFactory::register_classes	()
 	ADD(CMincer					,CSE_ALifeAnomalousZone			,TEXT2CLSID("ZS_GALAN")			,"zone_galant_s");
 	ADD(CMincer					,CSE_ALifeAnomalousZone			,TEXT2CLSID("ZS_MINCE")			,"zone_mincer_s");
 	ADD(CSpaceRestrictor		,CSE_ALifeSpaceRestrictor		,TEXT2CLSID("SPC_RS_S")			,"script_restr");
+	ADD(CRadioactiveZone, CSE_ALifeAnomalousZone, TEXT2CLSID("ZS_RADIO"), "zone_radioactive_s");
 }

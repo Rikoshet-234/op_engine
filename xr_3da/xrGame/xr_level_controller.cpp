@@ -186,7 +186,8 @@ _keyboard keyboards[] = {
 	{ "mouse2",			MOUSE_2			},	{ "mouse3",			MOUSE_3			},
 	{ "mouse4",			MOUSE_4			},	{ "mouse5",			MOUSE_5			},
 	{ "mouse6",			MOUSE_6			},	{ "mouse7",			MOUSE_7			},
-	{ "mouse8",			MOUSE_8			},	{nullptr, 			0				}
+	{ "mouse8",			MOUSE_8			},	{ "kLALT",	 		DIK_LALT		},
+	{ "kRALT",	 		DIK_RALT		},	{nullptr, 			0				}
 };
 
 void initialize_bindings()

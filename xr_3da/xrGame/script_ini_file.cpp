@@ -6,11 +6,12 @@
 //	Description : Script ini file class
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "pch_script.h"
 #include "script_ini_file.h"
 #include "script_engine.h"
 #include "ai_space.h"
 #include "object_factory.h"
+#include "../xrCore/xr_ini.h"
 
 CScriptIniFile::CScriptIniFile		(IReader *F, LPCSTR path) :
 	inherited	(F,path)
@@ -164,6 +165,7 @@ void CScriptIniFile::w_bool(LPCSTR S, LPCSTR L, bool V, LPCSTR comment)
 {
 	inherited::w_bool(S,L,V,comment);
 }
+
 
 
 

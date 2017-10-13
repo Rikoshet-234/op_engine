@@ -377,7 +377,12 @@ void CUIDragDropListEx::GetClientArea(Frect& r)
 
 void CUIDragDropListEx::ClearAll(bool bDestroy)
 {
-	DestroyDragItem			();
+	if (m_drag_item)
+	{
+		if (GetParent()->GetMouseCapturer() == m_drag_item)
+			GetParent()->SetCapture(nullptr, false);
+		delete_data(m_drag_item);
+	}
 	m_container->ClearAll	(bDestroy);
 	SetSelectedCell(nullptr);
 	m_container->SetWndPos	(0,0);

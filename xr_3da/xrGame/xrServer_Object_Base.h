@@ -34,6 +34,7 @@ class CSE_ALifeSmartZone;
 class CSE_ALifeOnlineOfflineGroup;
 class CSE_ALifeItemPDA;
 class CSE_ALifeItemGameBox;
+class CSE_ALifeSpaceRestrictor;
 
 #pragma warning(push)
 #pragma warning(disable:4005)
@@ -47,6 +48,9 @@ SERVER_ENTITY_DECLARE_BEGIN(CPureServerObject,IPureServerObject)
 };
 add_to_type_list(CPureServerObject)
 #define script_type_list save_type_list(CPureServerObject)
+
+#include <luabind/luabind.hpp>
+#include <luabind/object.hpp>
 
 SERVER_ENTITY_DECLARE_BEGIN3(CSE_Abstract,ISE_Abstract,CPureServerObject,CScriptValueContainer)
 public:
@@ -88,6 +92,11 @@ public:
 	CLASS_ID						m_tClassID;
 	int								m_script_clsid;
 	shared_str						m_ini_string;
+	luabind::object get_ini_lua_table();
+	LPCSTR get_ini_lua_string();
+	void set_ini_lua_string(LPCSTR lua_string);
+	void set_ini_lua_table(luabind::object const &lua_table);
+
 	CInifile						*m_ini_file;
 
 	// for ALife control
@@ -160,7 +169,8 @@ public:
 	virtual CSE_ALifeSmartZone			*cast_smart_zone			() {return 0;};
 	virtual CSE_ALifeOnlineOfflineGroup	*cast_online_offline_group	() {return 0;};
 	virtual CSE_ALifeItemPDA			*cast_item_pda				() {return 0;};
-	virtual CSE_ALifeItemGameBox			*cast_item_gbox() { return 0; };
+	virtual CSE_ALifeSpaceRestrictor	*cast_space_restrictor() { return 0; }
+	virtual CSE_ALifeItemGameBox		*cast_item_gbox() { return 0; };
 };
 add_to_type_list(CSE_Abstract)
 #define script_type_list save_type_list(CSE_Abstract)

@@ -37,12 +37,12 @@ bool SortStringsByAlphabetPred (const shared_str& s1, const shared_str& s2)
 };
 
 struct story_name_predicate {
-	IC	bool	operator()	(const xr_rtoken &_1, const xr_rtoken &_2) const
+	IC	bool	operator()	(const xr_rtoken &t1, const xr_rtoken &t2) const
 	{
-		VERIFY	(_1.name.size());
-		VERIFY	(_2.name.size());
+		VERIFY	(t1.name.size());
+		VERIFY	(t2.name.size());
 
-		return	(xr_strcmp(_1.name,_2.name) < 0);
+		return	(xr_strcmp(t1.name,t2.name) < 0);
 	}
 };
 
@@ -760,6 +760,43 @@ CSE_ALifeSpaceRestrictor::CSE_ALifeSpaceRestrictor	(LPCSTR caSection) : CSE_ALif
 	m_flags.set					(flUsedAI_Locations,FALSE);
 	m_spawn_flags.set			(flSpawnDestroyOnSpawn,FALSE);
 	m_flags.set					(flCheckForSeparator,TRUE);
+}
+
+void CSE_ALifeSpaceRestrictor::set_restrictor_type(u8 restrictor_type)
+{
+	m_space_restrictor_type = restrictor_type;
+}
+
+u8 CSE_ALifeSpaceRestrictor::get_restrictor_type()
+{
+	return m_space_restrictor_type;
+}
+
+void CSE_ALifeSpaceRestrictor::add_shape(float radius)
+{
+	shapes.push_back(shape_def());
+	CShapeData::shape_def*		_shape = &shapes.back();
+	_shape->data.sphere.P.set(0.0f, 0.0f, 0.0f);
+	_shape->data.sphere.R = radius;
+	_shape->type = CShapeData::cfSphere;
+}
+
+float CSE_ALifeSpaceRestrictor::get_max_radius()
+{
+	float radius = 0.0f;
+	std::for_each(shapes.begin(), shapes.end(), [&](shape_def shape)
+	{
+		if (shape.type== CShapeData::cfSphere)
+		{
+			radius = std::max(radius, shape.data.sphere.R);
+		}
+		else if (shape.type == CShapeData::cfBox)
+		{
+			auto box_radius = Fbox().set(Fvector().set(-.5f, -.5f, -.5f), Fvector().set(.5f, .5f, .5f)).xform(shape.data.box).getradius();
+			radius = std::max(radius, box_radius);
+		}
+	});
+	return radius;
 }
 
 CSE_ALifeSpaceRestrictor::~CSE_ALifeSpaceRestrictor	()

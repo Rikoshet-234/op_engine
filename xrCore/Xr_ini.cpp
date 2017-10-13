@@ -107,11 +107,18 @@ CInifile::~CInifile( )
 	}
 
 	xr_free			(fName);
+	std::for_each(DATA.begin(), DATA.end(), [](Sect*& sect)
+	{
+		xr_delete(sect);
+		sect = nullptr;
+	});
+	xr_vector<Sect*>::iterator new_end = remove(DATA.begin(), DATA.end(), static_cast<Sect*>(nullptr));
+	DATA.erase(new_end, DATA.end());
 
-	RootIt			I = DATA.begin();
+	/*RootIt			I = DATA.begin();
 	RootIt			E = DATA.end();
 	for ( ; I != E; ++I)
-		xr_delete	(*I);
+		xr_delete	(*I);*/
 }
 
 static void	insert_item(CInifile::Sect *tgt, const CInifile::Item& I)
@@ -313,7 +320,9 @@ bool	CInifile::save_as( LPCSTR new_fname )
 							// only name and value
 							sprintf_s	(temp,sizeof(temp),"%8s%-32s = %-32s"," ",*I.first,val);
 						}
-					} else {
+					} 
+					else 
+					{
 #ifdef DEBUG
 						if (*I.comment) {
 							// name and comment
@@ -325,7 +334,9 @@ bool	CInifile::save_as( LPCSTR new_fname )
 							sprintf_s(temp,sizeof(temp),"%8s%-32s = "," ",*I.first);
 						}
 					}
-				} else {
+				} 
+				else 
+				{
 					// no name, so no value
 #ifdef DEBUG
 					if (*I.comment)

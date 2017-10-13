@@ -10,6 +10,9 @@ struct	xr_token;
 //Описание Inifile
 //-----------------------------------------------------------------------------------------------------------
 
+XRCORE_API void _parse(LPSTR dest, LPCSTR src);
+XRCORE_API void _decorate(LPSTR dest, LPCSTR src);
+
 class XRCORE_API CInifile
 {
 public:
@@ -50,10 +53,9 @@ private:
 	LPSTR		fName;
 	Root		DATA;
 	BOOL		bReadOnly;
+public:
 	void		Load			(IReader* F, LPCSTR path);
-public:
     BOOL		bSaveAtEnd;
-public:
 				CInifile		( IReader* F, LPCSTR path=0 );
 				CInifile		( LPCSTR szFileName, BOOL ReadOnly=TRUE, BOOL bLoadAtStart=TRUE, BOOL SaveAtEnd=TRUE);
 	virtual 	~CInifile		( );

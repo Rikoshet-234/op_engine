@@ -316,23 +316,6 @@ shared_str	ui_core::get_xml_name(LPCSTR fn)
 	if (!FS.exist(path, "$game_config$", "ui\\", file.c_str()))
 		file = createFileName(fn, "");
 	return file.c_str();
-
-
-	/*if (is_16_9_mode())
-	{
-		file=createFileName(fn,"_16");
-	}
-	else if (is_21_9_mode())
-	{
-		file=createFileName(fn,"_21");
-	}
-	else
-	{
-		file=createFileName(fn,"");
-	}*/
-	if (!FS.exist(path,"$game_config$", "ui\\" ,file.c_str()))
-		file=createFileName(fn,"");
-	return file.c_str();
 }
 
 

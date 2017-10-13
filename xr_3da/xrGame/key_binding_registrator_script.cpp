@@ -221,7 +221,9 @@ void key_binding_registrator::script_register(lua_State *L)
 				value("MOUSE_1",						int(MOUSE_1			)),
 				value("MOUSE_3",						int(MOUSE_3			)),
 				value("DIK_RETURN",						int(DIK_RETURN		)),
-				value("DIK_NUMPADENTER",				int(DIK_NUMPADENTER	))
+				value("DIK_NUMPADENTER",				int(DIK_NUMPADENTER	)),
+				value("DIK_LALT", int(DIK_LALT)),
+				value("DIK_RALT", int(DIK_RALT))
 				
 			]
 	];

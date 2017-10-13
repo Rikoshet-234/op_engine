@@ -24,7 +24,7 @@ public:
 	virtual void	PlayAnimHide	();
 	virtual void	PlayAnimReload	();
 	virtual void	PlayAnimShoot	();
-
+	virtual void	PlayReloadSound();
 	virtual void	UpdateSounds	();
 protected:	
 	virtual bool	AllowFireWhileWorking() {return true;}

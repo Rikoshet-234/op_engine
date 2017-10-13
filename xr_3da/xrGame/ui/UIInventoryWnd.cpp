@@ -9,7 +9,7 @@
 #include "../uigamesp.h"
 #include "../hudmanager.h"
 #include "../CustomOutfit.h"
-#include "../weapon.h"
+#include "UICellItem.h"
 #include "../script_process.h"
 #include "../eatable_item.h"
 #include "../inventory.h"
@@ -467,7 +467,8 @@ void CUIInventoryWnd::Hide()
 	SendInfoToActor						("ui_inventory_hide");
 	SetCurrentItem(nullptr);
 	ClearAllLists						();
-
+	if (CUIDragDropListEx::m_drag_item)
+		delete_data(CUIDragDropListEx::m_drag_item);
 	//достать вещь в активный слот
 	CActor *pActor = smart_cast<CActor*>(Level().CurrentEntity());
 	if(pActor && m_iCurrentActiveSlot != NO_ACTIVE_SLOT && pActor->inventory().m_slots[m_iCurrentActiveSlot].m_pIItem)

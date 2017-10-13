@@ -40,15 +40,26 @@ void ParseFile(LPCSTR path, CMemoryWriter& W, IReader *F, CXml* xml )
 				IReader* I 			= NULL;
 				if(inc_name==strstr(inc_name,"ui\\"))
 				{
-					shared_str fn	= xml->correct_file_name("ui", strchr(inc_name,'\\')+1);
 					CHUDProfile* profile = multiHUDs->GetCurrentProfile();
-					if (!profile || (profile && !profile->ExistFileInProfile(fn.c_str()) && xr_strcmp(path,HUDS_PATH)==0))
+					bool replaced = false;
+					string_path fn_;
+					if (profile)
+					{
+						xr_string pfn = profile->ExistFileInProfile(inc_name);
+						if (pfn.size()>0)
+						{
+							path = HUDS_PATH;
+							sprintf_s(fn_, "%s\\%s", profile->GetProfileConfigPath().c_str(), pfn.c_str());
+							replaced = true;
+						}
+					}
+					if (!replaced)
 					{
 						path = CONFIG_PATH;
+						sprintf_s(fn_, "%s", *(xml->correct_file_name(path, inc_name)));
 					}
-					string_path		buff;
-					strconcat		(sizeof(buff),buff,"ui\\",fn.c_str());
-					I 				= FS.r_open(path, buff);
+
+					I 				= FS.r_open(path, fn_);
 				}
 
 				if(!I)
@@ -71,16 +82,24 @@ void ParseFile(LPCSTR path, CMemoryWriter& W, IReader *F, CXml* xml )
 
 bool CXml::Init(LPCSTR path_alias, LPCSTR path, LPCSTR _xml_filename)
 {
-	shared_str fn			= correct_file_name(path, _xml_filename);
-	string_path				str;
 	CHUDProfile* profile = multiHUDs->GetCurrentProfile();
-	if (profile && profile->ExistFileInProfile(fn.c_str()))
+	string_path				str;
+	bool replaced = false;
+	if (profile)
 	{
-		path_alias = HUDS_PATH;
-		sprintf(str, "%s\\%s", profile->GetProfileConfigUIPath().c_str(), *fn);
+		xr_string pfn = profile->ExistFileInProfile(_xml_filename);
+		if (pfn.size()>0)
+		{
+			path_alias = HUDS_PATH;
+			sprintf_s(str, "%s\\%s", profile->GetProfileConfigUIPath().c_str(), pfn.c_str());
+			replaced = true;
+		}
 	}
-	else
-		sprintf					(str,"%s\\%s", path, *fn);
+	if (!replaced)
+	{
+		shared_str fn = correct_file_name(path, _xml_filename);
+		sprintf_s(str, "%s\\%s", path, *fn);
+	}
 	return Init				(path_alias, str);
 }
 

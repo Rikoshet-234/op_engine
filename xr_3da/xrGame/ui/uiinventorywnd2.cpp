@@ -562,5 +562,9 @@ CUIDragDropListEx* CUIInventoryWnd::GetSlotList(u32 slot_idx)
 
 void CUIInventoryWnd::ClearAllLists()
 {
-	std::for_each(sourceDragDropLists.begin(),sourceDragDropLists.end(),[](CUIDragDropListEx* list){list->ClearAll(true);});
+	std::for_each(sourceDragDropLists.begin(),sourceDragDropLists.end(),[](CUIDragDropListEx* list)
+	{
+		list->GetParent()->SetCapture(nullptr, false);
+		list->ClearAll(true);
+	});
 }

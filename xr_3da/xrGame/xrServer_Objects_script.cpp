@@ -120,6 +120,10 @@ void CSE_Abstract::script_register(lua_State *L)
 			.def			("UPDATE_Write",		&BaseType::UPDATE_Write, &WrapType::UPDATE_Write_static)
 			.def("set_position", &cse_set_position)
 			.def("set_direction", &cse_set_direction)
+			.def("get_ini_lua_table", static_cast<luabind::object(BaseType::*)()>(&BaseType::get_ini_lua_table))
+			.def("get_ini_lua_string", static_cast<LPCSTR(BaseType::*)()>(&BaseType::get_ini_lua_string))
+			.def("set_ini_lua_string", static_cast<void(BaseType::*)(LPCSTR)>(&BaseType::set_ini_lua_string))
+			.def("set_ini_lua_table", static_cast<void(BaseType::*)(luabind::object const&)>(&BaseType::set_ini_lua_table))
 //			.def(		constructor<LPCSTR>())
 	];
 }

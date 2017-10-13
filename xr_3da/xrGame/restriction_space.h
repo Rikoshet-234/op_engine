@@ -29,7 +29,7 @@ namespace RestrictionSpace {
 		eDefaultRestrictorTypeIn   = u8(2),
 		eRestrictorTypeNone		   = u8(3),
 		eRestrictorTypeIn		   = u8(4),
-		eRestrictorTypeOut		   = u8(5),
+		eRestrictorTypeOut		   = u8(5), 
 	};
 };
 

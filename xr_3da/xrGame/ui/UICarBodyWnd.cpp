@@ -268,7 +268,14 @@ void CUICarBodyWnd::Hide()
 	PlaySnd								(eInvSndClose);
 	InventoryUtilities::SendInfoToActor			("ui_car_body_hide");
 	SetCurrentItem(nullptr);
-	std::for_each(sourceDragDropLists.begin(),sourceDragDropLists.end(),[](CUIDragDropListEx* list){list->ClearAll(true);});
+	std::for_each(sourceDragDropLists.begin(),sourceDragDropLists.end(),[](CUIDragDropListEx* list)
+	{
+		list->GetParent()->SetCapture(nullptr, false);
+		list->ClearAll(true);
+	});
+	if (CUIDragDropListEx::m_drag_item)
+		delete_data(CUIDragDropListEx::m_drag_item);
+
 	inherited::Hide								();
 	m_pUIPropertiesBox->Hide();
 	m_pUIPropertiesBox->RemoveAll();

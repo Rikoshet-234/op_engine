@@ -67,6 +67,10 @@ void CSE_ALifeAnomalousZone::script_register(lua_State *L)
 		)
 #ifdef XRGAME_EXPORTS
 		.def("spawn_artefacts",	&CSE_ALifeAnomalousZone::spawn_artefacts)
+		.def("get_restrictor_type", &CSE_ALifeSpaceRestrictor::get_restrictor_type)
+		.def("set_restrictor_type", &CSE_ALifeSpaceRestrictor::set_restrictor_type)
+		.def("add_shape", &CSE_ALifeSpaceRestrictor::add_shape)
+		.def("get_max_radius", &CSE_ALifeSpaceRestrictor::get_max_radius)
 #endif
 	];
 }

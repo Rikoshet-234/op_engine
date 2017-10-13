@@ -124,7 +124,6 @@ void CWeaponPistol::PlayAnimReload	()
 	VERIFY(GetState()==eReload);
 	if(m_opened)
 	{ 
-		PlaySound(sndReloadEmpty, get_LastFP());
 		CWeaponPistol::WWPMotions& m = wwpm_current();
 		m_pHUD->animPlay(random_anim(m.mhud_reload_empty), TRUE, this, GetState());
 	}
@@ -166,6 +165,14 @@ void CWeaponPistol::PlayAnimShoot	()
 		m_pHUD->animPlay	(random_anim(m.mhud_shot_l), FALSE, this, GetState()); 
 		m_opened = true; 
 	}
+}
+
+void CWeaponPistol::PlayReloadSound()
+{
+	if (m_opened)
+		PlaySound(sndReloadEmpty, get_LastFP());
+	else
+		inherited::PlayReloadSound();
 }
 
 

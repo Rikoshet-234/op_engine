@@ -772,10 +772,7 @@ float	CWeaponMagazinedWGrenade::CurrentZoomFactor	()
 	return inherited::CurrentZoomFactor();
 }
 
-LPCSTR bstr(bool tostr)
-{
-	return tostr ? "true" : "false";
-}
+
 
 void CWeaponMagazinedWGrenade::LoadAmmo(CWeaponAmmo* pAmmo)
 {

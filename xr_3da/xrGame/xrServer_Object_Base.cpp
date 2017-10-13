@@ -181,6 +181,156 @@ CSE_Motion* CSE_Abstract::motion			()
 	return						(0);
 }
 
+#include "script_engine.h"
+#include "ai_space.h"
+luabind::object CSE_Abstract::get_ini_lua_table()
+{
+	luabind::object lua_table = luabind::newtable(ai().script_engine().lua());
+	std::for_each(spawn_ini().sections().begin(), spawn_ini().sections().end(), [&](CInifile::Sect* section)
+	{
+		luabind::object section_data = luabind::newtable(ai().script_engine().lua());
+		std::for_each(section->Data.begin(), section->Data.end(), [section_data](CInifile::Item item)
+		{
+			section_data[item.first.c_str()] = item.second.c_str();
+		});
+		lua_table[section->Name.c_str()] = section_data;
+	});
+	return lua_table;
+}
+
+LPCSTR CSE_Abstract::get_ini_lua_string()
+{
+#pragma region moved from CIniFile
+	/*CMemoryWriter stream;
+	string512		temp, val;
+	for (RootIt r_it = sections().begin(); r_it != sections().end(); ++r_it)
+	{
+		sprintf_s(temp, sizeof(temp), "[%s]", *(*r_it)->Name);
+		stream.w_string(temp);
+		for (SectCIt s_it = (*r_it)->Data.begin(); s_it != (*r_it)->Data.end(); ++s_it)
+		{
+			const Item&	I = *s_it;
+			if (*I.first) {
+				if (*I.second) {
+					_decorate(val, *I.second);
+					sprintf_s(temp, sizeof(temp), "%8s%-32s = %-32s", " ", *I.first, val);
+				}
+				else
+				{
+					sprintf_s(temp, sizeof(temp), "%8s%-32s = ", " ", *I.first);
+				}
+			}
+			else
+			{
+				temp[0] = 0;
+			}
+			_TrimRight(temp);
+			if (temp[0])		stream.w_string(temp);
+		}
+	}
+	stream.w_stringZ("");
+	return xr_strdup((char*)stream.pointer());*/
+#pragma endregion
+	return m_ini_string.c_str();
+}
+
+
+//#pragma optimize("gyts", off)
+void CSE_Abstract::set_ini_lua_string(LPCSTR lua_string)
+{
+#pragma region moved from CIniFile
+	/*std::for_each(sections().begin(), sections().end(), [](Sect*& sect)
+	{
+		xr_delete(sect);
+		sect = nullptr;
+	});
+	xr_vector<Sect*>::iterator new_end = remove(sections().begin(), sections().end(), static_cast<Sect*>(nullptr));
+	sections().erase(new_end, sections().end());
+	IReader reader = IReader((void*)lua_string, xr_strlen(lua_string));
+	Load(&reader, FS.get_path("$game_config$")->m_Path);*/
+#pragma endregion 
+	if (xr_strlen(lua_string)>4096)
+	{
+		Msg("! ERROR set_ini_lua_string() maximum length exceed  - 4096 bytes");
+		return;
+	}
+	if (m_ini_file)
+		xr_delete(m_ini_file);
+	m_ini_string = lua_string;
+}
+
+void CSE_Abstract::set_ini_lua_table(luabind::object const &lua_table)
+{
+	if (!lua_table.is_valid() || lua_table.type() != LUA_TTABLE)
+	{
+		Msg("! ERROR input for set_lua_table() not valid or not table");
+		return;
+	}
+	xr_string ini_data;
+	for (luabind::object::iterator iter = lua_table.begin(); iter != lua_table.end(); ++iter)
+	{
+		if ((*iter).type()==LUA_TTABLE)
+		{
+			if (iter.key().type() == LUA_TSTRING)
+			{
+				string512 section_name;
+				sprintf_s(section_name, "[%s]\n", luabind::object_cast<LPCSTR>(iter.key()));
+				ini_data += section_name;
+				luabind::object const& field = *iter;
+				for (luabind::object::iterator field_iter= field.begin(); field_iter != lua_table.end(); ++field_iter)
+				{
+					string128 key;
+					switch (field_iter.key().type())
+					{
+						case LUA_TSTRING:
+							sprintf_s(key, "%s", luabind::object_cast<LPCSTR>(field_iter.key()));
+							break;
+						case LUA_TNUMBER:
+							sprintf_s(key, "%i", luabind::object_cast<int>(field_iter.key()));
+							break;
+						default:
+						{
+							Msg("! ERROR set_ini_lua_table() - invalid key type");
+							continue;
+						}
+					}
+					string128 value;
+					switch ((*field_iter).type())
+					{
+						case LUA_TSTRING:
+							sprintf_s(value, "%s", luabind::object_cast<LPCSTR>(*field_iter));
+							break;
+						case LUA_TBOOLEAN:
+							sprintf_s(value, "%s", luabind::object_cast<bool>(*field_iter) ? "true" : "false");
+							break;
+						case LUA_TNUMBER:
+							sprintf_s(value, "%f", luabind::object_cast<float>(*field_iter));
+							break;
+						default:
+						{
+							Msg("! ERROR set_ini_lua_table() - invalid value type");
+							continue;
+						}
+					}
+					string512 field_str;
+					sprintf_s(field_str, "%s = %s\n", key, value);
+					ini_data += field_str;
+				}
+			}
+			else
+			{
+				Msg("! ERROR set_ini_lua_table() - invalid field in input table!");
+			}
+		}
+		else
+		{
+			Msg("! ERROR set_ini_lua_table() - invalid struct in input table!");
+		}
+
+	}
+	set_ini_lua_string(ini_data.c_str());
+}
+
 CInifile &CSE_Abstract::spawn_ini			()
 {
 	if (!m_ini_file) 

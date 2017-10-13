@@ -313,6 +313,10 @@
 #	undef cast_type_list
 #	define cast_type_list save_cast_list	(CSE_ALifeItemGameBox,			CSE_Abstract)
 
+	DECLARE_SPECIALIZATION(CSE_ALifeSpaceRestrictor, CSE_Abstract, cast_space_restrictor);
+#	undef cast_type_list
+#	define cast_type_list save_cast_list	(CSE_ALifeSpaceRestrictor,CSE_Abstract)
+
 	DECLARE_SPECIALIZATION(CGBox, CInventoryItem, cast_gbox_object);
 #		undef cast_type_list
 #		define cast_type_list save_cast_list	(CGBox,			CInventoryItem)

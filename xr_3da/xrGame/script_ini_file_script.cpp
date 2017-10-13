@@ -101,7 +101,7 @@ void CScriptIniFile::script_register(lua_State *L)
 			.def("w_fvector4",		static_cast<void	(CScriptIniFile::*)		(LPCSTR, LPCSTR, const Fvector4&, LPCSTR )>	(&CScriptIniFile::w_fvector4))
 			.def("remove_line",		static_cast<void	(CScriptIniFile::*)		(LPCSTR, LPCSTR )>							(&CScriptIniFile::remove_line))
 			.def("remove_section",	static_cast<void	(CScriptIniFile::*)		(LPCSTR )>									(&CScriptIniFile::remove_section)),
-
+		
 
 		def("system_ini",			&get_system_ini),
 #ifdef XRGAME_EXPORTS

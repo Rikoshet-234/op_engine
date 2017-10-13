@@ -103,6 +103,8 @@ void CUIBuyWnd::Hide()
 {
 	inherited::Hide			();
 	SetCurrentItem(nullptr);
+	if (CUIDragDropListEx::m_drag_item)
+		delete_data(CUIDragDropListEx::m_drag_item);
 	CActor *pActor			= smart_cast<CActor*>(Level().CurrentEntity());
 	if(pActor)
 		pActor->SetWeaponHideState(INV_STATE_BUY_MENU, false);

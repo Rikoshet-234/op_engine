@@ -27,9 +27,66 @@ xr_string CHUDProfile::GetProfileConfigUIPath()
 	return buf;
 }
 
-bool CHUDProfile::ExistFileInProfile(LPCSTR fileName)
+xr_string CHUDProfile::GetProfileConfigPath()
 {
-	return GetFileFromProfile(fileName).size()>0;
+	string512 buf;
+	sprintf_s(buf, "%sconfig", folder_path.c_str());
+	return buf;
+}
+
+xr_string CHUDProfile::createFileName(xr_string oldFileName, xr_string postfix)
+{
+	size_t dot = oldFileName.find_last_of(".");
+	xr_string newName;
+	xr_string ext;
+	if (dot != std::string::npos)
+	{
+		newName = oldFileName.substr(0, dot);
+		ext = oldFileName.substr(dot, oldFileName.size() - dot);
+	}
+	else
+	{
+		newName = oldFileName;
+		ext = ".xml";
+	}
+	newName.append(postfix).append(ext);
+	return newName;
+}
+
+xr_string CHUDProfile::ExistFileInProfile(LPCSTR fileName)
+{
+	xr_string file;
+	string_path dev_path;
+	sprintf_s(dev_path, "_%dx%d", Device.dwWidth, Device.dwHeight);
+	file = createFileName(fileName, dev_path);
+	if (GetFileFromProfile(file.c_str()).size()>0)
+	{
+		return file;
+	}
+	float currRatio = float(Device.dwWidth) / float(Device.dwHeight);
+	if (currRatio>1.8f)
+	{
+		file = createFileName(fileName, "_21");
+	}
+	else if (std::isgreaterequal(currRatio, 1.6f) && std::islessequal(currRatio, 1.8f))
+	{
+		if (fsimilar(currRatio, 1.6f))
+		{
+			file = createFileName(fileName, "_16x10");
+		}
+		else
+			file = createFileName(fileName, "_16x9");
+		if (GetFileFromProfile(file.c_str()).size()==0)
+			file = createFileName(fileName, "_16");
+	}
+	if (GetFileFromProfile(file.c_str()).size() == 0)
+	{
+		file = createFileName(fileName, "");
+		if (GetFileFromProfile(file.c_str()).size() == 0)
+			file = xr_string();
+	}
+	return file;
+	//return GetFileFromProfile(fileName).size()>0;
 }
 
 xr_string CHUDProfile::GetProfileName()
@@ -106,7 +163,6 @@ CMultiHUDs::CMultiHUDs()
 		}
 		else
 			psCurrentHUDProfileIndex = std::distance(hudProfiles.begin(), defProfile);
-		tokens.clear();
 		std::for_each(hudProfiles.begin(), hudProfiles.end(), [&](CHUDProfile profile)
 		{
 			tokens.push_back(xr_token());
@@ -123,6 +179,17 @@ CMultiHUDs::CMultiHUDs()
 		hudsFound += huds + " ]";
 		Msg("- %s", hudsFound);
 	}
+}
+
+CMultiHUDs::~CMultiHUDs()
+{
+	std::for_each(tokens.begin(), tokens.end(), [](xr_token token)
+	{
+		xr_free(token.name);
+		token.name = nullptr;
+	});
+	xr_vector<xr_token>::iterator new_end = std::remove_if(tokens.begin(), tokens.end(), [](xr_token token) {return token.name == nullptr; });
+	tokens.erase(new_end, tokens.end());
 }
 
 bool CMultiHUDs::EnabledMultiHUDs() const

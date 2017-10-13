@@ -300,7 +300,13 @@ void CUITradeWnd::Hide()
 	UIPropertiesBox.RemoveAll();
 	UIPropertiesBox.Hide();
 	SetCurrentItem(nullptr);
-	std::for_each(sourceDragDropLists.begin(),sourceDragDropLists.end(),[](CUIDragDropListEx* list){list->ClearAll(true);});
+	if (CUIDragDropListEx::m_drag_item)
+		delete_data(CUIDragDropListEx::m_drag_item);
+	std::for_each(sourceDragDropLists.begin(),sourceDragDropLists.end(),[](CUIDragDropListEx* list)
+	{
+		list->GetParent()->SetCapture(nullptr, false);
+		list->ClearAll(true);
+	});
 }
 
 void CUITradeWnd::StartTrade()

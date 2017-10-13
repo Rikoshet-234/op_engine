@@ -216,8 +216,8 @@ public:
 
 	virtual void		FillProps	(LPCSTR pref, PropItemVec& items)
 	{
-   		inherited1::FillProps		(pref, items);
-   		inherited2::FillProps		(pref, items);
+		inherited1::FillProps		(pref, items);
+		inherited2::FillProps		(pref, items);
 	};	
 
 	virtual CSE_Abstract			*cast_abstract			()
@@ -320,6 +320,12 @@ SERVER_ENTITY_DECLARE_BEGIN2(CSE_ALifeSpaceRestrictor,CSE_ALifeDynamicObject,CSE
 	virtual ISE_Shape*  __stdcall	shape						();
 	virtual bool					can_switch_offline			() const;
 	virtual bool					used_ai_locations			() const;
+	void set_restrictor_type(u8 restrictor_type);
+	u8 get_restrictor_type();
+	void add_shape(float radius);
+	float get_max_radius();
+	virtual CSE_ALifeSpaceRestrictor* cast_space_restrictor() { return this; };
+
 SERVER_ENTITY_DECLARE_END
 add_to_type_list(CSE_ALifeSpaceRestrictor)
 #define script_type_list save_type_list(CSE_ALifeSpaceRestrictor)
@@ -371,9 +377,9 @@ add_to_type_list(CSE_ALifeSmartZone)
 SERVER_ENTITY_DECLARE_BEGIN2(CSE_ALifeObjectPhysic,CSE_ALifeDynamicObjectVisual,CSE_PHSkeleton)
 	u32 							type;
 	f32 							mass;
-    shared_str 						fixed_bones;
+	shared_str 						fixed_bones;
 									CSE_ALifeObjectPhysic	(LPCSTR caSection);
-    virtual 						~CSE_ALifeObjectPhysic	();
+	virtual 						~CSE_ALifeObjectPhysic	();
 	virtual bool					used_ai_locations		() const;
 	virtual bool					can_save				() const;
 	virtual	void					load					(NET_Packet &tNetPacket);
@@ -387,44 +393,44 @@ add_to_type_list(CSE_ALifeObjectPhysic)
 
 SERVER_ENTITY_DECLARE_BEGIN2(CSE_ALifeObjectHangingLamp,CSE_ALifeDynamicObjectVisual,CSE_PHSkeleton)
 
-    void __stdcall 					OnChangeFlag	(PropValue* sender);
-    enum{
-        flPhysic					= (1<<0),
+	void __stdcall 					OnChangeFlag	(PropValue* sender);
+	enum{
+		flPhysic					= (1<<0),
 		flCastShadow				= (1<<1),
 		flR1						= (1<<2),
 		flR2						= (1<<3),
 		flTypeSpot					= (1<<4),
-        flPointAmbient				= (1<<5),
-    };
+		flPointAmbient				= (1<<5),
+	};
 
-    Flags16							flags;
+	Flags16							flags;
 // light color    
-    u32								color;
-    float							brightness;
-    shared_str						color_animator;
+	u32								color;
+	float							brightness;
+	shared_str						color_animator;
 // light texture    
 	shared_str						light_texture;
 // range
-    float							range;
+	float							range;
 	float							m_virtual_size;
 // bones&motions
 	shared_str						light_ambient_bone;
 	shared_str						light_main_bone;
-    shared_str						fixed_bones;
+	shared_str						fixed_bones;
 // spot
 	float							spot_cone_angle;
 // ambient    
-    float							m_ambient_radius;
-    float							m_ambient_power;
+	float							m_ambient_radius;
+	float							m_ambient_power;
 	shared_str						m_ambient_texture;
 // glow    
 	shared_str						glow_texture;
 	float							glow_radius;
 // game
-    float							m_health;
+	float							m_health;
 	
-                                    CSE_ALifeObjectHangingLamp	(LPCSTR caSection);
-    virtual							~CSE_ALifeObjectHangingLamp	();
+									CSE_ALifeObjectHangingLamp	(LPCSTR caSection);
+	virtual							~CSE_ALifeObjectHangingLamp	();
 	virtual	void					load						(NET_Packet &tNetPacket);
 	virtual bool					used_ai_locations			() const;
 	virtual bool					match_configuration			() const;
@@ -488,7 +494,7 @@ add_to_type_list(CSE_ALifeCar)
 #define script_type_list save_type_list(CSE_ALifeCar)
 
 SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeObjectBreakable,CSE_ALifeDynamicObjectVisual)
-    float							m_health;
+	float							m_health;
 									CSE_ALifeObjectBreakable	(LPCSTR caSection);
 	virtual							~CSE_ALifeObjectBreakable	();
 	virtual bool					used_ai_locations	() const;

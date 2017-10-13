@@ -9839,6 +9839,9 @@
     <ClCompile Include="gbox.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\GameBox</Filter>
     </ClCompile>
+    <ClCompile Include="RadioactiveZone_script.cpp">
+      <Filter>Core\Client\Objects\zones\RadioactiveZone</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="graph_abstract.h">
