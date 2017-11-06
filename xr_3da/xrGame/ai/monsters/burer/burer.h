@@ -105,8 +105,7 @@ public:
 
 public:
 					CBurer				();
-	virtual			~CBurer				();	
-
+	virtual			~CBurer				();
 
 	virtual void	reinit				();
 	virtual void	reload				(LPCSTR section);

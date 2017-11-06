@@ -27,7 +27,7 @@ public:
 	virtual void	HitEntityInJump				(const CEntity *pEntity);
 
 	IC		void	SetUpperState				(bool state = true) {b_upper_state = state;}
-	
+
 	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
 

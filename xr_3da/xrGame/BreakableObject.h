@@ -8,6 +8,7 @@
 #pragma once
 
 #include "physicsshellholder.h"
+#include "script_export_space.h"
 
 class	CPHStaticGeomShell;
 struct	dContact;
@@ -66,6 +67,11 @@ private:
 	void			SendDestroy			();
 	void			enable_notificate	();
 	static 	void	ObjectContactCallback(bool& /**do_colide/**/,bool bo1,dContact& c,SGameMtl * /*material_1*/,SGameMtl * /*material_2*/);
+public:
+	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
 
+add_to_type_list(CBreakableObject)
+#undef script_type_list
+#define script_type_list save_type_list(CBreakableObject)
 #endif //BreakableObjectH

@@ -159,6 +159,7 @@
 #	include "saved_game_wrapper.h"
 #	include "mincer.h"
 #	include "mosquitobald.h"
+#	include "RadioactiveZone.h"
 #	include "HairsZone.h"
 #	include "ai/trader/ai_trader.h"
 #	include "space_restrictor.h"
@@ -167,4 +168,5 @@
 #	include "inventory_slots_script_enum.h"
 #	include	"ui/UIListItemIconed.h"
 #include "gbox.h"
+#include "BreakableObject.h"
 #endif

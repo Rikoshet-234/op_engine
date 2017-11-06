@@ -1,7 +1,7 @@
 #include "pch_script.h"
 #include "script_game_object.h"
-#include "alife_space.h"
-#include "script_entity_space.h"
+#include "alife_simulator.h"
+#include "alife_object_registry.h"
 #include "movement_manager_space.h"
 #include "script_callback_ex.h"
 #include "memory_space.h"
@@ -25,7 +25,7 @@
 #include "Weapon.h"
 #include "ui/UICarBodyWnd.h"
 #include "inventory_slots_script_enum.h"
-#include "item_place_change_enum.h"
+#include "ai_space.h"
 #include "ui/UIInventoryWnd.h"
 #include "ui/UITalkWnd.h"
 #include "ui/UITradeWnd.h"
@@ -58,6 +58,7 @@ u32 CScriptGameObject::GetSlot() const
 	return				(inventory_item->GetSlot());
 }
 
+#pragma region body manipulation
 #include "../skeletonanimated.h"
 void CScriptGameObject::SetVisualName(LPCSTR str)
 {
@@ -105,6 +106,66 @@ LPCSTR CScriptGameObject::GetVisualName() const
 
 }
 
+void CScriptGameObject::SetPosition(const Fvector &pos)
+{
+	if (!g_pGameLevel)
+	{
+		Msg("Error! CScriptGameObject::SetPosition : game level doesn't exist.");
+		return;
+	}
+	object().ChangePosition(pos);
+}
+void CScriptGameObject::SetDirection(float x, float y, float z)
+{
+	SetDirection(Fvector().set(x, y, z));
+}
+
+void CScriptGameObject::SetDirection(const Fvector &dir)
+{
+	if (!g_pGameLevel)
+	{
+		Msg("Error! CScriptGameObject::SetDirection : game level doesn't exist.");
+		return;
+	}
+	SRotation rot;
+	dir.getHP(rot.yaw, rot.pitch);
+	rot.roll = 0;
+	SetRotation(rot);
+}
+
+void CScriptGameObject::SetRotation(const SRotation &rot)
+{
+	if (this->IsActor())
+	{
+		Actor()->Orientation() = rot;
+	}
+	else
+	{
+		Fmatrix m = object().XFORM();
+		Fmatrix r = Fidentity;
+		r.setHPB(rot.yaw, rot.pitch, rot.roll);			// set 3-axis direction 
+		m.set(r.i, r.j, r.k, m.c);		// saved position in c		
+		object().UpdateXFORM(m);		// apply to physic shell
+		object().XFORM() = m;			// normal visual update
+		
+		//object().Direction().setHP(rot.yaw, rot.pitch);
+
+		CKinematics *pK = PKinematics(object().Visual());
+		if (pK)
+		{
+			pK->CalculateBones_Invalidate();
+			pK->CalculateBones();
+		}
+	}
+	CSE_ALifeDynamicObject* se_obj = object().alife_object();
+	if (se_obj)
+	{
+		object().XFORM().getXYZ(se_obj->angle()); 
+		se_obj->synchronize_location();
+	}
+}
+
+#pragma endregion
 bool CScriptGameObject::InventoryMoveItem(CScriptGameObject* item,u32 to,bool force) const
 {
 	if (to==NO_ACTIVE_SLOT || !item)
@@ -616,6 +677,19 @@ u8 CScriptGameObject::GetWeaponAddonState() const
 	ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "call [weapon_addon_state] for non-CWeapon object!");
 	return 0;
 }
+
+bool CScriptGameObject::get_grenade_mode()
+{
+	CWeapon		*weapon = smart_cast<CWeapon*>(&object());
+	if (weapon)
+	{
+		CWeaponMagazinedWGrenade	*weaponG = smart_cast<CWeaponMagazinedWGrenade*>(&object());
+		if (weaponG)
+			return weaponG->m_bGrenadeMode;
+	}
+	return false;
+}
+
 #pragma endregion
 
 LPCSTR get_obj_class_name(CGameObject *obj)
@@ -700,12 +774,18 @@ class_<CScriptGameObject> &script_register_game_object3(class_<CScriptGameObject
 		.def("has_silencer", &CScriptGameObject::has_silencer)
 		.def("has_grenadelauncher", &CScriptGameObject::has_grenadelauncher)
 		.def("get_addon_state", &CScriptGameObject::GetWeaponAddonState)
+		.def("get_grenade_mode", &CScriptGameObject::get_grenade_mode)
 
 		.def("full_unload_weapon", &CScriptGameObject::FullUnloadWeapon)
 		.def("current_ammo_section", &CScriptGameObject::GetCurrentAmmoSection)
 		.def("detach_scope", &CScriptGameObject::detach_scope)
 		.def("detach_silencer", &CScriptGameObject::detach_silencer)
 		.def("detach_grenadelauncher", &CScriptGameObject::detach_grenadelauncher)
+		.def("set_position", &CScriptGameObject::SetPosition)
+		//.def("set_direction", static_cast<void (CScriptGameObject::*)(const Fvector &dir,float)>(&CScriptGameObject::SetDirection))
+		.def("set_direction", static_cast<void (CScriptGameObject::*)(const Fvector &dir)>(&CScriptGameObject::SetDirection))
+		.def("set_direction", static_cast<void (CScriptGameObject::*)(float x,float y,float z)>(&CScriptGameObject::SetDirection))
+		.def("set_rotation", &CScriptGameObject::SetRotation) 
 		;
 
 	return	(instance);

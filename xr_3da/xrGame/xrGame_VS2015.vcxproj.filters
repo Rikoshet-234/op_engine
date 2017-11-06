@@ -9842,6 +9842,9 @@
     <ClCompile Include="RadioactiveZone_script.cpp">
       <Filter>Core\Client\Objects\zones\RadioactiveZone</Filter>
     </ClCompile>
+    <ClCompile Include="BreakableObject_script.cpp">
+      <Filter>Core\Client\Objects\physics\Breakable</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="graph_abstract.h">

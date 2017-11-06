@@ -123,6 +123,7 @@ struct CSightParams {
 	CScriptGameObject			*m_object;
 	Fvector						m_vector;
 };
+struct SRotation;
 
 class CScriptGameObject {
 	mutable CGameObject		*m_game_object;
@@ -433,6 +434,7 @@ public:
 	bool has_scope() const;
 	bool has_silencer() const;
 	bool has_grenadelauncher() const;
+	bool get_grenade_mode();
 	LPCSTR GetCurrentAmmoSection();
 	void FullUnloadWeapon();
 	LPCSTR detach_scope(luabind::object const &param);
@@ -618,6 +620,12 @@ public:
 	LPCSTR				GetVisualName() const;
 	void				SetVisualName(LPCSTR);
 	
+	void				SetPosition(const Fvector &pos);
+
+	void				SetDirection(const Fvector &dir);
+	void SetDirection(float x, float y, float z);
+	void				SetRotation(const SRotation &rot);
+
 
 	DECLARE_SCRIPT_REGISTER_FUNCTION
 };

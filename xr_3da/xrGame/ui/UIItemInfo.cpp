@@ -193,7 +193,7 @@ void CUIItemInfo::InitItem(CInventoryItem* pInvItem)
 			LPCSTR color = (value > 0) ? "%c[red]" : "%c[green]";
 			LPCSTR units = CStringTable().translate("ui_inv_radiation_units").c_str();
 			LPCSTR desc= CStringTable().translate("ui_inv_radiation_irr").c_str();
-			sprintf_s(buf, "%s %s%+3.0f%s", desc, color, value, units);
+			sprintf_s(buf, "%s %s%+3.2f%s", desc, color, value, units);
 			apRad->SetText(buf);
 			apRad->SetTextComplexMode(true);
 			apRad->AdjustHeightToText();

@@ -88,7 +88,6 @@ public:
 	void						pause					(BOOL bVal, int id);
 
 	virtual u32					play_time				( );
-
 	CSoundRender_Emitter		();
 	~CSoundRender_Emitter		();
 };

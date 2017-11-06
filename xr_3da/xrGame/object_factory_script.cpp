@@ -83,8 +83,11 @@ void CObjectFactory::register_script	() const
 
 	const_iterator				I = clsids().begin(), B = I;
 	const_iterator				E = clsids().end();
-	for ( ; I != E; ++I)
-		instance.enum_			("_clsid")[luabind::value(*(*I)->script_clsid(),int(I - B))];
+	for (; I != E; ++I)
+	{
+		instance.enum_("_clsid")[luabind::value(*(*I)->script_clsid(), int(I - B))];
+		//Msg((*I)->script_clsid().c_str());
+	}
 
 	luabind::module				(ai().script_engine().lua())[instance];
 }

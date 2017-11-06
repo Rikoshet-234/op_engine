@@ -119,6 +119,7 @@ public:
 	virtual	void			net_Relcase			( CObject* O );	
 	virtual void			UpdateCL			( );
 	virtual void			OnChangeVisual		( );
+
 	//object serialization
 	virtual void			net_Save			(NET_Packet &net_packet);
 	virtual void			net_Load			(IReader	&ireader);

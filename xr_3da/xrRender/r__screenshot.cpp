@@ -1,7 +1,7 @@
 #include "stdafx.h"
-#include "..\xr_effgamma.h"
-#include "..\xrRender\tga.h"
-#include "..\xrImage_Resampler.h"
+#include "../xr_effgamma.h"
+#include "../xrRender/tga.h"
+#include "../xrImage_Resampler.h"
 
 #define	GAMESAVE_SIZE	128
 
@@ -33,16 +33,39 @@ IC void MouseRayFromPoint	( Fvector& direction, int x, int y, Fmatrix& m_CamMat 
 void CRender::Screenshot		(IRender_interface::ScreenshotMode mode, LPCSTR name)
 {
 	if (!Device.b_is_Ready)			return;
-	if ((psDeviceFlags.test(rsFullscreen)) == 0) {
+	/*if ((psDeviceFlags.test(rsFullscreen)) == 0) {
 		Log("~ Can't capture screen while in windowed mode...");
 		return;
-	}
+	}*/
 
 	// Create temp-surface
 	IDirect3DSurface9*	pFB;
 	D3DLOCKED_RECT		D;
 	HRESULT				hr1;
-	hr1					= HW.pDevice->CreateOffscreenPlainSurface(Device.dwWidth,Device.dwHeight,D3DFMT_A8R8G8B8,D3DPOOL_SYSTEMMEM,&pFB,NULL);
+	int width = Device.dwWidth;
+	int height = Device.dwHeight;
+	RECT* srcRect = nullptr;
+	if ((psDeviceFlags.test(rsFullscreen)) == 0) 
+	{
+		RECT desktop;
+		const HWND hDesktop = GetDesktopWindow();
+		GetWindowRect(hDesktop, &desktop);
+		width = desktop.right;
+		height = desktop.bottom;
+		RECT windowRect;
+		const HWND hActive = GetActiveWindow();
+		GetClientRect(hActive, &windowRect);
+		srcRect = new RECT;
+		POINT p; p.x = windowRect.left; p.y = windowRect.top;
+		ClientToScreen(hActive, &p);
+		srcRect->left = p.x;
+		srcRect->top = p.y;
+		p.x = windowRect.right; p.y = windowRect.bottom;
+		ClientToScreen(hActive, &p);
+		srcRect->right = p.x;
+		srcRect->bottom = p.y;
+	}
+	hr1					= HW.pDevice->CreateOffscreenPlainSurface(width, height,D3DFMT_A8R8G8B8,D3DPOOL_SYSTEMMEM,&pFB, nullptr);
 	if(hr1!=D3D_OK)		return;
 
 	hr1					= HW.pDevice->GetFrontBufferData(0,pFB);
@@ -77,23 +100,24 @@ void CRender::Screenshot		(IRender_interface::ScreenshotMode mode, LPCSTR name)
 		case IRender_interface::SM_FOR_GAMESAVE:
 			{
 				// texture
-				IDirect3DTexture9*	texture	= NULL;
-				hr1					= D3DXCreateTexture(HW.pDevice,GAMESAVE_SIZE,GAMESAVE_SIZE,1,0,D3DFMT_DXT1,D3DPOOL_SCRATCH,&texture);
+				IDirect3DTexture9*	texture	= nullptr;
+				//hr1					= D3DXCreateTexture(HW.pDevice,GAMESAVE_SIZE,GAMESAVE_SIZE,1,0,D3DFMT_DXT1,D3DPOOL_SCRATCH,&texture);
+				hr1 = D3DXCreateTexture(HW.pDevice, 640, 480, 1, 0, D3DFMT_DXT1, D3DPOOL_SCRATCH, &texture);
 				if(hr1!=D3D_OK)		goto _end_;
 				if(NULL==texture)	goto _end_;
 
 				// resize&convert to surface
-				IDirect3DSurface9*	surface = 0;
+				IDirect3DSurface9*	surface = nullptr;
 				hr1					= texture->GetSurfaceLevel(0,&surface);
 				if(hr1!=D3D_OK)		goto _end_;
 				VERIFY				(surface);
-				hr1					= D3DXLoadSurfaceFromSurface(surface,0,0,pFB,0,0,D3DX_DEFAULT,0);
+				hr1					= D3DXLoadSurfaceFromSurface(surface,0,0,pFB,0,srcRect,D3DX_DEFAULT,0);
 				_RELEASE			(surface);
 				if(hr1!=D3D_OK)		goto _end_;
 
 				// save (logical & physical)
 				ID3DXBuffer*		saved	= 0;
-				hr1					= D3DXSaveTextureToFileInMemory (&saved,D3DXIFF_DDS,texture,0);
+				hr1					= D3DXSaveTextureToFileInMemory (&saved,D3DXIFF_DDS,texture,nullptr);
 				if(hr1!=D3D_OK)		goto _end_;
 				
 				IWriter*			fs		= FS.w_open	(name); 
@@ -113,7 +137,7 @@ void CRender::Screenshot		(IRender_interface::ScreenshotMode mode, LPCSTR name)
 				string_path			buf;
 				sprintf_s			(buf,sizeof(buf),"ss_%s_%s_(%s).jpg",Core.UserName,timestamp(t_stemp),(g_pGameLevel)?g_pGameLevel->name().c_str():"mainmenu");
 				ID3DXBuffer*		saved	= 0;
-				CHK_DX				(D3DXSaveSurfaceToFileInMemory (&saved,D3DXIFF_JPG,pFB,0,0));
+				CHK_DX				(D3DXSaveSurfaceToFileInMemory (&saved,D3DXIFF_JPG,pFB,0,srcRect));
 				IWriter*		fs	= FS.w_open	("$screenshots$",buf); R_ASSERT(fs);
 				fs->w				(saved->GetBufferPointer(),saved->GetBufferSize());
 				FS.w_close			(fs);
@@ -121,7 +145,7 @@ void CRender::Screenshot		(IRender_interface::ScreenshotMode mode, LPCSTR name)
 				if (strstr(Core.Params,"-ss_tga"))	{ // hq
 					sprintf_s			(buf,sizeof(buf),"ssq_%s_%s_(%s).tga",Core.UserName,timestamp(t_stemp),(g_pGameLevel)?g_pGameLevel->name().c_str():"mainmenu");
 					saved	            = 0;
-					CHK_DX				(D3DXSaveSurfaceToFileInMemory (&saved,D3DXIFF_TGA,pFB,0,0));
+					CHK_DX				(D3DXSaveSurfaceToFileInMemory (&saved,D3DXIFF_TGA,pFB,0,srcRect));
 					fs	                = FS.w_open	("$screenshots$",buf); R_ASSERT(fs);
 					fs->w				(saved->GetBufferPointer(),saved->GetBufferSize());
 					FS.w_close			(fs);

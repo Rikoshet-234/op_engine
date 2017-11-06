@@ -208,3 +208,49 @@ void FHierrarhyVisualScript::script_register		(lua_State *L)
 		];
 }
 */
+
+Fvector rotation_get_dir(SRotation *R, bool v_inverse)
+{
+	Fvector iresult;
+	if (v_inverse)
+		iresult.setHP(R->yaw, -R->pitch);
+	else
+		iresult.setHP(R->yaw, R->pitch);
+	return iresult;
+}
+
+void	rotation_set_dir(SRotation *R, const Fvector &dir, bool v_inverse)
+{
+	R->yaw = dir.getH();
+	if (v_inverse)
+		R->pitch = -dir.getP();
+	else
+		R->pitch = dir.getP();
+	R->roll = 0;
+}
+
+void    rotation_copy(SRotation *R, SRotation *src) { memcpy(R, src, sizeof(SRotation)); }
+void	rotation_init(SRotation *R, float y, float p, float r)
+{
+	R->pitch = p;
+	R->roll = r;
+	R->yaw = y;
+}
+
+
+void CRotationScript::script_register(lua_State *L)
+{
+	module(L)
+		[
+			class_<SRotation>("SRotation")
+			.def(constructor<>())
+		.def(constructor<float, float, float>())
+		.def_readwrite("pitch", &SRotation::pitch)
+		.def_readwrite("yaw", &SRotation::yaw)
+		.def_readwrite("roll", &SRotation::roll)
+		.def("get_dir", &rotation_get_dir)
+		.def("set_dir", &rotation_set_dir)
+		.def("set", &rotation_copy)
+		.def("set", &rotation_init)
+		];
+}

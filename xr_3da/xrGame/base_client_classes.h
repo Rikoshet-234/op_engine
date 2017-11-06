@@ -9,7 +9,7 @@
 #pragma once
 
 #include "script_export_space.h"
-
+#include "xrServer_Space.h"
 class DLL_Pure;
 class ISpatial;
 class ISheduled;
@@ -21,6 +21,7 @@ class FHierrarhyVisual;
 class CBlend;
 class CKinematics;
 class CKinematicsAnimated;
+
 
 typedef class_exporter<DLL_Pure>	DLL_PureScript;
 add_to_type_list(DLL_PureScript)
@@ -78,3 +79,8 @@ add_to_type_list(CKinematicsAnimatedScript)
 #undef script_type_list
 #define script_type_list save_type_list(CKinematicsAnimatedScript)
 
+
+typedef class_exporter<SRotation>   CRotationScript;
+add_to_type_list(CRotationScript)
+#undef script_type_list
+#define script_type_list save_type_list(CRotationScript)

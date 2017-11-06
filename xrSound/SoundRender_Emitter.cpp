@@ -95,3 +95,4 @@ u32	CSoundRender_Emitter::play_time	( )
 			state==stSimulating		|| 
 			state==stSimulatingLooped)?SoundRender->Timer_Value-dwTimeStarted:0; 
 }
+

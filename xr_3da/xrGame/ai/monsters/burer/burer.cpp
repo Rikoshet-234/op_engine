@@ -33,7 +33,6 @@ CBurer::~CBurer()
 	xr_delete(m_fast_gravi);
 }
 
-
 void CBurer::reinit()
 {
 	inherited::reinit			();

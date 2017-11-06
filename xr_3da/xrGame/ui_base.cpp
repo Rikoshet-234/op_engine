@@ -292,7 +292,9 @@ shared_str	ui_core::get_xml_name(LPCSTR fn)
 {	
 	std::string file;
 	string_path path;
-	file = createFileName(fn, "_"+ std::to_string(Device.dwWidth)+"x"+ std::to_string(Device.dwHeight));
+	string_path dev_path;
+	sprintf_s(dev_path, "_%dx%d", Device.dwWidth, Device.dwHeight);
+	file = createFileName(fn, dev_path);
 	if (FS.exist(path, "$game_config$", "ui\\", file.c_str()))
 	{
 		return file.c_str();

@@ -128,10 +128,6 @@ void CUIMainIngameWnd::Init()
 	UIStaticRadiationDanger.SetTextST("st_radiation_danger");
 	UIStaticRadiationDanger.SetVisible(false);
 
-	AttachChild(&UIStaticHudTime);
-	xml_init.InitStatic			(uiXml, "static_hud_time", 0, &UIStaticHudTime);
-	formatTimeString=uiXml.ReadAttrib("static_hud_time",0,"format","");
-	UIStaticHudTime.SetText(formatTimeString.c_str());
 	//static_hud_time
 
 	AttachChild					(&UIStaticHealth);
@@ -166,6 +162,12 @@ void CUIMainIngameWnd::Init()
 
 	UIWeaponIcon.Enable			(false);
 
+	//AttachChild(&UIStaticHudTime);
+	xml_init.InitStatic(uiXml, "static_hud_time", 0, &UIStaticHudTime);
+	formatTimeString = uiXml.ReadAttrib("static_hud_time", 0, "format", "");
+	UIStaticHudTime.SetText(formatTimeString.c_str());
+
+
 	//индикаторы 
 	UIZoneMap->Init				();
 	UIZoneMap->SetScale			(DEFAULT_MAP_SCALE);
@@ -174,6 +176,8 @@ void CUIMainIngameWnd::Init()
 	{
 		xml_init.InitStatic					(uiXml, "static_pda_online", 0, &UIPdaOnline);
 		UIZoneMap->Background().AttachChild	(&UIPdaOnline);
+		UIZoneMap->Background().AttachChild(&UIStaticHudTime);
+
 	}
 
 

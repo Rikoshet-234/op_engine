@@ -21,5 +21,6 @@ void CSE_ALifeItemWeaponMagazinedWGL::script_register(lua_State *L)
 			"cse_alife_item_weapon_magazined_w_gl",
 			CSE_ALifeItemWeaponMagazined
 			)
+			.def("get_grenade_mode", &CSE_ALifeItemWeaponMagazinedWGL::get_grenade_mode)
 	];
 }

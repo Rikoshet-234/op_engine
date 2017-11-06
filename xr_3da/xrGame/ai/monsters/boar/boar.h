@@ -31,7 +31,7 @@ public:
 			bool	look_at_enemy;
 	
 	virtual bool	ability_can_drag	() {return true;}
-	
+
 	DECLARE_SCRIPT_REGISTER_FUNCTION
 
 };
