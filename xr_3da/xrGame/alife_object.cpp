@@ -14,6 +14,7 @@
 
 void CSE_ALifeObject::spawn_supplies		()
 {
+#ifdef CHECK_CUSTOM_DATA_BROKEN
 	if (m_ini_string.size() > 300)
 	{
 		for (u32 i = 0; i < m_ini_string.size(); ++i)
@@ -26,7 +27,9 @@ void CSE_ALifeObject::spawn_supplies		()
 			}
 		}
 	}
+#endif
 	spawn_supplies(*m_ini_string);
+#ifdef CHECK_CUSTOM_DATA_BROKEN
 	if (m_ini_string.size() > 300)
 	{
 		for (u32 i = 0; i < m_ini_string.size(); ++i)
@@ -39,6 +42,7 @@ void CSE_ALifeObject::spawn_supplies		()
 			}
 		}
 	}
+#endif
 }
 
 void CSE_ALifeObject::spawn_supplies		(LPCSTR ini_string)

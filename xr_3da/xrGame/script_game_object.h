@@ -253,6 +253,7 @@ public:
 	bool actor_invulnerable() const;
 	void actor_invulnerable(bool invulnerable);
 	float GetActorMaxWeight() const;
+	void ActivateSlot(u32 slotId);
 #pragma endregion 
 #pragma region InventoryBox
 	void IterateInventoryBoxObject(luabind::functor<void> functor, bool showError = false) const;
@@ -409,6 +410,7 @@ public:
 	CScriptGameObject	*item_in_slot(u32 slot_id) const;
 	int	 active_slot();
 	void activate_slot(u32 slot_id);
+	void activate_slot(u32 slot_id,bool force);
 #pragma endregion 
 #pragma region операции с диалогами
 
@@ -425,6 +427,7 @@ public:
 #pragma region операции с оружием
 	void HideWeapon();
 	void RestoreWeapon();
+	void ClearBlockedFlag();
 	void UnloadMagazine();
 	u32	 GetAmmoElapsed();
 	void SetAmmoElapsed(int ammo_elapsed);

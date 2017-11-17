@@ -80,6 +80,7 @@ public:
 protected:
 	MotionSVec						m_anim_idle;
 	MotionSVec						m_anim_idle_sprint;
+	MotionSVec						m_anim_idle_moving;
 	MotionSVec						m_anim_hide;
 	MotionSVec						m_anim_show;
 	MotionSVec						m_anim_activate;

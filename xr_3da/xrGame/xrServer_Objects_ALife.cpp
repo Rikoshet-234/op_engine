@@ -312,6 +312,7 @@ void CSE_ALifeObject::STATE_Write			(NET_Packet &tNetPacket)
 	tNetPacket.w_u32			(m_bDirectControl);
 	tNetPacket.w_u32			(m_tNodeID);
 	tNetPacket.w_u32			(m_flags.get());
+#ifdef CHECK_CUSTOM_DATA_BROKEN
 	if (m_ini_string.size() > 300)
 	{
 		for (u32 i = 0; i < m_ini_string.size(); ++i)
@@ -325,6 +326,7 @@ void CSE_ALifeObject::STATE_Write			(NET_Packet &tNetPacket)
 			}
 		}
 	}
+#endif
 	tNetPacket.w_stringZ		(m_ini_string,true);
 	tNetPacket.w				(&m_story_id,sizeof(m_story_id));
 	tNetPacket.w				(&m_spawn_story_id,sizeof(m_spawn_story_id));
@@ -380,6 +382,7 @@ void CSE_ALifeObject::STATE_Read			(NET_Packet &tNetPacket, u16 size)
 	if (m_wVersion > 57) {
 		if (m_ini_file)
 			xr_delete			(m_ini_file);
+#ifdef CHECK_CUSTOM_DATA_BROKEN
 		if (m_ini_string.size() > 300)
 		{
 			for (u32 i = 0; i < m_ini_string.size(); ++i)
@@ -392,7 +395,9 @@ void CSE_ALifeObject::STATE_Read			(NET_Packet &tNetPacket, u16 size)
 				}
 			}
 		}
+#endif
 		tNetPacket.r_stringZ	(m_ini_string);
+#ifdef CHECK_CUSTOM_DATA_BROKEN
 		if (m_ini_string.size() > 300)
 		{
 			for (u32 i = 0; i < m_ini_string.size(); ++i)
@@ -405,6 +410,7 @@ void CSE_ALifeObject::STATE_Read			(NET_Packet &tNetPacket, u16 size)
 				}
 			}
 		}
+#endif
 	}
 
 	if (m_wVersion > 61)
@@ -425,6 +431,7 @@ void CSE_ALifeObject::UPDATE_Read			(NET_Packet &tNetPacket)
 void CSE_ALifeObject::FillProps				(LPCSTR pref, PropItemVec& items)
 {
 	inherited::FillProps		(pref, 	items);
+#ifdef CHECK_CUSTOM_DATA_BROKEN
 	if (m_ini_string.size() > 300)
 	{
 		for (u32 i = 0; i < m_ini_string.size(); ++i)
@@ -437,7 +444,9 @@ void CSE_ALifeObject::FillProps				(LPCSTR pref, PropItemVec& items)
 			}
 		}
 	}
+#endif
 	PHelper().CreateRText		(items,	PrepareKey(pref,*s_name,"Custom data"),&m_ini_string);
+#ifdef CHECK_CUSTOM_DATA_BROKEN
 	if (m_ini_string.size() > 300)
 	{
 		for (u32 i = 0; i < m_ini_string.size(); ++i)
@@ -450,6 +459,7 @@ void CSE_ALifeObject::FillProps				(LPCSTR pref, PropItemVec& items)
 			}
 		}
 	}
+#endif
 	if (m_flags.is(flUseSwitches)) {
 		PHelper().CreateFlag32	(items,	PrepareKey(pref,*s_name,"ALife\\Can switch online"),	&m_flags,			flSwitchOnline);
 		PHelper().CreateFlag32	(items,	PrepareKey(pref,*s_name,"ALife\\Can switch offline"),	&m_flags,			flSwitchOffline);

@@ -45,6 +45,7 @@ void CSE_ALifeTraderAbstract::spawn_supplies	()
 
 		if (xr_strlen(dynamic_object->m_ini_string))
 		{
+#ifdef CHECK_CUSTOM_DATA_BROKEN
 			if (dynamic_object->m_ini_string.size() > 300)
 			{
 				for (u32 i = 0; i < dynamic_object->m_ini_string.size(); ++i)
@@ -57,6 +58,7 @@ void CSE_ALifeTraderAbstract::spawn_supplies	()
 					}
 				}
 			}
+#endif
 #pragma warning(push)
 #pragma warning(disable:4238)
 			CInifile					ini(
@@ -70,7 +72,7 @@ void CSE_ALifeTraderAbstract::spawn_supplies	()
 
 			if (ini.section_exist("dont_spawn_character_supplies")) 
 				specific_character_supply = false;
-
+#ifdef CHECK_CUSTOM_DATA_BROKEN
 			if (dynamic_object->m_ini_string.size() > 300)
 			{
 				for (u32 i = 0; i < dynamic_object->m_ini_string.size(); ++i)
@@ -83,6 +85,7 @@ void CSE_ALifeTraderAbstract::spawn_supplies	()
 					}
 				}
 			}
+#endif
 		}
 
 		if(specific_character_supply)

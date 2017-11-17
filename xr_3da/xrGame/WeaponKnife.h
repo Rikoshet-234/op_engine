@@ -54,8 +54,10 @@ protected:
 	Fvector4			fvHitPower_2;
 	float				fCurrentHit;
 	float				fHitImpulse_2;
+	float m_fCriticalCondition;
 protected:
 	virtual void		LoadFireParams					(LPCSTR section, LPCSTR prefix);
+
 public:
 						CWeaponKnife(); 
 	virtual				~CWeaponKnife();

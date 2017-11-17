@@ -228,27 +228,24 @@ shared_str CMapLocation::LevelName()
 {
 	if(m_cached.m_updatedFrame==Device.dwFrame) 
 		return m_cached.m_LevelName;
-
+	m_cached.m_LevelName = Level().name();
 	if(ai().get_alife() && ai().get_game_graph())		
 	{
-		CSE_Abstract* E = ai().alife().objects().object(m_objectID,true);
+		CSE_Abstract* E = smart_cast<CSE_Abstract*>(ai().alife().objects().object(m_objectID,true));
 		if(!E){
 			Msg("- Critical: SMapLocation binded to non-existent object id=%d",m_objectID);
 			return "ERROR";
 		}
 		
 		CSE_ALifeObject* AO = smart_cast<CSE_ALifeObject*>(E);
-		if(AO){	
-			m_cached.m_LevelName = ai().game_graph().header().level(ai().game_graph().vertex(AO->m_tGraphID)->level_id()).name();
-			return m_cached.m_LevelName;
-		}else{	
-			m_cached.m_LevelName = Level().name();
-			return m_cached.m_LevelName;
+		if(AO)
+		{	
+			const GameGraph::SLevel* level = ai().game_graph().header().level_ex(ai().game_graph().vertex(AO->m_tGraphID)->level_id());
+			if (level != nullptr)
+				m_cached.m_LevelName = level->name();
 		}
-	}else{
-		m_cached.m_LevelName = Level().name();
-		return m_cached.m_LevelName;
 	}
+	return m_cached.m_LevelName;
 }
 
 bool CMapLocation::Update() //returns actual

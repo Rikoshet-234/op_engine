@@ -1223,7 +1223,6 @@ void CWeaponMagazined::InitAddons()
 	//////////////////////////////////////////////////////////////////////////
 	// Прицел
 	m_fIronSightZoomFactor = READ_IF_EXISTS(pSettings, r_float, cNameSect(), "ironsight_zoom_factor", 50.0f);
-
 	if(IsScopeAttached())
 	{
 		shared_str scope_tex_name;
@@ -1302,8 +1301,10 @@ void CWeaponMagazined::InitAddons()
 	{
 		if(m_UIScope) xr_delete(m_UIScope);
 		
-		if(IsZoomEnabled())
-			m_fIronSightZoomFactor = pSettings->r_float	(cNameSect(), "scope_zoom_factor");
+		if (IsZoomEnabled())
+		{
+			m_fIronSightZoomFactor = pSettings->r_float(cNameSect(), "scope_zoom_factor");
+		}
 	}
 
 	if (m_bZoomEnabled && m_pHUD) 

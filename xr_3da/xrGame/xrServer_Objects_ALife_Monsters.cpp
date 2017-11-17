@@ -138,6 +138,7 @@ CSE_Abstract *CSE_ALifeTraderAbstract::init	()
 {
 	string4096					S;
 	//sprintf_s						(S,"%s\r\n[game_info]\r\nname_id = default\r\n",!*base()->m_ini_string ? "" : *base()->m_ini_string);
+#ifdef CHECK_CUSTOM_DATA_BROKEN
 	if (base()->m_ini_string.size() > 300)
 	{
 		for (u32 i = 0; i < base()->m_ini_string.size(); ++i)
@@ -150,8 +151,10 @@ CSE_Abstract *CSE_ALifeTraderAbstract::init	()
 			}
 		}
 	}
+#endif
 	sprintf_s						(S,"%s\r\n[game_info]\r\n",!*base()->m_ini_string ? "" : *base()->m_ini_string);
 	base()->m_ini_string		= S;
+#ifdef CHECK_CUSTOM_DATA_BROKEN
 	if (base()->m_ini_string.size() > 300)
 	{
 		for (u32 i = 0; i < base()->m_ini_string.size(); ++i)
@@ -164,6 +167,7 @@ CSE_Abstract *CSE_ALifeTraderAbstract::init	()
 			}
 		}
 	}
+#endif
 	return						(base());
 }
 

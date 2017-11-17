@@ -409,10 +409,10 @@ std::pair<float, float>  CBulletManager::ObjectHit	(SBullet* bullet, const Fvect
 	float power = bullet->hit_power*speed_factor;
 	
 	SGameMtl* mtl = GMLib.GetMaterialByIdx(target_material);
-
 	//shoot_factor: коеффициент указывающий на текущие свойства пули 
 	//(Если меньше 1, то пуля либо рикошетит(если контакт идёт по касательной), либо застряёт в текущем 
 	//объекте, если больше 1, то пуля прошивает объект)
+
 	float shoot_factor = mtl->fShootFactor * bullet->pierce*speed_factor;
 
 	float impulse	= 0.f;
@@ -442,7 +442,8 @@ std::pair<float, float>  CBulletManager::ObjectHit	(SBullet* bullet, const Fvect
 	float f			= Random.randF	(0.5f,1.f);
 	//float f				= Random.randF	(0.0f,0.3);
 //	if(shoot_factor<RICOCHET_THRESHOLD &&  )
-	if (((f+shoot_factor)<ricoshet_factor) && bullet->flags.allow_ricochet)	{
+	if (((f+shoot_factor)<ricoshet_factor) && bullet->flags.allow_ricochet)	
+	{
 		//уменьшение скорости полета в зависимости 
 		//от угла падения пули (чем прямее угол, тем больше потеря)
 		float scale = 1.f -_abs(bullet->dir.dotproduct(hit_normal))*m_fCollisionEnergyMin;
@@ -465,21 +466,25 @@ std::pair<float, float>  CBulletManager::ObjectHit	(SBullet* bullet, const Fvect
 		#ifdef DEBUG
 		bullet_state = 0;
 		#endif		
-	} else if(shoot_factor <  1.0) {
+	} 
+	else if(shoot_factor <  EPS) 
+	{
 		//застрявание пули в материале
 		bullet->speed  = 0.f;
 		//передаем весь импульс целиком
 		impulse = bullet->hit_impulse*speed_factor;
+		bullet->flags.ricochet_was = 0;
 		#ifdef DEBUG
 		bullet_state = 1;
 		#endif		
-	} else {
+	} 
+	else 
+	{
 		//пробивание материала
 		//уменьшить скорость пропорцианально потраченому импульсу
 		//float speed_lost = fis_zero(bullet->hit_impulse) ?	1.f : 		1.f - impulse/bullet->hit_impulse;
 		//clamp (speed_lost, 0.f , 1.f);
 		//float speed_lost = shoot_factor;
-		
 		bullet->speed *=mtl->fShootFactor;
 		energy_lost = 1.f - bullet->speed/old_speed;
 		impulse = bullet->hit_impulse*speed_factor*energy_lost;

@@ -714,7 +714,9 @@ bool CWeaponMagazinedWGrenade::Detach(const char* item_section_name, bool b_spaw
 	   !xr_strcmp(*m_sGrenadeLauncherName, item_section_name))
 	{
 		if (is_fake_scope(item_section_name) && !fis_zero(m_fBackupFakeZoom))
+		{
 			m_fIronSightZoomFactor = m_fBackupFakeZoom;
+		}
 
 		m_flagsAddOnState &= ~CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher;
 		if(!m_bGrenadeMode)
@@ -754,6 +756,7 @@ void CWeaponMagazinedWGrenade::InitAddons()
 				else
 					LoadZoomOffset(*hud_sect, m_bEmptyScopeTexture && IsScopeAttached() ? "scope_" : "");
 			}
+			m_fIronSightZoomFactor = pSettings->r_float(cNameSect(), "scope_zoom_factor");
 		}
 	}
 }

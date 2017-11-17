@@ -213,7 +213,6 @@ void CController::Load(LPCSTR section)
 	m_velocity_move_fwd.Load	(section, "Velocity_MoveFwd");
 	m_velocity_move_bkwd.Load	(section, "Velocity_MoveBkwd");
 
-	load_friend_community_overrides(section);
 
 	// load
 	m_sound_hit_fx.create		("affects\\tinnitus3a",st_Effect,sg_SourceType);

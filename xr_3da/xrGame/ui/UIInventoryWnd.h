@@ -33,6 +33,7 @@ private:
 	bool					m_b_need_reinit;
 	void PaintItemFromSlot(u32 slotId);
 	bool m_bKeyControlPress;
+	PIItem m_pLastWorkeditem;
 public:
 							CUIInventoryWnd				();
 	virtual					~CUIInventoryWnd			();

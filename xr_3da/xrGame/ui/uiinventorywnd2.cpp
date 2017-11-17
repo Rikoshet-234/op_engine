@@ -199,16 +199,17 @@ bool CUIInventoryWnd::ToSlot(CUICellItem* itm, bool force_place)
 			return false;
 		if(_slot==GRENADE_SLOT && !new_owner )return true; //fake, sorry (((
 
-		bool result							= GetInventory()->Slot(iitem);
+		bool result							= GetInventory()->Slot(iitem,true);
 		VERIFY								(result);
 
 		CUICellItem* i						= old_owner->RemoveItem(itm, (old_owner==new_owner) );
 
 		new_owner->SetItem					(i);
 	
-		SendEvent_Item2Slot					(iitem);
+		//SendEvent_Item2Slot					(iitem);
+		//SendEvent_ActivateSlot				(iitem);
 
-		SendEvent_ActivateSlot				(iitem);
+		m_iCurrentActiveSlot = iitem->GetSlot();
 		GetInventory()->SetPrevActiveSlot(iitem->GetSlot());
 		UIOutfitInfo.UpdateImmuneView();
 		InventoryUtilities::UpdateWeight					(UIBagWnd, true);

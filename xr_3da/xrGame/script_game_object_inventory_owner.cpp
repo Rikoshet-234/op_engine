@@ -853,6 +853,18 @@ bool CScriptGameObject::attachable_item_enabled	() const
 }
 
 
+void  CScriptGameObject::ClearBlockedFlag()
+{
+	CActor	*actor = smart_cast<CActor*>(&object());
+	if (!actor)
+	{
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "clear_blocked_weapon : cannot access class member CActor!");
+		return;
+	}
+	for (int i = 0; i<SLOTS_TOTAL; ++i)
+		if (actor->inventory().m_slots[i].m_blockCounter>0 )
+			actor->inventory().m_slots[i].m_blockCounter = 0;
+}
 
 void  CScriptGameObject::RestoreWeapon		()
 {
@@ -904,6 +916,16 @@ int	CScriptGameObject::active_slot()
 		return		(0);
 	}
 	return inventory_owner->inventory().GetActiveSlot();
+}
+
+void CScriptGameObject::activate_slot(u32 slot_id, bool force)
+{
+	CInventoryOwner	*inventory_owner = smart_cast<CInventoryOwner*>(&object());
+	if (!inventory_owner) {
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CInventoryOwner : cannot access class member activate_slot!");
+		return;
+	}
+	inventory_owner->inventory().Activate(slot_id,eGeneral, force);
 }
 
 void CScriptGameObject::activate_slot	(u32 slot_id)

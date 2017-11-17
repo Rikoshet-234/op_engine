@@ -317,6 +317,7 @@ BOOL CGameObject::net_Spawn		(CSE_Abstract*	DC)
 	CSE_ALifeObject					*O = smart_cast<CSE_ALifeObject*>(E);
 	if (O && xr_strlen(O->m_ini_string)) 
 	{
+#ifdef CHECK_CUSTOM_DATA_BROKEN
 		if (O->m_ini_string.size() > 300)
 		{
 			for (u32 i = 0; i < O->m_ini_string.size(); ++i)
@@ -329,6 +330,7 @@ BOOL CGameObject::net_Spawn		(CSE_Abstract*	DC)
 				}
 			}
 		}
+#endif
 #pragma warning(push)
 #pragma warning(disable:4238)
 		m_ini_file					= xr_new<CInifile>(
@@ -339,6 +341,7 @@ BOOL CGameObject::net_Spawn		(CSE_Abstract*	DC)
 			FS.get_path("$game_config$")->m_Path
 		);
 #pragma warning(pop)
+#ifdef CHECK_CUSTOM_DATA_BROKEN
 		if (O->m_ini_string.size() > 300)
 		{
 			for (u32 i = 0; i < O->m_ini_string.size(); ++i)
@@ -351,6 +354,7 @@ BOOL CGameObject::net_Spawn		(CSE_Abstract*	DC)
 				}
 			}
 		}
+#endif
 	}
 	TSP_END("CGameObject::net_Spawn(2)", "spawn");
 	TSP_BEGIN("CGameObject::net_Spawn(3)", "spawn");

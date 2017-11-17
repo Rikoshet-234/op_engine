@@ -34,6 +34,8 @@ using namespace InventoryUtilities;
 #include "UIOutfitSlot.h"
 #include "UI3tButton.h"
 #include "UIWindow.h"
+#include "../alife_simulator.h"
+#include "../alife_keyval_registry.h"
 
 
 #define				INVENTORY_ITEM_XML		"inventory_item.xml"
@@ -46,6 +48,7 @@ CUIInventoryWnd*	g_pInvWnd = nullptr;
 CUIInventoryWnd::CUIInventoryWnd()
 {
 	m_iCurrentActiveSlot = NO_ACTIVE_SLOT;
+	m_pLastWorkeditem = nullptr;
 	UIRank = nullptr;
 	CUIInventoryWnd::Init();
 	m_pCurrentCellItem = nullptr;
@@ -434,7 +437,7 @@ void CUIInventoryWnd::Show()
 		CActor *pActor = smart_cast<CActor*>(Level().CurrentEntity());
 		if(!pActor) return;
 
-		pActor->SetWeaponHideState(INV_STATE_INV_WND, true);
+		//pActor->SetWeaponHideState(INV_STATE_INV_WND, true);
 
 		//rank icon		
 		int team = Game().local_player->team;
@@ -464,7 +467,6 @@ void CUIInventoryWnd::Hide()
 	PlaySnd								(eInvSndClose);
 	inherited::Hide						();
 
-	SendInfoToActor						("ui_inventory_hide");
 	SetCurrentItem(nullptr);
 	ClearAllLists						();
 	if (CUIDragDropListEx::m_drag_item)
@@ -474,14 +476,17 @@ void CUIInventoryWnd::Hide()
 	if(pActor && m_iCurrentActiveSlot != NO_ACTIVE_SLOT && pActor->inventory().m_slots[m_iCurrentActiveSlot].m_pIItem)
 	{
 		pActor->inventory().Activate(m_iCurrentActiveSlot);
+		CALifeKeyvalContainer* container = const_cast<CALifeKeyvalRegistry*>(&ai().get_alife()->keyvals())->container(nullptr);
+		if (container) //грязный грязный хак для скриптов :)
+			container->set("active_weapon_slot", luabind::object(ai().script_engine().lua(),m_iCurrentActiveSlot));
 		m_iCurrentActiveSlot = NO_ACTIVE_SLOT;
 	}
-
-	if (!IsGameTypeSingle())
-	{
-		if(!pActor)			return;
-		pActor->SetWeaponHideState(INV_STATE_INV_WND, false);
-	}
+	SendInfoToActor("ui_inventory_hide");
+	//if (!IsGameTypeSingle())
+	//{
+	//	if(!pActor)			return;
+	//	pActor->SetWeaponHideState(INV_STATE_INV_WND, false);
+	//}
 }
 
 void CUIInventoryWnd::AttachAddon(PIItem item_to_upgrade)

@@ -12,6 +12,10 @@
 #include "level_bullet_manager.h"
 #include "ai_sounds.h"
 #include "game_cl_single.h"
+#include "InventoryOwner.h"
+#include "Inventory.h"
+#include "game_news.h"
+#include "string_table.h"
 
 #define KNIFE_MATERIAL_NAME "objects\\knife"
 
@@ -21,6 +25,7 @@ CWeaponKnife::CWeaponKnife() : CWeapon("KNIFE")
 	SetState				( eHidden );
 	SetNextState			( eHidden );
 	knife_material_idx		= (u16)-1;
+	m_fCriticalCondition = 0;
 }
 CWeaponKnife::~CWeaponKnife()
 {
@@ -68,6 +73,7 @@ void CWeaponKnife::Load	(LPCSTR section)
 	HUD_SOUND::LoadSound(section,"snd_holster"	, sndHide		, ESoundTypes(SOUND_TYPE_ITEM_HIDING|SOUND_TYPE_WEAPON),false);
 
 	knife_material_idx =  GMLib.GetMaterialIdx(KNIFE_MATERIAL_NAME);
+	m_fCriticalCondition=READ_IF_EXISTS(pSettings, r_float, section, "critical_condition", 0.03f);
 }
 
 void CWeaponKnife::OnStateSwitch	(u32 S)
@@ -138,7 +144,6 @@ void CWeaponKnife::OnStateSwitch	(u32 S)
 	}
 }
 	
-
 void CWeaponKnife::KnifeStrike(const Fvector& pos, const Fvector& dir)
 {
 	CCartridge						cartridge; 
@@ -148,17 +153,36 @@ void CWeaponKnife::KnifeStrike(const Fvector& pos, const Fvector& dir)
 	cartridge.m_kHit				= 1;
 	cartridge.m_kImpulse			= 1;
 	cartridge.m_kPierce				= 1;
-	cartridge.m_flags.set			(CCartridge::cfTracer, FALSE);
-	cartridge.m_flags.set			(CCartridge::cfRicochet, FALSE);
+	cartridge.m_flags.set(CCartridge::cfTracer, FALSE);
+	cartridge.m_flags.set(CCartridge::cfRicochet, FALSE);
+	cartridge.m_flags.set(CCartridge::cfExplosive, FALSE);
 	cartridge.fWallmarkSize			= fWallmarkSize;
 	cartridge.bullet_material_idx	= knife_material_idx;
 
-	while(m_magazine.size() < 2)	m_magazine.push_back(cartridge);
+	while(m_magazine.size() < 2)	
+		m_magazine.push_back(cartridge);
 	iAmmoElapsed					= m_magazine.size();
 	bool SendHit					= SendHitAllowed(H_Parent());
 
 	PlaySound						(m_sndShot,pos);
-
+	//поломаем ножик, предугадывая объект для пересечения с пулей (махание в воздухе не учитываем)
+	if (!!Level().ObjectSpace.RayTest(pos, dir, fireDistance, collide::rqtBoth, nullptr, nullptr))
+	{
+		if (GetCondition()<=m_fCriticalCondition)//уберем в инвентарь поломанное ХО
+		{
+			CInventoryOwner* owner = smart_cast<CInventoryOwner*>(H_Parent());
+			if (owner)
+			{
+				owner->inventory().Ruck(this);
+				return;//без выпуска пули
+			}
+		}
+		//хит уменьшается от состояния
+		fCurrentHit=fCurrentHit*GetCondition();
+		//наша пуля попадет по чему нибудь... 
+		ChangeCondition(-GetWeaponDeterioration());
+	}
+	//пуля улетела... 
 	Level().BulletManager().AddBullet(	pos, 
 										dir, 
 										m_fStartBulletSpeed, 

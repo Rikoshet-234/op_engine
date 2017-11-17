@@ -58,6 +58,17 @@ u32 CScriptGameObject::GetSlot() const
 	return				(inventory_item->GetSlot());
 }
 
+void CScriptGameObject::ActivateSlot(u32 slotId)
+{
+	CActor *actor = smart_cast<CActor*>(&object());
+	if (!actor)
+	{
+		Msg("! ERROR ActivateSlot called for non-actor object!");
+		return;
+	}
+	actor->inventory().ProcessSlotAction(CMD_START, slotId);
+}
+
 #pragma region body manipulation
 #include "../skeletonanimated.h"
 void CScriptGameObject::SetVisualName(LPCSTR str)
@@ -67,21 +78,16 @@ void CScriptGameObject::SetVisualName(LPCSTR str)
 		Msg("Error! CScriptGameObject::SetVisualName : game level doesn't exist.");
 		return;
 	}
-
 	shared_str visual_name = str;
 	if (!visual_name.size() || object().cNameVisual() == visual_name)
 		return;
-
 	CActor *actor = smart_cast<CActor*>(&object());
 	if (actor)
 		return actor->ChangeVisual(visual_name);
-
 	object().cNameVisual_set(visual_name);
-
 	CWeapon *wpn = smart_cast<CWeapon*>(&object());
 	if (wpn)
 		return wpn->UpdateAddonsVisibility();
-
 	// Обновление костей.
 	IRender_Visual *visual = object().Visual();
 	if (visual)
@@ -141,14 +147,14 @@ void CScriptGameObject::SetRotation(const SRotation &rot)
 	}
 	else
 	{
-		Fmatrix m = object().XFORM();
-		Fmatrix r = Fidentity;
-		r.setHPB(rot.yaw, rot.pitch, rot.roll);			// set 3-axis direction 
-		m.set(r.i, r.j, r.k, m.c);		// saved position in c		
-		object().UpdateXFORM(m);		// apply to physic shell
-		object().XFORM() = m;			// normal visual update
+		//Fmatrix m = object().XFORM();
+		//Fmatrix r = Fidentity;
+		//r.setHPB(rot.yaw, rot.pitch, rot.roll);			// set 3-axis direction 
+		//m.set(r.i, r.j, r.k, m.c);		// saved position in c		
+		//object().UpdateXFORM(m);		// apply to physic shell
+		//object().XFORM() = m;			// normal visual update
 		
-		//object().Direction().setHP(rot.yaw, rot.pitch);
+		object().Direction().setHP(rot.yaw, rot.pitch);
 
 		CKinematics *pK = PKinematics(object().Visual());
 		if (pK)
@@ -781,6 +787,7 @@ class_<CScriptGameObject> &script_register_game_object3(class_<CScriptGameObject
 		.def("detach_scope", &CScriptGameObject::detach_scope)
 		.def("detach_silencer", &CScriptGameObject::detach_silencer)
 		.def("detach_grenadelauncher", &CScriptGameObject::detach_grenadelauncher)
+		.def("change_slot_state", &CScriptGameObject::ActivateSlot)
 		.def("set_position", &CScriptGameObject::SetPosition)
 		//.def("set_direction", static_cast<void (CScriptGameObject::*)(const Fvector &dir,float)>(&CScriptGameObject::SetDirection))
 		.def("set_direction", static_cast<void (CScriptGameObject::*)(const Fvector &dir)>(&CScriptGameObject::SetDirection))

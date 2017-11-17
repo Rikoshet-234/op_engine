@@ -113,10 +113,14 @@ void CArtefact::Load(LPCSTR section)
 	m_fArtJumpSpeedDelta = READ_IF_EXISTS(pSettings, r_float, section, "jump_speed_delta", 0);
 
 	animGet(m_anim_idle, pSettings->r_string(*hud_sect, "anim_idle"));
-	animGet(m_anim_idle_sprint, pSettings->r_string(*hud_sect, "anim_idle_sprint"));
 	animGet(m_anim_hide, pSettings->r_string(*hud_sect, "anim_hide"));
 	animGet(m_anim_show, pSettings->r_string(*hud_sect, "anim_show"));
 	animGet(m_anim_activate, pSettings->r_string(*hud_sect, "anim_activate"));
+
+	if (pSettings->line_exist(*hud_sect, "anim_idle_sprint"))
+		animGet(m_anim_idle_sprint, pSettings->r_string(*hud_sect, "anim_idle_sprint"));
+	if (pSettings->line_exist(*hud_sect, "anim_idle_moving"))
+		animGet(m_anim_idle_moving, pSettings->r_string(*hud_sect, "anim_idle_moving"));
 }
 #include "../xrCore/FTimerStat.h"
 BOOL CArtefact::net_Spawn(CSE_Abstract* DC) 
@@ -420,8 +424,24 @@ bool CArtefact::Action(s32 cmd, u32 flags)
 
 void CArtefact::onMovementChanged	(ACTOR_DEFS::EMoveCommand cmd)
 {
-	if( (cmd == ACTOR_DEFS::mcSprint)&&(GetState()==eIdle)  )
-		PlayAnimIdle		();
+	if (GetState() != eIdle)
+		return;
+	CEntity::SEntityState st;
+	g_actor->g_State(st);
+	if (st.bSprint)
+	{
+		MotionID mID = m_anim_idle_sprint.empty() ? random_anim(m_anim_idle) : random_anim(m_anim_idle_sprint);
+		m_pHUD->animPlay(mID, TRUE, this, eIdle);
+	}
+	else if (g_actor->AnyMove())
+	{
+		MotionID mID = m_anim_idle_moving.empty() ? random_anim(m_anim_idle) : random_anim(m_anim_idle_moving);
+		m_pHUD->animPlay(mID, TRUE, this, eIdle);
+	}
+	else
+	{
+		SwitchState(GetState());
+	}
 }
 
 void CArtefact::OnStateSwitch		(u32 S)

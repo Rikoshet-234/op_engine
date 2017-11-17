@@ -119,6 +119,7 @@ CSE_Abstract::CSE_Abstract					(LPCSTR caSection)
 			IReader				*reader = FS.r_open(file_name);
 			VERIFY				(reader);
 			{
+#ifdef CHECK_CUSTOM_DATA_BROKEN
 				if (m_ini_string.size() > 300)
 				{
 					for (u32 i = 0; i < m_ini_string.size(); ++i)
@@ -131,6 +132,7 @@ CSE_Abstract::CSE_Abstract					(LPCSTR caSection)
 						}
 					}
 				}
+#endif
 
 				int				size = reader->length()*sizeof(char);
 				LPSTR			temp = (LPSTR)_alloca(size + 1);
@@ -138,6 +140,7 @@ CSE_Abstract::CSE_Abstract					(LPCSTR caSection)
 				temp[size]		= 0;
 				m_ini_string	= temp;
 
+#ifdef CHECK_CUSTOM_DATA_BROKEN
 				if (m_ini_string.size() > 300)
 				{
 					for (u32 i = 0; i < m_ini_string.size(); ++i)
@@ -150,6 +153,7 @@ CSE_Abstract::CSE_Abstract					(LPCSTR caSection)
 						}
 					}
 				}
+#endif
 			}
 			FS.r_close			(reader);
 		}
@@ -335,6 +339,7 @@ CInifile &CSE_Abstract::spawn_ini			()
 {
 	if (!m_ini_file) 
 	{
+#ifdef CHECK_CUSTOM_DATA_BROKEN
 		if (m_ini_string.size() > 300)
 		{
 			for (u32 i = 0; i < m_ini_string.size(); ++i)
@@ -347,6 +352,7 @@ CInifile &CSE_Abstract::spawn_ini			()
 				}
 			}
 		}
+#endif
 #pragma warning(push)
 #pragma warning(disable:4238)
 		m_ini_file			= xr_new<CInifile>(
@@ -356,7 +362,7 @@ CInifile &CSE_Abstract::spawn_ini			()
 			),
 			FS.get_path("$game_config$")->m_Path
 		);
-
+#ifdef CHECK_CUSTOM_DATA_BROKEN
 		if (m_ini_string.size() > 300)
 		{
 			for (u32 i = 0; i < m_ini_string.size(); ++i)
@@ -369,6 +375,7 @@ CInifile &CSE_Abstract::spawn_ini			()
 				}
 			}
 		}
+#endif
 	}
 #pragma warning(pop)
 	return						(*m_ini_file);
