@@ -734,19 +734,16 @@ void CWeaponMagazinedWGrenade::LoadCurrentZoomOffset()
 		if (m_bGrenadeMode)
 		{
 			LoadZoomOffset(*hud_sect, "grenade_");
-			Msg("grenade_");
 		}
 		else
 		{
 			if (GrenadeLauncherAttachable() && IsGrenadeLauncherAttached())
 			{
 				LoadZoomOffset(*hud_sect, m_bEmptyScopeTexture && IsScopeAttached() ? "scope_" : "grenade_normal_");
-				Msg(m_bEmptyScopeTexture && IsScopeAttached() ? "scope_" : "grenade_normal_");
 			}
 			else
 			{
 				LoadZoomOffset(*hud_sect, m_bEmptyScopeTexture && IsScopeAttached() ? "scope_" : "");
-				Msg(m_bEmptyScopeTexture && IsScopeAttached() ? "scope_" : "non_scope");
 			}
 		}
 		m_fIronSightZoomFactor = pSettings->r_float(cNameSect(), "scope_zoom_factor");
