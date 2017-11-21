@@ -245,6 +245,10 @@ void  CInventoryItem::ChangeCondition(float fDeltaCondition)
 {
 	m_fCondition += fDeltaCondition;
 	clamp(m_fCondition, 0.f, 1.f);
+	NET_Packet		P;//можно так же и через ai().alife().objects().object(ID(),true)
+	object().u_EventGen(P, GE_UPDATE_SERVER_ENTRY_IAI_CONDITION, object().ID());
+	P.w_float(m_fCondition);
+	object().u_EventSend(P);
 }
 
 void	CInventoryItem::Hit					(SHit* pHDS)

@@ -38,6 +38,15 @@ void xrServer::Process_event	(NET_Packet& P, ClientID sender)
 
 	switch		(type)
 	{
+	case GE_UPDATE_SERVER_ENTRY_IAI_CONDITION:
+	{
+		CSE_ALifeInventoryItem* item = smart_cast<CSE_ALifeInventoryItem*>(receiver);
+		if (item)
+		{
+			item->m_fCondition = P.r_float();
+		}
+	}
+	break;
 	case GE_UPDATE_SERVER_ENTRY_IAI_WEIGHT:
 		{
 			CSE_ALifeInventoryItem* item = smart_cast<CSE_ALifeInventoryItem*>(receiver); 

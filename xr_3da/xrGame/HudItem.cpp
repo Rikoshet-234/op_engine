@@ -311,5 +311,10 @@ void CHudItem::animGet	(MotionSVec& lst, LPCSTR prefix)
 		const MotionID	&m = m_pHUD->animGet(sh_anim);
 		if (m)			lst.push_back(m);
 	}
-	R_ASSERT2			(!lst.empty(),prefix);
+	if (lst.empty())
+	{
+		//Msg("! ERROR Empty animation [%s] for [%s] in param [%s]", prefix, section, param);
+		Msg("! MotionSVec& lst is empty! FIX THIS CALL FROM ENGINE TO extended animGet function!");
+		FATAL("ENGINE Crush! See log for detail.");
+	}
 }

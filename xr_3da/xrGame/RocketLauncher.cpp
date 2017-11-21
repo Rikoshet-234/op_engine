@@ -56,6 +56,11 @@ void CRocketLauncher::SpawnRocket(LPCSTR rocket_section, CGameObject* parent_roc
 void CRocketLauncher::AttachRocket(u16 rocket_id, CGameObject* parent_rocket_launcher)
 {
 	CCustomRocket * pRocket = smart_cast<CCustomRocket*>(Level().Objects.net_Find(rocket_id));
+	if (!pRocket)
+	{
+		Msg("! ERROR CRocketLauncher::AttachRocket invalid/nonexistent rocket_id [%i] for net_Find", rocket_id);
+		return;
+	}
 	pRocket->m_pOwner = smart_cast<CGameObject*>(parent_rocket_launcher->H_Root());
 	VERIFY(pRocket->m_pOwner);
 	pRocket->H_SetParent(parent_rocket_launcher);

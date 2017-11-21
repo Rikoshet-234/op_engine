@@ -38,6 +38,7 @@ public:
 	virtual bool	CanAttach(PIItem pIItem);
 	virtual bool	CanDetach(const char* item_section_name);
 	virtual void	InitAddons();
+	void LoadCurrentZoomOffset();
 	virtual bool	UseScopeTexture();
 	virtual	float	CurrentZoomFactor	();
 	void			LoadAmmo			(CWeaponAmmo *pAmmo) override;

@@ -112,15 +112,15 @@ void CArtefact::Load(LPCSTR section)
 	m_bCanSpawnZone = !!pSettings->line_exist("artefact_spawn_zones", section);
 	m_fArtJumpSpeedDelta = READ_IF_EXISTS(pSettings, r_float, section, "jump_speed_delta", 0);
 
-	animGet(m_anim_idle, pSettings->r_string(*hud_sect, "anim_idle"));
-	animGet(m_anim_hide, pSettings->r_string(*hud_sect, "anim_hide"));
-	animGet(m_anim_show, pSettings->r_string(*hud_sect, "anim_show"));
-	animGet(m_anim_activate, pSettings->r_string(*hud_sect, "anim_activate"));
+	animGet(m_anim_idle, pSettings->r_string(*hud_sect, "anim_idle"), *hud_sect, "anim_idle");
+	animGet(m_anim_hide, pSettings->r_string(*hud_sect, "anim_hide"), *hud_sect, "anim_hide");
+	animGet(m_anim_show, pSettings->r_string(*hud_sect, "anim_show"), *hud_sect, "anim_show");
+	animGet(m_anim_activate, pSettings->r_string(*hud_sect, "anim_activate"), *hud_sect, "anim_activate");
 
 	if (pSettings->line_exist(*hud_sect, "anim_idle_sprint"))
-		animGet(m_anim_idle_sprint, pSettings->r_string(*hud_sect, "anim_idle_sprint"));
+		animGet(m_anim_idle_sprint, pSettings->r_string(*hud_sect, "anim_idle_sprint"), *hud_sect, "anim_idle_sprint");
 	if (pSettings->line_exist(*hud_sect, "anim_idle_moving"))
-		animGet(m_anim_idle_moving, pSettings->r_string(*hud_sect, "anim_idle_moving"));
+		animGet(m_anim_idle_moving, pSettings->r_string(*hud_sect, "anim_idle_moving"), *hud_sect, "anim_idle_moving");
 }
 #include "../xrCore/FTimerStat.h"
 BOOL CArtefact::net_Spawn(CSE_Abstract* DC) 
