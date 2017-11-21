@@ -251,9 +251,13 @@ bool CWeaponMagazinedWGrenade::SwitchMode(bool switchOnLoad)
 	m_bPending				= true;
 	PerformSwitchGL			(switchOnLoad);
 	if (m_bGrenadeMode)
+	{
 		m_fBackupZoom = m_fRTZoomFactor;
+	}
 	else
+	{
 		m_fRTZoomFactor = m_fBackupZoom;
+	}
 	PlaySound				(sndSwitch,get_LastFP());
 
 	PlayAnimModeSwitch		();
@@ -283,15 +287,7 @@ void  CWeaponMagazinedWGrenade::PerformSwitchGL(bool switchOnLoad)
 
 	if(m_bZoomEnabled && m_pHUD)
 	{
-		if(m_bGrenadeMode)
-			LoadZoomOffset(*hud_sect, "grenade_");
-		else 
-		{
-			if(GrenadeLauncherAttachable() && IsGrenadeLauncherAttached())
-				LoadZoomOffset(*hud_sect, "grenade_normal_");
-			else
-				LoadZoomOffset(*hud_sect, m_bEmptyScopeTexture && IsScopeAttached() ? "scope_" : "");
-		}
+		LoadCurrentZoomOffset();
 	}
 	if (m_bGrenadeMode)
 		SetQueueSize(1);
@@ -731,8 +727,28 @@ bool CWeaponMagazinedWGrenade::Detach(const char* item_section_name, bool b_spaw
 		return inherited::Detach(item_section_name, b_spawn_item);
 }
 
-
-//m_fScopeZoomFactor = pSettings->r_float(cNameSect(), "scope_zoom_factor");
+void CWeaponMagazinedWGrenade::LoadCurrentZoomOffset()
+{
+	if (m_bZoomEnabled && m_pHUD)
+	{
+		if (m_bGrenadeMode)
+		{
+			LoadZoomOffset(*hud_sect, "grenade_");
+		}
+		else
+		{
+			if (GrenadeLauncherAttachable() && IsGrenadeLauncherAttached())
+			{
+				LoadZoomOffset(*hud_sect, m_bEmptyScopeTexture && IsScopeAttached() ? "scope_" : "grenade_normal_");
+			}
+			else
+			{
+				LoadZoomOffset(*hud_sect, m_bEmptyScopeTexture && IsScopeAttached() ? "scope_" : "");
+			}
+		}
+		m_fIronSightZoomFactor = pSettings->r_float(cNameSect(), "scope_zoom_factor");
+	}
+}
 
 void CWeaponMagazinedWGrenade::InitAddons()
 {	
@@ -745,19 +761,11 @@ void CWeaponMagazinedWGrenade::InitAddons()
 			CRocketLauncher::m_fLaunchSpeed = pSettings->r_float(*m_sGrenadeLauncherName,"grenade_vel");
 		}
 
-		if(m_bZoomEnabled && m_pHUD)
-		{
-			if(m_bGrenadeMode)
-				LoadZoomOffset(*hud_sect, "grenade_");
-			else 
-			{
-				if(GrenadeLauncherAttachable() && IsGrenadeLauncherAttached())
-					LoadZoomOffset(*hud_sect, "grenade_normal_");
-				else
-					LoadZoomOffset(*hud_sect, m_bEmptyScopeTexture && IsScopeAttached() ? "scope_" : "");
-			}
-			m_fIronSightZoomFactor = pSettings->r_float(cNameSect(), "scope_zoom_factor");
-		}
+		LoadCurrentZoomOffset();
+	}
+	if (IsGrenadeLauncherAttached() && IsScopeAttached() && m_bGrenadeMode)
+	{
+		m_fBackupZoom = m_fRTZoomFactor;
 	}
 }
 

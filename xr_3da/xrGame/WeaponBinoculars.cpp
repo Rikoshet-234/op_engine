@@ -95,6 +95,11 @@ void CWeaponBinoculars::GetBriefInfo(xr_string& str_name, xr_string& icon_sect_n
 	str_count		= "";
 	icon_sect_name	= *cNameSect();*/
 	inherited::GetBriefInfo(str_name,icon_sect_name,str_count);
+	if (xr_strcmp(str_name.c_str(), str_count.c_str()) == 0)
+	{
+		str_count.clear();
+		str_count.shrink_to_fit();
+	}
 }
 
 void CWeaponBinoculars::net_Relcase	(CObject *object)
