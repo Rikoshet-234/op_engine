@@ -209,12 +209,12 @@ void CUIDragDropListEx::OnItemDBClick(CUIWindow* w, void* pData)
 	OnItemSelected						(w, pData);
 	CUICellItem*		itm = smart_cast<CUICellItem*>(w);
 	callback(GameObject::OnDragDropListDBLClickCell)(itm);
-	if (!m_bEnableDragDrop)
-		return;
+	/*if (!m_bEnableDragDrop)
+		return;*/
 
-	CUICellItem* pre_selected_item = GetSelectedCell();
+	//CUICellItem* pre_selected_item = GetSelectedCell();
 	if(m_f_item_db_click && m_f_item_db_click(itm) ){
-		DestroyDragItem						(pre_selected_item);
+		//DestroyDragItem						(pre_selected_item);
 		return;
 	}
 
@@ -227,7 +227,7 @@ void CUIDragDropListEx::OnItemDBClick(CUIWindow* w, void* pData)
 		CUICellItem* i					= old_owner->RemoveItem(itm, true);
 		old_owner->SetItem				(i);
 	}
-	DestroyDragItem						(pre_selected_item);
+	//DestroyDragItem						(pre_selected_item);
 }
 
 void CUIDragDropListEx::OnItemFocusReceived(CUIWindow* w, void* pData)

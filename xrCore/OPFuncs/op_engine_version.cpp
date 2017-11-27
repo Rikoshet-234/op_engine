@@ -18,7 +18,7 @@
 
 #define PATCH_DESCRIPTION "patch"
 #define PATCH_MINOR "0"
-#define PATCH_MAJOR "10" 
+#define PATCH_MAJOR "11" 
 
 namespace OPFuncs
 {

@@ -701,8 +701,10 @@ bool CUICarBodyWnd::OnItemDrop(CUICellItem* itm)
 	CUIDragDropListEx*	old_owner		= itm->OwnerList();
 	CUIDragDropListEx*	new_owner		= CUIDragDropListEx::m_drag_item->BackList();
 	
-	if(old_owner==new_owner || !old_owner || !new_owner || (false&&new_owner==m_pUIOthersBagList&&m_pInventoryBox))
-					return true;
+	if (old_owner == new_owner || !old_owner || !new_owner)
+	{
+		return true;
+	}
 
 	if(m_pOthersObject)
 	{
@@ -733,8 +735,8 @@ bool CUICarBodyWnd::OnItemDrop(CUICellItem* itm)
 		CUICellItem* ci			= old_owner->RemoveItem(CurrentItem(), false);
 		new_owner->SetItem		(ci);
 	}
-	SetCurrentItem					(nullptr);
 
+	SetCurrentItem					(nullptr);
 	return				true;
 }
 
@@ -748,10 +750,11 @@ bool CUICarBodyWnd::OnItemStartDrag(CUICellItem* itm)
 bool CUICarBodyWnd::OnItemDbClick(CUICellItem* itm)
 {
 	CUIDragDropListEx*	old_owner		= itm->OwnerList();
-	CUIDragDropListEx*	new_owner		= (old_owner==m_pUIOthersBagList)?m_pUIOurBagList:m_pUIOthersBagList;
-
-	if (!CurrentItem()->GetMoveableToOther()) 
+	CUIDragDropListEx*	new_owner = (old_owner==m_pUIOthersBagList)?m_pUIOurBagList:m_pUIOthersBagList;
+	if (!CurrentItem()->GetMoveableToOther())
+	{
 		return true;
+	}
 
 	if(m_pOthersObject)
 	{
@@ -779,7 +782,6 @@ bool CUICarBodyWnd::OnItemDbClick(CUICellItem* itm)
 
 	}
 	SetCurrentItem				(nullptr);
-
 	return						true;
 }
 
@@ -873,6 +875,7 @@ void CUICarBodyWnd::PlaySnd(eTradeSoundActions a)
 
 void CUICarBodyWnd::BindDragDropListEvents(CUIDragDropListEx* lst)
 {
+	lst->m_bEnableDragDrop = false;
 	lst->m_f_item_drop				= CUIDragDropListEx::DRAG_DROP_EVENT(this,&CUICarBodyWnd::OnItemDrop);
 	lst->m_f_item_start_drag		= CUIDragDropListEx::DRAG_DROP_EVENT(this,&CUICarBodyWnd::OnItemStartDrag);
 	lst->m_f_item_db_click			= CUIDragDropListEx::DRAG_DROP_EVENT(this,&CUICarBodyWnd::OnItemDbClick);

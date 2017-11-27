@@ -285,6 +285,11 @@ void CALifeSimulator__release					(CALifeSimulator *pself, CSE_Abstract *object,
 	THROW								(object);
 	CSE_ALifeObject						*alife_object = smart_cast<CSE_ALifeObject*>(object);
 	THROW								(alife_object);
+	//if (xr_strcmp(object->name_replace(), "esc_wpn_walther") == 0)
+	//{
+	//	Msg("release %s %s", object->name_replace(), object->name());
+	//	ai().script_engine().print_stack();
+	//}
 	if (!alife_object->m_bOnline) {
 		pself->release					(object,true);
 		return;

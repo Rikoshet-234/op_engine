@@ -372,9 +372,9 @@ void CWeaponKnife::StartIdleAnim()
 }
 void CWeaponKnife::GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count)
 {
-	str_name		= NameShort();
-	str_count		= "";
-	icon_sect_name	= *cNameSect();
+	str_name = "";//NameShort();
+	str_count		= NameShort();
+	icon_sect_name = "";// *cNameSect();
 }
 
 void CWeaponKnife::net_Export(NET_Packet& P)

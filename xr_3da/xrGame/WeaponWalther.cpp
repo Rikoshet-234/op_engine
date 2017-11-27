@@ -1,5 +1,8 @@
 #include "pch_script.h"
 #include "weaponwalther.h"
+#include "ai_space.h"
+#include "alife_simulator.h"
+#include "alife_object_registry.h"
 
 CWeaponWalther::CWeaponWalther(void) : CWeaponPistol("WALTHER")
 {
@@ -9,6 +12,7 @@ CWeaponWalther::CWeaponWalther(void) : CWeaponPistol("WALTHER")
 
 CWeaponWalther::~CWeaponWalther(void)
 {
+	
 }
 
 using namespace luabind;

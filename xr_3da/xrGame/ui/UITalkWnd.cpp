@@ -263,13 +263,11 @@ void CUITalkWnd::Show()
 void CUITalkWnd::Hide()
 {
 	StopSnd						();
-
+	UITradeWnd->Hide();
+	UITalkDialogWnd->Hide();
 	inherited::Hide				();
-	UITradeWnd->Hide				();
 	if(!m_pActor)				return;
-	
 	ToTopicMode					();
-
 	if (m_pActor->IsTalking()) m_pActor->StopTalk();
 	m_pActor = nullptr;
 }
@@ -366,10 +364,9 @@ void CUITalkWnd::SwitchToTrade()
 {
 	if(m_pOurInvOwner->IsTradeEnabled() && m_pOthersInvOwner->IsTradeEnabled() ){
 
-		UITalkDialogWnd->Hide		();
-
 		UITradeWnd->InitTrade		(m_pOurInvOwner, m_pOthersInvOwner);
 		UITradeWnd->Show				();
+		UITalkDialogWnd->Hide();
 		UITradeWnd->StartTrade		();
 		UITradeWnd->BringAllToTop	();
 		StopSnd						();

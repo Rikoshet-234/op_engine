@@ -314,8 +314,10 @@ bool CUIWindow::OnMouse(float x, float y, EUIMessages mouse_action)
 	//сообщение направляем ему сразу
 	if(m_pMouseCapturer)
 	{
-		m_pMouseCapturer->OnMouse(cursor_pos.x - m_pMouseCapturer->GetWndRect().left, 
-								  cursor_pos.y - m_pMouseCapturer->GetWndRect().top, 
+		float left = m_pMouseCapturer->GetWndRect().left;
+		float top = m_pMouseCapturer->GetWndRect().top;
+		m_pMouseCapturer->OnMouse(cursor_pos.x - left, 
+								  cursor_pos.y - top, 
 								  mouse_action);
 		return true;
 	}
