@@ -97,6 +97,7 @@ void CWeapon::FireTrace		(const Fvector& P, const Fvector& D)
 		CCartridge &nextCartridge = m_magazine.back();
 		m_ammoType=nextCartridge.m_LocalAmmoType;
 		m_iPropousedAmmoType=nextCartridge.m_LocalAmmoType;
+		m_set_next_ammoType_on_reload = u32(-1);
 	}
 
 }

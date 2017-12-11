@@ -129,7 +129,7 @@ void CUIOutfitInfo::createModifItem(CCustomOutfit* outfit,std::pair<int, restore
 			break;
 		case POWER_LOSS_ID:
 			{
-				outfitValue = outfit ? outfit->GetPowerLoss()*outfit->GetCondition():0;
+				outfitValue = outfit ? outfit->GetPowerLoss()/outfit->GetCondition():0;
 				outfitValue=outfitValue*100;
 			}
 			break;

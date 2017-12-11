@@ -39,7 +39,7 @@ CTorch::CTorch(void)
 
 	m_switched_on				= false;
 	glow_render					= ::Render->glow_create();
-	lanim						= 0;
+	lanim						= nullptr;
 	time2hide					= 0;
 	fBrightness					= 1.f;
 
@@ -52,6 +52,8 @@ CTorch::~CTorch(void)
 	light_render.destroy	();
 	light_omni.destroy	();
 	glow_render.destroy		();
+	HUD_SOUND::DestroySound(snd_DeviceTorchOn);
+	HUD_SOUND::DestroySound(snd_DeviceTorchOff);
 }
 
 inline bool CTorch::can_use_dynamic_lights	()
@@ -70,7 +72,10 @@ void CTorch::Load(LPCSTR section)
 {
 	inherited::Load			(section);
 	light_trace_bone		= pSettings->r_string(section,"light_trace_bone");
-
+	if (pSettings->line_exist(section, "snd_torch_on"))
+		HUD_SOUND::LoadSound(section, "snd_torch_on", snd_DeviceTorchOn, SOUND_TYPE_ITEM_USING);
+	if (pSettings->line_exist(section, "snd_torch_off"))
+		HUD_SOUND::LoadSound(section, "snd_torch_off", snd_DeviceTorchOff, SOUND_TYPE_ITEM_USING);
 }
 
 
@@ -84,12 +89,12 @@ void CTorch::Switch()
 void CTorch::Switch	(bool light_on)
 {
 	m_switched_on			= light_on;
+	CActor *pA = smart_cast<CActor *>(H_Parent());
 	if (can_use_dynamic_lights())
 	{
 		light_render->set_active(light_on);
-		
-		CActor *pA = smart_cast<CActor *>(H_Parent());
-		if(!pA)light_omni->set_active(light_on);
+		if (!pA)
+			light_omni->set_active(light_on);
 	}
 	glow_render->set_active					(light_on);
 
@@ -103,6 +108,8 @@ void CTorch::Switch	(bool light_on)
 
 		pVisual->LL_SetBoneVisible			(bi,	light_on,	TRUE); //hack
 	}
+	if (pA)
+		HUD_SOUND::PlaySound(light_on ? snd_DeviceTorchOn : snd_DeviceTorchOff, g_actor->Position(), g_actor, true);
 }
 #include "../xrCore/FTimerStat.h"
 BOOL CTorch::net_Spawn(CSE_Abstract* DC) 

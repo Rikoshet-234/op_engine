@@ -731,9 +731,16 @@ void CWeaponMagazinedWGrenade::LoadCurrentZoomOffset()
 {
 	if (m_bZoomEnabled && m_pHUD)
 	{
+		bool iszf_loaded = false;
 		if (m_bGrenadeMode)
 		{
 			LoadZoomOffset(*hud_sect, "grenade_");
+			if (pSettings->line_exist(cNameSect(), "ironsight_zoom_factor") && m_eGrenadeLauncherStatus == ALife::eAddonPermanent)
+			{
+				m_fIronSightZoomFactor = pSettings->r_float(cNameSect(), "ironsight_zoom_factor");
+				iszf_loaded = true;
+				//Msg(" m_bGrenadeMode %f %s", m_fIronSightZoomFactor, *hud_sect);
+			}
 		}
 		else
 		{
@@ -746,7 +753,11 @@ void CWeaponMagazinedWGrenade::LoadCurrentZoomOffset()
 				LoadZoomOffset(*hud_sect, m_bEmptyScopeTexture && IsScopeAttached() ? "scope_" : "");
 			}
 		}
-		m_fIronSightZoomFactor = pSettings->r_float(cNameSect(), "scope_zoom_factor");
+		if (!iszf_loaded)
+		{
+			m_fIronSightZoomFactor = pSettings->r_float(cNameSect(), "scope_zoom_factor");
+			//Msg(" default %f %s", m_fIronSightZoomFactor, cNameSect().c_str());
+		}
 	}
 }
 
@@ -754,12 +765,15 @@ void CWeaponMagazinedWGrenade::InitAddons()
 {	
 	inherited::InitAddons();
 
-	if(GrenadeLauncherAttachable())
+	if(GrenadeLauncherAttachable() || CSE_ALifeItemWeapon::eAddonPermanent == m_eGrenadeLauncherStatus)
 	{
-		if(IsGrenadeLauncherAttached())
-		{
-			CRocketLauncher::m_fLaunchSpeed = pSettings->r_float(*m_sGrenadeLauncherName,"grenade_vel");
-		}
+		shared_str vel_section;
+		if (CSE_ALifeItemWeapon::eAddonPermanent == m_eGrenadeLauncherStatus)
+			vel_section = cNameSect();
+		else if (IsGrenadeLauncherAttached())
+			vel_section = m_sGrenadeLauncherName;
+		if (*vel_section)
+			CRocketLauncher::m_fLaunchSpeed = pSettings->r_float(*vel_section,"grenade_vel");
 
 		LoadCurrentZoomOffset();
 	}
@@ -779,7 +793,10 @@ bool	CWeaponMagazinedWGrenade::UseScopeTexture()
 float	CWeaponMagazinedWGrenade::CurrentZoomFactor	()
 {
 	if (IsGrenadeLauncherAttached() && (m_bGrenadeMode || is_fake_scope(GetGrenadeLauncherName().c_str())))
+	{
+		//Msg("CurrentZoomFactor IGA %f", m_fIronSightZoomFactor);
 		return m_fIronSightZoomFactor;
+	}
 	return inherited::CurrentZoomFactor();
 }
 

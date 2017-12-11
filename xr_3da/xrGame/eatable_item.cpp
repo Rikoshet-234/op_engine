@@ -22,7 +22,7 @@ CEatableItem::CEatableItem()
 	m_fPowerInfluence = 0;
 	m_fSatietyInfluence = 0;
 	m_fRadiationInfluence = 0;
-
+	m_fPsyInfluence = 0;
 	m_iPortionsNum = -1;
 
 	m_physic_item	= 0;
@@ -52,6 +52,8 @@ void CEatableItem::Load(LPCSTR section)
 	m_iStartPortionsNum			= pSettings->r_s32	(section, "eat_portions_num");
 	m_fMaxPowerUpInfluence		= READ_IF_EXISTS	(pSettings,r_float,section,"eat_max_power",0.0f);
 	VERIFY						(m_iPortionsNum<10000);
+	m_fPsyInfluence= READ_IF_EXISTS(pSettings, r_float, section, "eat_psy_health", 0.0f);
+
 }
 #include "../xrCore/FTimerStat.h"
 BOOL CEatableItem::net_Spawn				(CSE_Abstract* DC)
@@ -97,7 +99,7 @@ void CEatableItem::UseBy (CEntityAlive* entity_alive)
 	entity_alive->conditions().ChangeSatiety	(m_fSatietyInfluence);
 	entity_alive->conditions().ChangeRadiation	(m_fRadiationInfluence);
 	entity_alive->conditions().ChangeBleeding	(m_fWoundsHealPerc);
-	
+	entity_alive->conditions().ChangePsyHealth(m_fPsyInfluence);
 	entity_alive->conditions().SetMaxPower( entity_alive->conditions().GetMaxPower()+m_fMaxPowerUpInfluence );
 	
 	//dirty hack for noneatablemultiusable items :)

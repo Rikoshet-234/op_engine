@@ -501,7 +501,7 @@ bool CUIDragDropListEx::select_suitables_by_item(CInventoryItem* item)
 	{
 		weaponSections.assign( pWeapon->m_ammoTypes.begin(), pWeapon->m_ammoTypes.end() );
 		CWeaponMagazinedWGrenade* wg = smart_cast<CWeaponMagazinedWGrenade*>(item);
-		if (wg &&  wg->m_ammoTypes2.size() && wg->GrenadeLauncherAttachable())
+		if (wg &&  wg->m_ammoTypes2.size() && (wg->GrenadeLauncherAttachable() || wg->IsGrenadeLauncherAttached()))
 		{
 			weaponSections.insert( weaponSections.end(), wg->m_ammoTypes2.begin(), wg->m_ammoTypes2.end() );
 		}

@@ -320,7 +320,7 @@ float CEntityCondition::HitPowerEffect(float power_loss)
 	CCustomOutfit* pOutfit			= (CCustomOutfit*)pInvOwner->inventory().m_slots[OUTFIT_SLOT].m_pIItem;
 	if(!pOutfit)					return power_loss;
 
-	float new_power_loss			= power_loss*pOutfit->GetPowerLoss();
+	float new_power_loss			= power_loss*(pOutfit->GetPowerLoss() / pOutfit->GetCondition());
 
 	return							new_power_loss;
 }

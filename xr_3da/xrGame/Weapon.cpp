@@ -1320,6 +1320,7 @@ void CWeapon::InitAddons()
 
 float CWeapon::CurrentZoomFactor	()
 {
+	//Msg("scope[%s] ZF[%f]", IsScopeAttached()?"yes":"no", IsScopeAttached() ? m_fRTZoomFactor : m_fIronSightZoomFactor);
 	return IsScopeAttached() ? m_fRTZoomFactor  : m_fIronSightZoomFactor;
 };
 

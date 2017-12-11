@@ -36,6 +36,8 @@ protected:
 	//заживление ран на кол-во процентов
 	float					m_fWoundsHealPerc;
 
+	float m_fPsyInfluence;
+
 	//количество порций еды, 
 	//-1 - порция одна и больше не бывает (чтоб не выводить надпись в меню)
 	int						m_iPortionsNum;

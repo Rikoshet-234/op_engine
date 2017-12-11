@@ -322,7 +322,7 @@ bool CWeaponMagazined::ZoomDec()
 void CWeaponMagazined::OnMagazineEmpty() 
 {
 	//попытка стрелять когда нет патронов
-	if(GetState() == eIdle) 
+	if(GetState() == eMagEmpty)
 	{
 		OnEmptyClick			();
 		return;

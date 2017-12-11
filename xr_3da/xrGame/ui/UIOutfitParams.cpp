@@ -198,7 +198,7 @@ void CUIOutfitParams::createModifItem(shared_str outfit_section, std::pair<int, 
 		case POWER_LOSS_ID:
 			{
 				outfitValue1 = modifValue*100;
-				outfitValue=outfitValue1*(inOutfit ? inOutfit->GetCondition() : 1.0f);
+				outfitValue=outfitValue1/(inOutfit ? inOutfit->GetCondition() : 1.0f);
 			}
 			break;
 		default:

@@ -1097,11 +1097,11 @@ u8 CSE_ALifeCreatureAbstract::g_group		()
 
 void CSE_ALifeCreatureAbstract::FillProps	(LPCSTR pref, PropItemVec& items)
 {
-  	inherited::FillProps			(pref,items);
-    PHelper().CreateU8				(items,PrepareKey(pref,*s_name, "Team"),		&s_team, 	0,64,1);
-    PHelper().CreateU8				(items,PrepareKey(pref,*s_name, "Squad"),	&s_squad, 	0,64,1);
-    PHelper().CreateU8				(items,PrepareKey(pref,*s_name, "Group"),	&s_group, 	0,64,1);
-   	PHelper().CreateFloat			(items,PrepareKey(pref,*s_name,"Personal",	"Health" 				),&fHealth,	0,2,5);
+	inherited::FillProps			(pref,items);
+	PHelper().CreateU8				(items,PrepareKey(pref,*s_name, "Team"),		&s_team, 	0,64,1);
+	PHelper().CreateU8				(items,PrepareKey(pref,*s_name, "Squad"),	&s_squad, 	0,64,1);
+	PHelper().CreateU8				(items,PrepareKey(pref,*s_name, "Group"),	&s_group, 	0,64,1);
+	PHelper().CreateFloat			(items,PrepareKey(pref,*s_name,"Personal",	"Health" 				),&fHealth,	0,2,5);
 }
 
 bool CSE_ALifeCreatureAbstract::used_ai_locations	() const
@@ -1276,7 +1276,7 @@ void CSE_ALifeMonsterAbstract::UPDATE_Read	(NET_Packet &tNetPacket)
 
 void CSE_ALifeMonsterAbstract::FillProps		(LPCSTR pref, PropItemVec& items)
 {
-  	inherited1::FillProps		(pref,items);
+	inherited1::FillProps		(pref,items);
 	
 	PHelper().CreateFlag32		(items,	PrepareKey(pref,*s_name,"ALife\\No move in offline"),	&m_flags,			flOfflineNoMove);
 	PHelper().CreateFlag32		(items,	PrepareKey(pref,*s_name,"Use smart terrain tasks"),	&m_flags,			flUseSmartTerrains);
@@ -1462,8 +1462,8 @@ void CSE_ALifeCreatureActor::UPDATE_Write	(NET_Packet	&tNetPacket)
 
 void CSE_ALifeCreatureActor::FillProps		(LPCSTR pref, PropItemVec& items)
 {
-  	inherited1::FillProps		(pref,items);
-  	inherited2::FillProps		(pref,items);
+	inherited1::FillProps		(pref,items);
+	inherited2::FillProps		(pref,items);
 }
 
 #ifdef XRGAME_EXPORTS
@@ -1515,7 +1515,7 @@ void CSE_ALifeCreatureCrow::UPDATE_Write		(NET_Packet	&tNetPacket)
 
 void CSE_ALifeCreatureCrow::FillProps			(LPCSTR pref, PropItemVec& values)
 {
-  	inherited::FillProps			(pref,values);
+	inherited::FillProps			(pref,values);
 }
 
 bool CSE_ALifeCreatureCrow::used_ai_locations	() const
@@ -1648,15 +1648,15 @@ void CSE_ALifeMonsterZombie::UPDATE_Write	(NET_Packet	&tNetPacket)
 
 void CSE_ALifeMonsterZombie::FillProps		(LPCSTR pref, PropItemVec& items)
 {
-   	inherited::FillProps			(pref, items);
+	inherited::FillProps			(pref, items);
 	// personal characteristics
 	PHelper().CreateFloat			(items, PrepareKey(pref,*s_name,"Personal",	"Field of view" 		),&fEyeFov,							0,170,10);
-   	PHelper().CreateFloat			(items, PrepareKey(pref,*s_name,"Personal",	"Eye range" 			),&fEyeRange,						0,300,10);
-   	PHelper().CreateFloat			(items, PrepareKey(pref,*s_name,"Personal",	"Minimum speed" 		),&fMinSpeed,						0,10,0.1f);
-   	PHelper().CreateFloat			(items, PrepareKey(pref,*s_name,"Personal",	"Maximum speed" 		),&fMaxSpeed,						0,10,0.1f);
-   	PHelper().CreateFloat			(items, PrepareKey(pref,*s_name,"Personal",	"Attack speed" 			),&fAttackSpeed,					0,10,0.1f);
-   	PHelper().CreateFloat			(items, PrepareKey(pref,*s_name,"Personal",	"Pursuit distance" 		),&fMaxPursuitRadius,				0,300,10);
-   	PHelper().CreateFloat			(items, PrepareKey(pref,*s_name,"Personal",	"Home distance" 		),&fMaxHomeRadius,					0,300,10);
+	PHelper().CreateFloat			(items, PrepareKey(pref,*s_name,"Personal",	"Eye range" 			),&fEyeRange,						0,300,10);
+	PHelper().CreateFloat			(items, PrepareKey(pref,*s_name,"Personal",	"Minimum speed" 		),&fMinSpeed,						0,10,0.1f);
+	PHelper().CreateFloat			(items, PrepareKey(pref,*s_name,"Personal",	"Maximum speed" 		),&fMaxSpeed,						0,10,0.1f);
+	PHelper().CreateFloat			(items, PrepareKey(pref,*s_name,"Personal",	"Attack speed" 			),&fAttackSpeed,					0,10,0.1f);
+	PHelper().CreateFloat			(items, PrepareKey(pref,*s_name,"Personal",	"Pursuit distance" 		),&fMaxPursuitRadius,				0,300,10);
+	PHelper().CreateFloat			(items, PrepareKey(pref,*s_name,"Personal",	"Home distance" 		),&fMaxHomeRadius,					0,300,10);
 	// attack																			 	
 	PHelper().CreateFloat			(items, PrepareKey(pref,*s_name,"Attack",		"Hit power" 			),&fHitPower,						0,200,5);
 	PHelper().CreateU16  			(items, PrepareKey(pref,*s_name,"Attack",		"Hit interval" 			),&u16HitInterval,					0,65535,500);
@@ -1669,7 +1669,7 @@ void CSE_ALifeMonsterZombie::FillProps		(LPCSTR pref, PropItemVec& items)
 //////////////////////////////////////////////////////////////////////////
 CSE_ALifeMonsterBase::CSE_ALifeMonsterBase	(LPCSTR caSection) : CSE_ALifeMonsterAbstract(caSection),CSE_PHSkeleton(caSection)
 {
-    set_visual					(pSettings->r_string(caSection,"visual"));
+	set_visual					(pSettings->r_string(caSection,"visual"));
 	m_spec_object_id			= 0xffff;
 	
 }
@@ -1828,8 +1828,8 @@ void CSE_ALifeHumanAbstract::UPDATE_Read	(NET_Packet &tNetPacket)
 
 void CSE_ALifeHumanAbstract::FillProps		(LPCSTR pref, PropItemVec& items)
 {
-  	inherited1::FillProps		(pref,items);
-  	inherited2::FillProps		(pref,items);
+	inherited1::FillProps		(pref,items);
+	inherited2::FillProps		(pref,items);
 	PHelper().CreateFlag32		(items,	PrepareKey(pref,*s_name,"Group behaviour"),			&m_flags,			flGroupBehaviour);
 }
 

@@ -68,6 +68,9 @@ void CNightVisionDevice::SwitchNightVision(bool vision_state)
 	bool maps_allow			= std::find(m_vDisableMaps.begin(),m_vDisableMaps.end(),Level().name())==m_vDisableMaps.end();
 	bool bPlaySoundFirstPerson = (g_actor == Level().CurrentViewEntity());
 	if (!m_bEnabled || (m_sEffectorSect.size() && !maps_allow)) {
+		CEffectorPP* pp = g_actor->Cameras().GetPPEffector(static_cast<EEffectorPPType>(effNightvision));
+		if (pp)
+			pp->Stop(1.0f);
 		HUD_SOUND::PlaySound(snd_DeviceBroken, g_actor->Position(), g_actor, bPlaySoundFirstPerson);
 		return;
 	}

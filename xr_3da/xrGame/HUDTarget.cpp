@@ -247,8 +247,8 @@ void CHUDTarget::Render()
 		FVF::TL*	pv		= static_cast<FVF::TL*>(RCache.Vertex.Lock(4, hGeom.stride(), vOffset));
 		
 		Fvector2		scr_size;
-//.		scr_size.set	(float(::Render->getTarget()->get_width()), float(::Render->getTarget()->get_height()));
-		scr_size.set	(float(Device.dwWidth) ,float(Device.dwHeight));
+		scr_size.set	(float(::Render->getTarget()->get_width()), float(::Render->getTarget()->get_height()));
+		//scr_size.set	(float(Device.dwWidth) ,float(Device.dwHeight));
 		float			size_x = scr_size.x	* di_size;
 		float			size_y = size_x;// scr_size.y * di_size;
 

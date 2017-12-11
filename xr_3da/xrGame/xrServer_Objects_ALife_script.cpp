@@ -113,6 +113,11 @@ void CSE_ALifeSpaceRestrictor::script_register(lua_State *L)
 			CSE_ALifeDynamicObject,
 			CSE_Shape
 		)
+			.def("get_restrictor_type", &CSE_ALifeSpaceRestrictor::get_restrictor_type)
+			.def("set_restrictor_type", &CSE_ALifeSpaceRestrictor::set_restrictor_type)
+			.def("add_shape", &CSE_ALifeSpaceRestrictor::add_shape)
+			.def("get_max_radius", &CSE_ALifeSpaceRestrictor::get_max_radius)
+
 	];
 }
 

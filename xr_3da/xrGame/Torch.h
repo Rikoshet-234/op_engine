@@ -26,6 +26,8 @@ protected:
 	ref_light		light_omni;
 	ref_glow		glow_render;
 	Fvector			m_focus;
+	HUD_SOUND				snd_DeviceTorchOn;
+	HUD_SOUND				snd_DeviceTorchOff;
 private:
 	inline	bool	can_use_dynamic_lights	();
 

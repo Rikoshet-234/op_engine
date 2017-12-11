@@ -112,6 +112,10 @@ void setIconedItem(xr_map<shared_str ,shared_str> iconIDs,CUIListItemIconed* ite
 						if (addParam == RADIATION_RESTORE_ID)
 							units = CStringTable().translate("ui_inv_radiation_units").c_str();
 					}
+					else if (addParam== POWER_LOSS_ID)
+					{
+						color = (column2Value > 0) ? "%c[red]" : "%c[green]";
+					}
 					if (column2Value > 9999)
 					{
 						column2Value /= 1000;
@@ -163,6 +167,10 @@ void setIconedItem(xr_map<shared_str ,shared_str> iconIDs,CUIListItemIconed* ite
 					color = (column3Value > 0) ? "%c[red]" : "%c[green]";
 					if (addParam == RADIATION_RESTORE_ID)
 						units = CStringTable().translate("ui_inv_radiation_units").c_str();
+				}
+				else if (addParam == POWER_LOSS_ID)
+				{
+					color = (column2Value > 0) ? "%c[red]" : "%c[green]";
 				}
 				if (column3Value > 9999)
 				{
