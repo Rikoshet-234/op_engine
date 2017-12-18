@@ -278,6 +278,7 @@ public:
 	IC CSeniorityHierarchyHolder	&seniority_holder			();
 	IC CClientSpawnManager			&client_spawn_manager		();
 	IC CAutosaveManager				&autosave_manager			();
+	IC CLevelSoundManager &level_sound_manager();
 #ifdef DEBUG
 	IC CDebugRenderer				&debug_renderer				();
 #endif
@@ -373,6 +374,12 @@ IC CSeniorityHierarchyHolder &CLevel::seniority_holder()
 {
 	VERIFY				(m_seniority_hierarchy_holder);
 	return				(*m_seniority_hierarchy_holder);
+}
+
+IC CLevelSoundManager &CLevel::level_sound_manager()
+{
+	VERIFY(m_level_sound_manager);
+	return (*m_level_sound_manager);
 }
 
 IC CClientSpawnManager &CLevel::client_spawn_manager()

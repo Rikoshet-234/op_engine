@@ -44,7 +44,7 @@ class CMainMenu :
 		flNeedChangeCapture	= (1<<4),
 		flRestoreCursor		= (1<<5),
 		flGameSaveScreenshot= (1<<6),
-		flNeedVidRestart	= (1<<7),
+		flNeedVidRestart	= (1<<7)
 	};
 	Flags16			m_Flags;
 	string_path		m_screenshot_name;

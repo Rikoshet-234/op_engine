@@ -556,6 +556,8 @@ void CCC_Register()
 	CMD2(CCC_Bool,		"ls_show_progress",		&lpLoadScreenEnableProgressBar);
 
 	CMD2(CCC_Bool, "mm_music", &pMMMusic);
+	CMD2(CCC_Bool, "snd_level_emb_music", &gPlayLevelAmbientMusic);
+	CMD2(CCC_Bool, "snd_level_emb_sounds", &gPlayLevelAmbientSounds);
 
 #if 1//defined DEBUG
 //	CMD1(CCC_Crash,		"crash"					);

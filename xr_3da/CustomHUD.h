@@ -16,6 +16,7 @@ ENGINE_API extern Flags32		psHUD_Flags;
 #define HUD_MIN_CROSSHAIR		(1<<11)
 #define HUD_DIALOG_NUMBERED		(1<<12)
 #define HUD_ARTEFACT_PANEL_VISIBLE		(1<<13)
+#define HUD_GAME_INDICATORS_VISIBLE (1<<14)
 
 class ENGINE_API IRender_Visual;
 class CUI;

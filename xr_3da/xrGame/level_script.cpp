@@ -278,7 +278,6 @@ CUIDialogWnd* main_input_receiver()
 void hide_indicators()
 {
 	HUD().GetUI()->UIGame()->HideShownDialogs();
-
 	HUD().GetUI()->HideGameIndicators();
 	HUD().GetUI()->HideCrosshair();
 }

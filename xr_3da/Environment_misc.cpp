@@ -89,6 +89,12 @@ void CEnvAmbient::load(const shared_str& sect)
 
 }
 
+ref_sound* CEnvAmbient::get_rnd_sound()
+{
+	return sounds.empty() ? nullptr : &sounds[Random.randI(sounds.size())];
+}
+
+
 //-----------------------------------------------------------------------------
 // Environment descriptor
 //-----------------------------------------------------------------------------

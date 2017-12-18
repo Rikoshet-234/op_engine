@@ -6,20 +6,24 @@
 #include "../IGame_Level.h"
 #include "../CameraManager.h"
 #include "xr_Level_controller.h"
-#include "ui\UITextureMaster.h"
-#include "ui\UIXmlInit.h"
+#include "ui/UITextureMaster.h"
+#include "ui/UIXmlInit.h"
 #include <dinput.h>
-#include "ui\UIBtnHint.h"
+#include "ui/UIBtnHint.h"
 #include "UICursor.h"
 #include "gamespy/GameSpy_Full.h"
 #include "gamespy/GameSpy_HTTP.h"
 #include "gamespy/GameSpy_Available.h"
 #include "gamespy/CdkeyDecode/cdkeydecode.h"
-#include "../ResourceManager.h"
+#include "level_sounds.h"
 #include "string_table.h"
 
 #include "object_broker.h"
 #include "../CMultiHUDs.h"
+#include "../CustomHUD.h"
+#include "Level.h"
+#include "HUDManager.h"
+#include "gamepersistent.h"
 
 //#define DEMO_BUILD
 
@@ -227,6 +231,29 @@ void CMainMenu::Activate	(bool bActivate)
 
 			}
 			Device.seqRender.Add			(g_pGameLevel);
+			if (psHUD_Flags.is(HUD_GAME_INDICATORS_VISIBLE))
+			{
+				HUD().GetUI()->ShowCrosshair();
+			}
+			else
+			{
+				if (psHUD_Flags.is(HUD_MIN_CROSSHAIR))
+					HUD().GetUI()->ShowCrosshair();
+				else
+					HUD().GetUI()->HideCrosshair();
+			}
+			if (!gPlayLevelAmbientMusic)
+				Level().level_sound_manager().StopPlay();
+			else
+				Level().level_sound_manager().SetNextTrackTime(0);
+			if (!gPlayLevelAmbientSounds)
+			{
+				if (GamePersistent().m_pCurrentAmbientSound)
+					GamePersistent().m_pCurrentAmbientSound->stop_deffered();
+				if (GamePersistent().m_pCurrentEffect)
+					if (GamePersistent().m_pCurrentEffect->sound._handle() || GamePersistent().m_pCurrentEffect->sound._feedback())
+						GamePersistent().m_pCurrentEffect->sound.stop_deffered();
+			}
 		};
 		if(m_Flags.test(flRestoreConsole))
 			Console->Show			();
@@ -240,7 +267,7 @@ void CMainMenu::Activate	(bool bActivate)
 		}	
 	
 		if(m_Flags.test(flRestoreCursor))
-			GetUICursor()->Show			();
+			GetUICursor()->Show();
 
 		Device.Pause					(FALSE, FALSE, TRUE, "mm_deactivate2");
 

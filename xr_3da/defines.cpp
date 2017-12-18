@@ -21,3 +21,5 @@
 	float lpLoadScreenTextOffsetY = 0;
 	bool lpLoadScreenEnableProgressBar = true;
 	bool pMMMusic = true;
+	bool gPlayLevelAmbientMusic = true;
+	bool gPlayLevelAmbientSounds = true;

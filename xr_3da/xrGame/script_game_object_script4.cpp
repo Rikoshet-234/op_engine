@@ -661,6 +661,38 @@ LPCSTR CScriptGameObject::GetCurrentAmmoSection()
 	return nullptr;
 }
 
+u16 CScriptGameObject::GetAmmoLeft()
+{
+	CWeaponAmmo *ammo= smart_cast<CWeaponAmmo*>(&object());
+	if (ammo)
+		return ammo->m_boxCurr;
+	ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "call [get_ammo_left] for non-CWeaponAmmo object!");
+	return (u16)-1;
+}
+
+void CScriptGameObject::SetAmmoLeft(u16 count)
+{
+	CWeaponAmmo *ammo = smart_cast<CWeaponAmmo*>(&object());
+	if (ammo)
+	{
+		clamp(count, static_cast<u16>(0), ammo->m_boxCurr);
+		ammo->m_boxCurr = count;
+		CSE_Abstract *cse_abstract = ai().alife().objects().object(ammo->ID(), true);
+		if (cse_abstract)
+		{
+			CSE_ALifeItemAmmo *cse_ammo = static_cast<CSE_ALifeItemAmmo*>(cse_abstract);
+			if (cse_ammo)
+				cse_ammo->a_elapsed = ammo->m_boxCurr;
+			else
+				ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "[set_ammo_left] invalid cast for CSE_ALifeItemAmmo!");
+		}
+		else
+			ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "[set_ammo_left] invalid cast for CSE_Abstract!");
+		return;
+	}
+	ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "call [set_ammo_left] for non-CWeaponAmmo object!");
+}
+
 void CScriptGameObject::FullUnloadWeapon()
 {
 	CWeapon		*weapon = smart_cast<CWeapon*>(&object());
@@ -793,6 +825,7 @@ class_<CScriptGameObject> &script_register_game_object3(class_<CScriptGameObject
 		.def("set_direction", static_cast<void (CScriptGameObject::*)(const Fvector &dir)>(&CScriptGameObject::SetDirection))
 		.def("set_direction", static_cast<void (CScriptGameObject::*)(float x,float y,float z)>(&CScriptGameObject::SetDirection))
 		.def("set_rotation", &CScriptGameObject::SetRotation) 
+		.def("get_ammo_left", &CScriptGameObject::GetAmmoLeft)
 		;
 
 	return	(instance);

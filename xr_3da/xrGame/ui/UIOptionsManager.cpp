@@ -8,8 +8,8 @@
 #include "../../xr_ioconsole.h"
 #include "../string_table.h"
 
-CUIOptionsManager::CUIOptionsManager(){
-	m_b_vid_restart = false;
+CUIOptionsManager::CUIOptionsManager(): m_b_snd_restart(false), m_bLangRestart(false)
+{
 	m_b_vid_restart = false;
 	m_bFontRestart = false;
 }

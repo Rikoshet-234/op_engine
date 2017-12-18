@@ -961,6 +961,7 @@ bool CUIMainIngameWnd::OnKeyboardPress(int dik)
 		{
 		case DIK_NUMPADMINUS:
 			//.HideAll();
+			psHUD_Flags.set(HUD_GAME_INDICATORS_VISIBLE, FALSE);
 			HUD().GetUI()->HideGameIndicators();
 			if (!psHUD_Flags.is(HUD_MIN_CROSSHAIR))
 			{
@@ -972,6 +973,7 @@ bool CUIMainIngameWnd::OnKeyboardPress(int dik)
 			break;
 		case DIK_NUMPADPLUS:
 			//.ShowAll();
+			psHUD_Flags.set(HUD_GAME_INDICATORS_VISIBLE, TRUE);
 			HUD().GetUI()->ShowGameIndicators();
 			HUD().GetUI()->ShowCrosshair();
 

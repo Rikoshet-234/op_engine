@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "UI.h"
-#include "../xr_IOConsole.h"
 #include "Entity.h"
 #include "HUDManager.h"
 #include "UIGameSP.h"
@@ -19,10 +18,22 @@ CUI::CUI(CHUDManager* p)
 	m_pMessagesWnd					= xr_new<CUIMessagesWindow>();
 
 	m_Parent						= p;
-	pUIGame							= NULL;
-
-	ShowGameIndicators				();
-	ShowCrosshair					();
+	pUIGame							= nullptr;
+	if (psHUD_Flags.is(HUD_GAME_INDICATORS_VISIBLE))
+		ShowGameIndicators();
+	else
+		HideGameIndicators();
+	if (GameIndicatorsShown())
+	{
+		ShowCrosshair();
+	}
+	else
+	{
+		if (psHUD_Flags.is(HUD_MIN_CROSSHAIR))
+			ShowCrosshair();
+		else
+			HideCrosshair();
+	}
 }
 //--------------------------------------------------------------------
 
@@ -118,8 +129,6 @@ bool CUI::Render()
 
 	return false;
 }
-//.		if(HUD().GetUI())HUD().GetUI()->HideGameIndicators();
-//.		if(HUD().GetUI())HUD().GetUI()->ShowGameIndicators();
 
 bool	CUI::IR_OnMouseWheel			(int direction)
 {
@@ -218,12 +227,17 @@ SDrawStaticStruct* CUI::AddInfoMessage			(LPCSTR message)
 
 void CUI::ShowGameIndicators()
 {
-	m_bShowGameIndicators	= true;
+	m_bShowGameIndicators = true;
 }
 
 void CUI::HideGameIndicators()					
 {
-	m_bShowGameIndicators	= false;
+	m_bShowGameIndicators = false;
+}
+
+bool CUI::GameIndicatorsShown()
+{
+	return m_bShowGameIndicators;
 }
 
 void CUI::ShowCrosshair()

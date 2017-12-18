@@ -39,17 +39,20 @@
 	static	void	ode_free	(void *ptr, size_t size)					{ return xr_free(ptr);				}
 #endif // DEBUG_MEMORY_MANAGER
 
-CGamePersistent::CGamePersistent(void)
+CGamePersistent::CGamePersistent()
 {
 	m_game_params.m_e_game_type	= GAME_ANY;
 	ambient_sound_next_time		= 0;
 	ambient_effect_next_time	= 0;
 	ambient_effect_stop_time	= 0;
-	ambient_particles			= 0;
+	ambient_particles			= nullptr;
 
-	m_pUI_core					= NULL;
-	m_pMainMenu					= NULL;
-	m_intro						= NULL;
+	m_pCurrentAmbientSound = nullptr;
+	m_pCurrentEffect = nullptr;
+
+	m_pUI_core					= nullptr;
+	m_pMainMenu					= nullptr;
+	m_intro						= nullptr;
 	m_intro_event.bind			(this,&CGamePersistent::start_logo_intro);
 #ifdef DEBUG
 	m_frame_counter				= 0;
@@ -74,8 +77,8 @@ CGamePersistent::CGamePersistent(void)
 		eDemoStart			=	Engine.Event.Handler_Attach("GAME:demo",this);	
 		uTime2Change		=	0;
 	} else {
-		pDemoFile			=	NULL;
-		eDemoStart			=	NULL;
+		pDemoFile			= nullptr;
+		eDemoStart			= nullptr;
 	}
 
 	CWeaponHUD::CreateSharedContainer();
@@ -84,7 +87,7 @@ CGamePersistent::CGamePersistent(void)
 
 }
 
-CGamePersistent::~CGamePersistent(void)
+CGamePersistent::~CGamePersistent()
 {	
 	CWeaponHUD::DestroySharedContainer();
 	FS.r_close					(pDemoFile);
@@ -97,22 +100,23 @@ void CGamePersistent::RegisterModel(IRender_Visual* V)
 {
 	// Check types
 	switch (V->Type){
-	case MT_SKELETON_ANIM:
-	case MT_SKELETON_RIGID:{
-		u16 def_idx		= GMLib.GetMaterialIdx("default_object");
-		R_ASSERT2		(GMLib.GetMaterialByIdx(def_idx)->Flags.is(SGameMtl::flDynamic),"'default_object' - must be dynamic");
-		CKinematics* K	= smart_cast<CKinematics*>(V); VERIFY(K);
-		int cnt = K->LL_BoneCount();
-		for (u16 k=0; k<cnt; k++){
-			CBoneData& bd	= K->LL_GetData(k); 
-			if (*(bd.game_mtl_name)){
-				bd.game_mtl_idx	= GMLib.GetMaterialIdx(*bd.game_mtl_name);
-				R_ASSERT2(GMLib.GetMaterialByIdx(bd.game_mtl_idx)->Flags.is(SGameMtl::flDynamic),"Required dynamic game material");
-			}else{
-				bd.game_mtl_idx	= def_idx;
+		case MT_SKELETON_ANIM:
+		case MT_SKELETON_RIGID:{
+			u16 def_idx		= GMLib.GetMaterialIdx("default_object");
+			R_ASSERT2		(GMLib.GetMaterialByIdx(def_idx)->Flags.is(SGameMtl::flDynamic),"'default_object' - must be dynamic");
+			CKinematics* K	= smart_cast<CKinematics*>(V); VERIFY(K);
+			int cnt = K->LL_BoneCount();
+			for (u16 k=0; k<cnt; k++){
+				CBoneData& bd	= K->LL_GetData(k); 
+				if (*(bd.game_mtl_name)){
+					bd.game_mtl_idx	= GMLib.GetMaterialIdx(*bd.game_mtl_name);
+					R_ASSERT2(GMLib.GetMaterialByIdx(bd.game_mtl_idx)->Flags.is(SGameMtl::flDynamic),"Required dynamic game material");
+				}else{
+					bd.game_mtl_idx	= def_idx;
+				}
 			}
-		}
-	}break;
+		}break;
+		default: break;
 	}
 }
 
@@ -246,14 +250,16 @@ void CGamePersistent::WeathersUpdate()
 		int data_set				= (Random.randF()<(1.f-Environment().CurrentEnv.weight))?0:1; 
 		CEnvDescriptor* _env		= Environment().Current[data_set]; VERIFY(_env);
 		if (!_env)
-			Msg("!ERROR: Environment().Current[%d] == NULL", data_set); // alpet: сия проблема всплывает, при вызове level.on_frame в скриптах
-		CEnvAmbient* env_amb		= _env ? _env->env_ambient : NULL; // _env->env_ambient; //
-		if (env_amb){
+			Msg("!ERROR: Environment().Current[%d] == NULL", data_set);
+		CEnvAmbient* env_amb		= _env ? _env->env_ambient : NULL; 
+		if (env_amb)
+		{
 			// start sound
-			if (Device.dwTimeGlobal > ambient_sound_next_time){
+			if ((Device.dwTimeGlobal > ambient_sound_next_time)){
 				ref_sound* snd			= env_amb->get_rnd_sound();
+				m_pCurrentAmbientSound = snd;
 				ambient_sound_next_time	= Device.dwTimeGlobal + env_amb->get_rnd_sound_time();
-				if (snd){
+				if (snd && gPlayLevelAmbientSounds){
 					Fvector	pos;
 					float	angle		= ::Random.randF(PI_MUL_2);
 					pos.x				= _cos(angle);
@@ -261,22 +267,28 @@ void CGamePersistent::WeathersUpdate()
 					pos.z				= _sin(angle);
 					pos.normalize		().mul(env_amb->get_rnd_sound_dist()).add(Device.vCameraPosition);
 					pos.y				+= 10.f;
-//					Msg("Try to play env_amb[%s] pos(%f,%f,%f)", snd->_handle()->file_name(),pos.x,pos.y,pos.z);
-					snd->play_at_pos	(0,pos);
+					//Msg("Try to play env_amb[%s] pos(%f,%f,%f)", snd->_handle()->file_name(),pos.x,pos.y,pos.z);
+					snd->play_at_pos	(nullptr,pos);
 				}
 			}
 
 			// start effect
 			if ((FALSE==bIndoor) && (0==ambient_particles) && Device.dwTimeGlobal>ambient_effect_next_time){
 				CEnvAmbient::SEffect* eff			= env_amb->get_rnd_effect(); 
-				if (eff){
+				m_pCurrentEffect = eff;
+				if (eff)
+				{
 					Environment().wind_gust_factor	= eff->wind_gust_factor;
 					ambient_effect_next_time		= Device.dwTimeGlobal + env_amb->get_rnd_effect_time();
 					ambient_effect_stop_time		= Device.dwTimeGlobal + eff->life_time;
 					ambient_particles				= CParticlesObject::Create(eff->particles.c_str(),FALSE,false);
 					Fvector pos; pos.add			(Device.vCameraPosition,eff->offset); 
 					ambient_particles->play_at_pos	(pos);
-					if (eff->sound._handle())		eff->sound.play_at_pos(0,pos);
+					if (eff->sound._handle() && gPlayLevelAmbientSounds)
+					{
+						//Msg("Try to play eff->sound[%s] pos(%f,%f,%f)", eff->sound._handle()->file_name(), pos.x, pos.y, pos.z);
+						eff->sound.play_at_pos(nullptr, pos);
+					}
 				}
 			}
 		}
@@ -297,7 +309,7 @@ void CGamePersistent::start_logo_intro		()
 {
 #if 1//def DEBUG
 	if (0!=strstr(Core.Params,"-nointro")){
-		m_intro_event			= 0;
+		m_intro_event			= nullptr;
 		Console->Show			();
 		Console->Execute		("main_menu on");
 		return;

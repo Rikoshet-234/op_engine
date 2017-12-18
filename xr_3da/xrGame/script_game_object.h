@@ -629,6 +629,8 @@ public:
 	void SetDirection(float x, float y, float z);
 	void				SetRotation(const SRotation &rot);
 
+	u16 GetAmmoLeft();
+	void SetAmmoLeft(u16 count);
 
 	DECLARE_SCRIPT_REGISTER_FUNCTION
 };

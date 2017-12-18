@@ -90,6 +90,8 @@ void CTorch::Switch	(bool light_on)
 {
 	m_switched_on			= light_on;
 	CActor *pA = smart_cast<CActor *>(H_Parent());
+	if (pA)
+		HUD_SOUND::PlaySound(light_on ? snd_DeviceTorchOn : snd_DeviceTorchOff, g_actor->Position(), g_actor, true);
 	if (can_use_dynamic_lights())
 	{
 		light_render->set_active(light_on);
@@ -108,8 +110,7 @@ void CTorch::Switch	(bool light_on)
 
 		pVisual->LL_SetBoneVisible			(bi,	light_on,	TRUE); //hack
 	}
-	if (pA)
-		HUD_SOUND::PlaySound(light_on ? snd_DeviceTorchOn : snd_DeviceTorchOff, g_actor->Position(), g_actor, true);
+	
 }
 #include "../xrCore/FTimerStat.h"
 BOOL CTorch::net_Spawn(CSE_Abstract* DC) 

@@ -2,7 +2,7 @@
 #pragma hdrstop
 
 #ifndef _EDITOR
-    #include "render.h"
+	#include "render.h"
 #endif
 
 #include "Environment.h"
@@ -43,18 +43,18 @@ CEnvironment::CEnvironment	()
 	bWFX					= false;
 	Current[0]				= 0;
 	Current[1]				= 0;
-    CurrentWeather			= 0;
-    CurrentWeatherName		= 0;
+	CurrentWeather			= 0;
+	CurrentWeatherName		= 0;
 	eff_Rain				= 0;
-    eff_LensFlare 			= 0;
-    eff_Thunderbolt			= 0;
+	eff_LensFlare 			= 0;
+	eff_Thunderbolt			= 0;
 	OnDeviceCreate			();
 #ifdef _EDITOR
 	ed_from_time			= 0.f;
 	ed_to_time				= DAY_LENGTH;
 #endif
 	fGameTime				= 0.f;
-    fTimeFactor				= 12.f;
+	fTimeFactor				= 12.f;
 
 	wind_strength_factor	= 0.f;
 	wind_gust_factor		= 0.f;
@@ -131,13 +131,13 @@ void CEnvironment::SetWeather(shared_str name, bool forced)
 //.	if(bAlready)	return;
 	if (name.size())	{
 //.		bAlready = TRUE;
-        EnvsMapIt it		= WeatherCycles.find(name);
+		EnvsMapIt it		= WeatherCycles.find(name);
 		if (it == WeatherCycles.end())
 		{
 			Msg("! Invalid weather name: %s", name.c_str());
 			return;
 		}
-        R_ASSERT3			(it!=WeatherCycles.end(),"Invalid weather name.",*name);
+		R_ASSERT3			(it!=WeatherCycles.end(),"Invalid weather name.",*name);
 		CurrentCycleName	= it->first;
 		if (forced)			{Invalidate();			}
 		if (!bWFX){
@@ -148,11 +148,11 @@ void CEnvironment::SetWeather(shared_str name, bool forced)
 #ifdef WEATHER_LOGGING
 		Msg					("Starting Cycle: %s [%s]",*name,forced?"forced":"deferred");
 #endif
-    }else{
+	}else{
 #ifndef _EDITOR
 		FATAL				("! Empty weather name");
 #endif
-    }
+	}
 }
 
 bool CEnvironment::SetWeatherFX(shared_str name)
@@ -253,11 +253,11 @@ void CEnvironment::SelectEnvs(EnvVec* envs, CEnvDescriptor*& e0, CEnvDescriptor*
 void CEnvironment::SelectEnvs(float gt)
 {
 	VERIFY				(CurrentWeather);
-    if ((Current[0]==Current[1])&&(Current[0]==0)){
+	if ((Current[0]==Current[1])&&(Current[0]==0)){
 		VERIFY			(!bWFX);
 		// first or forced start
 		SelectEnvs		(CurrentWeather,Current[0],Current[1],gt);
-    }else{
+	}else{
 		bool bSelect	= false;
 		if (Current[0]->exec_time>Current[1]->exec_time){
 			// terminator
@@ -272,7 +272,7 @@ void CEnvironment::SelectEnvs(float gt)
 			Msg			("Weather: '%s' Desc: '%s' Time: %3.2f/%3.2f",CurrentWeatherName.c_str(),Current[1]->sect_name.c_str(),Current[1]->exec_time,fGameTime);
 #endif
 		}
-    }
+	}
 }
 
 int get_ref_count(IUnknown* ii)
@@ -288,18 +288,18 @@ void CEnvironment::OnFrame()
 {
 #ifdef _EDITOR
 	SetGameTime				(fGameTime+Device.fTimeDelta*fTimeFactor,fTimeFactor);
-    if (fsimilar(ed_to_time,DAY_LENGTH)&&fsimilar(ed_from_time,0.f)){
-	    if (fGameTime>DAY_LENGTH)	fGameTime-=DAY_LENGTH;
-    }else{
-	    if (fGameTime>ed_to_time){	
-        	fGameTime=fGameTime-ed_to_time+ed_from_time;
-            Current[0]=Current[1]=0;
-        }
-    	if (fGameTime<ed_from_time){	
-        	fGameTime=ed_from_time;
-            Current[0]=Current[1]=0;
-        }
-    }
+	if (fsimilar(ed_to_time,DAY_LENGTH)&&fsimilar(ed_from_time,0.f)){
+		if (fGameTime>DAY_LENGTH)	fGameTime-=DAY_LENGTH;
+	}else{
+		if (fGameTime>ed_to_time){	
+			fGameTime=fGameTime-ed_to_time+ed_from_time;
+			Current[0]=Current[1]=0;
+		}
+		if (fGameTime<ed_from_time){	
+			fGameTime=ed_from_time;
+			Current[0]=Current[1]=0;
+		}
+	}
 	if (!psDeviceFlags.is(rsEnvironment))		return;
 #else
 	if (!g_pGameLevel)		return;
@@ -310,7 +310,7 @@ void CEnvironment::OnFrame()
 	if (bWFX&&(wfx_time<=0.f)) StopWFX();
 
 	SelectEnvs				(fGameTime);
-    VERIFY					(Current[0]&&Current[1]);
+	VERIFY					(Current[0]&&Current[1]);
 
 	float current_weight	= TimeWeight(fGameTime,Current[0]->exec_time,Current[1]->exec_time);
 
@@ -373,10 +373,10 @@ void CEnvironment::OnFrame()
 	PerlinNoise1D->SetFrequency		(wind_gust_factor*MAX_NOISE_FREQ);
 	wind_strength_factor			= clampr(PerlinNoise1D->GetContinious(Device.fTimeGlobal)+0.5f,0.f,1.f); 
 
-    int l_id							=	(current_weight<0.5f)?Current[0]->lens_flare_id:Current[1]->lens_flare_id;
+	int l_id							=	(current_weight<0.5f)?Current[0]->lens_flare_id:Current[1]->lens_flare_id;
 	eff_LensFlare->OnFrame				(l_id);
 	int t_id							=	(current_weight<0.5f)?Current[0]->tb_id:Current[1]->tb_id;
-    eff_Thunderbolt->OnFrame			(t_id,CurrentEnv.bolt_period,CurrentEnv.bolt_duration);
+	eff_Thunderbolt->OnFrame			(t_id,CurrentEnv.bolt_period,CurrentEnv.bolt_duration);
 	eff_Rain->OnFrame					();
 
 	// ******************** Environment params (setting)

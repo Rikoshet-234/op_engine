@@ -169,7 +169,13 @@ u32 get_level_id(CALifeSimulator *pself)
 CSE_ALifeDynamicObject *CALifeSimulator__create	(CALifeSimulator *pself, ALife::_SPAWN_ID spawn_id)
 {
 	const CALifeSpawnRegistry::SPAWN_GRAPH::CVertex	*vertex = ai().alife().spawns().spawns().vertex(spawn_id);
-	THROW2								(vertex,"Invalid spawn id!");
+	if (!vertex)
+	{
+		Msg("! ERROR Spawn id[%i] not found in spawns list!", spawn_id);
+		ai().script_engine().print_stack();
+		FATAL("Invalid spawn id!");
+	}
+
 
 	CSE_ALifeDynamicObject				*spawn = smart_cast<CSE_ALifeDynamicObject*>(&vertex->data()->object());
 	THROW								(spawn);
@@ -183,17 +189,35 @@ CSE_ALifeDynamicObject *CALifeSimulator__create	(CALifeSimulator *pself, ALife::
 CSE_Abstract *CALifeSimulator__spawn_item3(CALifeSimulator *pself, LPCSTR section, const Fvector &position, u32 level_vertex_id, GameGraph::_GRAPH_ID game_vertex_id,float distance)
 {
 	THROW(pself);
+	if (!pSettings->section_exist(section))
+	{
+		Msg("! ERROR Section[%s] not found in game configs!", section);
+		ai().script_engine().print_stack();
+		FATAL("Invalid section!");
+	}
 	return								(pself->spawn_item(section, position, level_vertex_id, game_vertex_id, ALife::_OBJECT_ID(-1), distance));
 }
 
 CSE_Abstract *CALifeSimulator__spawn_item		(CALifeSimulator *pself, LPCSTR section, const Fvector &position, u32 level_vertex_id, GameGraph::_GRAPH_ID game_vertex_id)
 {
 	THROW								(pself);
+	if (!pSettings->section_exist(section))
+	{
+		Msg("! ERROR Section[%s] not found in game configs!", section);
+		ai().script_engine().print_stack();
+		FATAL("Invalid section!");
+	}
 	return								(pself->spawn_item(section,position,level_vertex_id,game_vertex_id,ALife::_OBJECT_ID(-1)));
 }
 
 CSE_Abstract *CALifeSimulator__spawn_item2		(CALifeSimulator *pself, LPCSTR section, const Fvector &position, u32 level_vertex_id, GameGraph::_GRAPH_ID game_vertex_id, ALife::_OBJECT_ID id_parent)
 {
+	if (!pSettings->section_exist(section))
+	{
+		Msg("! ERROR Section[%s] not found in game configs!", section);
+		ai().script_engine().print_stack();
+		FATAL("Invalid section!");
+	}
 	if (id_parent == ALife::_OBJECT_ID(-1))
 		return							(pself->spawn_item(section,position,level_vertex_id,game_vertex_id,id_parent));
 

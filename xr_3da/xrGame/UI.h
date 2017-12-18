@@ -16,7 +16,7 @@ struct SDrawStaticStruct;
 class CUI			: public CDialogHolder
 {
 	CUIGameCustom*			pUIGame;
-	bool					m_bShowGameIndicators;
+	bool m_bShowGameIndicators;
 
 public:
 	CHUDManager*			m_Parent;
@@ -43,7 +43,7 @@ public:
 
 	void					ShowGameIndicators		();
 	void					HideGameIndicators		();
-	bool					GameIndicatorsShown		()					{return m_bShowGameIndicators;};
+	bool GameIndicatorsShown();;
 
 	void					ShowCrosshair			();
 	void					HideCrosshair			();

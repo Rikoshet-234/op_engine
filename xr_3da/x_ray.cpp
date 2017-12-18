@@ -728,8 +728,7 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance,
 			return 0;
 		}
 
-		LPCSTR ogg_check = "-ogg_check";
-		if (strstr(lpCmdLine, ogg_check))
+		if (strstr(lpCmdLine, "-ogg_check"))
 		{
 			doOggsCheck();
 			return 0;
@@ -739,7 +738,17 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance,
 		{
 			int l_res = doLauncher();
 			if (l_res != 0)
+			{
+				Msg("Exit request from xrLauncher.");
+				destroyConsole();
+				destroySettings();
+				destroyEngine();
+				Core._destroy();
+#ifdef NO_MULTI_INSTANCES		
+				CloseHandle(hCheckPresenceMutex);
+#endif
 				return 0;
+			}
 		};
 		
 
@@ -808,10 +817,7 @@ int stack_overflow_exception_filter	(int exception_code)
 	   return EXCEPTION_CONTINUE_SEARCH;
 }
 
-int APIENTRY WinMain(HINSTANCE hInstance,
-					 HINSTANCE hPrevInstance,
-					 char *    lpCmdLine,
-					 int       nCmdShow)
+int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, char *    lpCmdLine, int       nCmdShow)
 {
 	__try 
 	{
@@ -1227,7 +1233,7 @@ int doLauncher()
 		return					(1);
 	}
 */
-	return 0;
+	return 1;
 }
 
 #pragma region check correct ogg file 

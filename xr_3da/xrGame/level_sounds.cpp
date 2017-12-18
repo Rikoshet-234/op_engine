@@ -28,37 +28,56 @@ void SStaticSound::Load(IReader& F)
 
 void SStaticSound::Update(u32 game_time, u32 global_time)
 {
-	if ((0==m_ActiveTime.x)&&(0==m_ActiveTime.y)||((int(game_time)>=m_ActiveTime.x)&&(int(game_time)<m_ActiveTime.y))){
-		if (0==m_Source._feedback()){
-			if ((0==m_PauseTime.x)&&(0==m_PauseTime.y)){    
-				m_Source.play_at_pos	(0,m_Position,sm_Looped);
+	if ((0==m_ActiveTime.x)&&(0==m_ActiveTime.y)||((int(game_time)>=m_ActiveTime.x)&&(int(game_time)<m_ActiveTime.y)))
+	{
+		if (0==m_Source._feedback())
+		{
+			if ((0==m_PauseTime.x)&&(0==m_PauseTime.y) && gPlayLevelAmbientMusic)
+			{    
+				m_Source.play_at_pos	(nullptr,m_Position,sm_Looped);
 				m_Source.set_volume		(m_Volume);
 				m_Source.set_frequency	(m_Freq);
 				m_StopTime				= 0xFFFFFFFF;
-			}else{
-				if (global_time>=m_NextTime){
+			}
+			else
+			{
+				if (global_time>=m_NextTime && gPlayLevelAmbientMusic)
+				{
 					bool bFullPlay		= (0==m_PlayTime.x)&&(0==m_PlayTime.y);
-					m_Source.play_at_pos	(0,m_Position,bFullPlay?0:sm_Looped);
+					m_Source.play_at_pos	(nullptr,m_Position,bFullPlay?0:sm_Looped);
 					m_Source.set_volume		(m_Volume);
 					m_Source.set_frequency	(m_Freq);
-					if (bFullPlay){
+					if (bFullPlay)
+					{
 						m_StopTime		= 0xFFFFFFFF;
 						m_NextTime		= global_time+m_Source._handle()->length_ms()+Random.randI(m_PauseTime.x,m_PauseTime.y);
-					}else{
+					}
+					else
+					{
 						m_StopTime		= bFullPlay?0:global_time+Random.randI(m_PlayTime.x,m_PlayTime.y);
 						m_NextTime		= m_StopTime+Random.randI(m_PauseTime.x,m_PauseTime.y);
 					}
 				}
 			}
-		}else{
+		}
+		else
+		{
 			if (Device.dwTimeGlobal>=m_StopTime)
 				m_Source.stop_deffered();
 		}
-	}else{
+	}
+	else
+	{
 		if (0!=m_Source._feedback())
 			m_Source.stop_deffered();
 	}
 }
+
+void SStaticSound::Stop()
+{
+	m_Source.stop();
+}
+
 //-----------------------------------------------------------------------------
 // music tracks
 //-----------------------------------------------------------------------------
@@ -86,8 +105,8 @@ void SMusicTrack::Load(LPCSTR fn, LPCSTR params)
 
 void	SMusicTrack::Play()
 {
-	m_SourceLeft.play_at_pos	(0,Fvector().set(-0.5f,0.f,0.3f),sm_2D);
-	m_SourceRight.play_at_pos	(0,Fvector().set(+0.5f,0.f,0.3f),sm_2D);
+	m_SourceLeft.play_at_pos	(nullptr,Fvector().set(-0.5f,0.f,0.3f),sm_2D);
+	m_SourceRight.play_at_pos	(nullptr,Fvector().set(+0.5f,0.f,0.3f),sm_2D);
 	SetVolume					(1.0f);
 }
 
@@ -106,15 +125,15 @@ void SMusicTrack::Stop()
 //-----------------------------------------------------------------------------
 // level sound manager
 //-----------------------------------------------------------------------------
-CLevelSoundManager::CLevelSoundManager()
+CLevelSoundManager::CLevelSoundManager(): m_CurrentTrack(-1)
 {
-	m_NextTrackTime		= 0;
+	m_NextTrackTime = 0;
 }
 
 void CLevelSoundManager::Load()
 {
 	// static level sounds
- 	VERIFY(m_StaticSounds.empty());
+	VERIFY(m_StaticSounds.empty());
 	string_path fn;
 	if (FS.exist(fn, "$level$", "level.snd_static")) {
 		IReader *F		= FS.r_open	(fn);
@@ -139,7 +158,7 @@ void CLevelSoundManager::Load()
 				CInifile::Sect&	S	= gameLtx.r_section	(music_sect);
 				CInifile::SectCIt it	= S.Data.begin(), end = S.Data.end();
 				m_MusicTracks.reserve	(S.Data.size());
-				for (;it!=end; it++){
+				for (;it!=end; ++it){
 					m_MusicTracks.push_back	(SMusicTrack());
 					m_MusicTracks.back().Load(*it->first,*it->second);
 				}
@@ -147,6 +166,19 @@ void CLevelSoundManager::Load()
 		}
 	}
 }
+
+void CLevelSoundManager::StopPlay()
+{
+	std::for_each(m_StaticSounds.begin(), m_StaticSounds.end(), [](SStaticSound sound)
+	{
+		sound.Stop();
+	});
+	std::for_each(m_MusicTracks.begin(), m_MusicTracks.end(), [](SMusicTrack track)
+	{
+		track.Stop();
+	});
+}
+
 
 void CLevelSoundManager::Unload()
 {
@@ -184,7 +216,8 @@ void CLevelSoundManager::Update()
 				u32 idx			= Random.randI(indices.size());
 				m_CurrentTrack	= indices[idx];
 				SMusicTrack& T	= m_MusicTracks[m_CurrentTrack];
-				T.Play			();
+				if (gPlayLevelAmbientMusic)
+					T.Play			();
 #ifdef DEBUG
 				Log				("- Play music track:",T.m_DbgName.c_str());
 #endif

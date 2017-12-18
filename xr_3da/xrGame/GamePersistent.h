@@ -45,7 +45,8 @@ public:
 	IReader*			pDemoFile;
 	u32					uTime2Change;
 	EVENT				eDemoStart;
-
+	ref_sound* m_pCurrentAmbientSound;
+	CEnvAmbient::SEffect* m_pCurrentEffect;
 						CGamePersistent			();
 	virtual				~CGamePersistent		();
 

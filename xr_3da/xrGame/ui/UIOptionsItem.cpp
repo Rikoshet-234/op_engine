@@ -123,7 +123,6 @@ void CUIOptionsItem::SaveValue() {
 
 	if (/*m_entry == "snd_freq" ||*/ m_entry == "snd_efx")
 		m_optionsManager.DoSndRestart();
-
 }
 
 
