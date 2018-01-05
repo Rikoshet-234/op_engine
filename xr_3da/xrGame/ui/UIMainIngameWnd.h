@@ -29,6 +29,8 @@ class					CInventoryItem;
 
 class CUIMainIngameWnd: public CUIWindow  
 {
+private:
+	bool ShowExoOutfitDebug = false;
 public:
 	CUIMainIngameWnd();
 	virtual ~CUIMainIngameWnd();

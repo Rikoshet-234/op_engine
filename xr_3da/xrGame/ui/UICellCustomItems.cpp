@@ -70,6 +70,28 @@ bool CUIAmmoCellItem::EqualTo(CUICellItem* itm)
 	return					( (object()->cNameSect() == ci->object()->cNameSect()) );
 }
 
+CExoOutfitCellItem::CExoOutfitCellItem(CExoOutfit* itm) :inherited(itm)
+{
+
+}
+
+bool CExoOutfitCellItem::EqualTo(CUICellItem* itm)
+{
+	if (!inherited::EqualTo(itm))	return false;
+	CExoOutfitCellItem* ci = smart_cast<CExoOutfitCellItem*>(itm);
+	if (!ci)
+		return false;
+	if (object()->BatteryAccepted() && ci->object()->BatteryAccepted())
+	{
+		shared_str lb = object()->m_sCurrentBattery.size()>0 ? object()->m_sCurrentBattery: "";
+		shared_str rb = ci->object()->m_sCurrentBattery.size()>0 ? ci->object()->m_sCurrentBattery : "";
+		if (lb==rb)
+			return !!fsimilar(object()->m_fCurrentCharge, ci->object()->m_fCurrentCharge, 0.01f);
+		return false;
+	}
+	return true;
+}
+
 void CUIAmmoCellItem::Update()
 {
 	inherited::Update	();

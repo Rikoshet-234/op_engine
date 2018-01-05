@@ -79,9 +79,6 @@ protected:
 	void					ActivatePropertiesBox		();
 	void					EatItem						();
 
-	bool					ToOurBag					();
-	bool					ToOthersBag					();
-	
 	void					SetCurrentItem				(CUICellItem* itm);
 	void SetItemSelected(CUICellItem* itm);
 	CUICellItem*			CurrentItem					();

@@ -472,7 +472,9 @@ protected:
 	float					m_fRun_StrafeFactor;
 public:
 	float GetJumpSpeed() { return m_fJumpSpeed;}
+	float GetJumpSpeedStored() { return m_fJumpSpeedStored; }
 	void SetJumpSpeed(float jumpSpeed) { m_fJumpSpeed = jumpSpeed; }
+	void SetJumpSpeedStored(float jumpSpeed) { m_fJumpSpeedStored = jumpSpeed; }
 	void UpdateJumpSpeed(float jumpSpeedDelta);
 
 			IC u32 get_state() const

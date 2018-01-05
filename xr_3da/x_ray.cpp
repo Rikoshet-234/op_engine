@@ -670,6 +670,20 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance,
 	DWORD_PTR mask = SetThreadAffinityMask(GetCurrentThread(),0x1);
 	mask = SetThreadAffinityMask(GetCurrentThread(),mask&0xFFFFFFFE);
 
+	if (strstr(lpCmdLine, "-launcher"))
+	{
+		int l_res = doLauncher();
+		if (l_res != 0)
+		{
+			Msg("Exit request from xrLauncher.");
+			Core._destroy();
+#ifdef NO_MULTI_INSTANCES		
+			CloseHandle(hCheckPresenceMutex);
+#endif
+			return 0;
+		}
+	};
+
 	// Title window
 #ifdef SHOW_LOGO_WINDOW
 	logoWindow					= CreateDialog(GetModuleHandle(nullptr),	MAKEINTRESOURCE(IDD_STARTUP_OP_NEW), nullptr, logDlgProc );
@@ -681,11 +695,7 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance,
 #else
 		HWND_NOTOPMOST,
 #endif // NDEBUG
-		0,
-		0,
-		0,
-		0,
-		SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW
+		0,0,0,0,SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW
 	);
 #endif
 	// AVI
@@ -733,24 +743,6 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance,
 			doOggsCheck();
 			return 0;
 		}
-
-		if (strstr(lpCmdLine,"-launcher")) 
-		{
-			int l_res = doLauncher();
-			if (l_res != 0)
-			{
-				Msg("Exit request from xrLauncher.");
-				destroyConsole();
-				destroySettings();
-				destroyEngine();
-				Core._destroy();
-#ifdef NO_MULTI_INSTANCES		
-				CloseHandle(hCheckPresenceMutex);
-#endif
-				return 0;
-			}
-		};
-		
 
 		if(strstr(Core.Params,"-r2a"))	
 			Console->Execute			("renderer renderer_r2a");
@@ -1184,9 +1176,12 @@ int CApplication::Level_ID(LPCSTR name)
 
 
 //launcher stuff----------------------------
-extern "C"{
-	typedef int	 __cdecl LauncherFunc	(int);
-}
+
+extern "C"
+{
+	typedef int	 __stdcall LauncherFunc(HWND);
+};
+
 HMODULE			hLauncher		= nullptr;
 LauncherFunc*	pLauncher		= nullptr;
 
@@ -1197,7 +1192,8 @@ void InitLauncher(){
 	if (0==hLauncher)	R_CHK	(GetLastError());
 	R_ASSERT2		(hLauncher,"xrLauncher DLL raised exception during loading or there is no xrLauncher.dll at all");
 
-	pLauncher = reinterpret_cast<LauncherFunc*>(GetProcAddress(hLauncher,"RunXRLauncher"));
+	pLauncher = (LauncherFunc*)GetProcAddress(hLauncher, "RunXRLauncher");
+	//pLauncher = reinterpret_cast<LauncherFunc*>(GetProcAddress(hLauncher,"RunXRLauncher"));
 	R_ASSERT2		(pLauncher,"Cannot obtain RunXRLauncher function from xrLauncher.dll");
 };
 
@@ -1209,6 +1205,9 @@ void FreeLauncher(){
 
 int doLauncher()
 {
+	InitLauncher();
+	int res = pLauncher(Device.m_hWnd);
+	FreeLauncher();
 /*
 	execUserScript();
 	InitLauncher();
@@ -1233,7 +1232,7 @@ int doLauncher()
 		return					(1);
 	}
 */
-	return 1;
+	return res;
 }
 
 #pragma region check correct ogg file 

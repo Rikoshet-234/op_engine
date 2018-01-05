@@ -30,6 +30,7 @@
 #include "UITextureMaster.h"
 #include "UIDragDropListEx.h"
 #include "UItabButtonMP.h"
+#include "UIOutfitSlot.h"
 
 extern int keyname_to_dik(LPCSTR);
 
@@ -443,6 +444,15 @@ bool CUIXmlInit::InitButton(CUIXml& xml_doc, LPCSTR path,
 	return true;
 }
 
+bool CUIXmlInit::InitDragDropOutfitSlot(CUIXml& xml_doc, const char* path, int index, CUIDragDropListEx* pWnd)
+{
+	InitDragDropListEx(xml_doc, path, index, pWnd);
+	CUIOutfitDragDropList* listWnd = smart_cast<CUIOutfitDragDropList*>(pWnd);
+	if (!pWnd)
+		return false;
+	listWnd->UIInitBattery(xml_doc, path);
+	return true;
+}
 //////////////////////////////////////////////////////////////////////////
 bool CUIXmlInit::InitDragDropListEx(CUIXml& xml_doc, const char* path, int index, CUIDragDropListEx* pWnd)
 {

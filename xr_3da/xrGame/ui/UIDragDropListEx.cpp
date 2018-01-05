@@ -21,6 +21,7 @@
 #include "xrUIXmlParser.h"
 #include "UIXmlInit.h"
 #include "UICellItemFactory.h"
+#include "../exooutfit.h"
 
 
 CUIDragItem* CUIDragDropListEx::m_drag_item = nullptr;
@@ -208,7 +209,6 @@ void CUIDragDropListEx::OnItemDBClick(CUIWindow* w, void* pData)
 {
 	OnItemSelected						(w, pData);
 	CUICellItem*		itm = smart_cast<CUICellItem*>(w);
-	callback(GameObject::OnDragDropListDBLClickCell)(itm);
 	/*if (!m_bEnableDragDrop)
 		return;*/
 
@@ -217,6 +217,10 @@ void CUIDragDropListEx::OnItemDBClick(CUIWindow* w, void* pData)
 		//DestroyDragItem						(pre_selected_item);
 		return;
 	}
+
+	CScriptCallbackEx<bool> script_callback = callback(GameObject::OnDragDropListDBLClickCell);
+	if (script_callback && script_callback(itm))
+		return;
 
 	CUIDragDropListEx*	old_owner		= itm->OwnerList();
 	VERIFY								(m_drag_item==NULL);
@@ -247,12 +251,12 @@ void CUIDragDropListEx::OnItemFocusLost(CUIWindow* w, void* pData)
 	callback(GameObject::OnDragDropListCellFocusLost)(itm);
 }
 
-CScriptCallbackEx<void>& CUIDragDropListEx::callback(GameObject::ECallbackType type) const
+CScriptCallbackEx<bool>& CUIDragDropListEx::callback(GameObject::ECallbackType type) const
 {
 	return ((*m_callbacks)[type]);
 }
 
-void CUIDragDropListEx::SetCallback(GameObject::ECallbackType type, const luabind::functor<void>& functor)
+void CUIDragDropListEx::SetCallback(GameObject::ECallbackType type, const luabind::functor<bool>& functor)
 {
 	if (functor.is_valid())
 		callback(type).set(functor);
@@ -260,7 +264,7 @@ void CUIDragDropListEx::SetCallback(GameObject::ECallbackType type, const luabin
 		callback(type).clear();
 }
 
-void CUIDragDropListEx::SetCallback(GameObject::ECallbackType type, const luabind::functor<void>& functor, const luabind::object& object)
+void CUIDragDropListEx::SetCallback(GameObject::ECallbackType type, const luabind::functor<bool>& functor, const luabind::object& object)
 {
 	if (functor.is_valid())
 		callback(type).set(functor,object);
@@ -515,7 +519,14 @@ bool CUIDragDropListEx::select_suitables_by_item(CInventoryItem* item)
 		if (gr_l!=nullptr)
 			weaponSections.push_back(gr_l);
 	}
-	selected=select_weapons_by_addon(item) || select_weapons_by_ammo(item);
+	selected=select_weapons_by_addon(item) || select_weapons_by_ammo(item) || select_exos_by_battery(item);
+	if (CExoOutfit* exo = smart_cast<CExoOutfit*>(item))
+		std::for_each(exo->batterySections.begin(), exo->batterySections.end(),[&](shared_str sect)
+		{
+			weaponSections.push_back(sect);
+		});
+
+	
 	if (weaponSections.size()>0)
 	{
 		std::sort(weaponSections.begin(),weaponSections.end());
@@ -538,6 +549,27 @@ bool CUIDragDropListEx::select_suitables_by_item(CInventoryItem* item)
 		{ 
 			Msg("%s",section->c_str());
 		}*/
+	}
+	return selected;
+}
+
+bool CUIDragDropListEx::select_exos_by_battery(CInventoryItem* batteryItem)
+{
+	bool selected = false;
+	u32 const cnt = this->ItemsCount();
+	shared_str batterySection = batteryItem->object().cNameSect();
+	for (u32 i = 0; i < cnt; ++i)
+	{
+		CUICellItem* ci = this->GetItemIdx(i);
+		CInventoryItem* item = static_cast<CInventoryItem*>(ci->m_pData);
+		if (!item)
+			continue;
+		CExoOutfit* exo = smart_cast<CExoOutfit*>(item);
+		if (exo && exo->isSuitableBattery(batterySection))
+			{
+				ci->m_suitable = true;
+				selected = true;
+			}
 	}
 	return selected;
 }
@@ -588,7 +620,6 @@ bool CUIDragDropListEx::select_weapons_by_ammo(CInventoryItem* ammoItem)
 	CWeaponAmmo* ammo = smart_cast<CWeaponAmmo*>(ammoItem);
 	if (!ammo)
 		return false;
-	shared_str ammo_name = ammoItem->object().cNameSect();
 	bool selected=false;
 	u32 const cnt = this->ItemsCount();
 	for ( u32 i = 0; i < cnt; ++i )
@@ -725,7 +756,6 @@ void CUIDragDropListEx::SetItem(CUICellItem* itm, Fvector2 abs_pos) // start at 
 void CUIDragDropListEx::SetItem(CUICellItem* itm, Ivector2 cell_pos) // start at cell
 {
 	if(m_container->AddSimilar(itm))	return;
-	R_ASSERT						(m_container->IsRoomFree(cell_pos, itm->GetGridSize()));
 
 	if (m_b_adjustCells)
 	{
@@ -733,11 +763,13 @@ void CUIDragDropListEx::SetItem(CUICellItem* itm, Ivector2 cell_pos) // start at
 		int itemHeight=itm->GetGridSize().y;
 		int contWidth=m_container->CellsCapacity().x;
 		int contHeight=m_container->CellsCapacity().y;
-		if (itemWidth<contWidth)
+		if (itemWidth!=contWidth)
 			itm->SetGridWidth(contWidth);
-		if (itemHeight<contHeight)
+		if (itemHeight!=contHeight)
 			itm->SetGridHeight(contHeight);
 	}
+	else
+		R_ASSERT(m_container->IsRoomFree(cell_pos, itm->GetGridSize()));
 	m_container->PlaceItemAtPos	(itm, cell_pos);
 
 	itm->SetWindowName			("cell_item");
@@ -939,6 +971,8 @@ Ivector2 CUICellContainer::FindFreeCell	(const Ivector2& size)
 			for(tmp.x=0; tmp.x<=m_cellsCapacity.x-size.x; ++tmp.x )
 				if(IsRoomFree(tmp,size))
 					return  tmp;
+		if (m_pParentDragDropList->m_b_adjustCells)
+			return Ivector2().set(0, 0);
 		R_ASSERT2		(0,"there are no free room to place item");
 	}
 	return			tmp;

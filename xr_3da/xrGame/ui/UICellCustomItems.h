@@ -1,6 +1,7 @@
 #pragma once
 #include "UICellItem.h"
 #include "../Weapon.h"
+#include "../exooutfit.h"
 
 
 class CUISectionCellItem:public CUICellItem
@@ -35,6 +36,15 @@ public:
 				CWeaponAmmo*	object						() {return (CWeaponAmmo*)m_pData;}
 };
 
+class CExoOutfitCellItem :public CUIInventoryCellItem
+{
+private:
+	typedef  CUIInventoryCellItem	inherited;
+public:
+	CExoOutfitCellItem(CExoOutfit* itm);
+	bool EqualTo(CUICellItem* itm) override;
+	CExoOutfit*	object() { return static_cast<CExoOutfit*>(m_pData); }
+};
 
 class CUIWeaponCellItem :public CUIInventoryCellItem
 {

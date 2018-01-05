@@ -57,6 +57,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenAL32", "SDK\openal\buildWin\OpenAL32.vcxproj", "{70251080-6136-4F0C-AD93-0EB8A914AD75}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrLauncher", "xrLauncher\xrLauncher.vcxproj", "{D650ED5B-20DB-49BB-9022-F3A4B4CC8795}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2578C6D8-660D-48AE-9322-7422F8664F06} = {2578C6D8-660D-48AE-9322-7422F8664F06}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

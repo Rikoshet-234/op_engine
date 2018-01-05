@@ -2320,6 +2320,9 @@
     <Filter Include="Core\Client\Objects\items &amp; weapons\GameBox">
       <UniqueIdentifier>{5efa9941-5e1b-4259-b1dc-a0bfd49f42db}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\Client\Objects\items &amp; weapons\Outfit\ExoOutfit">
+      <UniqueIdentifier>{674f9b20-e1a7-408d-998a-415260c870a7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mt_config.h">
@@ -5325,9 +5328,6 @@
     <ClInclude Include="CustomOutfit.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
     </ClInclude>
-    <ClInclude Include="ExoOutfit.h">
-      <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
-    </ClInclude>
     <ClInclude Include="MilitaryOutfit.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
     </ClInclude>
@@ -6629,6 +6629,9 @@
     </ClInclude>
     <ClInclude Include="gbox.h">
       <Filter>Core\Client\Objects\items &amp; weapons\GameBox</Filter>
+    </ClInclude>
+    <ClInclude Include="ExoOutfit.h">
+      <Filter>Core\Client\Objects\items &amp; weapons\Outfit\ExoOutfit</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -8498,9 +8501,6 @@
     <ClCompile Include="CustomOutfit.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
     </ClCompile>
-    <ClCompile Include="ExoOutfit.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
-    </ClCompile>
     <ClCompile Include="MilitaryOutfit.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
     </ClCompile>
@@ -9844,6 +9844,9 @@
     </ClCompile>
     <ClCompile Include="BreakableObject_script.cpp">
       <Filter>Core\Client\Objects\physics\Breakable</Filter>
+    </ClCompile>
+    <ClCompile Include="ExoOutfit.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Outfit\ExoOutfit</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

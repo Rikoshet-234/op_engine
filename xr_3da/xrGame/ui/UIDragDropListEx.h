@@ -60,6 +60,7 @@ typedef enum //inventory list types for export to scripts (identically to Invent
 	ltTradeOtherTrade	= 25,
 	ltCarbodyOurBag		= 26,
 	ltCarbodyOtherBag		= 27,
+	ltExoOutfitBatterySlot=28,
 	ltUnknown			= -1
 } IWListTypes;
 
@@ -127,13 +128,13 @@ protected:
 
 	IWListTypes				listId;
 
-	typedef xr_map<GameObject::ECallbackType, CScriptCallbackEx<void>> callback_map;
+	typedef xr_map<GameObject::ECallbackType, CScriptCallbackEx<bool>> callback_map;
 	callback_map *m_callbacks;
 
 public:
-	CScriptCallbackEx<void> &callback(GameObject::ECallbackType type) const;
-	void SetCallback(GameObject::ECallbackType type, const luabind::functor<void> &functor);
-	void SetCallback(GameObject::ECallbackType type, const luabind::functor<void> &functor, const luabind::object &object);
+	CScriptCallbackEx<bool> &callback(GameObject::ECallbackType type) const;
+	void SetCallback(GameObject::ECallbackType type, const luabind::functor<bool> &functor);
+	void SetCallback(GameObject::ECallbackType type, const luabind::functor<bool> &functor, const luabind::object &object);
 	void SetCallback(GameObject::ECallbackType type);
 
 	CUICellItem* CreateCellItemSimple(LPCSTR itemSection);
@@ -168,6 +169,7 @@ public:
 	bool			select_weapons_by_addon(CInventoryItem* addonItem);
 	bool			select_weapons_by_ammo(CInventoryItem* ammoItem);
 	bool			select_items_by_section(shared_str section);
+	bool			select_exos_by_battery(CInventoryItem* ammoItem);
 
 	bool m_bEnableDragDrop;
 

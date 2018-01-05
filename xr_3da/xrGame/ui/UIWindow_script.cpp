@@ -325,8 +325,8 @@ void CUIWindow::script_register(lua_State *L)
 			.def("CreateCellItemSimple", &CUIDragDropListEx::CreateCellItemSimple)
 		
 			.def("GetSelectedCell",&CUIDragDropListEx::GetSelectedCell)
-			.def("set_callback", static_cast<void (CUIDragDropListEx::*)(GameObject::ECallbackType, const luabind::functor<void>&)>(&CUIDragDropListEx::SetCallback))
-			.def("set_callback", static_cast<void (CUIDragDropListEx::*)(GameObject::ECallbackType, const luabind::functor<void>&, const luabind::object&)>(&CUIDragDropListEx::SetCallback))
+			.def("set_callback", static_cast<void (CUIDragDropListEx::*)(GameObject::ECallbackType, const luabind::functor<bool>&)>(&CUIDragDropListEx::SetCallback))
+			.def("set_callback", static_cast<void (CUIDragDropListEx::*)(GameObject::ECallbackType, const luabind::functor<bool>&, const luabind::object&)>(&CUIDragDropListEx::SetCallback))
 			.def("set_callback", static_cast<void (CUIDragDropListEx::*)(GameObject::ECallbackType)>(&CUIDragDropListEx::SetCallback))
 			,
 

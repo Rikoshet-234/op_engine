@@ -363,8 +363,11 @@ void CUICarBodyWnd::SendMessage(CUIWindow *pWnd, s16 msg, void *pData)
 				break;
 			case INVENTORY_UNLOAD_MAGAZINE:
 			{
-				CUICellItem * itm = CurrentItem();
-				CWeapon* weapon = static_cast<CWeapon*>(itm->m_pData);
+#pragma todo("more correctness call throug GetData()... maybe rework all CurrentItem() calls?")
+				CUICellItem* cellItem = static_cast<CUICellItem*>(m_pUIPropertiesBox->GetClickedItem()->GetData()); 
+				if (!cellItem)
+					break;
+				CWeapon* weapon = static_cast<CWeapon*>(cellItem->m_pData);
 				if (!weapon)
 					break;
 				CWeaponMagazined* wg = smart_cast<CWeaponMagazined*>(weapon);
@@ -372,9 +375,9 @@ void CUICarBodyWnd::SendMessage(CUIWindow *pWnd, s16 msg, void *pData)
 					break;
 				wg->PlayEmptySnd();
 				OPFuncs::UnloadWeapon(wg);
-				for (size_t i = 0; i < itm->ChildsCount(); ++i)
+				for (size_t i = 0; i < cellItem->ChildsCount(); ++i)
 				{
-					CUICellItem * child_itm = itm->Child(i);
+					CUICellItem * child_itm = cellItem->Child(i);
 					OPFuncs::UnloadWeapon(smart_cast<CWeaponMagazined*>(static_cast<CWeapon*>(child_itm->m_pData)));
 				}
 				SetCurrentItem(nullptr);
@@ -622,7 +625,7 @@ void CUICarBodyWnd::ActivatePropertiesBox()
 				}
 			}
 			if(b){
-				m_pUIPropertiesBox->AddItem(OPFuncs::getComplexString("st_unload_magazine",pWeapon).c_str(),  nullptr, INVENTORY_UNLOAD_MAGAZINE);
+				m_pUIPropertiesBox->AddItem(OPFuncs::getComplexString("st_unload_magazine",pWeapon).c_str(),  CurrentItem(), INVENTORY_UNLOAD_MAGAZINE);
 				b_show			= true;
 			}
 		}

@@ -1282,6 +1282,7 @@ CLocatorAPI::files_it CLocatorAPI::file_find_it(LPCSTR fname)
 	check_pathes	();
 
 	file			desc_f;
+	ZeroMemory(&desc_f, sizeof(desc_f));
 	string_path		file_name;
 	VERIFY			(xr_strlen(fname)*sizeof(char) < sizeof(file_name));
 	strcpy_s		(file_name,sizeof(file_name),fname);
@@ -1596,5 +1597,14 @@ void CLocatorAPI::ProcessExternalArch()
 		strconcat			(sizeof(_path), _path, pFSRoot->m_Path, "gamedata");
 
 		ProcessArchive		(full_mod_name, _path);
+	}
+}
+
+void CLocatorAPI::dump_state()
+{
+	for (files_set::iterator it = files.begin(); it != files.end(); ++it)
+	{
+		const file&	f = *it;
+		Msg(f.name);
 	}
 }

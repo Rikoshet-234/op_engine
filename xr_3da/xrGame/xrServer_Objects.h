@@ -157,7 +157,8 @@
 // 121 - CSE_ALifeInventoryItem - add weight and cost store in SE
 // 122 - CSE_ALifeInventoryItem - add radiation store in SE
 // 123 - CSE_ALifeItemGameBox - store userdata 
-#define SPAWN_VERSION	u16(123)
+// 124 - CSE_ALifeItemExoOutfit - store battery section and charge value
+#define SPAWN_VERSION	u16(124)
 
 SERVER_ENTITY_DECLARE_BEGIN2(CSE_Shape,ISE_Shape,CShapeData)
 public:

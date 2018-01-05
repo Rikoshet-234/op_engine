@@ -33,6 +33,19 @@ public:
 	virtual void					OnMoveToSlot		();
 	virtual void					OnMoveToRuck		();
 
+	virtual void OnJump() {};
+	virtual void OnMove() {};
+	virtual void OnSprint() {};
+
+	virtual bool CanJump() { return true; }
+	virtual bool CanMove() { return true; }
+	virtual bool CanSprint() { return true; }
+
+	virtual void OnCantJump() {};
+	virtual void OnCantMove() {};
+	virtual void OnCantSprint() {};
+
+
 protected:
 	HitImmunity::HitTypeSVec		m_HitTypeProtection;
 	float							m_fPowerLoss;

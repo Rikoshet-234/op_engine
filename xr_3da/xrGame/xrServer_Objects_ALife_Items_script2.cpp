@@ -79,6 +79,17 @@ void CSE_ALifeItemCustomOutfit::script_register(lua_State *L)
 	];
 }
 
+void CSE_ALifeItemExoOutfit::script_register(lua_State *L)
+{
+	module(L)[
+		luabind_class_item1(
+			CSE_ALifeItemExoOutfit,
+			"cse_alife_item_exo_outfit",
+			CSE_ALifeItemCustomOutfit
+		)
+	];
+}
+
 void CSE_ALifeItemWeaponMagazined::script_register(lua_State *L)
 {
 	module(L)[

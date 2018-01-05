@@ -552,7 +552,6 @@ void	CActor::Hit							(SHit* pHDS)
 	case GAME_SINGLE:		
 		{
 			float hit_power	= HitArtefactsOnBelt(HDS.damage(), HDS.hit_type);
-
 			if (GodMode() || psActorFlags.test(AF_GODMODE_PARTIAL))
 			{
 				HDS.power = 0.0f;
@@ -1024,18 +1023,7 @@ void CActor::shedule_Update(u32 DT)
 		//------------------------------------------------
 	{
 		g_cl_CheckControls(mstate_wishful, NET_SavedAccel, NET_Jump, dt);
-		{
-			/*
-			if (mstate_real & mcJump)
-			{
-				NET_Packet	P;
-				u_EventGen(P, GE_ACTOR_JUMPING, ID());
-				P.w_sdir(NET_SavedAccel);
-				P.w_float(NET_Jump);
-				u_EventSend(P);
-			}
-			*/
-		}
+
 		g_cl_Orientate(mstate_real, dt);
 		g_Orientate(mstate_real, dt);
 
@@ -1774,5 +1762,5 @@ bool CActor::is_on_ground()
 CCustomOutfit* CActor::GetOutfit() const
 {
 	PIItem _of	= inventory().m_slots[OUTFIT_SLOT].m_pIItem;
-	return _of?smart_cast<CCustomOutfit*>(_of):NULL;
+	return _of?smart_cast<CCustomOutfit*>(_of):nullptr;
 }

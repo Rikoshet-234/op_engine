@@ -1729,13 +1729,9 @@ bool CWeapon::PlayAnimation(MotionSVec animation,BOOL mixMode,LPCSTR debugText,C
 	if(animation.size()>0)
 	{
 		m_pHUD->animPlay(random_anim(animation), mixMode, callback,GetState());
-#ifdef SHOW_ANIM_WEAPON_PLAYS
 		if (debugText!=nullptr)	Msg("Done %s",debugText);
-#endif
 		return true;
 	}
-#ifdef SHOW_ANIM_WEAPON_PLAYS
 	if (debugText!=nullptr)	Msg("Fail %s",debugText);
-#endif
 	return false;
 }

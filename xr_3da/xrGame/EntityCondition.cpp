@@ -304,9 +304,13 @@ float CEntityCondition::HitOutfitEffect(SHit *pHDS)
 	pOutfit->Hit					(pHDS);
 
 	if (pHDS->hit_type == ALife::eHitTypeFireWound)
-		new_hit_power				= pOutfit->HitThruArmour( pHDS);
+	{
+		new_hit_power = pOutfit->HitThruArmour(pHDS);
+	}
 	else
-		new_hit_power				*= pOutfit->GetHitTypeProtection(pHDS);
+	{
+		new_hit_power *= pOutfit->GetHitTypeProtection(pHDS);
+	}
 	
 
 	return							new_hit_power;

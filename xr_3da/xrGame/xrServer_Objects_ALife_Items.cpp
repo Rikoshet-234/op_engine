@@ -406,7 +406,8 @@ void CSE_ALifeItemNVDevice::STATE_Write		(NET_Packet	&tNetPacket)
 void CSE_ALifeItemNVDevice::UPDATE_Read		(NET_Packet	&tNetPacket)
 {
 	inherited::UPDATE_Read		(tNetPacket);
-	if (m_wVersion > 119 || (m_wVersion<119 && !tNetPacket.r_eof())) //second part of if - old object loaded, but new version update updated ^)
+#pragma todo("maybe remove second part from NG")
+	if (m_wVersion > 119 || (m_wVersion<119 && !tNetPacket.r_eof())) //second part of if - old object loaded, but new version update updated 
 	{
 		BYTE F = tNetPacket.r_u8();	
 		m_active					= !!(F & eActive);
@@ -1033,7 +1034,7 @@ void CSE_ALifeItemPDA::FillProps		(LPCSTR pref, PropItemVec& items)
 #pragma region CSE_ALifeItemDocument
 CSE_ALifeItemDocument::CSE_ALifeItemDocument(LPCSTR caSection): CSE_ALifeItem(caSection)
 {
-	m_wDoc					= NULL;
+	m_wDoc					= nullptr;
 }
 
 CSE_ALifeItemDocument::~CSE_ALifeItemDocument()
@@ -1047,7 +1048,7 @@ void CSE_ALifeItemDocument::STATE_Read		(NET_Packet	&tNetPacket, u16 size)
 	if ( m_wVersion < 98  ){
 		u16 tmp;
 		tNetPacket.r_u16			(tmp);
-		m_wDoc = NULL;
+		m_wDoc = nullptr;
 	}else
 		tNetPacket.r_stringZ		(m_wDoc);
 }
@@ -1250,5 +1251,59 @@ void CSE_ALifeItemCustomOutfit::FillProps			(LPCSTR pref, PropItemVec& items)
 BOOL CSE_ALifeItemCustomOutfit::Net_Relevant		()
 {
 	return							(true);
+}
+#pragma endregion
+
+
+#pragma region CSE_ALifeItemExoOutfit
+CSE_ALifeItemExoOutfit::CSE_ALifeItemExoOutfit(LPCSTR caSection) : CSE_ALifeItemCustomOutfit(caSection)
+{
+	m_fCurrentBatteryCharge = 0;
+	m_sCurrentBatterySection = nullptr;
+}
+
+CSE_ALifeItemExoOutfit::~CSE_ALifeItemExoOutfit()
+{
+}
+
+
+void CSE_ALifeItemExoOutfit::STATE_Read(NET_Packet	&tNetPacket, u16 size)
+{
+	inherited::STATE_Read(tNetPacket, size);
+	if (base()->m_wVersion>123)
+	{
+		tNetPacket.r_stringZ(m_sCurrentBatterySection);
+		m_fCurrentBatteryCharge = tNetPacket.r_float_q8(0.0f, 1.0f);
+	}
+}
+
+void CSE_ALifeItemExoOutfit::STATE_Write(NET_Packet	&tNetPacket)
+{
+	inherited::STATE_Write(tNetPacket);
+	tNetPacket.w_stringZ(m_sCurrentBatterySection.size()>0? m_sCurrentBatterySection.c_str() : "");
+	tNetPacket.w_float_q8(m_fCurrentBatteryCharge, 0.0f, 1.0f);
+}
+
+void CSE_ALifeItemExoOutfit::FillProps(LPCSTR pref, PropItemVec& items)
+{
+	inherited::FillProps(pref, items);
+}
+
+void CSE_ALifeItemExoOutfit::UPDATE_Read(NET_Packet	&tNetPacket)
+{
+	inherited::UPDATE_Read(tNetPacket);
+#pragma todo("maybe remove second part from NG")
+	if (base()->m_wVersion > 123 || (base()->m_wVersion < 124 && !tNetPacket.r_eof()))
+	{
+//		tNetPacket.r_stringZ(m_sCurrentBatterySection);
+		m_fCurrentBatteryCharge = tNetPacket.r_float_q8(0.0f, 1.0f);
+	}
+}
+
+void CSE_ALifeItemExoOutfit::UPDATE_Write(NET_Packet	&tNetPacket)
+{
+	inherited::UPDATE_Write(tNetPacket);
+	//tNetPacket.w_stringZ(m_sCurrentBatterySection.size()>0 ? m_sCurrentBatterySection.c_str() : "");
+	tNetPacket.w_float_q8(m_fCurrentBatteryCharge, 0.0f, 1.0f);
 }
 #pragma endregion

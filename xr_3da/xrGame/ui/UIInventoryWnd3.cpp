@@ -24,6 +24,7 @@
 #include "../script_game_object.h"
 #include "../OPFuncs/utils.h"
 #include "../gbox.h"
+#include "../exooutfit.h"
 
 
 void CUIInventoryWnd::EatItem(PIItem itm)
@@ -113,14 +114,26 @@ void CUIInventoryWnd::ActivatePropertiesBox()
 	{
 		if(!pOutfit)
 			UIPropertiesBox.AddItem(OPFuncs::getComplexString("st_move_to_bag",CurrentIItem()).c_str(),  nullptr, INVENTORY_TO_BAG_ACTION);
-		else
-			UIPropertiesBox.AddItem(OPFuncs::getComplexString("st_undress_outfit",pOutfit).c_str(),  nullptr, INVENTORY_TO_BAG_ACTION);
+		else 
+		{
+			UIPropertiesBox.AddItem(OPFuncs::getComplexString("st_undress_outfit", pOutfit).c_str(), nullptr, INVENTORY_TO_BAG_ACTION);
+			if (CExoOutfit* exo = smart_cast<CExoOutfit*>(g_actor->GetOutfit()))
+			{
+				if (exo->m_sCurrentBattery.size()>0)
+					UIPropertiesBox.AddItem("st_discharge_exo", g_actor->GetOutfit(), INVENTORY_DISCHARGE_EXO);
+			}
+		}
 		bAlreadyDressed = true;
 		b_show			= true;
 	}
 	if(pOutfit  && !bAlreadyDressed )
 	{
 		UIPropertiesBox.AddItem(OPFuncs::getComplexString("st_dress_outfit",pOutfit).c_str(),  nullptr, INVENTORY_TO_SLOT_ACTION);
+		if (CExoOutfit* exo = smart_cast<CExoOutfit*>(pOutfit))
+		{
+			if (exo->m_sCurrentBattery.size()>0)
+				UIPropertiesBox.AddItem("st_discharge_exo", pOutfit, INVENTORY_DISCHARGE_EXO);
+		}
 		b_show			= true;
 	}
 	
@@ -224,9 +237,14 @@ void CUIInventoryWnd::ActivatePropertiesBox()
 		b_show			= true;
 	}
 
+	if (CExoOutfit* exo = smart_cast<CExoOutfit*>(g_actor->GetOutfit()))
+	{
+		if (exo->isSuitableBattery(CurrentIItem()->object().cNameSect()))
+			UIPropertiesBox.AddItem("st_charge_exo", nullptr, INVENTORY_CHARGE_EXO);
+	}
+
 	bool disallow_drop	= (pOutfit&&bAlreadyDressed);
 	disallow_drop		|= !!CurrentIItem()->IsQuestItem();
-
 	if(!disallow_drop)
 	{
 
@@ -240,6 +258,7 @@ void CUIInventoryWnd::ActivatePropertiesBox()
 	/*CGameObject* GO = smart_cast<CGameObject*>(CurrentIItem()); 
 	if (GO)
 		Actor()->callback(GameObject::eOnInventoryShowPropBox)(&UIPropertiesBox,GO->lua_game_object());*/
+
 
 	if(b_show)
 	{
@@ -271,6 +290,14 @@ void CUIInventoryWnd::ProcessPropertiesBoxClicked	()
 			break;
 		case INVENTORY_TO_BAG_ACTION:	
 			ToBag(CurrentItem(),false);
+			break;
+		case INVENTORY_CHARGE_EXO:
+			if (CExoOutfit* exo = smart_cast<CExoOutfit*>(g_actor->GetOutfit()))
+				exo->PutToBatterySlot(CurrentIItem());
+			break;
+		case INVENTORY_DISCHARGE_EXO:
+			if (CExoOutfit* exo = (CExoOutfit*)UIPropertiesBox.GetClickedItem()->GetData())
+				exo->RemoveFromBatterySlot(true);
 			break;
 		case INVENTORY_DROP_ACTION:
 			{

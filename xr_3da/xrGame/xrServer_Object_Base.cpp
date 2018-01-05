@@ -298,11 +298,20 @@ void CSE_Abstract::set_ini_lua_table(luabind::object const &lua_table)
 							continue;
 						}
 					}
-					string128 value;
+					string512 value;
 					switch ((*field_iter).type())
 					{
 						case LUA_TSTRING:
-							sprintf_s(value, "%s", luabind::object_cast<LPCSTR>(*field_iter));
+						{
+							auto str = luabind::object_cast<LPCSTR>(*field_iter);
+							if (str && xr_strlen(str)>sizeof(value))
+							{
+								Msg("~ WARNING value param more great at size[%d] for key[%s]. truncate.", sizeof(value),key);
+								strncpy_s(value, str, sizeof(value) - 1);
+							}
+							else 
+								sprintf_s(value, "%s", str ? str : "");
+						}
 							break;
 						case LUA_TBOOLEAN:
 							sprintf_s(value, "%s", luabind::object_cast<bool>(*field_iter) ? "true" : "false");

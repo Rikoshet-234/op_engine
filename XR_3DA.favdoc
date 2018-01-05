@@ -432,6 +432,58 @@
         </Favorite>
       </favorites>
     </Folder>
+    <Folder>
+      <name>xrLauncher</name>
+      <folders />
+      <favorites>
+        <Favorite>
+          <name>xrLauncher.rc</name>
+          <path>xrLauncher\xrLauncher.rc</path>
+          <absolutePath>S:\xrLauncher\xrLauncher.rc</absolutePath>
+          <position>
+            <line>3</line>
+            <column>19</column>
+            <lineHash>rE99xo6jV56n9RqUJ0Qz6ODN8s8p51+2JHfYyfhyoL0=</lineHash>
+          </position>
+        </Favorite>
+        <Favorite>
+          <name>x_ray.cpp</name>
+          <path>xr_3da\x_ray.cpp</path>
+          <absolutePath>S:\xr_3da\x_ray.cpp</absolutePath>
+          <position>
+            <line>1</line>
+            <column>1</column>
+            <lineHash>fjiUGeY+c9V9cNdQygX3BzEw5v7IxX8QwvdpRKtF3WQ=</lineHash>
+          </position>
+        </Favorite>
+        <Favorite>
+          <name>xrLauncher.cpp</name>
+          <path>xrLauncher\xrLauncher.cpp</path>
+          <absolutePath>S:\xrLauncher\xrLauncher.cpp</absolutePath>
+          <position>
+            <line>18</line>
+            <column>4</column>
+            <lineHash>YMDGt2yRJjW0nD3BcO8zMmnsyiwUW8kA6pFI4P/M/aA=</lineHash>
+          </position>
+        </Favorite>
+      </favorites>
+    </Folder>
+    <Folder>
+      <name>Working</name>
+      <folders />
+      <favorites>
+        <Favorite>
+          <name>step_manager.cpp</name>
+          <path>xr_3da\xrGame\step_manager.cpp</path>
+          <absolutePath>S:\xr_3da\xrGame\step_manager.cpp</absolutePath>
+          <position>
+            <line>78</line>
+            <column>26</column>
+            <lineHash>u0fUZ/v6vMYJi6pDDHkjPCqUX/bLco5XfICywAOfYQ8=</lineHash>
+          </position>
+        </Favorite>
+      </favorites>
+    </Folder>
   </folders>
   <favorites />
 </Favorites>

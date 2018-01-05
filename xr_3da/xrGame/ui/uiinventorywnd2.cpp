@@ -22,6 +22,7 @@
 #include "../OPFuncs/utils.h"
 #include "../../defines.h"
 #include "../UIGameSP.h"
+#include "../exooutfit.h"
 
 CUICellItem* CUIInventoryWnd::CurrentItem()
 {
@@ -427,6 +428,14 @@ bool CUIInventoryWnd::OnItemDbClick(CUICellItem* itm)
 			}
 			else
 				break;
+
+			if (CExoOutfit* exo = smart_cast<CExoOutfit*>(g_actor->GetOutfit()))
+				if (exo->isSuitableBattery(itm->GetCellSection()))
+				{
+					exo->PutToBatterySlot(CurrentIItem());
+					break;
+				}
+
 
 			CInventoryItem *pistol=m_pInv->m_slots[PISTOL_SLOT].m_pIItem;
 			CInventoryItem *rifle=m_pInv->m_slots[RIFLE_SLOT].m_pIItem;

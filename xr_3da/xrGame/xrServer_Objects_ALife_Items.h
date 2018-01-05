@@ -349,10 +349,23 @@ SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemCustomOutfit,CSE_ALifeItem)
 	virtual							~CSE_ALifeItemCustomOutfit	();
 	virtual u32						ef_equipment_type			() const;
 	virtual BOOL					Net_Relevant				();
-SERVER_ENTITY_DECLARE_END
-add_to_type_list(CSE_ALifeItemCustomOutfit)
+	SERVER_ENTITY_DECLARE_END
+		add_to_type_list(CSE_ALifeItemCustomOutfit)
 #define script_type_list save_type_list(CSE_ALifeItemCustomOutfit)
 #pragma endregion
+
+#pragma region CSE_ALifeItemExoOutfit
+		SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemExoOutfit, CSE_ALifeItemCustomOutfit)
+		shared_str m_sCurrentBatterySection;
+		float m_fCurrentBatteryCharge;
+								CSE_ALifeItemExoOutfit(LPCSTR caSection);
+virtual							~CSE_ALifeItemExoOutfit();
+
+SERVER_ENTITY_DECLARE_END
+add_to_type_list(CSE_ALifeItemExoOutfit)
+#define script_type_list save_type_list(CSE_ALifeItemExoOutfit)
+#pragma endregion
+
 #pragma warning(pop)
 
 #endif

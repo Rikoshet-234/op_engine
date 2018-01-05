@@ -5,7 +5,11 @@ class CUIOutfitDragDropList :public CUIDragDropListEx
 {
 	typedef CUIDragDropListEx						inherited;
 	CUIStatic*										m_background;
+	CUIStatic*										m_pBatteryText;
+	CUIDragDropListEx*								m_pBatteryIcon;
+	CUIProgressBar* m_pChargeBatteryProgress;
 	shared_str										m_default_outfit;
+	bool m_bDrawBatteryPart;
 	void					SetOutfit				(CUICellItem* itm);
 	
 public:
@@ -18,4 +22,6 @@ public:
 	virtual CUICellItem*	RemoveItem				(CUICellItem* itm, bool force_root);
 	virtual	void			Draw					();
 			void			SetDefaultOutfit		(LPCSTR default_outfit);
+
+			void UIInitBattery(CUIXml& xml_doc, const char* rootPath);
 };

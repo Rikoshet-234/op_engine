@@ -12,11 +12,12 @@
 #include "script_callback_ex.h"
 #include "script_game_object.h"
 #include "game_object_space.h"
-#include "ui\UIVideoPlayerWnd.h"
+#include "ui/UIVideoPlayerWnd.h"
 #include "script_callback_ex.h"
 #include "object_broker.h"
 #include "weapon.h"
 #include "artifact.h"
+#include "exooutfit.h"
 
 #define MAX_SATIETY					1.0f
 #define START_SATIETY				0.5f
@@ -224,7 +225,7 @@ void CActorCondition::UpdateSatiety()
 
 CWound* CActorCondition::ConditionHit(SHit* pHDS)
 {
-	if (GodMode()) return NULL;
+	if (GodMode()) return nullptr;
 	return inherited::ConditionHit(pHDS);
 }
 
@@ -235,6 +236,7 @@ void CActorCondition::ConditionJump(float weight)
 	power				+=	m_fJumpWeightPower*weight*(weight>1.f?m_fOverweightJumpK:1.f);
 	m_fPower			-=	HitPowerEffect(power);
 }
+
 void CActorCondition::ConditionWalk(float weight, bool accel, bool sprint)
 {	
 	float power			=	m_fWalkPower;

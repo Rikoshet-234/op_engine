@@ -8,6 +8,7 @@
 #include "../CustomOutfit.h"
 #include "IconedItemsHelper.h"
 #include "../OPFuncs/utils.h"
+#include <locale>
 
 CUIOutfitParams::CUIOutfitParams()
 {
@@ -48,9 +49,17 @@ bool CUIOutfitParams::Check(CInventoryItem* outfitItem) const
 
 bool CUIOutfitParams::Check(shared_str section) const
 {
-	shared_str className=READ_IF_EXISTS(pSettings,r_string,section,"class","");
-	if (xr_strlen(className)>0)
-		return xr_strcmp(className,"E_STLK")==0;	
+	xr_vector<xr_string> classes;
+	classes.push_back("E_STLK");
+	classes.push_back("EQU_SCIE");
+	classes.push_back("EQU_STLK");
+	classes.push_back("EQU_MLTR");
+	classes.push_back("EQU_EXO");
+	xr_string className=READ_IF_EXISTS(pSettings,r_string,section,"class","");
+	std::transform(className.begin(), className.end(), className.begin(), ::toupper);
+	if (!className.empty())
+		if (std::find(classes.begin(), classes.end(), className) != classes.end())
+			return true;
 	return false;
 }
 

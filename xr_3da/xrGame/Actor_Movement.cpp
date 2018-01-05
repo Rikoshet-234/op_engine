@@ -17,6 +17,7 @@
 #include "game_cl_base.h"
 #include "WeaponMagazined.h"
 #include "CharacterPhysicsSupport.h"
+#include "exooutfit.h"
 #ifdef DEBUG
 #include "phdebug.h"
 #endif
@@ -159,9 +160,20 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector &vControlAccel, float &Ju
 			mstate_real		&=		~mcJump;
 			mstate_wf &= ~mcJump;
 		}
-			//character_physics_support()->movement()->EnableCharacter();
-		//return;
 	}
+	else
+	{
+		if (CCustomOutfit* outfit = g_actor->GetOutfit())
+		{
+			outfit->OnMove();
+			if (!outfit->CanMove() && !GodMode())
+			{
+				outfit->OnCantMove();
+				//add support to stop move????
+			}
+		}
+	}
+
 
 	// update player accel
 	if (mstate_wf&mcFwd)		vControlAccel.z +=  1;
@@ -194,15 +206,29 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector &vControlAccel, float &Ju
 
 		if ( CanJump() && (mstate_wf&mcJump) )
 		{
-			mstate_real			|=	mcJump;
-			m_bJumpKeyPressed	=	TRUE;
-			Jump				= m_fJumpSpeed;
-			m_fJumpTime			= s_fJumpTime;
+			
+			bool ignoreJump = false;
+			if (CCustomOutfit* outfit = g_actor->GetOutfit())
+			{
+				outfit->OnJump();
+				if (!outfit->CanJump() && !GodMode())
+				{
+					outfit->OnCantJump();
+					ignoreJump = true;
+				}
+			}
 
+			if (!ignoreJump)
+			{
+				mstate_real |= mcJump;
+				m_bJumpKeyPressed = TRUE;
+				Jump = m_fJumpSpeed;
+				m_fJumpTime = s_fJumpTime;
 
-			//уменьшить силу игрока из-за выполненого прыжка
-			if (!GodMode())
-				conditions().ConditionJump(inventory().TotalWeight() / MaxCarryWeight());
+				//уменьшить силу игрока из-за выполненого прыжка
+				if (!GodMode())
+					conditions().ConditionJump(inventory().TotalWeight() / MaxCarryWeight());
+			}
 		}
 
 		/*
@@ -237,7 +263,22 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector &vControlAccel, float &Ju
 			}
 		}
 
-		if ((mstate_wf&mcSprint) && !CanSprint())
+		if ((mstate_wf&mcSprint) && CanSprint())
+		{
+			bool ignoreSprint = false;
+			if (CCustomOutfit* outfit = g_actor->GetOutfit())
+			{
+				outfit->OnSprint();
+				if (!outfit->CanSprint() && !GodMode())
+				{
+					outfit->OnCantSprint();
+					ignoreSprint = true;
+				}
+				if (ignoreSprint)
+					mstate_wf &= ~mcSprint;
+			}
+		}
+		else
 		{
 			mstate_wf				&= ~mcSprint;
 		}
@@ -278,8 +319,6 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector &vControlAccel, float &Ju
 				else
 					if (mstate_real&mcBack)
 						scale *= m_fWalkBackFactor;
-
-
 
 				if (mstate_real&mcCrouch)	scale *= m_fCrouchFactor;
 				if (mstate_real&mcClimb)	scale *= m_fClimbFactor;
@@ -539,8 +578,7 @@ bool CActor::CanSprint			()
 						Game().PlayerCanSprint(this)
 						&& CanRun()
 						&& !(mstate_real&mcLStrafe || mstate_real&mcRStrafe)
-						&& InventoryAllowSprint()
-						;
+						&& InventoryAllowSprint();
 
 	return can_Sprint;
 }
@@ -548,9 +586,10 @@ bool CActor::CanSprint			()
 bool	CActor::CanJump				()
 {
 	bool can_Jump = /*!IsLimping() &&*/
-		!character_physics_support()->movement()->PHCapture() &&((mstate_real&mcJump)==0) && (m_fJumpTime<=0.f) 
-		&& !m_bJumpKeyPressed &&!m_bZoomAimingMode;// && ((mstate_real&mcCrouch)==0);
-
+		!character_physics_support()->movement()->PHCapture() && ((mstate_real&mcJump) == 0) && (m_fJumpTime <= 0.f)
+		&& !m_bJumpKeyPressed && !m_bZoomAimingMode;
+		// && ((mstate_real&mcCrouch)==0);
+	
 	return can_Jump;
 }
 
@@ -576,7 +615,6 @@ bool	CActor::CanMove				()
 
 	if(IsTalking())
 		return false;
-
 	return true;
 }
 

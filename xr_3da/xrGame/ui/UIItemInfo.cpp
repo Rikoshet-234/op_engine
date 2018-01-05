@@ -12,28 +12,31 @@
 #include "../Inventory_Item.h"
 #include "UIInventoryUtilities.h"
 #include "../PhysicsShellHolder.h"
+#include "UIDragDropListEx.h"
 #include "UIWpnParams.h"
 #include "../game_object_space.h"
 #include "ui_af_params.h"
 #include "../actor.h"
 #include "../script_callback_ex.h"
 #include "../CustomOutfit.h"
+#include "../exooutfit.h"
+#include "UICellItemFactory.h"
 
 CUIItemInfo::CUIItemInfo()
 {
-	UIItemImageSize.set			(0.0f,0.0f);
-	UICondProgresBar			= nullptr;
-	UICondition					= nullptr;
-	UICost						= nullptr;
-	UIWeight					= nullptr;
-	UIItemImage					= nullptr;
-	UIDesc						= nullptr;
-	UIWpnParams					= nullptr;
-	UIArtefactParams			= nullptr;
-	UIOutfitParams				= nullptr;
-	UIName						= nullptr;
-	m_pInvItem					= nullptr;
-	m_b_force_drawing			= false;
+	UIItemImageSize.set(0.0f, 0.0f);
+	UICondProgresBar = nullptr;
+	UICondition = nullptr;
+	UICost = nullptr;
+	UIWeight = nullptr;
+	UIItemImage = nullptr;
+	UIDesc = nullptr;
+	UIWpnParams = nullptr;
+	UIArtefactParams = nullptr;
+	UIOutfitParams = nullptr;
+	UIName = nullptr;
+	m_pInvItem = nullptr;
+	m_b_force_drawing = false;
 }
 
 CUIItemInfo::~CUIItemInfo()
@@ -129,6 +132,24 @@ void CUIItemInfo::Init(LPCSTR xml_name){
 		UIItemImageSize.set				(UIItemImage->GetWidth(),UIItemImage->GetHeight());
 	}
 
+	if (uiXml.NavigateToNode("battery_icon", 0))
+	{
+		m_pBatteryIcon = xr_new<CUIDragDropListEx>();
+		m_pBatteryIcon->SetAutoDelete(true);
+		CUIXmlInit().InitDragDropListEx(uiXml, "battery_icon", 0, m_pBatteryIcon);
+		AttachChild(m_pBatteryIcon);
+
+		m_pChargeBatteryProgress = xr_new<CUIProgressBar>();
+		m_pChargeBatteryProgress->SetAutoDelete(true);
+		CUIXmlInit().InitProgressBar(uiXml, "battery_charge_progress", 0, m_pChargeBatteryProgress);
+		AttachChild(m_pChargeBatteryProgress);
+		m_pChargeBatteryProgress->SetProgressPos(0);
+
+		m_pBatteryText = xr_new<CUIStatic>();
+		m_pBatteryText->SetAutoDelete(true);
+		CUIXmlInit().InitStatic(uiXml, "battery_charge_text", 0, m_pBatteryText);
+		AttachChild(m_pBatteryText);
+	}
 	xml_init.InitAutoStaticGroup	(uiXml, "auto", 0, this);
 }
 
@@ -234,6 +255,27 @@ void CUIItemInfo::InitItem(CInventoryItem* pInvItem)
 		UIItemImage->GetUIStaticItem().SetRect	(v_r);
 		UIItemImage->SetWidth					(_min(v_r.width(),	UIItemImageSize.x));
 		UIItemImage->SetHeight					(_min(v_r.height(),	UIItemImageSize.y));
+	}
+
+	if (m_pBatteryIcon)
+	{
+		m_pBatteryIcon->Show(false);
+		m_pBatteryText->Show(false);
+		m_pChargeBatteryProgress->Show(false);
+		m_pBatteryIcon->ClearAll(true);
+		CExoOutfit* exo = smart_cast<CExoOutfit*>(m_pInvItem);
+		if (exo && exo->BatteryAccepted())
+		{
+			if (exo->m_sCurrentBattery.size() > 0)
+			{
+				m_pBatteryIcon->SetItem(create_cell_item(exo->m_sCurrentBattery));
+				m_pChargeBatteryProgress->SetProgressPos(exo->m_fCurrentCharge*100.0f + 1.0f - EPS);
+			}
+			m_pBatteryIcon->Show(true);
+			m_pBatteryText->Show(true);			
+			m_pChargeBatteryProgress->Show(true);
+		}
+
 	}
 }
 

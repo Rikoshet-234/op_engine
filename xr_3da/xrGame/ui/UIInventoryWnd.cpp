@@ -28,8 +28,6 @@ using namespace InventoryUtilities;
 #include "../entitycondition.h"
 #include "../../xrSound/Sound.h"
 #include "../game_cl_base.h"
-#include "UISleepWnd.h"
-#include "../ActorCondition.h"
 #include "UIDragDropListEx.h"
 #include "UIOutfitSlot.h"
 #include "UI3tButton.h"
@@ -157,10 +155,12 @@ void CUIInventoryWnd::Init()
 	m_pUIOutfitList						= xr_new<CUIOutfitDragDropList>(); 
 	AttachChild(m_pUIOutfitList); 
 	m_pUIOutfitList->SetAutoDelete(true);
-	xml_init.InitDragDropListEx			(uiXml, "dragdrop_outfit", 0, m_pUIOutfitList);
+	xml_init.InitDragDropOutfitSlot(uiXml, "dragdrop_outfit", 0, m_pUIOutfitList);
 	m_pUIOutfitList->SetUIListId(IWListTypes::ltSlotOutfit);
 	sourceDragDropLists.push_back(m_pUIOutfitList);
+
 	
+
 	m_pUIKnifeList						= xr_new<CUIDragDropListEx>(); 
 	AttachChild(m_pUIKnifeList); 
 	m_pUIKnifeList->SetAutoDelete(true);
@@ -284,7 +284,6 @@ void CUIInventoryWnd::re_init2()
 void CUIInventoryWnd::re_init()
 {
 	sourceDragDropLists.clear();
-	UIPropertiesBox.RemoveAll();
 	UIDescrWnd.DetachChild(&UIItemInfo);
 	UIPersonalWnd.DetachChild(&UIStaticPersonal);
 	UIProgressBack.DetachChild(&UIProgressBarHealth);

@@ -200,9 +200,9 @@ void CXML_IdToIndex::InitInternal(CXML_IdToIndex::InitFunc& f)
 
 			if(!item_name)
 			{
-				string256 buf;
-				sprintf_s(buf, "id for item don't set, number %d in %s", i, xml_file);
-				R_ASSERT2(item_name, buf);
+				Msg("! ERROR id for item don't set, number %d in %s", i, xml_file);
+				Msg("! ERROR Previous successfully read id [%s]", m_pItemDataVector->back().id.c_str());
+				FATAL("ENGINE Crush. See log for details.");
 			}
 			TSP_END("g_iiReadAttr", "init");
 

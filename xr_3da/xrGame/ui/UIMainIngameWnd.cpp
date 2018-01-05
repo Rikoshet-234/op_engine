@@ -52,6 +52,7 @@
 #include "UICellCustomItems.h"
 #include "../../defines.h"
 #include <stdlib.h>
+#include "../exooutfit.h"
 
 
 #ifdef DEBUG
@@ -340,6 +341,17 @@ void CUIMainIngameWnd::Draw()
 
 	RenderQuickInfos			();		
 
+	if (ShowExoOutfitDebug)
+	{
+		if (CExoOutfit* exo = smart_cast<CExoOutfit*>(g_actor->GetOutfit()))
+		{
+			UI()->Font()->pFontDI->SetHeightI(0.03f);
+			UI()->Font()->pFontDI->OutSet(400, 10);
+			UI()->Font()->pFontDI->SetColor(0xffffffff);
+			UI()->Font()->pFontDI->OutNext("SECTION: %s", exo->m_sCurrentBattery.c_str());
+			UI()->Font()->pFontDI->OutNext("CHARGE:  %f", exo->m_fCurrentCharge);
+		}
+	}
 #ifdef DEBUG
 	draw_adjust_mode			();
 #endif
@@ -943,7 +955,7 @@ bool CUIMainIngameWnd::OnKeyboardPress(int dik)
 
 	if(Level().IR_GetKeyState(DIK_LSHIFT) || Level().IR_GetKeyState(DIK_RSHIFT))
 	{
-		switch(dik)
+		switch (dik)
 		{
 		case DIK_NUMPADMINUS:
 			UIZoneMap->ZoomOut();
@@ -953,6 +965,10 @@ bool CUIMainIngameWnd::OnKeyboardPress(int dik)
 			UIZoneMap->ZoomIn();
 			return true;
 			break;
+
+		case DIK_NUMPADSTAR:
+			ShowExoOutfitDebug = !ShowExoOutfitDebug;
+			return true;
 		}
 	}
 	else

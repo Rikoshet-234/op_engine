@@ -247,7 +247,10 @@ bool CWeaponMagazined::TryReload()
 	{
 		bool isActor = smart_cast<CActor*>(H_Parent()) != nullptr;
 		if (isActor && m_bRequredDemandCheck && g_uCommonFlags.is(E_COMMON_FLAGS::gpDemandReload))
+		{
+			SwitchState(eIdle);
 			return false;
+		}
 		int ammoIndex=m_ammoType;
 		if (static_cast<int>(m_ammoType)!=m_iPropousedAmmoType && m_iPropousedAmmoType!=-1)
 			ammoIndex=m_iPropousedAmmoType;
@@ -1405,20 +1408,13 @@ bool CWeaponMagazined::TryPlayAnimIdle()
 			pActor->g_State(st);
 			if(st.bSprint)
 			{
-#ifdef SHOW_ANIM_WEAPON_PLAYS
-				return PlayAnimation(mhud.mhud_idle_sprint,TRUE,"try play [mhud.mhud_idle_sprint]");
-#else
+				//return PlayAnimation(mhud.mhud_idle_sprint,TRUE,"try play [mhud.mhud_idle_sprint]");
 				return PlayAnimation(mhud.mhud_idle_sprint,TRUE);
-#endif
-						
 			} 
-			else if (!st.bCrouch && pActor->AnyMove())
+			else if (pActor->AnyMove())
 			{
-#ifdef SHOW_ANIM_WEAPON_PLAYS				
-				return PlayAnimation(mhud.anim_idle_moving,TRUE,"try play [mhud.anim_idle_moving]");
-#else
+				//return PlayAnimation(mhud.anim_idle_moving,TRUE,"try play [mhud.anim_idle_moving]");
 				return PlayAnimation(mhud.anim_idle_moving,TRUE);					
-#endif
 			}
 		}
 	}
@@ -1443,14 +1439,9 @@ void CWeaponMagazined::PlayAnimIdle()
 	}
 
 	VERIFY(GetState()==eIdle);
-#ifdef SHOW_ANIM_WEAPON_PLAYS
-	string256 buf;
-	sprintf_s(buf,"try play [%s]",IsZoomed()?"mhud.mhud_idle_aim":"mhud.mhud_idle");
-	PlayAnimation(*m,TRUE,buf);
-#else
+
+	//string256 buf;sprintf_s(buf,"try play [%s]",IsZoomed()?"mhud.mhud_idle_aim":"mhud.mhud_idle");PlayAnimation(*m,TRUE,buf);
 	PlayAnimation(*m,TRUE);
-#endif
-	//m_pHUD->animPlay(random_anim(*m), TRUE, nullptr, GetState());
 }
 
 void CWeaponMagazined::PlayAnimShoot()
