@@ -1,0 +1,12 @@
+client_class::net_Export - вызывается каждый фрейм, для обновления server_class через server_class::UPDATE_Read
+client_class::net_Import
+client_class::net_Spawn - вызывается при переходе в онлайн
+client_class::net_Destroy - вызывается при переходе в оффлайн
+client_class::save - вызывается при сохранении сейва, если объект в онлайне
+client_class::load - вызывается при загрузке сейва, если объект должен появиться в онлайне после client_class::net_Spawn
+
+server_class::UPDATE_Read - вызывается каждый фрейм, для обновления server_class данными, переданными  client_class::net_Export
+server_class::UPDATE_Write
+server_class::STATE_Read - вызывается при загрузке сейва (не проверены некоторые вызовы при dedicate?), при переходе в онлайн перед client_class::net_Spawn
+server_class::STATE_Write - вызывается при создании сейва, при переходе объекта в онлайн и перед STATE_Read в некоторых случаях (заодно обновляя m_wVersion)- 
+							проверить стэк вызовов
