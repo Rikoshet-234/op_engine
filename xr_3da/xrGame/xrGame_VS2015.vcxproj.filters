@@ -6633,6 +6633,9 @@
     <ClInclude Include="ExoOutfit.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Outfit\ExoOutfit</Filter>
     </ClInclude>
+    <ClInclude Include="UIExoBatteryStatic.h">
+      <Filter>UI\Common\InventoryWnd</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -9847,6 +9850,9 @@
     </ClCompile>
     <ClCompile Include="ExoOutfit.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Outfit\ExoOutfit</Filter>
+    </ClCompile>
+    <ClCompile Include="UIExoBatteryStatic.cpp">
+      <Filter>UI\Common\InventoryWnd</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

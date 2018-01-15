@@ -33,7 +33,7 @@ protected:
 	ICustomDrawCell*		m_custom_draw;
 	int						m_accelerator;
 	bool					m_selected;
-	CUIProgressBar*			p_ConditionProgressBar;
+	CUIProgressBar*			m_pConditionProgressBar;
 	virtual void			UpdateItemText			();
 
 public:
@@ -69,7 +69,7 @@ public:
 				void		SetMoveableToOther	(bool value)	{m_moveableToOther=value;}
 
 	CUIDragDropListEx*		OwnerList				()						{return m_pParentList;}
-				void		SetOwnerList			(CUIDragDropListEx* p);
+				bool		virtual SetOwnerList			(CUIDragDropListEx* p);
 				void		SetCustomDraw			(ICustomDrawCell* c);
 				size_t			m_drawn_frame;
 				void*		m_pData;

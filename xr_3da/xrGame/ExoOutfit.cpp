@@ -64,7 +64,8 @@ void CExoOutfit::RemoveFromBatterySlot(bool spawn)
 {
 	if (m_sCurrentBattery.size() > 0 && spawn)
 	{
-		CSE_Abstract* abstractItem = Level().spawn_item(m_sCurrentBattery.c_str(), g_actor->Position(), g_actor->ai_location().level_vertex_id(), g_actor->ID(), true);
+		auto parentId = H_Parent()? H_Parent()->ID() : g_actor->ID();
+		CSE_Abstract* abstractItem = Level().spawn_item(m_sCurrentBattery.c_str(), g_actor->Position(), g_actor->ai_location().level_vertex_id(), parentId, true);
 		CSE_ALifeInventoryItem*	inventoryItem = smart_cast<CSE_ALifeInventoryItem*>(abstractItem);
 		if (inventoryItem)
 			inventoryItem->m_fCondition = m_fCurrentCharge;

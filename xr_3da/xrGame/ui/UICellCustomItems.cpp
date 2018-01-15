@@ -2,6 +2,7 @@
 #include "UICellCustomItems.h"
 #include "UIInventoryUtilities.h"
 #include "../Weapon.h"
+#include "UIDragDropListEx.h"
 
 #define INV_GRID_WIDTHF			50.0f
 #define INV_GRID_HEIGHTF		50.0f
@@ -72,7 +73,63 @@ bool CUIAmmoCellItem::EqualTo(CUICellItem* itm)
 
 CExoOutfitCellItem::CExoOutfitCellItem(CExoOutfit* itm) :inherited(itm)
 {
+	m_pCustomIcon = xr_new<CUIStatic>();
+	m_pCustomIcon->SetAutoDelete(true);
+	m_pCustomIcon->TextureAvailable(true);
+	m_pCustomIcon->TextureOn();
+	CUIWindow::AttachChild(m_pCustomIcon);
+}
 
+bool CExoOutfitCellItem::SetOwnerList(CUIDragDropListEx* p)
+{
+	if (!inherited::SetOwnerList(p))
+		return false;
+	m_pCustomIcon->TextureOff();
+	m_pCustomIcon->TextureAvailable(false);
+	PIItem itm = PIItem(m_pData);
+	CExoOutfit* exo = smart_cast<CExoOutfit*>(itm);
+	if (!exo || (exo && !(exo->m_sCurrentBattery.size() > 0)))
+		return false;
+	float x, y;
+	switch (m_pParentList->cacheData.exo_icon.position)
+	{
+	case left_top:
+	{
+		x = m_pParentList->cacheData.exo_icon.indent;
+		y = m_pParentList->cacheData.exo_icon.indent;
+	}
+	break;
+	case right_top:
+	{
+		x = GetWidth() - m_pParentList->cacheData.exo_icon.indent - m_pParentList->cacheData.exo_icon.w;
+		y = m_pParentList->cacheData.exo_icon.indent;
+	}
+	break;
+	case right_bottom:
+	{
+		x= GetWidth() - m_pParentList->cacheData.exo_icon.indent - m_pParentList->cacheData.exo_icon.w;
+		y = GetHeight() - m_pParentList->cacheData.exo_icon.indent - m_pParentList->cacheData.exo_icon.h;
+	}
+	break;
+	case left_bottom:
+	default:
+	{
+		x = m_pParentList->cacheData.exo_icon.indent;
+		y = GetHeight() - m_pParentList->cacheData.exo_icon.indent - m_pParentList->cacheData.exo_icon.h;
+	}
+	break;
+	}
+	if (m_pParentList->cacheData.exo_icon.texture.size() > 0)
+	{
+		m_pCustomIcon->TextureOn();
+		m_pCustomIcon->TextureAvailable(true);
+		m_pCustomIcon->InitTexture(m_pParentList->cacheData.exo_icon.texture.c_str());
+		m_pCustomIcon->SetStretchTexture(m_pParentList->cacheData.exo_icon.stretch);
+	}
+	m_pCustomIcon->SetWndPos(x, y);
+	m_pCustomIcon->SetWndRect(x, y, m_pParentList->cacheData.exo_icon.w, m_pParentList->cacheData.exo_icon.h);
+
+	return true;
 }
 
 bool CExoOutfitCellItem::EqualTo(CUICellItem* itm)

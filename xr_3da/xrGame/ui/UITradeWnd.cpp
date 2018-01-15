@@ -33,6 +33,7 @@
 #include "../antirad.h"
 #include "../bottleitem.h"
 #include "../gbox.h"
+#include "../exooutfit.h"
 
 
 #define				TRADE_XML			"trade.xml"
@@ -774,6 +775,10 @@ void CUITradeWnd::ProcessPropertiesBoxClicked	()
 		u32 itemTag=clickedItem->GetTAG();
 		switch(itemTag)
 		{
+		case INVENTORY_DISCHARGE_EXO:
+			if (CExoOutfit* exo = (CExoOutfit*)clickedItem->GetData())
+				exo->RemoveFromBatterySlot(true);
+			break;
 		case INVENTORY_DETACH_GRENADE_LAUNCHER_ADDON:
 			DetachAddon(*(smart_cast<CWeapon*>(CurrentIItem()))->GetGrenadeLauncherName());
 			break;
@@ -887,6 +892,7 @@ void CUITradeWnd::ActivatePropertiesBox()
 		CEatableItem*		pEatableItem		= smart_cast<CEatableItem*>		(CurrentIItem());
 		CBottleItem*		pBottleItem			= smart_cast<CBottleItem*>		(CurrentIItem());
 		CGBox*			pBox = smart_cast<CGBox*>			(CurrentIItem());
+		CExoOutfit*			pExo = smart_cast<CExoOutfit*>		(CurrentIItem());
 		if (pWeapon)
 		{
 			if(pWeapon->GrenadeLauncherAttachable() && pWeapon->IsGrenadeLauncherAttached())
@@ -926,6 +932,14 @@ void CUITradeWnd::ActivatePropertiesBox()
 				}
 			}
 		}
+		else if (pExo)
+		{
+			if (pExo->m_sCurrentBattery.size()>0)
+			{
+				UIPropertiesBox.AddItem("st_discharge_exo", pExo, INVENTORY_DISCHARGE_EXO);
+				b_show = true;
+			}
+		}
 		LPCSTR _action = nullptr;
 		if(pMedkit || pAntirad || pBox)
 			_action					= "st_use";
@@ -949,13 +963,14 @@ void CUITradeWnd::ActivatePropertiesBox()
 					UIPropertiesBox.AddItem("ui_carbody_move_all", CurrentItem(), INVENTORY_CB_MOVE_ALL);
 				b_show			= true;
 			}
-			if (CurrentItem()->OwnerList()==&UIOurBagList)
+			//commented due to use this for hack in some quests...
+			/*if (CurrentItem()->OwnerList()==&UIOurBagList)
 			{
 				UIPropertiesBox.AddItem("st_drop", nullptr, INVENTORY_DROP_ACTION);
 				if(CurrentItem()->ChildsCount())
 					UIPropertiesBox.AddItem("st_drop_all", reinterpret_cast<void*>(33), INVENTORY_DROP_ACTION);
 				b_show			= true;
-			}
+			}*/
 		}
 	}
 	else

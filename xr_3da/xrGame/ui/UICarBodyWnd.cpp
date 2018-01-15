@@ -31,6 +31,7 @@
 #include "../OPFuncs/utils.h"
 #include "../string_table.h"
 #include "../gbox.h"
+#include "../exooutfit.h"
 
 #define				CAR_BODY_XML		"carbody_new.xml"
 #define				CARBODY_ITEM_XML	"carbody_item.xml"
@@ -357,7 +358,10 @@ void CUICarBodyWnd::SendMessage(CUIWindow *pWnd, s16 msg, void *pData)
 			u32 itemTag = m_pUIPropertiesBox->GetClickedItem()->GetTAG();
 			switch (itemTag)
 			{
-
+			case INVENTORY_DISCHARGE_EXO:
+				if (CExoOutfit* exo = (CExoOutfit*)m_pUIPropertiesBox->GetClickedItem()->GetData())
+					exo->RemoveFromBatterySlot(true);
+				break;
 			case INVENTORY_EAT_ACTION:	//סתוסעü מבתוךע
 				EatItem();
 				break;
@@ -588,6 +592,7 @@ void CUICarBodyWnd::ActivatePropertiesBox()
 	CMedkit*				pMedkit			= smart_cast<CMedkit*>			(CurrentIItem());
 	CAntirad*				pAntirad		= smart_cast<CAntirad*>			(CurrentIItem());
 	CBottleItem*			pBottleItem		= smart_cast<CBottleItem*>		(CurrentIItem());
+	CExoOutfit*			pExo = smart_cast<CExoOutfit*>		(CurrentIItem());
 	CGBox*			pBox = smart_cast<CGBox*>			(CurrentIItem());
 	bool					b_show			= false;
 	
@@ -630,6 +635,15 @@ void CUICarBodyWnd::ActivatePropertiesBox()
 			}
 		}
 	}
+	else if (pExo)
+	{
+		if (pExo->m_sCurrentBattery.size()>0)
+		{
+			m_pUIPropertiesBox->AddItem("st_discharge_exo", pExo, INVENTORY_DISCHARGE_EXO);
+			b_show = true;
+		}
+	}
+
 	LPCSTR _action				= nullptr;
 	
 	if(pMedkit || pAntirad)

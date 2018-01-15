@@ -283,6 +283,50 @@ CUICellItem* CUIDragDropListEx::CreateCellItemSimple(LPCSTR itemSection)
 	return cell;
 }
 
+TPosition parsePosition(LPCSTR value)
+{
+	TPosition result = TPosition::top;
+	/*if (xr_strcmp(value, "top") == 0)
+	{
+		result = TPosition::top;
+	}
+	else */
+	if (xr_strcmp(value, "bottom") == 0)
+	{
+		result = TPosition::bottom;
+	}
+	else if (xr_strcmp(value, "left") == 0)
+	{
+		result = TPosition::left;
+	}
+	else if (xr_strcmp(value, "right") == 0)
+	{
+		result = TPosition::right;
+	}
+	else if (xr_strcmp(value, "left_top") == 0)
+	{
+		result = TPosition::left_top;
+	}
+	else if (xr_strcmp(value, "right_top") == 0)
+	{
+		result = TPosition::right_top;
+	}
+	else if (xr_strcmp(value, "right_bottom") == 0)
+	{
+		result = TPosition::right_bottom;
+	}
+	else if (xr_strcmp(value, "left_bottom") == 0)
+	{
+		result = TPosition::left_bottom;
+	}
+	else
+	{
+		Msg("! ERROR Invalid cell_config - condition bar location is incorrect! ");
+		FATAL("ENGINE Crush. See log for details.");
+	}
+	return result;
+}
+
 void CUIDragDropListEx::SetShowConditionBar(bool state)
 {
 	m_b_showConditionBar = state;
@@ -302,40 +346,22 @@ void CUIDragDropListEx::SetShowConditionBar(bool state)
 		cacheData.stretchTextureBack=uiXml.ReadAttribInt("progress_item_condition:background:texture", 0, "stretch")==1?true:false;
 
 		auto tmp=uiXml.ReadAttrib("progress_item_condition", 0, "position","top");
-		if (xr_strcmp(tmp,"top")==0)
-		{
-			cacheData.position=TPosition::top;
-		} else if (xr_strcmp(tmp,"bottom")==0)
-		{
-			cacheData.position=TPosition::bottom;
-		} else if (xr_strcmp(tmp,"left")==0)
-		{
-			cacheData.position=TPosition::left;
-		} else if (xr_strcmp(tmp,"right")==0)
-		{
-			cacheData.position=TPosition::right;
-		} else if (xr_strcmp(tmp,"left_top")==0)
-		{
-			cacheData.position=TPosition::left_top;
-		} else if (xr_strcmp(tmp,"right_top")==0)
-		{
-			cacheData.position=TPosition::right_top;
-		} else if (xr_strcmp(tmp,"right_bottom")==0)
-		{
-			cacheData.position=TPosition::right_bottom;
-		} else if (xr_strcmp(tmp,"left_bottom")==0)
-		{
-			cacheData.position=TPosition::left_bottom;
-		}
-		else
-		{
-			Msg("! ERROR Invalid cell_config - condition bar location is incorrect! ");
-			FATAL("ENGINE Crush. See log for details.");
-		}
+		cacheData.position = parsePosition(tmp);
 		cacheData.min_color=CUIXmlInit::GetColor(uiXml,"progress_item_condition:min_color",0,0xff);
 		cacheData.max_color=CUIXmlInit::GetColor(uiXml,"progress_item_condition:max_color",0,0xff);
 		cacheData.inertion=uiXml.ReadAttribFlt("progress_item_condition", 0, "inertion", 0.0f);
 		cacheData.initialized=true;
+
+		if (uiXml.NavigateToNode("ci_exo_charge"))
+		{
+			auto cip = uiXml.ReadAttrib("ci_exo_charge", 0, "position", "top");
+			cacheData.exo_icon.position= parsePosition(cip);
+			cacheData.exo_icon.indent = uiXml.ReadAttribFlt("ci_exo_charge", 0, "indent");
+			cacheData.exo_icon.w = uiXml.ReadAttribFlt("ci_exo_charge", 0, "width");
+			cacheData.exo_icon.h = uiXml.ReadAttribFlt("ci_exo_charge", 0, "height");
+			cacheData.exo_icon.texture = uiXml.Read("ci_exo_charge:texture", 0, nullptr);
+			cacheData.exo_icon.stretch = uiXml.ReadAttribInt("ci_exo_charge:texture", 0, "stretch") == 1 ? true : false;
+		}
 	}
 }
 

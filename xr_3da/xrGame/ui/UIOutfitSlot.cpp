@@ -15,9 +15,16 @@ CUIOutfitDragDropList::CUIOutfitDragDropList()
 	m_background->SetAutoDelete(true);
 	CUIWindow::AttachChild(m_background);
 
-	m_pBatteryIcon = xr_new<CUIDragDropListEx>();
+	m_pBatteryIcon = xr_new<CUIExoBatteryStatic>();
 	m_pBatteryIcon->SetAutoDelete(true);
+	m_pBatteryIcon->SetShader(InventoryUtilities::GetEquipmentIconsShader());
+	m_pBatteryIcon->TextureAvailable(true);
+	m_pBatteryIcon->SetParentItem(this);
 	CUIWindow::AttachChild(m_pBatteryIcon);
+	m_pBatteryIconBackground= xr_new<CUIFrameWindow>();
+	m_pBatteryIconBackground->SetAutoDelete(true);
+	m_pBatteryIcon->AttachChild(m_pBatteryIconBackground);
+
 
 	m_pChargeBatteryProgress= xr_new<CUIProgressBar>();
 	m_pChargeBatteryProgress->SetAutoDelete(true);
@@ -44,7 +51,7 @@ void CUIOutfitDragDropList::SetOutfit(CUICellItem* itm)
 	m_background->Init					(0,0, GetWidth(), GetHeight());
 	m_background->SetStretchTexture		(true);
 	m_bDrawBatteryPart=false;
-	m_pBatteryIcon->ClearAll(true);
+	m_pBatteryIcon->TextureOff();
 	m_pChargeBatteryProgress->SetProgressPos(0);
 	if(itm)
 	{
@@ -57,7 +64,10 @@ void CUIOutfitDragDropList::SetOutfit(CUICellItem* itm)
 		{
 			if (exo->m_sCurrentBattery.size() > 0)
 			{
-				m_pBatteryIcon->SetItem(create_cell_item(exo->m_sCurrentBattery));
+				UIIconInfo iconInfo(exo->m_sCurrentBattery);
+				m_pBatteryIcon->SetOriginalRect(iconInfo.getOriginalRect());
+				m_pBatteryIcon->SetStretchTexture(true);
+				m_pBatteryIcon->TextureOn();
 				m_pChargeBatteryProgress->SetProgressPos(exo->m_fCurrentCharge*100.0f + 1.0f - EPS);
 			}
 			m_bDrawBatteryPart=true;
@@ -78,7 +88,9 @@ void CUIOutfitDragDropList::UIInitBattery(CUIXml& xml_doc, const char* rootPath)
 {
 	string256 path;
 	sprintf_s(path, "%s:%s", rootPath, "battery_icon");
-	CUIXmlInit().InitDragDropListEx(xml_doc, path, 0, m_pBatteryIcon);
+	CUIXmlInit().InitStatic(xml_doc, path, 0, m_pBatteryIcon);
+	sprintf_s(path, "%s:%s", rootPath, "battery_icon:background");
+	CUIXmlInit().InitFrameWindow(xml_doc, path, 0, m_pBatteryIconBackground);
 	sprintf_s(path, "%s:%s", rootPath, "battery_charge_progress");
 	CUIXmlInit().InitProgressBar(xml_doc, path, 0, m_pChargeBatteryProgress);
 	sprintf_s(path, "%s:%s", rootPath, "battery_charge_text");
@@ -117,9 +129,10 @@ void CUIOutfitDragDropList::Draw()
 	m_background->Draw					();
 	if (m_bDrawBatteryPart)
 	{
+		m_pBatteryIconBackground->Draw();
 		m_pBatteryIcon->Draw();
 		m_pChargeBatteryProgress->Draw();
 		m_pBatteryText->Draw();
+
 	}
-//.	inherited::Draw						();
 }

@@ -499,7 +499,7 @@ void CWeaponMagazined::OnStateSwitch	(u32 S)
 						}
 						break;
 					default:
-						m_sub_state = eSubStateMax;
+						m_sub_state = eSubstateReloadBegin;
 						break;
 				}
 				m_bPending = false;
@@ -807,7 +807,20 @@ void CWeaponMagazined::OnAnimationEnd(u32 state)
 				}
 			}
 			break;	// End of Hide
-		case eShowing:	SwitchState(eIdle);		break;	// End of Show
+		case eShowing:	
+		{
+			switch (m_sub_state)
+			{
+				case eSubStateDetachScopeEnd:
+				case eSubStateAttachScopeEnd:
+				case eSubStateAttachGLEnd:
+				case eSubStateDetachGLEnd:
+					m_sub_state = eSubstateReloadBegin;
+					break;
+				default: break;
+			}
+			SwitchState(eIdle);
+		}break;	// End of Show
 		case eIdle:		switch2_Idle();			break;  // Keep showing idle
 	}
 	inherited::OnAnimationEnd(state);

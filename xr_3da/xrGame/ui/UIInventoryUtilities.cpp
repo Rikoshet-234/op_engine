@@ -14,6 +14,7 @@
 #include "../InfoPortion.h"
 #include "../game_base_space.h"
 #include "../actor.h"
+#include "UICellCustomItems.h"
 
 const LPCSTR relationsLtxSection	= "game_relations";
 const LPCSTR ratingField			= "rating_names";
@@ -486,6 +487,21 @@ u32 InventoryUtilities::GetReputationColor(CHARACTER_REPUTATION_VALUE rv)
 	}
 	return res;
 }
+
+bool InventoryUtilities::OnItemBatteryDbClickHelper(CUICellItem* itm, CCustomOutfit* outfit)
+{
+	CUISectionCellItem* cell = static_cast<CUISectionCellItem*>(itm);
+	if (!cell || !outfit)
+		return false;
+	if (!cell->m_sSection || cell->m_sSection.size() == 0)
+		return false;
+	CExoOutfit* exo = smart_cast<CExoOutfit*>(outfit);
+	if (!exo)
+		return false;
+	exo->RemoveFromBatterySlot(true);
+	return true;
+}
+
 
 u32	InventoryUtilities::GetRelationColor(ALife::ERelationType relation)
 {

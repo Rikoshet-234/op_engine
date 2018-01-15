@@ -355,6 +355,12 @@ bool CUIInventoryWnd::OnItemDrop(CUICellItem* itm)
 			}*/
 #pragma endregion
 		}
+		CExoOutfit* exo = smart_cast<CExoOutfit*>(focusedItem);
+		if (exo && exo->isSuitableBattery(draggedItem->object().cNameSect()))
+		{
+			exo->PutToBatterySlot(draggedItem);
+			processed = true;
+		}
 		if (Actor())
 			Actor()->callback(GameObject::ECallbackType::eOnCellItemDrop)(this,old_owner,new_owner,itm,focusedCellItem,processed);
 		return true;
@@ -367,6 +373,26 @@ bool CUIInventoryWnd::OnItemDrop(CUICellItem* itm)
 			CUIDragDropListEx *slotForitem=GetSlotList(CurrentIItem()->GetSlot());
 			if(slotForitem==new_owner)
 					processed=ToSlot	(itm, true);
+			else
+			{
+				if (new_owner == m_pUIOutfitList)
+				{
+					CExoOutfit* exo = nullptr;
+					if (focusedItem)
+						exo = smart_cast<CExoOutfit*>(focusedItem);
+					else
+					{
+						CUICellItem* cell = m_pUIOutfitList->GetItemIdx(0);
+						if (cell && cell->m_pData)
+						{
+							PIItem _iitem = static_cast<PIItem>(cell->m_pData);
+							exo = smart_cast<CExoOutfit*>(_iitem);
+						}
+					}
+					if (exo && exo->isSuitableBattery(draggedItem->object().cNameSect()))
+						exo->PutToBatterySlot(draggedItem);
+				}
+			}
 #pragma region disabled due i do not wont move active item to slot
 			/*else
 			{

@@ -13,7 +13,7 @@
 #include "ai_object_location.h"
 #include "ai_space.h"
 #include "game_graph.h"
-#include "PHDestroyable.h"
+#include "xrServer_Object_Base.h"
 #define F_MAX         3.402823466e+38F
 
 u32 CPHSkeleton::existence_time=5000;
@@ -60,7 +60,7 @@ void CPHSkeleton::Init()
 {
 	m_remove_time = u32(-1);
 	b_removing=false;
-	m_startup_anim=NULL;
+	m_startup_anim= nullptr;
 }
 
 bool CPHSkeleton::Spawn(CSE_Abstract *D)
@@ -87,7 +87,7 @@ bool CPHSkeleton::Spawn(CSE_Abstract *D)
 	else 
 	{
 		CPhysicsShellHolder	*obj	=	PPhysicsShellHolder();
-		CKinematics			*K		=	NULL;
+		CKinematics			*K		= nullptr;
 		if (obj->Visual())
 		{
 			K= smart_cast<CKinematics*>(obj->Visual());
@@ -235,17 +235,33 @@ void CPHSkeleton::RestoreNetState(CSE_PHSkeleton* po)
 {
 	if(!po->_flags.test(CSE_PHSkeleton::flSavedData))return;
 	CPhysicsShellHolder* obj=PPhysicsShellHolder();
-	PHNETSTATE_VECTOR& saved_bones=po->saved_bones.bones;
-	PHNETSTATE_I i=saved_bones.begin(),e=saved_bones.end();
+
 	if(obj->PPhysicsShell()&&obj->PPhysicsShell()->isActive())
 	{
 		obj->PPhysicsShell()->Disable();
 	}
-	for(u16 bone=0;e!=i;i++,bone++)
+	PHNETSTATE_VECTOR& saved_bones = po->saved_bones.bones;
+#pragma region original code
+	//PHNETSTATE_I i=saved_bones.begin(),e=saved_bones.end();
+	/*for(u16 bone=0;e!=i; ++i,bone++)
 	{
-		R_ASSERT(bone<obj->PHGetSyncItemsNumber());
-		obj->PHGetSyncItem(bone)->set_State(*i);
-	}
+	R_ASSERT(bone<obj->PHGetSyncItemsNumber());
+	obj->PHGetSyncItem(bone)->set_State(*i);
+	}*/
+#pragma endregion
+	u16 bone = 0;
+	std::all_of(saved_bones.begin(), saved_bones.end(),[&](SPHNetState state)
+	{
+		if (bone>=obj->PHGetSyncItemsNumber())
+		{
+			Msg("~ WARNING [%s] has different state in saved_bones[%d] PHGetSyncItemsNumber[%d] Visual[%s] alive[%s]", 
+				obj->Name_script(), saved_bones.size(), obj->PHGetSyncItemsNumber(), obj->cNameVisual().c_str(),obj->GetHealth()>0 ?"yes":"no");
+			return false;
+		}
+		obj->PHGetSyncItem(bone)->set_State(state);
+		bone++;
+		return true;
+	});
 	saved_bones.clear();
 	po->_flags.set(CSE_PHSkeleton::flSavedData,FALSE);
 	m_flags.set(CSE_PHSkeleton::flSavedData,FALSE);

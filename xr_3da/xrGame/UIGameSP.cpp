@@ -52,15 +52,9 @@ void CUIGameSP::shedule_Update(u32 dt)
 void CUIGameSP::HideShownDialogs()
 {
 	CUIDialogWnd* mir				= MainInputReceiver();
-	if( mir			&&
-			(	mir==InventoryMenu	||
-				mir==PdaMenu		||
-				mir==TalkMenu		||
-				mir==UICarBodyMenu
-			)
-		)
-	mir->GetHolder()->StartStopMenu			(mir,true);
-
+	bool isclimb = !!(Actor()->get_state()&mcClimb);
+	if( mir	&& (mir==InventoryMenu||mir==PdaMenu||mir==TalkMenu||mir==UICarBodyMenu) && !isclimb)
+		mir->GetHolder()->StartStopMenu			(mir,true);
 }
 
 void CUIGameSP::SetClGame (game_cl_GameState* g)
@@ -80,31 +74,35 @@ bool CUIGameSP::IR_OnKeyboardPress(int dik)
 	CActor *pActor = smart_cast<CActor*>(Level().CurrentEntity());
 	if(!pActor)								return false;
 	if( pActor && !pActor->g_Alive() )		return false;
-
+	bool isClimb = !!(Actor()->get_state()&mcClimb);
 	switch ( get_binded_action(dik) )
 	{
 	case kINVENTORY: 
-		if( !MainInputReceiver() || MainInputReceiver()==InventoryMenu){
+		if( (!MainInputReceiver() || MainInputReceiver()==InventoryMenu) && !isClimb)
+		{
 			m_game->StartStopMenu(InventoryMenu,true);
 			return true;
 		}break;
 
 	case kACTIVE_JOBS:
-		if( !MainInputReceiver() || MainInputReceiver()==PdaMenu){
+		if( (!MainInputReceiver() || MainInputReceiver()==PdaMenu) && !isClimb)
+		{
 			PdaMenu->SetActiveSubdialog(eptQuests);
 			m_game->StartStopMenu(PdaMenu,true);
 			return true;
 		}break;
 
 	case kMAP:
-		if( !MainInputReceiver() || MainInputReceiver()==PdaMenu){
+		if( (!MainInputReceiver() || MainInputReceiver()==PdaMenu) && !isClimb)
+		{
 			PdaMenu->SetActiveSubdialog(eptMap);
 			m_game->StartStopMenu(PdaMenu,true);
 			return true;
 		}break;
 
 	case kCONTACTS:
-		if( !MainInputReceiver() || MainInputReceiver()==PdaMenu){
+		if( (!MainInputReceiver() || MainInputReceiver()==PdaMenu) && !isClimb)
+		{
 			PdaMenu->SetActiveSubdialog(eptContacts);
 			m_game->StartStopMenu(PdaMenu,true);
 			return true;

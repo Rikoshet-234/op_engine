@@ -22,7 +22,7 @@
 #include "../exooutfit.h"
 #include "UICellItemFactory.h"
 
-CUIItemInfo::CUIItemInfo()
+CUIItemInfo::CUIItemInfo(): m_pBatteryText(nullptr), m_pBatteryIconBackground(nullptr), m_pChargeBatteryProgress(nullptr)
 {
 	UIItemImageSize.set(0.0f, 0.0f);
 	UICondProgresBar = nullptr;
@@ -37,6 +37,7 @@ CUIItemInfo::CUIItemInfo()
 	UIName = nullptr;
 	m_pInvItem = nullptr;
 	m_b_force_drawing = false;
+	m_pBatteryIcon = nullptr;
 }
 
 CUIItemInfo::~CUIItemInfo()
@@ -134,10 +135,18 @@ void CUIItemInfo::Init(LPCSTR xml_name){
 
 	if (uiXml.NavigateToNode("battery_icon", 0))
 	{
-		m_pBatteryIcon = xr_new<CUIDragDropListEx>();
+		m_pBatteryIcon = xr_new<CUIExoBatteryStatic>();
 		m_pBatteryIcon->SetAutoDelete(true);
-		CUIXmlInit().InitDragDropListEx(uiXml, "battery_icon", 0, m_pBatteryIcon);
+		m_pBatteryIcon->SetShader(InventoryUtilities::GetEquipmentIconsShader());
+		m_pBatteryIcon->TextureAvailable(false);
+		m_pBatteryIcon->TextureOff();
+		m_pBatteryIcon->SetParentItem(nullptr);
+		CUIXmlInit().InitStatic(uiXml, "battery_icon", 0, m_pBatteryIcon);
 		AttachChild(m_pBatteryIcon);
+		m_pBatteryIconBackground = xr_new<CUIFrameWindow>();
+		m_pBatteryIconBackground->SetAutoDelete(true);
+		m_pBatteryIcon->AttachChild(m_pBatteryIconBackground);
+		CUIXmlInit().InitFrameWindow(uiXml, "battery_icon:background", 0, m_pBatteryIconBackground);
 
 		m_pChargeBatteryProgress = xr_new<CUIProgressBar>();
 		m_pChargeBatteryProgress->SetAutoDelete(true);
@@ -262,13 +271,19 @@ void CUIItemInfo::InitItem(CInventoryItem* pInvItem)
 		m_pBatteryIcon->Show(false);
 		m_pBatteryText->Show(false);
 		m_pChargeBatteryProgress->Show(false);
-		m_pBatteryIcon->ClearAll(true);
+		m_pChargeBatteryProgress->SetProgressPos(0);
+		m_pBatteryIcon->TextureOff();
+		m_pBatteryIcon->TextureAvailable(false);
 		CExoOutfit* exo = smart_cast<CExoOutfit*>(m_pInvItem);
 		if (exo && exo->BatteryAccepted())
 		{
 			if (exo->m_sCurrentBattery.size() > 0)
 			{
-				m_pBatteryIcon->SetItem(create_cell_item(exo->m_sCurrentBattery));
+				UIIconInfo iconInfo(exo->m_sCurrentBattery);
+				m_pBatteryIcon->SetOriginalRect(iconInfo.getOriginalRect());
+				m_pBatteryIcon->SetStretchTexture(true);
+				m_pBatteryIcon->TextureOn();
+				m_pBatteryIcon->TextureAvailable(true);
 				m_pChargeBatteryProgress->SetProgressPos(exo->m_fCurrentCharge*100.0f + 1.0f - EPS);
 			}
 			m_pBatteryIcon->Show(true);

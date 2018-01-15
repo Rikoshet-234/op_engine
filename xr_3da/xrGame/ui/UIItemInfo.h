@@ -2,6 +2,7 @@
 #include "uiwindow.h"
 #include "UIOutfitInfo.h"
 #include "UIOutfitParams.h"
+#include "UIExoBatteryStatic.h"
 
 class CInventoryItem;
 class CUIStatic;
@@ -52,7 +53,8 @@ public:
 	CUIStatic*			UIItemImage;
 
 	CUIStatic* m_pBatteryText;
-	CUIDragDropListEx* m_pBatteryIcon;
+	CUIExoBatteryStatic* m_pBatteryIcon;
+	CUIFrameWindow*	m_pBatteryIconBackground;
 	CUIProgressBar* m_pChargeBatteryProgress;
 
 };

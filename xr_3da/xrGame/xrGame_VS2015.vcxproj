@@ -660,6 +660,7 @@
     <ClInclude Include="OPFuncs\utils.h" />
     <ClInclude Include="QuickSlots.h" />
     <ClInclude Include="script_writer.h" />
+    <ClInclude Include="ui\UIExoBatteryStatic.h" />
     <ClInclude Include="UIListsManipulations.h" />
     <ClInclude Include="ui\IconedItemsHelper.h" />
     <ClInclude Include="ui\UIIconInfo.h" />
@@ -2450,6 +2451,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
+    <ClCompile Include="ui\UIExoBatteryStatic.cpp" />
     <ClCompile Include="UIListsManipulations.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">pch_script.h</PrecompiledHeaderFile>

@@ -526,7 +526,7 @@ void CWeaponMagazinedWGrenade::OnStateSwitch(u32 S)
 					}
 				break;
 				default:
-					m_sub_state = eSubStateMax;
+					m_sub_state = eSubstateReloadBegin;
 					break;
 				}
 				m_bPending = false;
@@ -735,7 +735,7 @@ void CWeaponMagazinedWGrenade::LoadCurrentZoomOffset()
 		if (m_bGrenadeMode)
 		{
 			LoadZoomOffset(*hud_sect, "grenade_");
-			if (pSettings->line_exist(cNameSect(), "ironsight_zoom_factor") && m_eGrenadeLauncherStatus == ALife::eAddonPermanent)
+			if (pSettings->line_exist(cNameSect(), "ironsight_zoom_factor") && (m_eGrenadeLauncherStatus == ALife::eAddonPermanent|| m_eScopeStatus== ALife::eAddonPermanent))
 			{
 				m_fIronSightZoomFactor = pSettings->r_float(cNameSect(), "ironsight_zoom_factor");
 				iszf_loaded = true;

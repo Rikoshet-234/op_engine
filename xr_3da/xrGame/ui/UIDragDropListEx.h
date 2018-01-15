@@ -93,8 +93,15 @@ struct TCachedData
 	bool stretchTexture;
 	shared_str textureBack;
 	bool stretchTextureBack;
-	
-} ;
+	struct customIcon
+	{
+		TPosition position;
+		float indent;
+		float w, h;
+		shared_str texture;
+		bool stretch;
+	} exo_icon;
+};
 
 class CUIDragDropListEx :public CUIWindow, public CUIWndCallback
 {

@@ -40,8 +40,10 @@ class CExoOutfitCellItem :public CUIInventoryCellItem
 {
 private:
 	typedef  CUIInventoryCellItem	inherited;
+	CUIStatic*				m_pCustomIcon;
 public:
 	CExoOutfitCellItem(CExoOutfit* itm);
+	bool SetOwnerList(CUIDragDropListEx* p) override;
 	bool EqualTo(CUICellItem* itm) override;
 	CExoOutfit*	object() { return static_cast<CExoOutfit*>(m_pData); }
 };

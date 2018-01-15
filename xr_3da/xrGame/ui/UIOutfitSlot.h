@@ -1,12 +1,15 @@
 #pragma once
 #include "UIDragDropListEx.h"
+#include "UIExoBatteryStatic.h"
 
 class CUIOutfitDragDropList :public CUIDragDropListEx
 {
 	typedef CUIDragDropListEx						inherited;
 	CUIStatic*										m_background;
-	CUIStatic*										m_pBatteryText;
-	CUIDragDropListEx*								m_pBatteryIcon;
+
+	CUIStatic* m_pBatteryText;
+	CUIExoBatteryStatic* m_pBatteryIcon;
+	CUIFrameWindow*	m_pBatteryIconBackground;
 	CUIProgressBar* m_pChargeBatteryProgress;
 	shared_str										m_default_outfit;
 	bool m_bDrawBatteryPart;

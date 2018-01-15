@@ -29,10 +29,10 @@ CUICellItem::CUICellItem()
 	m_selected=false;
 	m_allowedGrouping=true;
 	m_suitable=false;
-	p_ConditionProgressBar=xr_new<CUIProgressBar>();
-	p_ConditionProgressBar->SetAutoDelete(true);
 	m_bIgnoreItemPlace = false;
-	CUIWindow::AttachChild(p_ConditionProgressBar);
+	m_pConditionProgressBar=xr_new<CUIProgressBar>();
+	m_pConditionProgressBar->SetAutoDelete(true);
+	CUIWindow::AttachChild(m_pConditionProgressBar);
 }
 
 CUICellItem::~CUICellItem()
@@ -112,13 +112,11 @@ CUIDragItem* CUICellItem::CreateDragItem()
 	return tmp;
 }
 
-void CUICellItem::SetOwnerList(CUIDragDropListEx* p)	
+bool CUICellItem::SetOwnerList(CUIDragDropListEx* p)	
 {
 	m_pParentList=p;
-	if (!m_pParentList)
-		return;
-	if (!m_pData)
-		return;
+	if (!m_pParentList || !m_pData)
+		return false;
 	PIItem itm = static_cast<PIItem>(m_pData);
 	CWeapon* pWeapon = smart_cast<CWeapon*>(itm);
 	CCustomOutfit* pOutfit=smart_cast<CCustomOutfit*>(itm);
@@ -263,37 +261,38 @@ void CUICellItem::SetOwnerList(CUIDragDropListEx* p)
 				else
 					height=y_size-m_pParentList->cacheData.indent*2;
 		}
-		p_ConditionProgressBar->SetWndPos(x,y);
-		p_ConditionProgressBar->SetWndRect(x,y,width,height);		
-		p_ConditionProgressBar->SetRange(0,100);
-		p_ConditionProgressBar->SetOrientation(isHorizontal);
+		m_pConditionProgressBar->SetWndPos(x,y);
+		m_pConditionProgressBar->SetWndRect(x,y,width,height);		
+		m_pConditionProgressBar->SetRange(0,100);
+		m_pConditionProgressBar->SetOrientation(isHorizontal);
 
 
-		p_ConditionProgressBar->m_UIProgressItem.InitTexture(m_pParentList->cacheData.texture.c_str());
-		p_ConditionProgressBar->m_UIProgressItem.SetStretchTexture(m_pParentList->cacheData.stretchTexture);
-		p_ConditionProgressBar->m_UIProgressItem.TextureAvailable(true);
-		p_ConditionProgressBar->m_UIProgressItem.TextureOn();
-		p_ConditionProgressBar->m_UIProgressItem.SetWidth(width);
-		p_ConditionProgressBar->m_UIProgressItem.SetHeight(height); 
+		m_pConditionProgressBar->m_UIProgressItem.InitTexture(m_pParentList->cacheData.texture.c_str());
+		m_pConditionProgressBar->m_UIProgressItem.SetStretchTexture(m_pParentList->cacheData.stretchTexture);
+		m_pConditionProgressBar->m_UIProgressItem.TextureAvailable(true);
+		m_pConditionProgressBar->m_UIProgressItem.TextureOn();
+		m_pConditionProgressBar->m_UIProgressItem.SetWidth(width);
+		m_pConditionProgressBar->m_UIProgressItem.SetHeight(height); 
 
 		if (m_pParentList->cacheData.textureBack.size()>0)
 		{
-			p_ConditionProgressBar->m_UIBackgroundItem.InitTexture(m_pParentList->cacheData.textureBack.c_str());
-			p_ConditionProgressBar->m_UIBackgroundItem.SetStretchTexture(m_pParentList->cacheData.stretchTextureBack);
-			p_ConditionProgressBar->m_UIBackgroundItem.TextureAvailable(true);
-			p_ConditionProgressBar->m_UIBackgroundItem.TextureOn();
-			p_ConditionProgressBar->m_UIBackgroundItem.SetWidth(width);
-			p_ConditionProgressBar->m_UIBackgroundItem.SetHeight(height);
-			p_ConditionProgressBar->SetBackgroundPresent(true);
+			m_pConditionProgressBar->m_UIBackgroundItem.InitTexture(m_pParentList->cacheData.textureBack.c_str());
+			m_pConditionProgressBar->m_UIBackgroundItem.SetStretchTexture(m_pParentList->cacheData.stretchTextureBack);
+			m_pConditionProgressBar->m_UIBackgroundItem.TextureAvailable(true);
+			m_pConditionProgressBar->m_UIBackgroundItem.TextureOn();
+			m_pConditionProgressBar->m_UIBackgroundItem.SetWidth(width);
+			m_pConditionProgressBar->m_UIBackgroundItem.SetHeight(height);
+			m_pConditionProgressBar->SetBackgroundPresent(true);
 		}
-		p_ConditionProgressBar->m_minColor.set(color_rgba(255,36,0,255));
-		p_ConditionProgressBar->m_maxColor.set(color_rgba(0,255,0,255));
-		p_ConditionProgressBar->m_bUseColor=true;
-		p_ConditionProgressBar->SetProgressPos(itm->GetCondition()*100);
+		m_pConditionProgressBar->m_minColor.set(color_rgba(255,36,0,255));
+		m_pConditionProgressBar->m_maxColor.set(color_rgba(0,255,0,255));
+		m_pConditionProgressBar->m_bUseColor=true;
+		m_pConditionProgressBar->SetProgressPos(itm->GetCondition()*100);
 
 		visible=true;
 	}
-	p_ConditionProgressBar->Show(visible);
+	m_pConditionProgressBar->Show(visible);
+	return visible;
 }
 
 bool CUICellItem::EqualTo(CUICellItem* itm)
