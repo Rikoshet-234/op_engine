@@ -51,10 +51,4 @@ public:
 
 	Fvector2			UIItemImageSize; 
 	CUIStatic*			UIItemImage;
-
-	CUIStatic* m_pBatteryText;
-	CUIExoBatteryStatic* m_pBatteryIcon;
-	CUIFrameWindow*	m_pBatteryIconBackground;
-	CUIProgressBar* m_pChargeBatteryProgress;
-
 };

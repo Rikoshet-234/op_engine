@@ -80,12 +80,26 @@ CWeaponHUD::CWeaponHUD			(CHudItem* pHudItem)
 	m_pParentWeapon				= pHudItem;
 	m_bHidden					= true;
 	m_bStopAtEndAnimIsRunning	= false;
-	m_pCallbackItem				= NULL;
+	m_pCallbackItem				= nullptr;
 	m_Transform.identity		();
+	m_pBobbing = xr_new<CWeaponBobbing>();
+	m_bEnableBobbing = false;
 }
 
 CWeaponHUD::~CWeaponHUD()
 {
+	xr_delete(m_pBobbing);
+}
+
+void CWeaponHUD::SetHudBobbong(bool value)
+{
+	m_bEnableBobbing = value;
+//	Msg("set bobbing to %s for %s",value ?"true":"false", m_pParentWeapon->object().cNameSect().c_str());
+}
+
+bool CWeaponHUD::GetHudBobbing()
+{
+	return m_bEnableBobbing;
 }
 
 void CWeaponHUD::Load(LPCSTR section)
@@ -96,20 +110,23 @@ void CWeaponHUD::Load(LPCSTR section)
 void  CWeaponHUD::Init()
 {
 	m_bStopAtEndAnimIsRunning	= false;
-	m_pCallbackItem				= NULL;
+	m_pCallbackItem				= nullptr;
 }
 
 
 void  CWeaponHUD::net_DestroyHud()
 {
 	m_bStopAtEndAnimIsRunning	= false;
-	m_pCallbackItem				= NULL;
+	m_pCallbackItem				= nullptr;
 	Visible						(false);
 }
 
 void CWeaponHUD::UpdatePosition(const Fmatrix& trans)
 {
-	m_Transform.mul				(trans,m_shared_data.get_value()->m_offset);
+	Fmatrix xform = trans;
+	if (m_bEnableBobbing)
+		m_pBobbing->Update(xform);
+	m_Transform.mul(xform, m_shared_data.get_value()->m_offset);
 	VERIFY						(!fis_zero(DET(m_Transform)));
 }
 

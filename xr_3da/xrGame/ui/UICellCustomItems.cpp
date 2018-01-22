@@ -75,17 +75,18 @@ CExoOutfitCellItem::CExoOutfitCellItem(CExoOutfit* itm) :inherited(itm)
 {
 	m_pCustomIcon = xr_new<CUIStatic>();
 	m_pCustomIcon->SetAutoDelete(true);
-	m_pCustomIcon->TextureAvailable(true);
-	m_pCustomIcon->TextureOn();
+	m_pCustomIcon->TextureAvailable(false);
+	m_pCustomIcon->TextureOff();
 	CUIWindow::AttachChild(m_pCustomIcon);
 }
 
 bool CExoOutfitCellItem::SetOwnerList(CUIDragDropListEx* p)
 {
-	if (!inherited::SetOwnerList(p))
-		return false;
+	inherited::SetOwnerList(p);
 	m_pCustomIcon->TextureOff();
 	m_pCustomIcon->TextureAvailable(false);
+	if (!m_pParentList || !m_pData)
+		return false;
 	PIItem itm = PIItem(m_pData);
 	CExoOutfit* exo = smart_cast<CExoOutfit*>(itm);
 	if (!exo || (exo && !(exo->m_sCurrentBattery.size() > 0)))

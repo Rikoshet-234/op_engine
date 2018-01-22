@@ -450,6 +450,7 @@ public:
 
 	bool					AnyAction				()	{return (mstate_real & mcAnyAction) != 0;};
 	bool					AnyMove					();
+	bool					is_sprint();
 	bool					is_jump					();		
 protected:
 	u32						mstate_wishful;

@@ -1728,10 +1728,12 @@ bool CWeapon::PlayAnimation(MotionSVec animation,BOOL mixMode,LPCSTR debugText,C
 {
 	if(animation.size()>0)
 	{
+		m_pHUD->SetHudBobbong(false);
 		m_pHUD->animPlay(random_anim(animation), mixMode, callback,GetState());
 		if (debugText!=nullptr)	Msg("Done %s",debugText);
 		return true;
 	}
-	if (debugText!=nullptr)	Msg("Fail %s",debugText);
+	m_pHUD->SetHudBobbong(true);
+	if (debugText != nullptr)	Msg("Fail %s", debugText);
 	return false;
 }

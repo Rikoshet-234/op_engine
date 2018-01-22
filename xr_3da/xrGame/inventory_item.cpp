@@ -1278,7 +1278,7 @@ BOOL CInventoryItem::IsInvalid() const
 	return object().getDestroy() || GetDropManual();
 }
 
-void CInventoryItem::SetCost(unsigned cost)
+void CInventoryItem::SetCost(u32 cost)
 {
 	m_cost = cost;
 	NET_Packet		P;

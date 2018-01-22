@@ -5,17 +5,10 @@
 #include "pch_script.h"
 #include "ai_debug.h"
 #include "CustomMonster.h"
-#include "hudmanager.h"
 #include "ai_space.h"
-#include "ai/monsters/BaseMonster/base_monster.h"
 #include "xrserver_objects_alife_monsters.h"
 #include "xrserver.h"
-#include "seniority_hierarchy_holder.h"
-#include "team_hierarchy_holder.h"
-#include "squad_hierarchy_holder.h"
-#include "group_hierarchy_holder.h"
 #include "customzone.h"
-#include "clsid_game.h"
 #include "../skeletonanimated.h"
 #include "detail_path_manager.h"
 #include "memory_manager.h"
@@ -39,7 +32,6 @@
 #include "profiler.h"
 #include "date_time.h"
 #include "characterphysicssupport.h"
-#include "ai/monsters/snork/snork.h"
 #include "ai/monsters/burer/burer.h"
 #include "GamePersistent.h"
 #include "actor.h"
@@ -106,70 +98,62 @@ CCustomMonster::~CCustomMonster	()
 		Level().client_spawn_manager().clear(ID());
 }
 
-void CCustomMonster::Load		(LPCSTR section)
+void CCustomMonster::Load(LPCSTR section)
 {
-	inherited::Load				(section);
-	material().Load				(section);
-	memory().Load				(section);
-	movement().Load				(section);
-	//////////////////////////////////////////////////////////////////////////
-
-	///////////
-	// m_PhysicMovementControl: General
-
-	character_physics_support()->movement()->Load			(section);
-	//Fbox	bb;
-
-	//// m_PhysicMovementControl: BOX
-	//Fvector	vBOX0_center= pSettings->r_fvector3	(section,"ph_box0_center"	);
-	//Fvector	vBOX0_size	= pSettings->r_fvector3	(section,"ph_box0_size"		);
-	//bb.set	(vBOX0_center,vBOX0_center); bb.grow(vBOX0_size);
-	//m_PhysicMovementControl->SetBox		(0,bb);
-
-	//// m_PhysicMovementControl: BOX
-	//Fvector	vBOX1_center= pSettings->r_fvector3	(section,"ph_box1_center"	);
-	//Fvector	vBOX1_size	= pSettings->r_fvector3	(section,"ph_box1_size"		);
-	//bb.set	(vBOX1_center,vBOX1_center); bb.grow(vBOX1_size);
-	//m_PhysicMovementControl->SetBox		(1,bb);
-
-	//// m_PhysicMovementControl: Foots
-	//Fvector	vFOOT_center= pSettings->r_fvector3	(section,"ph_foot_center"	);
-	//Fvector	vFOOT_size	= pSettings->r_fvector3	(section,"ph_foot_size"		);
-	//bb.set	(vFOOT_center,vFOOT_center); bb.grow(vFOOT_size);
-	//m_PhysicMovementControl->SetFoots	(vFOOT_center,vFOOT_size);
-
-	//// m_PhysicMovementControl: Crash speed and mass
-	//float	cs_min		= pSettings->r_float	(section,"ph_crash_speed_min"	);
-	//float	cs_max		= pSettings->r_float	(section,"ph_crash_speed_max"	);
-	//float	mass		= pSettings->r_float	(section,"ph_mass"				);
-	//m_PhysicMovementControl->SetCrashSpeeds	(cs_min,cs_max);
-	//m_PhysicMovementControl->SetMass		(mass);
+	inherited::Load(section);
+	material().Load(section);
+	memory().Load(section);
+	movement().Load(section);
+	character_physics_support()->movement()->Load(section);
+	Position().y += EPS_L;
+	eye_fov = pSettings->r_float(section, "eye_fov");
+	eye_range = pSettings->r_float(section, "eye_range");
+	load_friend_community_overrides(section);
+}
 
 
-	// m_PhysicMovementControl: Frictions
-	/*
-	float af, gf, wf;
-	af					= pSettings->r_float	(section,"ph_friction_air"	);
-	gf					= pSettings->r_float	(section,"ph_friction_ground");
-	wf					= pSettings->r_float	(section,"ph_friction_wall"	);
-	m_PhysicMovementControl->SetFriction	(af,wf,gf);
+void CCustomMonster::load_friend_community_overrides(LPCSTR section)
+{
+	if (pSettings->line_exist(section, "Friend_Community_Overrides"))
+	{
+		LPCSTR src = pSettings->r_string(section, "Friend_Community_Overrides");
 
-	// BOX activate
-	m_PhysicMovementControl->ActivateBox	(0);
-	*/
-	////////
+		// parse src
+		int item_count = _GetItemCount(src);
+		m_friend_community_overrides.resize(item_count);
+		for (int i = 0; i < item_count; i++) {
+			string128	st;
+			_GetItem(src, i, st);
+			m_friend_community_overrides.at(i) = st;
+		}
+	}
+}
 
-	Position().y			+= EPS_L;
+#include "monster_community.h"
+#include "ai/stalker/ai_stalker.h"
 
-	//	m_current			= 0;
+bool CCustomMonster::is_community_friend_overrides(const CEntityAlive *entity_alive) const
+{
+	if (m_friend_community_overrides.empty())
+		return false;
+	const CInventoryOwner	*IO = smart_cast<const CInventoryOwner*>(entity_alive);
+	if (!IO) 
+		return false;
+	shared_str communityIndex = nullptr;
+	if (auto CBS = const_cast<CEntityAlive *>(entity_alive)->cast_base_monster())
+		communityIndex = CBS->monster_community->id();
+	else if (auto SBS = const_cast<CEntityAlive *>(entity_alive)->cast_stalker())
+		communityIndex = SBS->CharacterInfo().Community().id();
+	if (!communityIndex)
+		return false;
+	auto co = std::find(m_friend_community_overrides.begin(), m_friend_community_overrides.end(), communityIndex);
+	return co != m_friend_community_overrides.end();
+}
 
-	eye_fov					= pSettings->r_float(section,"eye_fov");
-	eye_range				= pSettings->r_float(section,"eye_range");
-
-	// Health & Armor
-//	fArmor					= 0;
-
-	// Msg				("! cmonster size: %d",sizeof(*this));
+bool CCustomMonster::is_relation_enemy(const CEntityAlive* tpEntityAlive) const
+{
+	if (is_community_friend_overrides(tpEntityAlive)) return false;
+	return inherited::is_relation_enemy(tpEntityAlive);
 }
 
 void CCustomMonster::reinit		()

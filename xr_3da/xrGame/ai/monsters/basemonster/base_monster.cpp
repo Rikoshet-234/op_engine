@@ -106,46 +106,6 @@ CBaseMonster::~CBaseMonster()
 	xr_delete(Home);
 }
 
-void CBaseMonster::load_friend_community_overrides(LPCSTR section)
-{
-	if (pSettings->line_exist(section, "Friend_Community_Overrides"))
-	{
-		LPCSTR src = pSettings->r_string(section, "Friend_Community_Overrides");
-
-		// parse src
-		int item_count = _GetItemCount(src);
-		m_friend_community_overrides.resize(item_count);
-		for (int i = 0; i < item_count; i++) {
-			string128	st;
-			_GetItem(src, i, st);
-			m_friend_community_overrides.at(i) = st;
-		}
-	}
-}
-
-bool CBaseMonster::is_community_friend_overrides(const CEntityAlive *entity_alive) const
-{
-	const CInventoryOwner	*IO = smart_cast<const CInventoryOwner*>(entity_alive);
-	if (!IO) return false;
-	if (const_cast<CEntityAlive *>(entity_alive)->cast_base_monster()) return false;
-
-	return (
-		std::find(
-			m_friend_community_overrides.begin(),
-			m_friend_community_overrides.end(),
-			IO->CharacterInfo().Community().id()
-		)
-		!=
-		m_friend_community_overrides.end()
-		);
-}
-
-bool CBaseMonster::is_relation_enemy(const CEntityAlive* tpEntityAlive) const
-{
-	if (is_community_friend_overrides(tpEntityAlive)) return false;
-	return inherited::is_relation_enemy(tpEntityAlive);
-}
-
 void CBaseMonster::UpdateCL()
 {
 	inherited::UpdateCL();

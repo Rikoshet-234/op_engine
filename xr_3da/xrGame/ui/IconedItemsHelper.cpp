@@ -81,7 +81,7 @@ void setIconedItem(xr_map<shared_str ,shared_str> iconIDs,CUIListItemIconed* ite
 	}
 	item->SetFieldText(1,CStringTable().translate(column1Value).c_str());
 	bool column2ValuePresent=false;
-	if (!fsimilar(column2Value, 0.0f))
+	if (!fsimilar(column2Value, 0.0f) && column2Type!=3)
 	{
 		string128 buff_column2;
 		switch (column2Type)
@@ -132,6 +132,12 @@ void setIconedItem(xr_map<shared_str ,shared_str> iconIDs,CUIListItemIconed* ite
 				break;
 			default:NODEFAULT;
 		}
+		item->SetFieldText(2, buff_column2);
+		column2ValuePresent = true;
+	} else if (column2Type==3)
+	{
+		string128 buff_column2;
+		sprintf_s(buff_column2, "%s%3.0f%%", (column2Value > 0.0f) ? "%c[green]" : "%c[red]", column2Value*100.0f);
 		item->SetFieldText(2, buff_column2);
 		column2ValuePresent = true;
 	}

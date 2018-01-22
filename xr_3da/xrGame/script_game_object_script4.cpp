@@ -804,7 +804,7 @@ class_<CScriptGameObject> &script_register_game_object3(class_<CScriptGameObject
 		.def("is_inventory_box", &CScriptGameObject::IsInventoryBox)
 		.def("is_pnv", &CScriptGameObject::IsPNV)
 		.def("iterate_box_obj", &CScriptGameObject::IterateInventoryBoxObject)
-		.def("iterate_box_obj", &CScriptGameObject::IterateInventoryBoxId)
+		.def("iterate_box_id", &CScriptGameObject::IterateInventoryBoxId)
 		.def("get_current_pnv", &CScriptGameObject::GetCurrentPNV)
 		.def("useful_for_npc", &CScriptGameObject::get_useful_for_npc)
 

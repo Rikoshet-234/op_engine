@@ -6,6 +6,7 @@ class CUIOutfitDragDropList :public CUIDragDropListEx
 {
 	typedef CUIDragDropListEx						inherited;
 	CUIStatic*										m_background;
+	bool m_bBackgroundInitialized;
 
 	CUIStatic* m_pBatteryText;
 	CUIExoBatteryStatic* m_pBatteryIcon;

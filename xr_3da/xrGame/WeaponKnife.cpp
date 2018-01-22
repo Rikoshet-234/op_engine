@@ -394,9 +394,7 @@ void CWeaponKnife::onMovementChanged	(ACTOR_DEFS::EMoveCommand cmd)
 {
 	if (GetState()!=eIdle)
 		return;
-	CEntity::SEntityState st;
-	g_actor->g_State(st);
-	if (st.bSprint) 
+	if (g_actor->is_sprint()) 
 	{
 		MotionID mID;
 		if (mhud_idle_sprint.size()>0)
@@ -409,7 +407,7 @@ void CWeaponKnife::onMovementChanged	(ACTOR_DEFS::EMoveCommand cmd)
 		}
 		m_pHUD->animPlay(mID, TRUE, this, eIdle);
 	}
-	else if (/*!st.bCrouch && */g_actor->AnyMove())
+	else if (g_actor->AnyMove())
 	{
 		MotionID mID;
 		if (mhud_idle_moving.size()>0)

@@ -426,9 +426,8 @@ void CArtefact::onMovementChanged	(ACTOR_DEFS::EMoveCommand cmd)
 {
 	if (GetState() != eIdle)
 		return;
-	CEntity::SEntityState st;
-	g_actor->g_State(st);
-	if (st.bSprint)
+	
+	if (g_actor->is_sprint())
 	{
 		MotionID mID = m_anim_idle_sprint.empty() ? random_anim(m_anim_idle) : random_anim(m_anim_idle_sprint);
 		m_pHUD->animPlay(mID, TRUE, this, eIdle);

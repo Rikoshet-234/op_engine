@@ -113,55 +113,55 @@ CUIMainIngameWnd::~CUIMainIngameWnd()
 void CUIMainIngameWnd::Init()
 {
 	CUIXml						uiXml;
-	uiXml.Init					(CONFIG_PATH, UI_PATH, MAININGAME_XML);
-	
+	uiXml.Init(CONFIG_PATH, UI_PATH, MAININGAME_XML);
+
 	CUIXmlInit					xml_init;
-	CUIWindow::Init				(0,0, UI_BASE_WIDTH, UI_BASE_HEIGHT);
+	CUIWindow::Init(0, 0, UI_BASE_WIDTH, UI_BASE_HEIGHT);
 
 	Enable(false);
 
-	AttachChild					(&UIStaticRadiation);
-	xml_init.InitStatic			(uiXml, "static_radiation", 0, &UIStaticRadiation);
-	UIStaticRadiation.AttachChild	(&UIRadiationBar);
-	xml_init.InitProgressBar	(uiXml, "progress_bar_radiation", 0, &UIRadiationBar);
-	AttachChild					(&UIStaticRadiationDanger);
-	xml_init.InitStatic			(uiXml, "static_radiation_danger", 0, &UIStaticRadiationDanger);
+	AttachChild(&UIStaticRadiation);
+	xml_init.InitStatic(uiXml, "static_radiation", 0, &UIStaticRadiation);
+	UIStaticRadiation.AttachChild(&UIRadiationBar);
+	xml_init.InitProgressBar(uiXml, "progress_bar_radiation", 0, &UIRadiationBar);
+	AttachChild(&UIStaticRadiationDanger);
+	xml_init.InitStatic(uiXml, "static_radiation_danger", 0, &UIStaticRadiationDanger);
 	UIStaticRadiationDanger.SetTextST("st_radiation_danger");
 	UIStaticRadiationDanger.SetVisible(false);
 
 	//static_hud_time
 
-	AttachChild					(&UIStaticHealth);
-	xml_init.InitStatic			(uiXml, "static_health", 0, &UIStaticHealth);
+	AttachChild(&UIStaticHealth);
+	xml_init.InitStatic(uiXml, "static_health", 0, &UIStaticHealth);
 
-	AttachChild					(&UIStaticArmor);
-	xml_init.InitStatic			(uiXml, "static_armor", 0, &UIStaticArmor);
+	AttachChild(&UIStaticArmor);
+	xml_init.InitStatic(uiXml, "static_armor", 0, &UIStaticArmor);
 
-	AttachChild					(&UIWeaponBack);
-	xml_init.InitStatic			(uiXml, "static_weapon", 0, &UIWeaponBack);
+	AttachChild(&UIWeaponBack);
+	xml_init.InitStatic(uiXml, "static_weapon", 0, &UIWeaponBack);
 
-	UIWeaponBack.AttachChild	(&UIWeaponSignAmmo);
-	xml_init.InitStatic			(uiXml, "static_ammo", 0, &UIWeaponSignAmmo);
-	UIWeaponSignAmmo.SetElipsis	(CUIStatic::eepEnd, 2);
+	UIWeaponBack.AttachChild(&UIWeaponSignAmmo);
+	xml_init.InitStatic(uiXml, "static_ammo", 0, &UIWeaponSignAmmo);
+	UIWeaponSignAmmo.SetElipsis(CUIStatic::eepEnd, 2);
 
-	UIWeaponBack.AttachChild	(&UIWeaponIcon);
-	xml_init.InitStatic			(uiXml, "static_wpn_icon", 0, &UIWeaponIcon);
-	UIWeaponIcon.SetShader		(GetEquipmentIconsShader());
-	UIWeaponIcon_rect			= UIWeaponIcon.GetWndRect();
+	UIWeaponBack.AttachChild(&UIWeaponIcon);
+	xml_init.InitStatic(uiXml, "static_wpn_icon", 0, &UIWeaponIcon);
+	UIWeaponIcon.SetShader(GetEquipmentIconsShader());
+	UIWeaponIcon_rect = UIWeaponIcon.GetWndRect();
 	//---------------------------------------------------------
-	AttachChild					(&UIPickUpItemIcon);
-	xml_init.InitStatic			(uiXml, "pick_up_item", 0, &UIPickUpItemIcon);
-	UIPickUpItemIcon.SetShader	(GetEquipmentIconsShader());
-	UIPickUpItemIcon.ClipperOn	();
+	AttachChild(&UIPickUpItemIcon);
+	xml_init.InitStatic(uiXml, "pick_up_item", 0, &UIPickUpItemIcon);
+	UIPickUpItemIcon.SetShader(GetEquipmentIconsShader());
+	UIPickUpItemIcon.ClipperOn();
 
-	m_iPickUpItemIconWidth		= UIPickUpItemIcon.GetWidth();
-	m_iPickUpItemIconHeight		= UIPickUpItemIcon.GetHeight();
-	m_iPickUpItemIconX			= UIPickUpItemIcon.GetWndRect().left;
-	m_iPickUpItemIconY			= UIPickUpItemIcon.GetWndRect().top;
+	m_iPickUpItemIconWidth = UIPickUpItemIcon.GetWidth();
+	m_iPickUpItemIconHeight = UIPickUpItemIcon.GetHeight();
+	m_iPickUpItemIconX = UIPickUpItemIcon.GetWndRect().left;
+	m_iPickUpItemIconY = UIPickUpItemIcon.GetWndRect().top;
 	//---------------------------------------------------------
 
 
-	UIWeaponIcon.Enable			(false);
+	UIWeaponIcon.Enable(false);
 
 	//AttachChild(&UIStaticHudTime);
 	xml_init.InitStatic(uiXml, "static_hud_time", 0, &UIStaticHudTime);
@@ -170,80 +170,83 @@ void CUIMainIngameWnd::Init()
 
 
 	//индикаторы 
-	UIZoneMap->Init				();
-	UIZoneMap->SetScale			(DEFAULT_MAP_SCALE);
+	UIZoneMap->Init();
+	UIZoneMap->SetScale(DEFAULT_MAP_SCALE);
 
-	if(IsGameTypeSingle())
+	if (IsGameTypeSingle())
 	{
-		xml_init.InitStatic					(uiXml, "static_pda_online", 0, &UIPdaOnline);
-		UIZoneMap->Background().AttachChild	(&UIPdaOnline);
+		xml_init.InitStatic(uiXml, "static_pda_online", 0, &UIPdaOnline);
+		UIZoneMap->Background().AttachChild(&UIPdaOnline);
 		UIZoneMap->Background().AttachChild(&UIStaticHudTime);
 
 	}
 
 
 	//Полоса прогресса здоровья
-	UIStaticHealth.AttachChild	(&UIHealthBar);
-//.	xml_init.InitAutoStaticGroup(uiXml,"static_health", &UIStaticHealth);
-	xml_init.InitProgressBar	(uiXml, "progress_bar_health", 0, &UIHealthBar);
+	UIStaticHealth.AttachChild(&UIHealthBar);
+	//.	xml_init.InitAutoStaticGroup(uiXml,"static_health", &UIStaticHealth);
+	xml_init.InitProgressBar(uiXml, "progress_bar_health", 0, &UIHealthBar);
 
 	//Полоса прогресса армора
-	UIStaticArmor.AttachChild	(&UIArmorBar);
-//.	xml_init.InitAutoStaticGroup(uiXml,"static_armor", &UIStaticArmor);
-	xml_init.InitProgressBar	(uiXml, "progress_bar_armor", 0, &UIArmorBar);
+	UIStaticArmor.AttachChild(&UIArmorBar);
+	//.	xml_init.InitAutoStaticGroup(uiXml,"static_armor", &UIStaticArmor);
+	xml_init.InitProgressBar(uiXml, "progress_bar_armor", 0, &UIArmorBar);
 
-	
+
 
 	// Подсказки, которые возникают при наведении прицела на объект
-	AttachChild					(&UIStaticQuickHelp);
-	xml_init.InitStatic			(uiXml, "quick_info", 0, &UIStaticQuickHelp);
+	AttachChild(&UIStaticQuickHelp);
+	xml_init.InitStatic(uiXml, "quick_info", 0, &UIStaticQuickHelp);
 
-	uiXml.SetLocalRoot			(uiXml.GetRoot());
+	uiXml.SetLocalRoot(uiXml.GetRoot());
 
-	m_UIIcons					= xr_new<CUIScrollView>(); m_UIIcons->SetAutoDelete(true);
-	xml_init.InitScrollView		(uiXml, "icons_scroll_view", 0, m_UIIcons);
-	AttachChild					(m_UIIcons);
+	m_UIIcons = xr_new<CUIScrollView>(); m_UIIcons->SetAutoDelete(true);
+	xml_init.InitScrollView(uiXml, "icons_scroll_view", 0, m_UIIcons);
+	AttachChild(m_UIIcons);
 
 	// Загружаем иконки 
-	if(IsGameTypeSingle())
+	if (IsGameTypeSingle())
 	{
-		xml_init.InitStatic		(uiXml, "starvation_static", 0, &UIStarvationIcon);
-		UIStarvationIcon.Show	(false);
+		xml_init.InitStatic(uiXml, "starvation_static", 0, &UIStarvationIcon);
+		UIStarvationIcon.Show(false);
 
-		xml_init.InitStatic		(uiXml, "psy_health_static", 0, &UIPsyHealthIcon);
-		UIPsyHealthIcon.Show	(false);
+		xml_init.InitStatic(uiXml, "psy_health_static", 0, &UIPsyHealthIcon);
+		UIPsyHealthIcon.Show(false);
 	}
 
-	xml_init.InitStatic			(uiXml, "weapon_jammed_static", 0, &UIWeaponJammedIcon);
-	UIWeaponJammedIcon.Show		(false);
+	xml_init.InitStatic(uiXml, "weapon_jammed_static", 0, &UIWeaponJammedIcon);
+	UIWeaponJammedIcon.Show(false);
 
-	xml_init.InitStatic			(uiXml, "radiation_static", 0, &UIRadiaitionIcon);
-	UIRadiaitionIcon.Show		(false);
+	xml_init.InitStatic(uiXml, "radiation_static", 0, &UIRadiaitionIcon);
+	UIRadiaitionIcon.Show(false);
 
-	xml_init.InitStatic			(uiXml, "wound_static", 0, &UIWoundIcon);
-	UIWoundIcon.Show			(false);
+	xml_init.InitStatic(uiXml, "wound_static", 0, &UIWoundIcon);
+	UIWoundIcon.Show(false);
 
-	xml_init.InitStatic			(uiXml, "invincible_static", 0, &UIInvincibleIcon);
-	UIInvincibleIcon.Show		(false);
+	xml_init.InitStatic(uiXml, "invincible_static", 0, &UIInvincibleIcon);
+	UIInvincibleIcon.Show(false);
 
-	xml_init.InitStatic			(uiXml, "weight_current_static", 0, &UIWeightIcon);
-	UIWeightIcon.Show		(false);
+	xml_init.InitStatic(uiXml, "weight_current_static", 0, &UIWeightIcon);
+	UIWeightIcon.Show(false);
 
+	xml_init.InitStatic(uiXml, "exo_charge_static", 0, &UIExoCharge);
+	UIExoCharge.Show(false);
 
-	if(GameID()==GAME_ARTEFACTHUNT){
-		xml_init.InitStatic		(uiXml, "artefact_static", 0, &UIArtefactIcon);
-		UIArtefactIcon.Show		(false);
+	if (GameID() == GAME_ARTEFACTHUNT) {
+		xml_init.InitStatic(uiXml, "artefact_static", 0, &UIArtefactIcon);
+		UIArtefactIcon.Show(false);
 	}
-	
-	shared_str warningStrings[7] = 
-	{	
+
+	shared_str warningStrings[8] =
+	{
 		"jammed",
 		"radiation",
 		"wounds",
 		"starvation",
 		"fatigue",
 		"weight",
-		"invincible"		
+		"exo_charge",
+		"invincible"
 	};
 
 	// Загружаем пороговые значения для индикаторов
@@ -269,34 +272,34 @@ void CUIMainIngameWnd::Init()
 
 
 	// Flashing icons initialize
-	uiXml.SetLocalRoot						(uiXml.NavigateToNode("flashing_icons"));
-	InitFlashingIcons						(&uiXml);
+	uiXml.SetLocalRoot(uiXml.NavigateToNode("flashing_icons"));
+	InitFlashingIcons(&uiXml);
 
-	uiXml.SetLocalRoot						(uiXml.GetRoot());
-	
-	AttachChild								(&UICarPanel);
-	xml_init.InitWindow						(uiXml, "car_panel", 0, &UICarPanel);
+	uiXml.SetLocalRoot(uiXml.GetRoot());
 
-	AttachChild								(&UIMotionIcon);
-	UIMotionIcon.Init						();
+	AttachChild(&UICarPanel);
+	xml_init.InitWindow(uiXml, "car_panel", 0, &UICarPanel);
 
-	if(IsGameTypeSingle())
+	AttachChild(&UIMotionIcon);
+	UIMotionIcon.Init();
+
+	if (IsGameTypeSingle())
 	{
-		m_artefactPanel->InitFromXML		(uiXml, "artefact_panel", 0);
-		this->AttachChild					(m_artefactPanel);	
+		m_artefactPanel->InitFromXML(uiXml, "artefact_panel", 0);
+		this->AttachChild(m_artefactPanel);
 		if (Actor() && Level().CurrentViewEntity() && Level().CurrentViewEntity() == Actor())
 			m_artefactPanel->InitIcons(Actor()->GetArtifactsOnBelt());
 	}
 
-	AttachChild								(&UIStaticDiskIO);
-	UIStaticDiskIO.SetWndRect				(1000,750,16,16);
-	UIStaticDiskIO.GetUIStaticItem().SetRect(0,0,16,16);
-	UIStaticDiskIO.InitTexture				("ui\\ui_disk_io");
-	UIStaticDiskIO.SetOriginalRect			(0,0,32,32);
-	UIStaticDiskIO.SetStretchTexture		(true);
+	AttachChild(&UIStaticDiskIO);
+	UIStaticDiskIO.SetWndRect(1000, 750, 16, 16);
+	UIStaticDiskIO.GetUIStaticItem().SetRect(0, 0, 16, 16);
+	UIStaticDiskIO.InitTexture("ui\\ui_disk_io");
+	UIStaticDiskIO.SetOriginalRect(0, 0, 32, 32);
+	UIStaticDiskIO.SetStretchTexture(true);
 
 
-	HUD_SOUND::LoadSound					("maingame_ui", "snd_new_contact"		, m_contactSnd		, SOUND_TYPE_IDLE);
+	HUD_SOUND::LoadSound("maingame_ui", "snd_new_contact", m_contactSnd, SOUND_TYPE_IDLE);
 }
 
 void CUIMainIngameWnd::UpdateArtPanelVisible() 
@@ -341,6 +344,7 @@ void CUIMainIngameWnd::Draw()
 
 	RenderQuickInfos			();		
 
+#pragma region some debug output
 	if (ShowExoOutfitDebug)
 	{
 		if (CExoOutfit* exo = smart_cast<CExoOutfit*>(g_actor->GetOutfit()))
@@ -352,6 +356,17 @@ void CUIMainIngameWnd::Draw()
 			UI()->Font()->pFontDI->OutNext("CHARGE:  %f", exo->m_fCurrentCharge);
 		}
 	}
+	
+	CHudItem* pHudItem = smart_cast<CHudItem*>(g_actor->inventory().ActiveItem());
+	if (pHudItem)
+	{
+		UI()->Font()->pFontDI->SetHeightI(0.03f);
+		UI()->Font()->pFontDI->OutSet(400, 50);
+		UI()->Font()->pFontDI->SetColor(0xffffffff);
+		UI()->Font()->pFontDI->OutNext("WPN_BOBBING:  %s", pHudItem->GetHUD()->GetHudBobbing() ? "enable" : "disable");
+	}
+		
+#pragma endregion
 #ifdef DEBUG
 	draw_adjust_mode			();
 #endif
@@ -484,6 +499,7 @@ void CUIMainIngameWnd::Update()
 
 		UpdateActiveItemInfo();
 		EWarningIcons i					= ewiWeaponJammed;
+		bool exoPresent = false;
 		while (i < ewiInvincible)
 		{
 			float value = 0;
@@ -513,10 +529,25 @@ void CUIMainIngameWnd::Update()
 					value=cur_weight*100/max_weight;
 				}
 				break;
+			case ewiExoCharge:
+				if (CExoOutfit* exo = smart_cast<CExoOutfit*>(m_pActor->GetOutfit()))
+				{
+					value = 1 - exo->m_fCurrentCharge;
+					exoPresent = true;
+				}
+				else
+					exoPresent = false;
+				break;
 			default:
 				R_ASSERT(!"Unknown type of warning icon");
 			}
 
+			if (i==ewiExoCharge && !exoPresent && UIExoCharge.IsShown())
+			{
+				TurnOffWarningIcon(i);
+				i = static_cast<EWarningIcons>(i + 1);
+				continue;
+			}
 			xr_vector<float>::reverse_iterator	rit;
 
 			// Сначала проверяем на точное соответсвие
@@ -1084,6 +1115,9 @@ void CUIMainIngameWnd::SetWarningIconColor(EWarningIcons icon, const u32 cl)
 		break;
 	case ewiWeight:
 		SetWarningIconColor		(&UIWeightIcon, cl);
+		if (bMagicFlag) break;
+	case ewiExoCharge:
+		SetWarningIconColor(&UIExoCharge, cl);
 		if (bMagicFlag) break;
 	default:
 		R_ASSERT(!"Unknown warning icon type");

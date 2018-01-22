@@ -76,6 +76,7 @@ void CExoOutfit::RemoveFromBatterySlot(bool spawn)
 	}
 	m_fCurrentCharge=0;
 	m_sCurrentBattery = nullptr;
+	TryToUpdateSE();
 }
 
 void CExoOutfit::PutToBatterySlot(CInventoryItem* item)

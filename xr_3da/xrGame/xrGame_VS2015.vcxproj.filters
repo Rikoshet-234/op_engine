@@ -6633,8 +6633,11 @@
     <ClInclude Include="ExoOutfit.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Outfit\ExoOutfit</Filter>
     </ClInclude>
-    <ClInclude Include="UIExoBatteryStatic.h">
-      <Filter>UI\Common\InventoryWnd</Filter>
+    <ClInclude Include="WeaponBobbing.h">
+      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\HUD</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\UIExoBatteryStatic.h">
+      <Filter>UI\UIWindows\Static</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -9851,8 +9854,11 @@
     <ClCompile Include="ExoOutfit.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Outfit\ExoOutfit</Filter>
     </ClCompile>
-    <ClCompile Include="UIExoBatteryStatic.cpp">
-      <Filter>UI\Common\InventoryWnd</Filter>
+    <ClCompile Include="WeaponBobbing.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\HUD</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIExoBatteryStatic.cpp">
+      <Filter>UI\UIWindows\Static</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

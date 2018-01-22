@@ -163,15 +163,16 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector &vControlAccel, float &Ju
 	}
 	else
 	{
-		if (CCustomOutfit* outfit = g_actor->GetOutfit())
-		{
-			outfit->OnMove();
-			if (!outfit->CanMove() && !GodMode())
+		if (mstate_wf&mcAnyMove)
+			if (CCustomOutfit* outfit = g_actor->GetOutfit())
 			{
-				outfit->OnCantMove();
-				//add support to stop move????
+				outfit->OnMove();
+				if (!outfit->CanMove() && !GodMode())
+				{
+					outfit->OnCantMove();
+					//add support to stop move????
+				}
 			}
-		}
 	}
 
 
@@ -628,6 +629,11 @@ void CActor::StopAnyMove()
 bool CActor::AnyMove()
 {
 	return ((mstate_real & (mcFwd|mcBack|mcLStrafe|mcRStrafe)) != 0);
+}
+
+bool CActor::is_sprint()
+{
+	return !!(mstate_real&mcSprint);
 }
 
 bool CActor::is_jump()

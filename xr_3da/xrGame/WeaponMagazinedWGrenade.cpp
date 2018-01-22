@@ -942,9 +942,6 @@ void CWeaponMagazinedWGrenade::PlayAnimIdle()
 	if (GetState() != eIdle)
 		return;	
 	MotionSVec* smAnimation = nullptr;
-#ifdef SHOW_ANIM_WEAPON_PLAYS
-	LPCSTR animName;
-#endif
 	BOOL mixMode;
 	if(IsGrenadeLauncherAttached())
 	{
@@ -952,44 +949,22 @@ void CWeaponMagazinedWGrenade::PlayAnimIdle()
 		{
 			mixMode=FALSE;
 			if(IsZoomed())
-			{
 				smAnimation=&mhud_idle_g_aim;
-#ifdef SHOW_ANIM_WEAPON_PLAYS
-				animName="try play [mhud_idle_g_aim]";
-#endif
-			}
 			else
 			{
 				mixMode=TRUE;
 				smAnimation=&mhud_idle_g;
-#ifdef SHOW_ANIM_WEAPON_PLAYS
-				animName="try play [mhud_idle_g]";
-#endif
 			}
 		}
 		else
 		{
 			mixMode=TRUE;
 			if(IsZoomed())
-			{
 				smAnimation=&mhud_idle_w_gl_aim;
-#ifdef SHOW_ANIM_WEAPON_PLAYS
-				animName="try play [mhud_idle_w_gl_aim]";
-#endif
-			}
 			else
-			{
 				smAnimation=&mhud_idle_w_gl;
-#ifdef SHOW_ANIM_WEAPON_PLAYS
-				animName="try play [mhud_idle_w_gl]";
-#endif
-			}
 		}
-#ifdef SHOW_ANIM_WEAPON_PLAYS
-		PlayAnimation(*smAnimation,mixMode,animName);
-#else
 		PlayAnimation(*smAnimation,mixMode);
-#endif
 	}
 	else
 		inherited::PlayAnimIdle();
@@ -1024,67 +999,31 @@ bool CWeaponMagazinedWGrenade::TryPlayAnimIdle()
 	VERIFY(GetState() == eIdle);
 	if (!IsZoomed())
 	{
-		int actorState = 0;
 		CActor* pActor = smart_cast<CActor*>(H_Parent());
 		if (pActor)
 		{
-			CEntity::SEntityState st;
-			pActor->g_State(st);
-			if (st.bSprint)
-				actorState=1;
-			else if(pActor->AnyMove())	
-				actorState = 2;
 			MotionSVec* smAnimation = nullptr;
-#ifdef SHOW_ANIM_WEAPON_PLAYS
-			LPCSTR animName;
-#endif
-			if (actorState==1)
+			if (pActor->is_sprint())
 			{
 				if (m_bGrenadeMode)
-				{
 					smAnimation=&mhud_idle_sprint_g;
-#ifdef SHOW_ANIM_WEAPON_PLAYS
-					animName="mhud_idle_sprint_g";
-#endif
-				}
 				else if (IsGrenadeLauncherAttached())
-				{
 					smAnimation=&mhud_idle_sprint_w_gl;
-#ifdef SHOW_ANIM_WEAPON_PLAYS
-					animName="mhud_idle_sprint_w_gl";
-#endif
-				}
 				else 
 					return inherited::TryPlayAnimIdle();
 			}
-			else if (actorState==2)
+			else if (pActor->AnyMove())
 			{
 				if (m_bGrenadeMode)
-				{
 					smAnimation=&mhud_idle_moving_g;
-#ifdef SHOW_ANIM_WEAPON_PLAYS
-					animName="mhud_idle_moving_g";
-#endif
-				}
 				else if (IsGrenadeLauncherAttached())
-				{
 					smAnimation=&mhud_idle_moving_w_gl;
-#ifdef SHOW_ANIM_WEAPON_PLAYS
-					animName="mhud_idle_moving_w_gl";
-#endif
-				}
 				else 
 					return inherited::TryPlayAnimIdle();
 			}
 			else
 				return inherited::TryPlayAnimIdle();
-#ifdef SHOW_ANIM_WEAPON_PLAYS
-			string256 debugStr;
-			sprintf_s(debugStr,"try play [%s] GrenadeMode [%s]",animName,OPFuncs::boolToStr(m_bGrenadeMode));
-			bool result=PlayAnimation(*smAnimation,TRUE,debugStr);
-#else
 			bool result=PlayAnimation(*smAnimation,TRUE,nullptr);
-#endif
 			if (!result)
 				return inherited::TryPlayAnimIdle();
 			return true;

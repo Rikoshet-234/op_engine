@@ -16,6 +16,7 @@
 #include "WeaponAmmo.h"
 #include "WeaponMagazinedWGrenade.h"
 #include "trade_parameters.h"
+#include "exooutfit.h"
 
 
 bool CTrade::CanTrade()
@@ -237,6 +238,7 @@ u32	CTrade::GetItemPrice(PIItem pItem, bool b_buying)
 	float scCost=0;
 	float amiwCost=0;
 	float griwCost=0;
+	float exoBatteryCost = 0;
 	if (pArtefact && (pThis.type == TT_ACTOR) && (pPartner.type == TT_TRADER)) {
 		CAI_Trader			*pTrader = smart_cast<CAI_Trader*>(pPartner.inv_owner);
 		VERIFY				(pTrader);
@@ -247,6 +249,7 @@ u32	CTrade::GetItemPrice(PIItem pItem, bool b_buying)
 		float itemCost=static_cast<float>(pItem->Cost());
 		CWeaponAmmo *ammo= smart_cast<CWeaponAmmo*>(pItem);
 		CWeaponMagazined* weapon=smart_cast<CWeaponMagazined*>(pItem);
+		CExoOutfit* exo = smart_cast<CExoOutfit*>(pItem);
 		base_cost=-1;
 		if (ammo)
 		{
@@ -288,6 +291,15 @@ u32	CTrade::GetItemPrice(PIItem pItem, bool b_buying)
 					griwCost=griwCost*calcTradeFactor(returnTradeFactors(b_buying,griwName),relation_factor);
 				}
 		}
+		else if (exo)
+		{
+			if (exo->m_sCurrentBattery.size()>0)
+			{
+				shared_str batteryName= exo->m_sCurrentBattery;
+				exoBatteryCost = pSettings->r_float(batteryName, "cost");
+				exoBatteryCost= exoBatteryCost*calcTradeFactor(returnTradeFactors(b_buying, batteryName), relation_factor);
+			}
+		}
 		if (base_cost==-1)
 			base_cost			= itemCost;
 	}
@@ -318,6 +330,7 @@ u32	CTrade::GetItemPrice(PIItem pItem, bool b_buying)
 	result+=iFloor(scCost);
 	result+=iFloor(amiwCost);
 	result+=iFloor(griwCost);
+	result += iFloor(exoBatteryCost);
 #pragma endregion
 
 	return					(result);

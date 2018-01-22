@@ -24,11 +24,12 @@
 using namespace InventoryUtilities;
 
 // what to block
-u32	INV_STATE_LADDER		= (1<<RIFLE_SLOT)+(1<<SHOTGUN_SLOT)+ (1 << APPARATUS_SLOT);
-u32	INV_STATE_CAR			= INV_STATE_LADDER;
-u32	INV_STATE_BLOCK_ALL		= 0xffffffff;
-u32	INV_STATE_INV_WND		= INV_STATE_BLOCK_ALL;
-u32	INV_STATE_BUY_MENU		= INV_STATE_BLOCK_ALL;
+u32	INV_STATE_BLOCK_ALL = 0xffffffff;
+//u32	INV_STATE_LADDER		= (1<<RIFLE_SLOT)+(1<<SHOTGUN_SLOT)+ (1 << APPARATUS_SLOT);
+u32	INV_STATE_LADDER = INV_STATE_BLOCK_ALL;
+u32	INV_STATE_CAR = INV_STATE_LADDER;
+u32	INV_STATE_INV_WND = INV_STATE_BLOCK_ALL;
+u32	INV_STATE_BUY_MENU = INV_STATE_BLOCK_ALL;
 
 CInventorySlot::CInventorySlot() 
 {
@@ -1201,7 +1202,7 @@ void  CInventory::AddAvailableItems(TIItemContainer& items_container, bool for_t
 	for(TIItemContainer::const_iterator it = m_ruck.begin(); m_ruck.end() != it; ++it) 
 	{
 		PIItem pIItem = *it;
-		if((!for_trade || pIItem->CanTrade()))
+		if ((!for_trade || pIItem->CanTrade()))
 			items_container.push_back(pIItem);
 	}
 

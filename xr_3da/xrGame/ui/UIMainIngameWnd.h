@@ -81,6 +81,7 @@ protected:
 	// - усталости
 	// - веса
 	CUIStatic			UIWeaponJammedIcon;
+	CUIStatic			UIExoCharge;
 	CUIStatic			UIRadiaitionIcon;
 	CUIStatic			UIWoundIcon;
 	CUIStatic			UIStarvationIcon;
@@ -108,6 +109,7 @@ public:
 		ewiStarvation,
 		ewiPsyHealth,
 		ewiWeight,
+		ewiExoCharge,
 		ewiInvincible,
 //		ewiSleep,
 		ewiArtefact,

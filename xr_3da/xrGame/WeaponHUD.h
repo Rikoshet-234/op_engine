@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../SkeletonAnimated.h"
+#include "WeaponBobbing.h"
 class CHudItem;
 
 struct weapon_hud_value: public shared_value
@@ -61,18 +62,20 @@ class CWeaponHUD
 //	CInventoryItem*		m_pCallbackItem;
 	CHudItem*			m_pCallbackItem;
 
-	//остановление таймера текущей анимации, и вызов callback
-	void				StopCurrentAnim	();
-
 	//поворот и смещение для режима приближения
 	float				m_fZoomRotateX;
 	float				m_fZoomRotateY;
 	Fvector				m_fZoomOffset;
+
+	CWeaponBobbing *m_pBobbing;
+	bool m_bEnableBobbing;
 public: 
 						CWeaponHUD		(CHudItem* pHudItem);
 						~CWeaponHUD		();
 
 	// misc
+						void SetHudBobbong(bool value);
+						bool GetHudBobbing();
 	void				Load			(LPCSTR section);
 	void				net_DestroyHud	();
 	void				Init			();
@@ -92,7 +95,6 @@ public:
 	void				SetZoomRotateX	(float zoom_rotate_x)		  { m_fZoomRotateX = zoom_rotate_x;}
 	void				SetZoomRotateY	(float zoom_rotate_y)		  { m_fZoomRotateY = zoom_rotate_y;}
 	
-
 	// Animations
 	void				animPlay		(MotionID M, BOOL bMixIn/*=TRUE*/, CHudItem*  W /*=0*/, u32 state);
 	void				animDisplay		(MotionID M, BOOL bMixIn);
@@ -109,8 +111,9 @@ public:
 	//обновление HUD должно вызываться на каждом кадре
 	void				Update			();
 
-	void				StopCurrentAnimWithoutCallback	();
-
+	void				StopCurrentAnimWithoutCallback();
+	//остановление таймера текущей анимации, и вызов callback
+	void				StopCurrentAnim();
 public:
 	static void			CreateSharedContainer	();
 	static void			DestroySharedContainer	();

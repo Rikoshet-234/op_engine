@@ -666,6 +666,7 @@
     <ClInclude Include="ui\UIIconInfo.h" />
     <ClInclude Include="ui\UIListItemIconed.h" />
     <ClInclude Include="ui\UIOutfitParams.h" />
+    <ClInclude Include="WeaponBobbing.h" />
     <ClInclude Include="wrapper_abstract.h" />
     <ClInclude Include="wrapper_abstract_inline.h" />
     <ClInclude Include="action_management_config.h" />
@@ -5078,6 +5079,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="WeaponBobbing.cpp" />
     <ClCompile Include="xml_str_id_loader.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">StdAfx.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">StdAfx.h</PrecompiledHeaderFile>

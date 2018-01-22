@@ -154,6 +154,10 @@ public:
 
 	virtual void		SelectAnimation			( const Fvector& _view, const Fvector& _move, float speed ) = 0;
 
+	xr_vector<shared_str>				m_friend_community_overrides;
+	void								load_friend_community_overrides(LPCSTR section);
+	bool								is_community_friend_overrides(const CEntityAlive *tpEntityAlive) const;
+	bool	is_relation_enemy(const CEntityAlive *tpEntityAlive) const override;
 	// debug
 #ifdef DEBUG
 	virtual void		OnRender				( );

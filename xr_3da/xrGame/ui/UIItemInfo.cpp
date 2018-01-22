@@ -22,7 +22,7 @@
 #include "../exooutfit.h"
 #include "UICellItemFactory.h"
 
-CUIItemInfo::CUIItemInfo(): m_pBatteryText(nullptr), m_pBatteryIconBackground(nullptr), m_pChargeBatteryProgress(nullptr)
+CUIItemInfo::CUIItemInfo()
 {
 	UIItemImageSize.set(0.0f, 0.0f);
 	UICondProgresBar = nullptr;
@@ -37,7 +37,6 @@ CUIItemInfo::CUIItemInfo(): m_pBatteryText(nullptr), m_pBatteryIconBackground(nu
 	UIName = nullptr;
 	m_pInvItem = nullptr;
 	m_b_force_drawing = false;
-	m_pBatteryIcon = nullptr;
 }
 
 CUIItemInfo::~CUIItemInfo()
@@ -133,32 +132,6 @@ void CUIItemInfo::Init(LPCSTR xml_name){
 		UIItemImageSize.set				(UIItemImage->GetWidth(),UIItemImage->GetHeight());
 	}
 
-	if (uiXml.NavigateToNode("battery_icon", 0))
-	{
-		m_pBatteryIcon = xr_new<CUIExoBatteryStatic>();
-		m_pBatteryIcon->SetAutoDelete(true);
-		m_pBatteryIcon->SetShader(InventoryUtilities::GetEquipmentIconsShader());
-		m_pBatteryIcon->TextureAvailable(false);
-		m_pBatteryIcon->TextureOff();
-		m_pBatteryIcon->SetParentItem(nullptr);
-		CUIXmlInit().InitStatic(uiXml, "battery_icon", 0, m_pBatteryIcon);
-		AttachChild(m_pBatteryIcon);
-		m_pBatteryIconBackground = xr_new<CUIFrameWindow>();
-		m_pBatteryIconBackground->SetAutoDelete(true);
-		m_pBatteryIcon->AttachChild(m_pBatteryIconBackground);
-		CUIXmlInit().InitFrameWindow(uiXml, "battery_icon:background", 0, m_pBatteryIconBackground);
-
-		m_pChargeBatteryProgress = xr_new<CUIProgressBar>();
-		m_pChargeBatteryProgress->SetAutoDelete(true);
-		CUIXmlInit().InitProgressBar(uiXml, "battery_charge_progress", 0, m_pChargeBatteryProgress);
-		AttachChild(m_pChargeBatteryProgress);
-		m_pChargeBatteryProgress->SetProgressPos(0);
-
-		m_pBatteryText = xr_new<CUIStatic>();
-		m_pBatteryText->SetAutoDelete(true);
-		CUIXmlInit().InitStatic(uiXml, "battery_charge_text", 0, m_pBatteryText);
-		AttachChild(m_pBatteryText);
-	}
 	xml_init.InitAutoStaticGroup	(uiXml, "auto", 0, this);
 }
 
@@ -264,33 +237,6 @@ void CUIItemInfo::InitItem(CInventoryItem* pInvItem)
 		UIItemImage->GetUIStaticItem().SetRect	(v_r);
 		UIItemImage->SetWidth					(_min(v_r.width(),	UIItemImageSize.x));
 		UIItemImage->SetHeight					(_min(v_r.height(),	UIItemImageSize.y));
-	}
-
-	if (m_pBatteryIcon)
-	{
-		m_pBatteryIcon->Show(false);
-		m_pBatteryText->Show(false);
-		m_pChargeBatteryProgress->Show(false);
-		m_pChargeBatteryProgress->SetProgressPos(0);
-		m_pBatteryIcon->TextureOff();
-		m_pBatteryIcon->TextureAvailable(false);
-		CExoOutfit* exo = smart_cast<CExoOutfit*>(m_pInvItem);
-		if (exo && exo->BatteryAccepted())
-		{
-			if (exo->m_sCurrentBattery.size() > 0)
-			{
-				UIIconInfo iconInfo(exo->m_sCurrentBattery);
-				m_pBatteryIcon->SetOriginalRect(iconInfo.getOriginalRect());
-				m_pBatteryIcon->SetStretchTexture(true);
-				m_pBatteryIcon->TextureOn();
-				m_pBatteryIcon->TextureAvailable(true);
-				m_pChargeBatteryProgress->SetProgressPos(exo->m_fCurrentCharge*100.0f + 1.0f - EPS);
-			}
-			m_pBatteryIcon->Show(true);
-			m_pBatteryText->Show(true);			
-			m_pChargeBatteryProgress->Show(true);
-		}
-
 	}
 }
 

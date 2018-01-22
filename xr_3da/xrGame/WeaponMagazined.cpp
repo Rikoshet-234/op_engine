@@ -23,6 +23,7 @@
 #include "script_game_object.h"
 #include "ui/UIInventoryWnd.h"
 #include "UIGameSP.h"
+#include "clsid_game.h"
 
 CWeaponMagazined::CWeaponMagazined(LPCSTR name, ESoundTypes eSoundType) : CWeapon(name)
 {
@@ -1417,9 +1418,7 @@ bool CWeaponMagazined::TryPlayAnimIdle()
 		CActor* pActor = smart_cast<CActor*>(H_Parent());
 		if(pActor)
 		{
-			CEntity::SEntityState st;
-			pActor->g_State(st);
-			if(st.bSprint)
+			if(pActor->is_sprint())
 			{
 				//return PlayAnimation(mhud.mhud_idle_sprint,TRUE,"try play [mhud.mhud_idle_sprint]");
 				return PlayAnimation(mhud.mhud_idle_sprint,TRUE);
@@ -1442,19 +1441,23 @@ void CWeaponMagazined::PlayPreviewAmmoSound()
 void CWeaponMagazined::PlayAnimIdle()
 {
 	MotionSVec* m = nullptr;
+	bool animStarted = false;
 	if(IsZoomed())
 	{
 		m = &mhud.mhud_idle_aim;
 	}
 	else{
 		m = &mhud.mhud_idle;
-		if (TryPlayAnimIdle()) return;
+		animStarted = TryPlayAnimIdle();
+		//if (TryPlayAnimIdle()) return;
 	}
-
-	VERIFY(GetState()==eIdle);
-
-	//string256 buf;sprintf_s(buf,"try play [%s]",IsZoomed()?"mhud.mhud_idle_aim":"mhud.mhud_idle");PlayAnimation(*m,TRUE,buf);
-	PlayAnimation(*m,TRUE);
+	//VERIFY(GetState()==eIdle);
+	bool moving = H_Parent() &&  H_Parent()->CLS_ID == CLSID_OBJECT_ACTOR && g_actor->AnyMove();
+	if (!animStarted)
+		PlayAnimation(*m,TRUE);
+	if (!animStarted && moving && !IsZoomed())
+		m_pHUD->SetHudBobbong(true);
+	//Msg("bobbing %s isrunanim %s", m_pHUD->GetHudBobbing()?"yes":"no", animStarted ? "yes" : "no");
 }
 
 void CWeaponMagazined::PlayAnimShoot()

@@ -37,6 +37,7 @@ CUIOutfitDragDropList::CUIOutfitDragDropList()
 
 	m_bDrawBatteryPart = false;
 	m_default_outfit			= "npc_icon_without_outfit";
+	m_bBackgroundInitialized = false;
 }
 
 CUIOutfitDragDropList::~CUIOutfitDragDropList()
@@ -48,7 +49,8 @@ CUIOutfitDragDropList::~CUIOutfitDragDropList()
 
 void CUIOutfitDragDropList::SetOutfit(CUICellItem* itm)
 {
-	m_background->Init					(0,0, GetWidth(), GetHeight());
+	if (!m_bBackgroundInitialized)
+		m_background->Init					(0,0, GetWidth(), GetHeight());
 	m_background->SetStretchTexture		(true);
 	m_bDrawBatteryPart=false;
 	m_pBatteryIcon->TextureOff();
@@ -87,6 +89,12 @@ void CUIOutfitDragDropList::SetDefaultOutfit(LPCSTR default_outfit){
 void CUIOutfitDragDropList::UIInitBattery(CUIXml& xml_doc, const char* rootPath)
 {
 	string256 path;
+	sprintf_s(path, "%s:%s", rootPath, "outfit_image");
+	if (xml_doc.NavigateToNode(path))
+	{
+		CUIXmlInit().InitStatic(xml_doc, path, 0, m_background);
+		m_bBackgroundInitialized = true;
+	}
 	sprintf_s(path, "%s:%s", rootPath, "battery_icon");
 	CUIXmlInit().InitStatic(xml_doc, path, 0, m_pBatteryIcon);
 	sprintf_s(path, "%s:%s", rootPath, "battery_icon:background");

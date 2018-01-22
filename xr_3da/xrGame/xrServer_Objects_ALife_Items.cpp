@@ -1280,7 +1280,7 @@ void CSE_ALifeItemExoOutfit::STATE_Read(NET_Packet	&tNetPacket, u16 size)
 void CSE_ALifeItemExoOutfit::STATE_Write(NET_Packet	&tNetPacket)
 {
 	inherited::STATE_Write(tNetPacket);
-	tNetPacket.w_stringZ(m_sCurrentBatterySection.size()>0? m_sCurrentBatterySection.c_str() : "");
+	tNetPacket.w_stringZ(m_sCurrentBatterySection);
 	tNetPacket.w_float_q8(m_fCurrentBatteryCharge, 0.0f, 1.0f);
 }
 
