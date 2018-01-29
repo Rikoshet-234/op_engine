@@ -34,6 +34,7 @@
 #include "OPFuncs/utils.h"
 #include "xrServer_Objects_ALife_Items.h"
 #include "gbox.h"
+#include "ExoOutfit.h"
 
 using namespace luabind;
 
@@ -408,7 +409,7 @@ bool CScriptGameObject::actor_is_crouch() const
 		ai().script_engine().script_log		(ScriptStorage::eLuaMessageTypeError,"CActor::is_crouch non-Actor object !!!");
 		return false;
 	}
-	return !!(actor->get_state()&mcCrouch);
+	return actor->is_crouch();
 }
 #pragma endregion
 
@@ -745,10 +746,21 @@ CGBox* CScriptGameObject::GetGameBox() const
 	return gbox;
 }
 
+CExoOutfit* CScriptGameObject::GetExoOutfit() const
+{
+	CExoOutfit *exo = smart_cast<CExoOutfit*>(&object());
+	if (!exo) {
+		log_script_error("! Cannot cast %s to CExoOutfit ", object().CppClassName());
+		return nullptr;
+	}
+	return exo;
+}
+
 class_<CScriptGameObject> &script_register_game_object3(class_<CScriptGameObject> &instance)
 {
 	instance
 		.def("get_gbox",&CScriptGameObject::GetGameBox)
+		.def("get_exo_outfit", &CScriptGameObject::GetExoOutfit)
 		.def("get_obj_class_name",&get_obj_class_name)
 		.def("get_slot", &CScriptGameObject::GetSlot)
 		.def("get_inventory_wnd", &get_inventory_wnd)

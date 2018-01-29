@@ -177,7 +177,11 @@ LPCSTR CPhraseDialog::GetPhraseText	(const shared_str& phrase_id, bool current_s
 {
 	
 	CPhraseGraph::CVertex* phrase_vertex = data()->m_PhraseGraph.vertex(phrase_id);
-	THROW(phrase_vertex);
+	if (!phrase_vertex)
+	{
+		Msg("! ERROR cannot get phrase graph for phrase_id[%s]", phrase_id.c_str());
+		FATAL("ENGINE Crush. See log for details.");
+	}
 
 	return phrase_vertex->data()->GetText();
 }

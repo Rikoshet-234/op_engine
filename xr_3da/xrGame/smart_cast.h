@@ -321,6 +321,10 @@
 #		undef cast_type_list
 #		define cast_type_list save_cast_list	(CGBox,			CInventoryItem)
 
+	DECLARE_SPECIALIZATION(CExoOutfit, CInventoryItem, cast_exo_object);
+#		undef cast_type_list
+#		define cast_type_list save_cast_list	(CExoOutfit,			CInventoryItem)
+
 #	ifndef DO_NOT_DECLARE_TYPE_LIST
 #		include "smart_cast_impl1.h"
 #	endif

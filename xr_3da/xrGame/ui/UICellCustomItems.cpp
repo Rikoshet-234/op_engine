@@ -89,7 +89,7 @@ bool CExoOutfitCellItem::SetOwnerList(CUIDragDropListEx* p)
 		return false;
 	PIItem itm = PIItem(m_pData);
 	CExoOutfit* exo = smart_cast<CExoOutfit*>(itm);
-	if (!exo || (exo && !(exo->m_sCurrentBattery.size() > 0)))
+	if (!exo || (exo && !exo->isBatteryPresent()))
 		return false;
 	float x, y;
 	switch (m_pParentList->cacheData.exo_icon.position)
@@ -141,8 +141,8 @@ bool CExoOutfitCellItem::EqualTo(CUICellItem* itm)
 		return false;
 	if (object()->BatteryAccepted() && ci->object()->BatteryAccepted())
 	{
-		shared_str lb = object()->m_sCurrentBattery.size()>0 ? object()->m_sCurrentBattery: "";
-		shared_str rb = ci->object()->m_sCurrentBattery.size()>0 ? ci->object()->m_sCurrentBattery : "";
+		shared_str lb = object()->isBatteryPresent() ? object()->m_sCurrentBattery: "";
+		shared_str rb = ci->object()->isBatteryPresent() ? ci->object()->m_sCurrentBattery : "";
 		if (lb==rb)
 			return !!fsimilar(object()->m_fCurrentCharge, ci->object()->m_fCurrentCharge, 0.01f);
 		return false;

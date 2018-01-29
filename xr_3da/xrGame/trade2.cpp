@@ -293,7 +293,7 @@ u32	CTrade::GetItemPrice(PIItem pItem, bool b_buying)
 		}
 		else if (exo)
 		{
-			if (exo->m_sCurrentBattery.size()>0)
+			if (exo->isBatteryPresent())
 			{
 				shared_str batteryName= exo->m_sCurrentBattery;
 				exoBatteryCost = pSettings->r_float(batteryName, "cost");

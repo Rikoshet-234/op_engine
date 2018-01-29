@@ -23,8 +23,8 @@ CExoOutfit::CExoOutfit()
 
 CExoOutfit::~CExoOutfit() 
 {
-	HUD_SOUND::DestroySound(sndCantJump);
-	HUD_SOUND::DestroySound(sndCantSprint);
+	sndCantJump.destroy();
+	sndCantSprint.destroy();
 }
 
 void CExoOutfit::Load(LPCSTR section)
@@ -40,8 +40,10 @@ void CExoOutfit::Load(LPCSTR section)
 		R_ASSERT3(batterySections.size() != 0, "Batteries must be specified for ", section);
 	}
 
-	HUD_SOUND::LoadSound(section, "snd_cant_sprint", sndCantSprint, SOUND_TYPE_RECHARGING,false);
-	HUD_SOUND::LoadSound(section, "snd_cant_jump", sndCantJump, SOUND_TYPE_RECHARGING,false);
+	if (pSettings->line_exist(section, "snd_cant_sprint"))
+		sndCantSprint.create(pSettings->r_string(section, "snd_cant_sprint"), st_Effect, SOUND_TYPE_WORLD);
+	if (pSettings->line_exist(section, "snd_cant_jump"))
+		sndCantJump.create(pSettings->r_string(section, "snd_cant_jump"), st_Effect, SOUND_TYPE_WORLD);
 }
 
 void CExoOutfit::UpdateCharge(float value)
@@ -62,7 +64,7 @@ bool CExoOutfit::BatteryAccepted() const
 
 void CExoOutfit::RemoveFromBatterySlot(bool spawn)
 {
-	if (m_sCurrentBattery.size() > 0 && spawn)
+	if (isBatteryPresent() && spawn)
 	{
 		auto parentId = H_Parent()? H_Parent()->ID() : g_actor->ID();
 		CSE_Abstract* abstractItem = Level().spawn_item(m_sCurrentBattery.c_str(), g_actor->Position(), g_actor->ai_location().level_vertex_id(), parentId, true);
@@ -124,8 +126,6 @@ void CExoOutfit::TryToUpdateSE()
 
 void CExoOutfit::OnH_B_Independent(bool just_before_destroy)
 {
-	HUD_SOUND::StopSound(sndCantJump);
-	HUD_SOUND::StopSound(sndCantSprint);
 	inherited::OnH_B_Independent(just_before_destroy);
 }
 
@@ -190,15 +190,27 @@ bool CExoOutfit::CanMove()
 	return true;
 }
 
+void CExoOutfit::play_sound(ref_sound sound)
+{
+	Fvector snd_pos;
+	snd_pos.set(0, ACTOR_HEIGHT, 0);
+	//if (!sound._feedback())
+	sound.play_at_pos(g_actor,snd_pos, sm_2D);
+	//	sound.play_at_pos(nullptr, snd_pos, sm_2D);
+	//::Sound->play_at_pos(sound, g_actor, g_actor->Position());
+
+
+}
+
 void CExoOutfit::OnCantSprint()
 {
-	HUD_SOUND::PlaySound(sndCantSprint, g_actor->Position(), g_actor, true);
+	play_sound(sndCantSprint);
 	HUD().GetUI()->AddInfoMessage("cant_exo_sprint");
 }
 
 void CExoOutfit::OnCantJump()
 {
-	HUD_SOUND::PlaySound(sndCantJump, g_actor->Position(), g_actor, true);
+	play_sound(sndCantJump);
 	HUD().GetUI()->AddInfoMessage("cant_exo_jump");
 }
 

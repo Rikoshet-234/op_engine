@@ -169,4 +169,5 @@
 #	include	"ui/UIListItemIconed.h"
 #include "gbox.h"
 #include "BreakableObject.h"
+#include "ExoOutfit.h"
 #endif

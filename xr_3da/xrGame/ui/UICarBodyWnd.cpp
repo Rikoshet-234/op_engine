@@ -637,7 +637,7 @@ void CUICarBodyWnd::ActivatePropertiesBox()
 	}
 	else if (pExo)
 	{
-		if (pExo->m_sCurrentBattery.size()>0)
+		if (pExo->isBatteryPresent())
 		{
 			m_pUIPropertiesBox->AddItem("st_discharge_exo", pExo, INVENTORY_DISCHARGE_EXO);
 			b_show = true;

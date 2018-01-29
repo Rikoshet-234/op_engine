@@ -937,7 +937,7 @@ void CWeaponMagazinedWGrenade::PlayAnimReload()
 
 void CWeaponMagazinedWGrenade::PlayAnimIdle()
 {
-	if(TryPlayAnimIdle())	return;
+	bool animStarted = TryPlayAnimIdle();
 	//VERIFY(GetState()==eIdle);
 	if (GetState() != eIdle)
 		return;	
@@ -964,7 +964,11 @@ void CWeaponMagazinedWGrenade::PlayAnimIdle()
 			else
 				smAnimation=&mhud_idle_w_gl;
 		}
-		PlayAnimation(*smAnimation,mixMode);
+		bool moving = H_Parent() && H_Parent()->CLS_ID == CLSID_OBJECT_ACTOR && g_actor->AnyMove();
+		if (!animStarted)
+			PlayAnimation(*smAnimation, mixMode);
+		if (!animStarted && moving && !IsZoomed())
+			m_pHUD->SetHudBobbong(true);
 	}
 	else
 		inherited::PlayAnimIdle();
@@ -1012,7 +1016,7 @@ bool CWeaponMagazinedWGrenade::TryPlayAnimIdle()
 				else 
 					return inherited::TryPlayAnimIdle();
 			}
-			else if (pActor->AnyMove())
+			else if (pActor->AnyMove() && !(pActor->is_crouch() || pActor->is_creep()))
 			{
 				if (m_bGrenadeMode)
 					smAnimation=&mhud_idle_moving_g;

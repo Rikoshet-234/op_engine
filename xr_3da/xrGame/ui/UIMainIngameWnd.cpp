@@ -357,14 +357,14 @@ void CUIMainIngameWnd::Draw()
 		}
 	}
 	
-	CHudItem* pHudItem = smart_cast<CHudItem*>(g_actor->inventory().ActiveItem());
+	/*CHudItem* pHudItem = smart_cast<CHudItem*>(g_actor->inventory().ActiveItem());
 	if (pHudItem)
 	{
 		UI()->Font()->pFontDI->SetHeightI(0.03f);
 		UI()->Font()->pFontDI->OutSet(400, 50);
 		UI()->Font()->pFontDI->SetColor(0xffffffff);
 		UI()->Font()->pFontDI->OutNext("WPN_BOBBING:  %s", pHudItem->GetHUD()->GetHudBobbing() ? "enable" : "disable");
-	}
+	}*/
 		
 #pragma endregion
 #ifdef DEBUG

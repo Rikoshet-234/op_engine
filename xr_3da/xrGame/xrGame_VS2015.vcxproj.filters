@@ -9860,6 +9860,9 @@
     <ClCompile Include="ui\UIExoBatteryStatic.cpp">
       <Filter>UI\UIWindows\Static</Filter>
     </ClCompile>
+    <ClCompile Include="ExoOutfit_script.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Outfit\ExoOutfit</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="graph_abstract.h">

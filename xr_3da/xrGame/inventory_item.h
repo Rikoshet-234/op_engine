@@ -269,15 +269,16 @@ public:
 
 	virtual CInventoryItem		*cast_inventory_item		()	{return this;}
 	virtual CAttachableItem		*cast_attachable_item		()	{return this;}
-	virtual CPhysicsShellHolder	*cast_physics_shell_holder	()	{return 0;}
-	virtual CEatableItem		*cast_eatable_item			()	{return 0;}
-	virtual CWeapon				*cast_weapon				()	{return 0;}
-	virtual CFoodItem			*cast_food_item				()	{return 0;}
-	virtual CMissile			*cast_missile				()	{return 0;}
-	virtual CHudItem			*cast_hud_item				()	{return 0;}
-	virtual CWeaponAmmo			*cast_weapon_ammo			()	{return 0;}
-	virtual CGameObject			*cast_game_object			()  {return 0;};
-	virtual CGBox				*cast_gbox_object() { return 0; };
+	virtual CPhysicsShellHolder	*cast_physics_shell_holder	()	{return nullptr;}
+	virtual CEatableItem		*cast_eatable_item			()	{return nullptr;}
+	virtual CWeapon				*cast_weapon				()	{return nullptr;}
+	virtual CFoodItem			*cast_food_item				()	{return nullptr;}
+	virtual CMissile			*cast_missile				()	{return nullptr;}
+	virtual CHudItem			*cast_hud_item				()	{return nullptr;}
+	virtual CWeaponAmmo			*cast_weapon_ammo			()	{return nullptr;}
+	virtual CGameObject			*cast_game_object			()  {return nullptr;};
+	virtual CGBox				*cast_gbox_object() { return nullptr; };
+	virtual CExoOutfit				*cast_exo_object() { return nullptr; };
 
 	DECLARE_SCRIPT_REGISTER_FUNCTION
 };

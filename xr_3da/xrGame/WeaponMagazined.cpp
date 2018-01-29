@@ -1423,7 +1423,7 @@ bool CWeaponMagazined::TryPlayAnimIdle()
 				//return PlayAnimation(mhud.mhud_idle_sprint,TRUE,"try play [mhud.mhud_idle_sprint]");
 				return PlayAnimation(mhud.mhud_idle_sprint,TRUE);
 			} 
-			else if (pActor->AnyMove())
+			if (pActor->AnyMove() && !(pActor->is_crouch() || pActor->is_creep()))
 			{
 				//return PlayAnimation(mhud.anim_idle_moving,TRUE,"try play [mhud.anim_idle_moving]");
 				return PlayAnimation(mhud.anim_idle_moving,TRUE);					
@@ -1457,6 +1457,7 @@ void CWeaponMagazined::PlayAnimIdle()
 		PlayAnimation(*m,TRUE);
 	if (!animStarted && moving && !IsZoomed())
 		m_pHUD->SetHudBobbong(true);
+
 	//Msg("bobbing %s isrunanim %s", m_pHUD->GetHudBobbing()?"yes":"no", animStarted ? "yes" : "no");
 }
 

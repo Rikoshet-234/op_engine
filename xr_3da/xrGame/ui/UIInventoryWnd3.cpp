@@ -119,7 +119,7 @@ void CUIInventoryWnd::ActivatePropertiesBox()
 			UIPropertiesBox.AddItem(OPFuncs::getComplexString("st_undress_outfit", pOutfit).c_str(), nullptr, INVENTORY_TO_BAG_ACTION);
 			if (CExoOutfit* exo = smart_cast<CExoOutfit*>(g_actor->GetOutfit()))
 			{
-				if (exo->m_sCurrentBattery.size()>0)
+				if (exo->isBatteryPresent())
 					UIPropertiesBox.AddItem("st_discharge_exo", g_actor->GetOutfit(), INVENTORY_DISCHARGE_EXO);
 			}
 		}
@@ -131,7 +131,7 @@ void CUIInventoryWnd::ActivatePropertiesBox()
 		UIPropertiesBox.AddItem(OPFuncs::getComplexString("st_dress_outfit",pOutfit).c_str(),  nullptr, INVENTORY_TO_SLOT_ACTION);
 		if (CExoOutfit* exo = smart_cast<CExoOutfit*>(pOutfit))
 		{
-			if (exo->m_sCurrentBattery.size()>0)
+			if (exo->isBatteryPresent())
 				UIPropertiesBox.AddItem("st_discharge_exo", pOutfit, INVENTORY_DISCHARGE_EXO);
 		}
 		b_show			= true;

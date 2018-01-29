@@ -178,7 +178,10 @@ bool CPhraseScript::Precondition	(	const CGameObject* pSpeakerGO1,
 			predicate_result=false;
 		}
 		else
-			predicate_result = lua_function	(pSpeakerGO1->lua_game_object(), pSpeakerGO2->lua_game_object(), dialog_id, phrase_id, next_phrase_id);
+		{
+			predicate_result = lua_function(pSpeakerGO1->lua_game_object(), pSpeakerGO2->lua_game_object(), dialog_id, phrase_id, next_phrase_id);
+
+		}
 		if(!predicate_result)
 		{
 		#ifdef DEBUG

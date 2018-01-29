@@ -297,10 +297,10 @@ u32 CScriptGameObject::get_current_patrol_point_index()
 
 Fvector	CScriptGameObject::bone_position	(LPCSTR bone_name) const
 {
-	u16					bone_id;
+	u16					bone_id= BI_NONE;
 	if (xr_strlen(bone_name))
-		bone_id			= smart_cast<CKinematics*>(object().Visual())->LL_BoneID(bone_name);
-	else
+		bone_id = smart_cast<CKinematics*>(object().Visual())->LL_BoneID(bone_name);
+	if (bone_id == BI_NONE)
 		bone_id			= smart_cast<CKinematics*>(object().Visual())->LL_GetBoneRoot();
 
 	Fmatrix				matrix;

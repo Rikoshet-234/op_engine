@@ -64,7 +64,7 @@ void CUIOutfitDragDropList::SetOutfit(CUICellItem* itm)
 		CExoOutfit* exo = smart_cast<CExoOutfit*>(pOutfit);
 		if (exo && exo->BatteryAccepted())
 		{
-			if (exo->m_sCurrentBattery.size() > 0)
+			if (exo->isBatteryPresent())
 			{
 				UIIconInfo iconInfo(exo->m_sCurrentBattery);
 				m_pBatteryIcon->SetOriginalRect(iconInfo.getOriginalRect());

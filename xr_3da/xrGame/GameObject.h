@@ -40,6 +40,7 @@ class CSpaceRestrictor;
 class CAttachableItem;
 class animation_movement_controller;
 class CBlend;
+class CExoOutfit;
 
 // alpet: для добавления свойства property
 template <typename T>
@@ -93,6 +94,7 @@ public:
 	virtual CAI_Stalker*				cast_stalker				()						{return NULL;}
 	virtual CScriptEntity*				cast_script_entity			()						{return NULL;}
 	virtual CWeapon*					cast_weapon					()						{return NULL;}
+	virtual CExoOutfit*					cast_exo_object() { return nullptr; }
 	virtual CExplosive*					cast_explosive				()						{return NULL;}
 	virtual CSpaceRestrictor*			cast_restrictor				()						{return NULL;}
 	virtual CAttachableItem*			cast_attachable_item		()						{return NULL;}

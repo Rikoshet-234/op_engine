@@ -641,6 +641,16 @@ bool CActor::is_jump()
 	return ((mstate_real & (mcJump|mcFall|mcLanding|mcLanding2)) != 0);
 }
 
+bool CActor::is_crouch()
+{
+	return !!(mstate_real&mcCrouch);
+}
+
+bool CActor::is_creep()
+{
+	return !!(mstate_real&(mcCrouch|mcAccel));
+}
+
 void CActor::UpdateJumpSpeed(float jumpSpeedDelta)
 {
 	float newValue = m_fJumpSpeed + jumpSpeedDelta;

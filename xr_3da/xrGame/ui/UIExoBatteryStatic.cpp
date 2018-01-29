@@ -19,7 +19,7 @@ bool CUIExoBatteryStatic::OnDbClick()
 			PIItem _iitem = static_cast<PIItem>(cell->m_pData);
 			//CCustomOutfit* pOutfit = smart_cast<CCustomOutfit*>(_iitem); 
 			CExoOutfit* exo = smart_cast<CExoOutfit*>(_iitem);
-			if (exo && exo->m_sCurrentBattery.size() > 0)
+			if (exo && exo->isBatteryPresent())
 				exo->RemoveFromBatterySlot();
 		}
 		return true;

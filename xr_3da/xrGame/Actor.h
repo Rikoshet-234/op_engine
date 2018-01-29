@@ -452,6 +452,8 @@ public:
 	bool					AnyMove					();
 	bool					is_sprint();
 	bool					is_jump					();		
+	bool					is_crouch();
+	bool					is_creep();
 protected:
 	u32						mstate_wishful;
 	u32						mstate_old;

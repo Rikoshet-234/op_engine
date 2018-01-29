@@ -81,6 +81,7 @@ struct ScriptCallbackInfo;
 struct STasks;
 class CCar;
 class CGBox;
+class CExoOutfit;
 class CDangerObject;
 class CScriptGameObject;
 class CNightVisionDevice;
@@ -620,6 +621,7 @@ public:
 	float				GetTotalWeight() const;
 	u32					GetSlot() const;
 	CGBox* GetGameBox() const;
+	CExoOutfit* GetExoOutfit() const;
 	LPCSTR				GetVisualName() const;
 	void				SetVisualName(LPCSTR);
 	

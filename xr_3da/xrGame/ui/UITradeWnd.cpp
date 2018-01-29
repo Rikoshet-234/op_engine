@@ -934,7 +934,7 @@ void CUITradeWnd::ActivatePropertiesBox()
 		}
 		else if (pExo)
 		{
-			if (pExo->m_sCurrentBattery.size()>0)
+			if (pExo->isBatteryPresent())
 			{
 				UIPropertiesBox.AddItem("st_discharge_exo", pExo, INVENTORY_DISCHARGE_EXO);
 				b_show = true;
