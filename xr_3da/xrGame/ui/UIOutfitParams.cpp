@@ -101,12 +101,11 @@ void CUIOutfitParams::SetInfo(const shared_str& outfit_section, CUIScrollView* p
 	if (m_bShowModifiers)
 	{
 		CExoOutfit* exo = smart_cast<CExoOutfit*>(inOutfit);
-		if (exo)
-		{
-			CUIListItemIconed* chargeItem = findIconedItem(m_lModificatorsUnsortedItems, "exo_charge", false, xmlParams(currentFileNameXml, PARAMS_PATH));
-			if (chargeItem)
-				setIconedItem(m_mIconIDs, chargeItem, "exo_charge", "ui_st_bci_desc", exo->m_fCurrentCharge, 3, 0, 0);
-		}
+		CUIListItemIconed* chargeItem = findIconedItem(m_lModificatorsUnsortedItems, "exo_charge", exo ? false : true, xmlParams(currentFileNameXml, PARAMS_PATH));
+		if (chargeItem)
+			setIconedItem(m_mIconIDs, chargeItem, "exo_charge", "ui_st_bci_desc", exo ? exo->m_fCurrentCharge:0, 3, 0, 0);
+
+
 		float outfitAddWeight = inOutfit ? inOutfit->m_additional_weight*inOutfit->GetCondition() : 0;
 		float outfitOriginalAddWeight = pSettings->r_float(outfit_section, "additional_inventory_weight");
 		CUIListItemIconed* weightItem = findIconedItem(m_lModificatorsUnsortedItems, "additional_weight", fsimilar(outfitAddWeight, 0.0f) && fsimilar(outfitOriginalAddWeight, 0.0f), xmlParams(currentFileNameXml, PARAMS_PATH));

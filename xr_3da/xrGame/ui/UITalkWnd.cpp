@@ -189,8 +189,10 @@ void CUITalkWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 	}
 	else if(pWnd == UITradeWnd && msg == TRADE_WND_CLOSED)
 	{
+		//InitTalkDialog();
 		UITalkDialogWnd->Show();
 		UITradeWnd->Hide();
+		
 	}
 
 	inherited::SendMessage(pWnd, msg, pData);
@@ -229,9 +231,10 @@ void CUITalkWnd::Update()
 	}else{
 		CGameObject* pOurGO = smart_cast<CGameObject*>(m_pOurInvOwner);
 		CGameObject* pOtherGO = smart_cast<CGameObject*>(m_pOthersInvOwner);
-	
-		if(NULL==pOurGO || NULL==pOtherGO || ((pOurGO->Position().distance_to(pOtherGO->Position())>3.0f)&&!m_pOthersInvOwner->NeedOsoznanieMode()) )
-			Game().StartStopMenu(this,true);
+		if (NULL == pOurGO || NULL == pOtherGO || ((pOurGO->Position().distance_to(pOtherGO->Position()) > 3.0f) && !m_pOthersInvOwner->NeedOsoznanieMode()))
+		{
+			Game().StartStopMenu(this, true);
+		}
 	}
 
 	if(m_bNeedToUpdateQuestions)

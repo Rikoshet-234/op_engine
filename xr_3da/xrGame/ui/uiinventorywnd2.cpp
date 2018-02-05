@@ -209,7 +209,7 @@ bool CUIInventoryWnd::ToSlot(CUICellItem* itm, bool force_place)
 	
 		//SendEvent_Item2Slot					(iitem);
 		//SendEvent_ActivateSlot				(iitem);
-
+		PlaySnd(eInvItemToSlot);
 		m_iCurrentActiveSlot = iitem->GetSlot();
 		GetInventory()->SetPrevActiveSlot(iitem->GetSlot());
 		UIOutfitInfo.UpdateImmuneView();

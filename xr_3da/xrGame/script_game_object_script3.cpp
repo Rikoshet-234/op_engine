@@ -134,6 +134,7 @@ class_<CScriptGameObject> &script_register_game_object2(class_<CScriptGameObject
 		.def("set_task_state",				&CScriptGameObject::SetGameTaskState)
 		.def("give_task",					&CScriptGameObject::GiveTaskToActor,		adopt(_2))
 
+		.def("get_talk_partner", &CScriptGameObject::GetTalkPartnerGameObj)
 		.def("is_talking",					&CScriptGameObject::IsTalking)
 		.def("stop_talk",					&CScriptGameObject::StopTalk)
 		.def("enable_talk",					&CScriptGameObject::EnableTalk)

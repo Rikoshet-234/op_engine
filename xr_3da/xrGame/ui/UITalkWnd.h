@@ -62,6 +62,7 @@ protected:
 	// Функции добавления строк в листы вопросов и ответов
 public:
 	bool GetInitState() const {return m_bInitState;}
+	void SetInitState(bool value) { m_bInitState = value; }
 	void				AddQuestion				(const shared_str& text, const shared_str& id,int number);
 	void				AddAnswer				(const shared_str& text, LPCSTR SpeakerName);
 	CUITradeWnd*		GetTradeWnd() const {return UITradeWnd;}

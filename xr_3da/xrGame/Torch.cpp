@@ -155,7 +155,9 @@ BOOL CTorch::net_Spawn(CSE_Abstract* DC)
 	glow_render->set_radius	(pUserData->r_float					("torch_definition","glow_radius"));
 
 	//включить/выключить фонарик
-	Switch					(torch->m_active);
+	//Switch(torch->m_active);
+	Switch(false);
+
 	VERIFY					(!torch->m_active || (torch->ID_Parent != 0xffff));
 	
 

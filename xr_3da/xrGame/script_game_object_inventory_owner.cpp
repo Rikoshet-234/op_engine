@@ -132,6 +132,16 @@ xrTime CScriptGameObject::GetInfoTime			(LPCSTR info_id)
 }
 
 
+CScriptGameObject* CScriptGameObject::GetTalkPartnerGameObj()
+{
+	CInventoryOwner* pInventoryOwner = smart_cast<CInventoryOwner*>(&object());
+	if (!pInventoryOwner) 
+		return nullptr;
+	if (!pInventoryOwner->IsTalking())
+		return nullptr;
+	CGameObject* go= smart_cast<CGameObject*>(pInventoryOwner->GetTalkPartner());
+	return go->lua_game_object();
+}
 
 bool CScriptGameObject::IsTalking()
 {

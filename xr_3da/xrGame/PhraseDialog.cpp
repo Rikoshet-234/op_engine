@@ -215,22 +215,6 @@ void CPhraseDialog::Load(shared_str dialog_id)
 			if (std::string::npos != sidx)
 				file_name=file_name.substr(sidx+1,file_name.length());
 			item_data._xml->ReInit(CONFIG_PATH, GAME_PATH, file_name.c_str()); //физически распарсим наново xml документ
-			//item_data._xml->dump();
-	
-			/*int items_num			= item_data._xml->GetNodesNum(item_data._xml->GetRoot(), id_to_index::GetTagName());
-			item_data._xml->SetLocalRoot		(item_data._xml->GetRoot());
-			int pos=-1;
-			for(int i=0; i<items_num; ++i)
-			{
-				XML_NODE* dialog_node = item_data._xml->NavigateToNode(id_to_index::GetTagName(), i);
-				xr_string data=item_data._xml->ReadAttrib(dialog_node,"id",nullptr);
-				if (xr_strcmp(data.c_str(),m_DialogId.c_str())==0)
-				{
-					pos=i;
-					break;
-				}
-			}
-			item_data.pos_in_file=pos;*/
 			data()->SetLoad(false);
 			inherited_shared::load_shared(m_DialogId, nullptr); //перестроим грай диалогов на основании новой структуры xml
 		}

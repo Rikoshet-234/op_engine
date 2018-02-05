@@ -261,26 +261,26 @@ u32	CTrade::GetItemPrice(PIItem pItem, bool b_buying)
 			{
 				shared_str glName=weapon->GetGrenadeLauncherName();
 				glCost=pSettings->r_float(glName,"cost");
-				glCost=glCost*calcTradeFactor(returnTradeFactors(b_buying,glName),relation_factor);
+				glCost*=calcTradeFactor(returnTradeFactors(b_buying,glName),relation_factor);
 			}
 			if (weapon->IsScopeAttached() && weapon->ScopeAttachable())
 			{
 				shared_str scName=weapon->GetScopeName();
 				scCost=pSettings->r_float(scName,"cost");
-				scCost=scCost*calcTradeFactor(returnTradeFactors(b_buying,scName),relation_factor);
+				scCost*=calcTradeFactor(returnTradeFactors(b_buying,scName),relation_factor);
 			}
 			if (weapon->IsSilencerAttached() && weapon->SilencerAttachable())
 			{
 				shared_str slName=weapon->GetSilencerName();
 				slCost=pSettings->r_float(slName,"cost");
-				scCost=scCost*calcTradeFactor(returnTradeFactors(b_buying,slName),relation_factor);
+				slCost*= calcTradeFactor(returnTradeFactors(b_buying, slName), relation_factor);
 			}
 			int ammoInWeapon=weapon->GetAmmoElapsed();
 			if (ammoInWeapon>0)
 			{
 				shared_str amiwName=weapon->m_magazine.back().m_ammoSect;
 				amiwCost=GetAmmoCostInWeapon(amiwName)*ammoInWeapon;
-				amiwCost=amiwCost*calcTradeFactor(returnTradeFactors(b_buying,amiwName),relation_factor);
+				amiwCost*=calcTradeFactor(returnTradeFactors(b_buying,amiwName),relation_factor);
 			}
 			CWeaponMagazinedWGrenade* weaponG=smart_cast<CWeaponMagazinedWGrenade*>(pItem);
 			if (weaponG)
@@ -288,7 +288,7 @@ u32	CTrade::GetItemPrice(PIItem pItem, bool b_buying)
 				{
 					shared_str griwName=weaponG->m_magazine2.back().m_ammoSect;
 					griwCost=GetAmmoCostInWeapon(griwName)*weaponG->m_magazine2.size();
-					griwCost=griwCost*calcTradeFactor(returnTradeFactors(b_buying,griwName),relation_factor);
+					griwCost*=calcTradeFactor(returnTradeFactors(b_buying,griwName),relation_factor);
 				}
 		}
 		else if (exo)
@@ -297,7 +297,8 @@ u32	CTrade::GetItemPrice(PIItem pItem, bool b_buying)
 			{
 				shared_str batteryName= exo->m_sCurrentBattery;
 				exoBatteryCost = pSettings->r_float(batteryName, "cost");
-				exoBatteryCost= exoBatteryCost*calcTradeFactor(returnTradeFactors(b_buying, batteryName), relation_factor);
+				float charge_factor=powf(exo->m_fCurrentCharge*0.9f + .1f, 0.75f);
+				exoBatteryCost*= calcTradeFactor(returnTradeFactors(b_buying, batteryName), relation_factor)*charge_factor;;
 			}
 		}
 		if (base_cost==-1)
@@ -324,14 +325,9 @@ u32	CTrade::GetItemPrice(PIItem pItem, bool b_buying)
 #pragma endregion
 
 #pragma region total price calculation
-	u32	result = iFloor	(base_cost*condition_factor*action_factor*deficit_factor);
-	result+=iFloor(glCost);
-	result+=iFloor(slCost);
-	result+=iFloor(scCost);
-	result+=iFloor(amiwCost);
-	result+=iFloor(griwCost);
-	result += iFloor(exoBatteryCost);
+	base_cost *= condition_factor*action_factor;
+	float totalCost = base_cost + glCost + slCost + scCost + amiwCost + griwCost + exoBatteryCost;
+	totalCost *= deficit_factor;
 #pragma endregion
-
-	return					(result);
+	return					(iFloor(totalCost));
 }
