@@ -129,6 +129,7 @@ CInventoryItem::CInventoryItem()
 	m_flags.set			(Fbelt,FALSE);
 	m_flags.set			(Fruck,TRUE);
 	m_flags.set			(FRuckDefault,TRUE);
+	m_flags.set(FCanNPCPutInSlot, TRUE);
 	m_pCurrentInventory	= nullptr;
 	SetDropManual		(FALSE);
 
@@ -211,6 +212,7 @@ void CInventoryItem::Load(LPCSTR section)
 	m_flags.set(FCanTake, READ_IF_EXISTS(pSettings, r_bool, section, "can_take", TRUE));
 	m_flags.set(FCanTrade, READ_IF_EXISTS(pSettings, r_bool, section, "can_trade", TRUE));
 	m_flags.set(FIsQuestItem, READ_IF_EXISTS(pSettings, r_bool, section, "quest_item", FALSE));
+	m_flags.set(FCanNPCPutInSlot, READ_IF_EXISTS(pSettings, r_bool, section, "npc_put_in_slot", TRUE));
 
 	if (pSettings->line_exist(section, "useful_for_npc"))
 	{

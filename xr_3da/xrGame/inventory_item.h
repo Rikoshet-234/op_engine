@@ -47,7 +47,6 @@ class CInventoryItem :
 {
 	friend class CInventoryScript;
 	friend class CInventory;
-private:
 	typedef CAttachableItem inherited;
 	UIIconInfo m_iconInfo;
 	std::string ParseDescription() const;
@@ -67,7 +66,8 @@ protected:
 								Fuseful_for_NPC		=(1<<8),
 								FInInterpolation	=(1<<9),
 								FInInterpolate		=(1<<10),
-								FIsQuestItem		=(1<<11)
+								FIsQuestItem		=(1<<11),
+								FCanNPCPutInSlot = (1 << 12),
 	};
 
 	Flags16						m_flags;
@@ -75,7 +75,6 @@ public:
 								CInventoryItem		();
 	virtual						~CInventoryItem		();
 
-public:
 	virtual void				Load				(LPCSTR section);
 
 	virtual LPCSTR				Name				();
@@ -137,7 +136,6 @@ public:
 	float AP_Radiation() const { return m_fActivePropertyRadiation; }
 	void SetAP_Radiation(float value);
 
-public:
 	CInventory*					m_pCurrentInventory;
 
 	shared_str					m_name;
@@ -173,6 +171,7 @@ public:
 			bool				Ruck				()							{return !!m_flags.test(Fruck);}
 			void				Ruck				(bool on_ruck)				{m_flags.set(Fruck,on_ruck);}
 			bool				RuckDefault			()							{return !!m_flags.test(FRuckDefault);}
+			bool CanNPCPutInSlot() const { return !!m_flags.test(FCanNPCPutInSlot); }
 			
 	virtual bool				CanTake				() const					{return !!m_flags.test(FCanTake);}
 			bool				CanTrade			() const;

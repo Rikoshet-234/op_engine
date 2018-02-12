@@ -954,6 +954,11 @@ const MonsterSpace::SBoneRotation &CAI_Stalker::head_orientation	() const
 	return		(movement().head_orientation());
 }
 
+bool CAI_Stalker::CanPutInSlot(PIItem item, u32 slot)
+{
+	return slot != OUTFIT_SLOT && item->CanNPCPutInSlot();
+}
+
 void CAI_Stalker::net_Relcase				(CObject*	 O)
 {
 	inherited::net_Relcase				(O);

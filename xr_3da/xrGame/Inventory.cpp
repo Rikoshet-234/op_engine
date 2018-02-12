@@ -20,6 +20,8 @@
 #include "script_callback_ex.h"
 #include "item_place_change_enum.h"
 #include "UIGameSP.h"
+#include "ai/stalker/ai_stalker.h"
+#include "ai/trader/ai_trader.h"
 
 using namespace InventoryUtilities;
 
@@ -148,6 +150,12 @@ void CInventory::Take(CGameObject *pObj, bool bNotActivate, bool strict_placemen
 		pIItem->m_eItemPlace			= eItemPlaceUndefined;
 
 	bool result							= false;
+
+	/*CAI_Stalker* npc = smart_cast<CAI_Stalker*> (GetOwner());
+	if (npc && xr_strcmp(npc->Name_script(),"esc_akim")==0 && !pIItem->CanNPCPutInSlot())
+	{
+		DebugBreak;
+	}*/
 	switch(pIItem->m_eItemPlace)
 	{
 	case eItemPlaceBelt:
@@ -167,7 +175,10 @@ void CInventory::Take(CGameObject *pObj, bool bNotActivate, bool strict_placemen
 
 		break;
 	case eItemPlaceSlot:
-		result							= Slot(pIItem, bNotActivate); 
+		if (!CanPutInSlot(pIItem)) //если изменился конфиг для уже помещенное в сейве вещи в слоте
+			Ruck(pIItem);
+		else
+			result							= Slot(pIItem, bNotActivate); 
 #ifdef DEBUG
 		if(!result) 
 			Msg("cant slot in ruck item %s", *pIItem->object().cName());
