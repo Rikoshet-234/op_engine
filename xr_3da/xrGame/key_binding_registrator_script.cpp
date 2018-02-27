@@ -91,6 +91,8 @@ void key_binding_registrator::script_register(lua_State *L)
 				value("kUSE_USER_ACTION8", int(kUSE_USER_ACTION8)),
 				value("kUSE_USER_ACTION9", int(kUSE_USER_ACTION9)),
 
+				value("kCARBODY_TAKE_ALL", int(kCARBODY_TAKE_ALL)),
+
 				value("kNOTBINDED",					int(kNOTBINDED))
 			],
 		class_<key_binding_registrator >("DIK_keys")

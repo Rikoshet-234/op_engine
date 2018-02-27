@@ -156,8 +156,10 @@ BOOL CTorch::net_Spawn(CSE_Abstract* DC)
 
 	//включить/выключить фонарик
 	//Switch(torch->m_active);
-	Switch(false);
-
+	if (g_actor && torch->ID_Parent==g_actor->ID())
+		Switch(torch->m_active); //у актора схемы фонарика нет
+	else
+		Switch(false); //включит при необходимости скриптовая схема
 	VERIFY					(!torch->m_active || (torch->ID_Parent != 0xffff));
 	
 

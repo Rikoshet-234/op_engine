@@ -118,6 +118,8 @@ _action  actions[] = {
 	{ "use_user_action8",	kUSE_USER_ACTION8		,_sp },
 	{ "use_user_action9",	kUSE_USER_ACTION9		,_sp },
 
+	{ "car_body_take_all",	kCARBODY_TAKE_ALL		,_sp },
+
 	{nullptr, 				kLASTACTION				,_both}
 };
 

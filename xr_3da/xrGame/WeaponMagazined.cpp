@@ -141,11 +141,10 @@ void CWeaponMagazined::Load(LPCSTR section)
 	animName = "anim_idle_moving";
 	if (pSettings->line_exist(*hud_sect, "anim_idle_moving"))
 		animGet(mhud.anim_idle_moving, pSettings->r_string(*hud_sect, animName), *hud_sect, animName);
-#pragma endregion 
 
 	if (IsZoomEnabled())
 		animGet(mhud.mhud_idle_aim, pSettings->r_string(*hud_sect, "anim_idle_aim"), *hud_sect, "anim_idle_aim");
-
+#pragma endregion 
 
 	//звуки и партиклы глушителя, еслит такой есть
 	if (m_eSilencerStatus == ALife::eAddonAttachable)
@@ -1442,18 +1441,20 @@ void CWeaponMagazined::PlayAnimIdle()
 {
 	MotionSVec* m = nullptr;
 	bool animStarted = false;
+	bool moving = H_Parent() && H_Parent()->CLS_ID == CLSID_OBJECT_ACTOR && g_actor->AnyMove();
 	if(IsZoomed())
 	{
 		m = &mhud.mhud_idle_aim;
 	}
 	else{
-		m = &mhud.mhud_idle;
+		if (!moving)
+			m = &mhud.mhud_idle;
 		animStarted = TryPlayAnimIdle();
 		//if (TryPlayAnimIdle()) return;
 	}
 	//VERIFY(GetState()==eIdle);
-	bool moving = H_Parent() &&  H_Parent()->CLS_ID == CLSID_OBJECT_ACTOR && g_actor->AnyMove();
-	if (!animStarted)
+	
+	if (!animStarted && m && m->size()>0)
 		PlayAnimation(*m,TRUE);
 	if (!animStarted && moving && !IsZoomed())
 		m_pHUD->SetHudBobbong(true);

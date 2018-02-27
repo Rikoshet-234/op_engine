@@ -78,6 +78,12 @@ void CWeaponPistol::Load	(LPCSTR section)
 		animGet				(wm_mhud_r.mhud_idle_aim,		str);
 	}
 
+	LPCSTR animName = "anim_idle_moving_empty"; //пойдем на хитрости, дабы не добавлять анимацию для всего оружия
+	if (pSettings->line_exist(*hud_sect, "anim_idle_moving_empty"))
+	{
+		animGet(pre_anim_idle_moving_empty, pSettings->r_string(*hud_sect, animName), *hud_sect, animName);
+	}
+	pre_anim_idle_moving = mhud.anim_idle_moving; //закешируем обшие анимации
 }
 
 void CWeaponPistol::OnH_B_Chield		()
@@ -116,20 +122,34 @@ void CWeaponPistol::PlayAnimIdle	()
 		else if (pActor->AnyMove())
 			movingNormal = true;
 	}
-	if (m_opened)
+	if (m_opened) //если пустой ствол
 	{
+
 		if (!movingSprint && !movingNormal)
-			anim = &wwpm_current().mhud_empty;
+			anim = &wwpm_current().mhud_empty; //типа стоим на месте
+		else
+		{
+			if (movingNormal) //при обычном шаге
+			{
+				if (pre_anim_idle_moving_empty.empty()) //dirty hack если нет анимации для ходьбы с пустым стволом - сбросим анимации для inherited::PlayAnimIdle() 
+					mhud.anim_idle_moving.clear(); //дабы включилась движковая раскачка
+				else if (mhud.anim_idle_moving.empty()) //если есть - будем играть все, на всякий случай восстановим из кеша
+					mhud.anim_idle_moving = pre_anim_idle_moving;
+			}
+			anim = &pre_anim_idle_moving_empty; //попробуем проиграть анимацию движения с пустым стволом
+		}
 	}
 	else
 	{
 		CActor* A = smart_cast<CActor*>(H_Parent());
 		if (A && A->Holder())
 			anim = (IsZoomed()) ? &wm_mhud_r.mhud_idle_aim : &wm_mhud_r.mhud_idle;
+		if (mhud.anim_idle_moving.empty()) //восстановим из кеша, если надо обычную анимацию движения
+			mhud.anim_idle_moving = pre_anim_idle_moving;
 	}
 	if (anim && !anim->empty())
 		m_pHUD->animPlay(random_anim(*anim), TRUE, nullptr, GetState());
-	else
+	else 
 		inherited::PlayAnimIdle();
 }
 

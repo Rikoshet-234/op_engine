@@ -15,7 +15,7 @@
 #include "InventoryOwner.h"
 #include "Inventory.h"
 #include "game_news.h"
-#include "string_table.h"
+#include "ActorCondition.h"
 
 #define KNIFE_MATERIAL_NAME "objects\\knife"
 
@@ -166,7 +166,9 @@ void CWeaponKnife::KnifeStrike(const Fvector& pos, const Fvector& dir)
 
 	PlaySound						(m_sndShot,pos);
 	//поломаем ножик, предугадывая объект для пересечения с пулей (махание в воздухе не учитываем)
-	if (!!Level().ObjectSpace.RayTest(pos, dir, fireDistance, collide::rqtBoth, nullptr, nullptr))
+	collide::rq_result	l_rq;
+	bool result = !!Level().ObjectSpace.RayPick(pos, dir, fireDistance, collide::rqtBoth, l_rq, H_Parent());
+	if (result)
 	{
 		if (GetCondition()<=m_fCriticalCondition)//уберем в инвентарь поломанное ХО
 		{
@@ -181,6 +183,12 @@ void CWeaponKnife::KnifeStrike(const Fvector& pos, const Fvector& dir)
 		fCurrentHit=fCurrentHit*GetCondition();
 		//наша пуля попадет по чему нибудь... 
 		ChangeCondition(-GetWeaponDeterioration());
+	}
+	if (ParentIsActor() && !l_rq.O)
+	{
+		float power = float(Actor()->conditions().GetPower()*0.02);
+		float weight = Weight() / 200;
+		Actor()->conditions().ChangePower(-(power+weight));
 	}
 	//пуля улетела... 
 	Level().BulletManager().AddBullet(	pos, 

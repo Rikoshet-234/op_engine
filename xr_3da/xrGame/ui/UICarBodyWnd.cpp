@@ -4,6 +4,7 @@
 #include "UIXmlInit.h"
 #include "../HUDManager.h"
 #include "../level.h"
+#include "../xr_level_controller.h"
 #include "UICharacterInfo.h"
 #include "UIDragDropListEx.h"
 #include "UIFrameWindow.h"
@@ -564,16 +565,28 @@ void CUICarBodyWnd::TakeAll()
 }
 
 
-#include "../xr_level_controller.h"
-
 bool CUICarBodyWnd::OnKeyboard(int dik, EUIMessages keyboard_action)
 {
 	if( inherited::OnKeyboard(dik,keyboard_action) )return true;
-
-	if(keyboard_action==WINDOW_KEY_PRESSED && is_binded(kUSE, dik)) 
+	if (keyboard_action == WINDOW_KEY_PRESSED)
 	{
-			GetHolder()->StartStopMenu(this,true);
-			return true;
+		EGameActions action = get_binded_action(dik);
+		bool processed = false;
+		switch (action)
+		{
+			case kUSE:
+				GetHolder()->StartStopMenu(this, true);
+				processed = true;
+				break;
+			case kCARBODY_TAKE_ALL:
+				TakeAll();
+				processed = true;
+				break;
+			default:
+				break;
+		}
+		return processed;
+		
 	}
 	return false;
 }
@@ -865,13 +878,17 @@ bool CUICarBodyWnd::TransferItem(PIItem itm, CInventoryOwner* owner_from, CInven
 
 bool CUICarBodyWnd::OnMouse(float x, float y, EUIMessages mouse_action)
 {
-	if(mouse_action == WINDOW_RBUTTON_DOWN)
+	switch (mouse_action)
 	{
-		if(m_pUIPropertiesBox->IsShown())
-		{
-			m_pUIPropertiesBox->Hide		();
-			return						true;
-		}
+		case WINDOW_CBUTTON_DOWN:
+			if (is_binded(kCARBODY_TAKE_ALL, MOUSE_3))
+				TakeAll();
+			break;
+		case WINDOW_RBUTTON_DOWN:
+			if (m_pUIPropertiesBox->IsShown())
+				m_pUIPropertiesBox->Hide();
+			break;
+		default:break;
 	}
 	CUIWindow::OnMouse					(x, y, mouse_action);
 	return true; 

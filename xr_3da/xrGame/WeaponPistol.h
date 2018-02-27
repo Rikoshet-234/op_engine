@@ -41,6 +41,11 @@ protected:
 		MotionSVec		mhud_close;
 		MotionSVec		mhud_reload_empty;
 	};
+
+	MotionSVec pre_anim_idle_moving;
+	MotionSVec pre_anim_idle_moving_empty;
+
+
 	WWPMotions			mhud_pistol,mhud_pistol_r;
 	SWMmotions			wm_mhud_r;
 	
