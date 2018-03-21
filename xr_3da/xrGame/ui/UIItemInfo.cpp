@@ -173,11 +173,11 @@ void CUIItemInfo::InitItem(CInventoryItem* pInvItem)
 	if(UICondProgresBar)
 	{
 		float cond							= pInvItem->GetConditionToShow();
-		UICondProgresBar->Show				(true);
+		UICondProgresBar->Show				(pInvItem->m_bUIConditionShow);
 		UICondProgresBar->SetProgressPos	( cond*100.0f+1.0f-EPS );
 	}
 	if (UICondition)
-		UICondition->Show(true);
+		UICondition->Show(pInvItem->m_bUIConditionShow);
 	if(UIDesc)
 	{
 		UIDesc->Clear						();

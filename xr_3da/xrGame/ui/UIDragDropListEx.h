@@ -145,6 +145,7 @@ public:
 	void SetCallback(GameObject::ECallbackType type);
 
 	CUICellItem* CreateCellItemSimple(LPCSTR itemSection);
+	CUICellItem* CreateCellItemSimple2(LPCSTR itemSection,float condition);
 
 	TCachedData cacheData;
 	bool					GetShowConditionBar() const {return m_b_showConditionBar;}
@@ -175,9 +176,11 @@ public:
 	bool			select_suitables_by_item(CInventoryItem* item);
 	bool			select_weapons_by_addon(CInventoryItem* addonItem);
 	bool			select_weapons_by_ammo(CInventoryItem* ammoItem);
-	bool			select_items_by_section(shared_str section);
+	bool			select_items_by_section(LPCSTR section);
 	bool			select_exos_by_battery(CInventoryItem* ammoItem);
 
+	void ClearAllSuitables();
+	void SetSuitableBySection(luabind::object const& sections);
 	bool m_bEnableDragDrop;
 
 	const	Ivector2&		CellsCapacity		();
@@ -213,6 +216,8 @@ public:
 
 			u32				ItemsCount			();
 			CUICellItem*	GetItemIdx			(u32 idx);
+			Fvector2		GetItemPos			(CUICellItem* itm);
+			CUICellItem*	GetCellAt(Fvector2 pos);
 	virtual CUICellItem*	RemoveItem			(CUICellItem* itm, bool force_root);
 			void			CreateDragItem		(CUICellItem* itm);
 

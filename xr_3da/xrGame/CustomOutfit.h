@@ -45,7 +45,6 @@ public:
 	virtual void OnCantMove() {};
 	virtual void OnCantSprint() {};
 
-
 protected:
 	HitImmunity::HitTypeSVec		m_HitTypeProtection;
 	float							m_fPowerLoss;

@@ -11,6 +11,7 @@
 #include "GameObject.h"
 #include "HUDManager.h"
 #include "ai_sounds.h"
+#include "ActorCondition.h"
 
 CExoOutfit::CExoOutfit()
 {
@@ -40,10 +41,11 @@ void CExoOutfit::Load(LPCSTR section)
 		R_ASSERT3(batterySections.size() != 0, "Batteries must be specified for ", section);
 	}
 
-	if (pSettings->line_exist(section, "snd_cant_sprint"))
+	//disabled due very-very bagged
+	/*if (pSettings->line_exist(section, "snd_cant_sprint"))
 		sndCantSprint.create(pSettings->r_string(section, "snd_cant_sprint"), st_Effect, SOUND_TYPE_WORLD);
 	if (pSettings->line_exist(section, "snd_cant_jump"))
-		sndCantJump.create(pSettings->r_string(section, "snd_cant_jump"), st_Effect, SOUND_TYPE_WORLD);
+		sndCantJump.create(pSettings->r_string(section, "snd_cant_jump"), st_Effect, SOUND_TYPE_WORLD);*/
 }
 
 void CExoOutfit::UpdateCharge(float value)
@@ -173,6 +175,11 @@ void CExoOutfit::OnMove()
 {
 	if (!(g_actor->get_state()&(mcFall| mcLanding | mcLanding2)))
 		UpdateCharge(-(m_fMovingDischarge / m_fCondition));
+	if (fsimilar(m_fCurrentCharge, 0, EPS) || !isBatteryPresent())
+	{
+		float power = float(m_fMovingDischarge / m_fCondition)* 200.0f;
+		Actor()->conditions().ChangePower(-power);
+	}
 }
 
 bool CExoOutfit::CanSprint()
@@ -194,8 +201,9 @@ void CExoOutfit::play_sound(ref_sound sound)
 {
 	Fvector snd_pos;
 	snd_pos.set(0, ACTOR_HEIGHT, 0);
-	//if (!sound._feedback())
-	sound.play_at_pos(g_actor,snd_pos, sm_2D);
+	float volume = 0.4f;
+	if (sound._handle() && !sound._feedback())
+		sound.play_no_feedback(nullptr, sm_2D,0,&snd_pos, &volume);
 	//	sound.play_at_pos(nullptr, snd_pos, sm_2D);
 	//::Sound->play_at_pos(sound, g_actor, g_actor->Position());
 
@@ -204,13 +212,13 @@ void CExoOutfit::play_sound(ref_sound sound)
 
 void CExoOutfit::OnCantSprint()
 {
-	play_sound(sndCantSprint);
+	//play_sound(sndCantSprint);
 	HUD().GetUI()->AddInfoMessage("cant_exo_sprint");
 }
 
 void CExoOutfit::OnCantJump()
 {
-	play_sound(sndCantJump);
+	//play_sound(sndCantJump);
 	HUD().GetUI()->AddInfoMessage("cant_exo_jump");
 }
 

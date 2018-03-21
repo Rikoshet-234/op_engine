@@ -1690,7 +1690,8 @@ void CCC_RegisterCommands()
 	CMD3(CCC_Mask,				"gp_sticky_scope",				&g_uCommonFlags,gpStickyScope);
 	CMD3(CCC_Mask, "gp_show_modificators", &g_uCommonFlags, gpShowModificators);
 	CMD3(CCC_ChangeScopeVisual,	"gp_open_scope",				&g_uCommonFlags,gpOpenScope);
-
+	CMD2(CCC_Bool, "invert_trade", &gInvertTrade);
+	
 
 
 	CMD1(CCC_GSCheckForUpdates, "check_for_updates"		);

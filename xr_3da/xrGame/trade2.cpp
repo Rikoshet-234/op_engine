@@ -211,7 +211,11 @@ u32	CTrade::GetItemPrice(PIItem pItem, bool b_buying)
 
 	#pragma region computing relation factor
 	float					relation_factor;
-	CHARACTER_GOODWILL		attitude = RELATION_REGISTRY().GetAttitude(pPartner.inv_owner, pThis.inv_owner);
+	CHARACTER_GOODWILL		attitude;
+	if (gInvertTrade)
+		attitude = RELATION_REGISTRY().GetAttitude(pThis.inv_owner, pPartner.inv_owner);
+	else
+		attitude = RELATION_REGISTRY().GetAttitude(pPartner.inv_owner, pThis.inv_owner);
 	if (NO_GOODWILL == attitude)
 		relation_factor		= 0.f;
 	else
@@ -219,16 +223,6 @@ u32	CTrade::GetItemPrice(PIItem pItem, bool b_buying)
 
 	clamp					(relation_factor,0.f,1.f);
 
-	/*const SInventoryOwner	*_partner = nullptr;
-	bool					buying = true;
-	bool					is_actor = (pThis.type == TT_ACTOR) || (pPartner.type == TT_ACTOR);
-	if (is_actor) {
-		buying				= b_buying;
-		_partner			= &(buying ? pThis : pPartner);
-	}
-	else {
-		_partner			= &pPartner;
-	}*/
 #pragma endregion
 
 	// computing base_cost

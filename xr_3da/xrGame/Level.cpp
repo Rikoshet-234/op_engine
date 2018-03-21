@@ -76,6 +76,7 @@ CLevel::CLevel():IPureClient	(Device.GetTimerGlobal())
 	game						= NULL;
 //	game						= xr_new<game_cl_GameState>();
 	game_events					= xr_new<NET_Queue_Event>();
+	//spawn_events				= xr_new<NET_Queue_Event>();
 
 	game_configured				= FALSE;
 	m_bGameConfigStarted		= FALSE;
@@ -247,7 +248,7 @@ CLevel::~CLevel()
 
 	xr_delete					(game);
 	xr_delete					(game_events);
-
+	//xr_delete					(spawn_events);
 
 	//by Dandy
 	//destroy fog of war
@@ -397,7 +398,9 @@ void CLevel::ProcessGameEvents		()
 		if (!game_events->queue.empty())	
 			Msg("- d[%d],ts[%d] -- E[svT=%d],[evT=%d]",Device.dwTimeGlobal,timeServer(),svT,game_events->queue.begin()->timestamp);
 		*/
+#pragma region SPAWN_ANTIFREEZE
 
+#pragma endregion
 		while	(game_events->available(svT))
 		{
 			u16 ID,dest,type;

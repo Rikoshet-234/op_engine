@@ -84,6 +84,7 @@ ENGINE_API extern	bool			lpLoadScreenEnableProgressBar;
 ENGINE_API extern bool pMMMusic;
 ENGINE_API extern bool gPlayLevelAmbientMusic;
 ENGINE_API extern bool gPlayLevelAmbientSounds;
+ENGINE_API extern bool gInvertTrade;
 
 // game path definition
 #define _game_data_				"$game_data$"

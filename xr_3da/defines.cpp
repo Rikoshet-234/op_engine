@@ -23,3 +23,4 @@
 	bool pMMMusic = true;
 	bool gPlayLevelAmbientMusic = true;
 	bool gPlayLevelAmbientSounds = true;
+	bool gInvertTrade = false;

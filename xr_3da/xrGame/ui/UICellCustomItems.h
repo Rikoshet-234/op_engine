@@ -15,6 +15,17 @@ public:
 	CInventoryItem* object() const { return nullptr; }
 };
 
+
+class CUISection_ConditionCellItem:public CUISectionCellItem
+{
+private:
+	typedef  CUISectionCellItem	inherited;
+public:
+	CUISection_ConditionCellItem(shared_str section,float condition);
+	bool			EqualTo(CUICellItem* itm) override;
+	void			Update() override;
+};
+
 class CUIInventoryCellItem :public CUICellItem
 {
 	typedef  CUICellItem	inherited;

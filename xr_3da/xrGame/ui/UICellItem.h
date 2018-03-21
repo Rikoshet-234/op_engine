@@ -35,7 +35,7 @@ protected:
 	bool					m_selected;
 	CUIProgressBar*			m_pConditionProgressBar;
 	virtual void			UpdateItemText			();
-
+	
 public:
 							CUICellItem				();
 	virtual					~CUICellItem			();
@@ -78,7 +78,8 @@ public:
 	bool					m_suitable;
 				bool		m_b_already_drawn;
 	bool					m_b_destroy_childs;
-	
+	bool m_bForceConditionShow;
+	void ForceConditionShow() {m_bForceConditionShow=true;}
 	bool m_bIgnoreItemPlace;
 	Fcolor					m_preAnimTexColor;
 	Fcolor					m_preAnimTextColor;
@@ -88,8 +89,12 @@ public:
 	void SetSelected(bool value);
 
 	LPCSTR GetCellSection();
+	float GetAbsCellCondition();
+	float GetCellCondition();
+	void SetCellCondition(float value);
 	UIIconInfo m_iconInfo;
 	shared_str m_sSection;
+	float m_fSectionCondition;
 	bool GetFocused() {return m_focused;}
 	bool GetSelected() {return m_selected;}
 };

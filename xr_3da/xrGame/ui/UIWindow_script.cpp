@@ -107,7 +107,7 @@ void DragDropListSetItem(CUIDragDropListEx* self, CUICellItem* item)
 	self->SetItem(item);
 }
 
-void DragDropListSetItem(CUIDragDropListEx* self, CScriptGameObject* item)
+void DragDropListSetItem(CUIDragDropListEx* self, CScriptGameObject* item,bool forceCellShowCondition)
 {
 	if (!self)
 	{
@@ -128,6 +128,8 @@ void DragDropListSetItem(CUIDragDropListEx* self, CScriptGameObject* item)
 
 	}
 	CUICellItem* itm = create_cell_item(inventory_item);
+	if (forceCellShowCondition)
+		itm->ForceConditionShow();
 	self->SetItem(itm);
 }
 
@@ -260,7 +262,11 @@ void CUIWindow::script_register(lua_State *L)
 		.def("SetFocused",		&CUICellItem::SetFocused)
 		.def("SetSelected",		&CUICellItem::SetSelected)
 		.def("GetInventoryItem",		&CUICellItem::GetInventoryItem)
-		.def("GetCellSection", &CUICellItem::GetCellSection),
+		.def("GetCellSection", &CUICellItem::GetCellSection)
+		.def("SetCellCondition", &CUICellItem::SetCellCondition)
+		.def("GetCellCondition", &CUICellItem::GetAbsCellCondition)
+		.def("ForceConditionShow", &CUICellItem::ForceConditionShow)
+		,
 		
 
 		class_<CUIMMShniaga, CUIWindow>("CUIMMShniaga")
@@ -315,16 +321,26 @@ void CUIWindow::script_register(lua_State *L)
 			.def("SetCellsColumns", static_cast<void (CUIDragDropListEx::*)(int)>(&CUIDragDropListEx::SetCellsColumns))
 			.def("SetCellsCapacity", static_cast<void (CUIDragDropListEx::*)(const Ivector2)>(&CUIDragDropListEx::SetCellsCapacity))
 			.def("SetCellsCapacity", static_cast<void (CUIDragDropListEx::*)(int, int)>(&CUIDragDropListEx::SetCellsCapacity))
+			.def("ItemsCount", &CUIDragDropListEx::ItemsCount)
 		
-			.def("SetItem", static_cast<void(*)(CUIDragDropListEx*, CScriptGameObject*)>(&DragDropListSetItem))
+			.def("SetItem", static_cast<void(*)(CUIDragDropListEx*, CScriptGameObject*,bool)>(&DragDropListSetItem))
 			.def("SetItem", static_cast<void(*)(CUIDragDropListEx*, CUICellItem*)>(&DragDropListSetItem))
 			.def("Compact", static_cast<void(*)(CUIDragDropListEx*)>(&DragDropListCompact))
 			.def("ClearAll", static_cast<void(*)(CUIDragDropListEx*)>(&DragDropListClearAll))
 			.def("HasFreeSpace", &CUIDragDropListEx::HasFreeSpace)
 			.def("RemoveItem", &DragDropListRemoveItem)
-			.def("CreateCellItemSimple", &CUIDragDropListEx::CreateCellItemSimple)
-		
+			//.def("CreateCellItemSimple", &CUIDragDropListEx::CreateCellItemSimple)
+			.def("CreateCellItemSimple", static_cast<CUICellItem*(CUIDragDropListEx::*)(LPCSTR)>(&CUIDragDropListEx::CreateCellItemSimple))
+			.def("CreateCellItemSimple", static_cast<CUICellItem*(CUIDragDropListEx::*)(LPCSTR,float)>(&CUIDragDropListEx::CreateCellItemSimple2))
+			.def("ClearAllSuitables", &CUIDragDropListEx::ClearAllSuitables)
+			
+			.def("SetSuitableBySection", static_cast<bool (CUIDragDropListEx::*)(LPCSTR)>(&CUIDragDropListEx::select_items_by_section))
+			.def("SetSuitableBySection", static_cast<void (CUIDragDropListEx::*)(luabind::object const& )>(&CUIDragDropListEx::SetSuitableBySection))
+			
 			.def("GetSelectedCell",&CUIDragDropListEx::GetSelectedCell)
+			.def("GetItemIdx",&CUIDragDropListEx::GetItemIdx)
+			.def("GetItemPos",&CUIDragDropListEx::GetItemPos)
+			.def("GetCellAt",&CUIDragDropListEx::GetCellAt)
 			.def("set_callback", static_cast<void (CUIDragDropListEx::*)(GameObject::ECallbackType, const luabind::functor<bool>&)>(&CUIDragDropListEx::SetCallback))
 			.def("set_callback", static_cast<void (CUIDragDropListEx::*)(GameObject::ECallbackType, const luabind::functor<bool>&, const luabind::object&)>(&CUIDragDropListEx::SetCallback))
 			.def("set_callback", static_cast<void (CUIDragDropListEx::*)(GameObject::ECallbackType)>(&CUIDragDropListEx::SetCallback))

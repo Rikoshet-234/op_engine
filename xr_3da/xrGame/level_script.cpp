@@ -522,6 +522,13 @@ void set_pp_effector_factor2(int id, float f)
 
 #include "relation_registry.h"
 
+int g_actor_community_goodwill(LPCSTR _community)
+{
+	CHARACTER_COMMUNITY	comm;
+	comm.set(_community);
+	return CHARACTER_COMMUNITY::relation(Actor()->Community(), comm.index());
+}
+
  int g_community_goodwill(LPCSTR _community, int _entity_id)
  {
 	 CHARACTER_COMMUNITY c;
@@ -660,6 +667,7 @@ void CLevel::script_register(lua_State *L)
 	[
 		def("community_goodwill",				&g_community_goodwill),
 		def("set_community_goodwill",			&g_set_community_goodwill),
-		def("change_community_goodwill",		&g_change_community_goodwill)
+		def("change_community_goodwill",		&g_change_community_goodwill),
+		def("actor_community_goodwill", &g_actor_community_goodwill)
 	];
 }

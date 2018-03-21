@@ -1683,7 +1683,7 @@ BOOL CWeapon::ParentIsActor	()
 {
 	CObject* O=H_Parent();
 	CEntityAlive* EA=smart_cast<CEntityAlive*>(O);
-	return EA->cast_actor()!=0;
+	return (EA && EA->cast_actor()!=nullptr);
 }
 
 const float &CWeapon::hit_probability	() const

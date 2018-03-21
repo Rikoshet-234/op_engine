@@ -147,6 +147,7 @@ CInventoryItem::CInventoryItem()
 	m_weight = -1;
 	m_cost = static_cast<unsigned int>(-1);
 	m_fActivePropertyRadiation = 0;
+	m_bUIConditionShow=false;
 //	m_dropTarget.set(0, 0, 0);
 }
 
@@ -224,7 +225,7 @@ void CInventoryItem::Load(LPCSTR section)
 
 	//время убирания объекта с уровня
 	m_dwItemRemoveTime = READ_IF_EXISTS(pSettings, r_u32, section, "item_remove_time", ITEM_REMOVE_TIME);
-
+	m_bUIConditionShow=!!READ_IF_EXISTS(pSettings, r_bool, section, "ui_show_condition", false);
 	m_flags.set(FAllowSprint, READ_IF_EXISTS(pSettings, r_bool, section, "sprint_allowed", TRUE));
 	m_fControlInertionFactor = READ_IF_EXISTS(pSettings, r_float, section, "control_inertion_factor", 1.0f);
 	m_icon_name = READ_IF_EXISTS(pSettings, r_string, section, "icon_name", NULL);

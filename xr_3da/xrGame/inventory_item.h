@@ -15,6 +15,7 @@
 #include "script_game_object.h"
 #include "CharacterPhysicsSupport.h"
 
+
 enum EHandDependence{
 	hdNone	= 0,
 	hd1Hand	= 1,
@@ -142,6 +143,7 @@ public:
 	shared_str					m_nameShort;
 	shared_str					m_nameComplex;
 	EItemPlace					m_eItemPlace;
+	bool m_bUIConditionShow;
 //	Fvector						m_dropTarget;
 	virtual void				OnMoveToSlot		() {};
 	virtual void				OnMoveToBelt		() {};
@@ -277,7 +279,7 @@ public:
 	virtual CWeaponAmmo			*cast_weapon_ammo			()	{return nullptr;}
 	virtual CGameObject			*cast_game_object			()  {return nullptr;};
 	virtual CGBox				*cast_gbox_object() { return nullptr; };
-	virtual CExoOutfit				*cast_exo_object() { return nullptr; };
+	virtual CExoOutfit			*cast_exo_object() { return nullptr; };
 
 	DECLARE_SCRIPT_REGISTER_FUNCTION
 };

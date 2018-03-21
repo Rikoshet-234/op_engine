@@ -29,7 +29,17 @@ BOOL weapon_hud_value::load(const shared_str& section, CHudItem* owner)
 	// fire bone	
 	if(smart_cast<CWeapon*>(owner)){
 		LPCSTR fire_bone		= pSettings->r_string					(section,"fire_bone");
+		if (!fire_bone || xr_strlen(fire_bone)==0)
+		{
+			Msg("! ERROR invalid fire_bone value for [%s]", section.c_str());
+			FATAL("ENGINE CRASH: See details in log");
+		}
 		m_fire_bone				= m_animations->LL_BoneID	(fire_bone);
+		if (m_fire_bone==BI_NONE)
+		{
+			Msg("! ERROR fire_bone [%s] for [%s] does not have animations in visual [%s]", fire_bone,section, visual_name);
+			FATAL("ENGINE CRASH: See details in log");
+		}
 		if (m_fire_bone>=m_animations->LL_BoneCount())	
 			Debug.fatal	(DEBUG_INFO,"There is no '%s' bone for weapon '%s'.",fire_bone, *section);
 		m_fp_offset				= pSettings->r_fvector3					(section,"fire_point");

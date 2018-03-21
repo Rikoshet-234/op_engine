@@ -27,4 +27,9 @@ CUICellItem* create_cell_item(shared_str itemSection)
 	return xr_new<CUISectionCellItem>(itemSection);
 }
 
+CUICellItem* create_cell_item(shared_str itemSection, float condition)
+{
+	return xr_new<CUISection_ConditionCellItem>(itemSection,condition);
+}
+
 

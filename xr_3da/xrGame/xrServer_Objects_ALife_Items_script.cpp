@@ -22,6 +22,7 @@ void CSE_ALifeInventoryItem::script_register(lua_State *L)
 			.def_readwrite("cost", &CSE_ALifeInventoryItem::m_dwCost)
 			.def_readwrite("weight", &CSE_ALifeInventoryItem::m_fMass)
 			.def_readwrite("radiation", &CSE_ALifeInventoryItem::m_fRadiation)
+			.def_readwrite("condition", &CSE_ALifeInventoryItem::m_fCondition)
 	];
 }
 

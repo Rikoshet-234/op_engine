@@ -458,7 +458,10 @@ bool CUIXmlInit::InitDragDropListEx(CUIXml& xml_doc, const char* path, int index
 {
 	R_ASSERT3(xml_doc.NavigateToNode(path,index), "XML node not found", path);
 	//! jarni: it is good to know which window it is
-	if (path) pWnd->SetWindowName(path);
+	LPCSTR str_name = xml_doc.ReadAttrib(path, index, "window_name", "");
+	if (xr_strlen(str_name)>0)
+		pWnd->SetWindowName(str_name);
+	else if (path) pWnd->SetWindowName(path);
 
 	float x			= xml_doc.ReadAttribFlt(path, index, "x");
 	float y			= xml_doc.ReadAttribFlt(path, index, "y");

@@ -22,6 +22,7 @@
 #include "UIXmlInit.h"
 #include "UICellItemFactory.h"
 #include "../exooutfit.h"
+#include "../OPFuncs/utils.h"
 
 
 CUIDragItem* CUIDragDropListEx::m_drag_item = nullptr;
@@ -279,8 +280,12 @@ void CUIDragDropListEx::SetCallback(GameObject::ECallbackType type)
 
 CUICellItem* CUIDragDropListEx::CreateCellItemSimple(LPCSTR itemSection)
 {
-	auto cell= create_cell_item(itemSection);
-	return cell;
+	return create_cell_item(itemSection);
+}
+
+CUICellItem* CUIDragDropListEx::CreateCellItemSimple2(LPCSTR itemSection, float condition)
+{
+	return create_cell_item(itemSection,condition);
 }
 
 TPosition parsePosition(LPCSTR value)
@@ -333,34 +338,64 @@ void CUIDragDropListEx::SetShowConditionBar(bool state)
 	if (m_b_showConditionBar && !cacheData.initialized)
 	{
 		CUIXml	uiXml;
-		uiXml.Init( CONFIG_PATH, UI_PATH, "cell_item.xml" );
-		cacheData.fatness = uiXml.ReadAttribFlt("progress_item_condition", 0, "fatness");
-		cacheData.indent = uiXml.ReadAttribFlt("progress_item_condition", 0, "indent");
-		cacheData.min_pos = uiXml.ReadAttribFlt("progress_item_condition", 0, "min");
-		cacheData.max_pos = uiXml.ReadAttribFlt("progress_item_condition", 0, "max");
-		cacheData.pos = uiXml.ReadAttribFlt("progress_item_condition", 0, "pos");
-		cacheData.fixed_cells = uiXml.ReadAttribFlt("progress_item_condition", 0, "fixed_cells");
-		cacheData.texture=uiXml.Read("progress_item_condition:progress:texture", 0, nullptr);
-		cacheData.stretchTexture=uiXml.ReadAttribInt("progress_item_condition:progress:texture", 0, "stretch")==1?true:false;
-		cacheData.textureBack=uiXml.Read("progress_item_condition:background:texture", 0, nullptr);
-		cacheData.stretchTextureBack=uiXml.ReadAttribInt("progress_item_condition:background:texture", 0, "stretch")==1?true:false;
+		uiXml.Init(CONFIG_PATH, UI_PATH, "cell_item.xml");
+		string256 root= {0};
+		XML_NODE* nodes = uiXml.NavigateToNode("parents", 0);
+		if (nodes)
+		{
+			string256 buf = {0};
+			if (m_windowName.size() > 0)
+			{
+				sprintf_s(buf, "parents:%s", m_windowName.c_str());
+				LPCSTR data = uiXml.Read(buf, 0, "");
+				if (xr_strlen(data)>0)
+					strcpy_s(root, data);
+			}
+			if (xr_strlen(root) == 0)
+			{
+				strcpy_s(buf, "parents:all");
+				strcpy_s(root, uiXml.Read(buf, 0, ""));
+			}
+		}
+		if (xr_strlen(root)==0)
+		{
+			Msg("! ERROR Invalid cell_config - relations not found! ");
+			FATAL("ENGINE Crush. See log for details.");
+		}
+		cacheData.fatness = uiXml.ReadAttribFlt(root, 0, "fatness");
+		cacheData.indent = uiXml.ReadAttribFlt(root, 0, "indent");
+		cacheData.min_pos = uiXml.ReadAttribFlt(root, 0, "min");
+		cacheData.max_pos = uiXml.ReadAttribFlt(root, 0, "max");
+		cacheData.pos = uiXml.ReadAttribFlt(root, 0, "pos");
+		cacheData.fixed_cells = uiXml.ReadAttribFlt(root, 0, "fixed_cells");
+		string128 buf;
+		sprintf_s(buf, "%s:progress:texture", root);
+		cacheData.texture=uiXml.Read(buf, 0, nullptr);
+		cacheData.stretchTexture=uiXml.ReadAttribInt(buf, 0, "stretch")==1?true:false;
+		sprintf_s(buf, "%s:background:texture", root);
+		cacheData.textureBack=uiXml.Read(buf, 0, nullptr);
+		cacheData.stretchTextureBack=uiXml.ReadAttribInt(buf, 0, "stretch")==1?true:false;
 
-		auto tmp=uiXml.ReadAttrib("progress_item_condition", 0, "position","top");
+		auto tmp=uiXml.ReadAttrib(root, 0, "position","top");
 		cacheData.position = parsePosition(tmp);
-		cacheData.min_color=CUIXmlInit::GetColor(uiXml,"progress_item_condition:min_color",0,0xff);
-		cacheData.max_color=CUIXmlInit::GetColor(uiXml,"progress_item_condition:max_color",0,0xff);
-		cacheData.inertion=uiXml.ReadAttribFlt("progress_item_condition", 0, "inertion", 0.0f);
+		sprintf_s(buf, "%s:min_color", root);
+		cacheData.min_color=CUIXmlInit::GetColor(uiXml, buf,0,0xff);
+		sprintf_s(buf, "%s:max_color", root);
+		cacheData.max_color=CUIXmlInit::GetColor(uiXml, buf,0,0xff);
+		cacheData.inertion=uiXml.ReadAttribFlt(root, 0, "inertion", 0.0f);
 		cacheData.initialized=true;
 
-		if (uiXml.NavigateToNode("ci_exo_charge"))
+		strcpy_s(root, "ci_exo_charge");
+		if (uiXml.NavigateToNode(root))
 		{
-			auto cip = uiXml.ReadAttrib("ci_exo_charge", 0, "position", "top");
+			auto cip = uiXml.ReadAttrib(root, 0, "position", "top");
 			cacheData.exo_icon.position= parsePosition(cip);
-			cacheData.exo_icon.indent = uiXml.ReadAttribFlt("ci_exo_charge", 0, "indent");
-			cacheData.exo_icon.w = uiXml.ReadAttribFlt("ci_exo_charge", 0, "width");
-			cacheData.exo_icon.h = uiXml.ReadAttribFlt("ci_exo_charge", 0, "height");
-			cacheData.exo_icon.texture = uiXml.Read("ci_exo_charge:texture", 0, nullptr);
-			cacheData.exo_icon.stretch = uiXml.ReadAttribInt("ci_exo_charge:texture", 0, "stretch") == 1 ? true : false;
+			cacheData.exo_icon.indent = uiXml.ReadAttribFlt(root, 0, "indent");
+			cacheData.exo_icon.w = uiXml.ReadAttribFlt(root, 0, "width");
+			cacheData.exo_icon.h = uiXml.ReadAttribFlt(root, 0, "height");
+			sprintf_s(buf, "%s:texture", root);
+			cacheData.exo_icon.texture = uiXml.Read(buf, 0, nullptr);
+			cacheData.exo_icon.stretch = uiXml.ReadAttribInt(buf, 0, "stretch") == 1 ? true : false;
 		}
 	}
 }
@@ -600,6 +635,22 @@ bool CUIDragDropListEx::select_exos_by_battery(CInventoryItem* batteryItem)
 	return selected;
 }
 
+
+void CUIDragDropListEx::SetSuitableBySection(luabind::object const& sections)
+{
+	xr_vector<LPCSTR> sectionsList= OPFuncs::getStringsFromLua(sections);
+	if (sectionsList.size()>0)
+		std::for_each(sectionsList.begin(),sectionsList.end(),[&](LPCSTR section)
+		{
+			select_items_by_section(section);
+		});
+}
+
+void CUIDragDropListEx::ClearAllSuitables()
+{
+	GetCellContainer()->clear_select_suitables();
+}
+
 bool CUIDragDropListEx::select_weapons_by_addon(CInventoryItem* addonItem)
 {
 	CScope*				pScope				= smart_cast<CScope*>			(addonItem);
@@ -670,7 +721,7 @@ bool CUIDragDropListEx::select_weapons_by_ammo(CInventoryItem* ammoItem)
 	return selected;
 }
 
-bool CUIDragDropListEx::select_items_by_section(shared_str section)
+bool CUIDragDropListEx::select_items_by_section(LPCSTR section)
 {
 	if (!section)
 		return false;
@@ -682,7 +733,7 @@ bool CUIDragDropListEx::select_items_by_section(shared_str section)
 		CInventoryItem* item = static_cast<CInventoryItem*>(ci->m_pData);
 		if (!item)
 			continue;
-		if (xr_strcmp(item->object().cNameSect(),section)==0)
+		if (xr_strcmp(item->object().cNameSect().c_str(),section)==0)
 		{
 			ci->m_suitable = true;
 			selected=true;
@@ -826,6 +877,18 @@ u32 CUIDragDropListEx::ItemsCount()
 
 bool CUIDragDropListEx::IsOwner(CUICellItem* itm){
 	return m_container->IsChild(itm);
+}
+
+CUICellItem* CUIDragDropListEx::GetCellAt(Fvector2 pos)
+{
+	auto cell=m_container->GetCellAt(Ivector2().set(pos.x,pos.y));
+	return cell.m_item;
+}
+
+Fvector2 CUIDragDropListEx::GetItemPos(CUICellItem* itm)
+{
+	Ivector2 res = m_container->GetItemPos(itm);
+	return Fvector2().set(res.x,res.y);
 }
 
 CUICellItem* CUIDragDropListEx::GetItemIdx(u32 idx)

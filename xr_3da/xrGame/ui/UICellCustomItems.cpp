@@ -34,6 +34,25 @@ void CUISectionCellItem::Update()
 	inherited::Update();
 }
 
+CUISection_ConditionCellItem::CUISection_ConditionCellItem(shared_str section, float condition):CUISectionCellItem(section)
+{
+	m_fSectionCondition = condition;
+}
+
+bool CUISection_ConditionCellItem::EqualTo(CUICellItem* itm)
+{
+	if (!inherited::EqualTo(itm))	return false;
+	CUISection_ConditionCellItem* ci = smart_cast<CUISection_ConditionCellItem*>(itm);
+	if (!ci)
+		return false;
+	return !!fsimilar(m_fSectionCondition, ci->m_fSectionCondition, EPS);
+}
+
+void CUISection_ConditionCellItem::Update()
+{
+	inherited::Update();
+}
+
 CUIInventoryCellItem::CUIInventoryCellItem(CInventoryItem* itm)
 {
 	m_pData											= (void*)itm;

@@ -7,6 +7,7 @@
 #include "../object_broker.h"
 #include "UIDragDropListEx.h"
 #include "../Weapon.h"
+#include "../Artifact.h"
 #include "../CustomOutfit.h"
 #include "../../defines.h"
 #include "../smart_cast.h"
@@ -32,6 +33,8 @@ CUICellItem::CUICellItem()
 	m_bIgnoreItemPlace = false;
 	m_pConditionProgressBar=xr_new<CUIProgressBar>();
 	m_pConditionProgressBar->SetAutoDelete(true);
+	m_fSectionCondition = -1.0f;
+	m_bForceConditionShow=false;
 	CUIWindow::AttachChild(m_pConditionProgressBar);
 }
 
@@ -56,6 +59,48 @@ LPCSTR CUICellItem::GetCellSection()
 	if (m_sSection.size() > 0)
 		return m_sSection.c_str();
 	return nullptr;
+}
+
+void CUICellItem::SetCellCondition(float value)
+{
+	clamp(value,0.0f,1.0f);
+	if (m_pData)
+	{
+		PIItem itm = static_cast<PIItem>(m_pData);
+		if (itm)
+		{
+			float deltaCondition= value - itm->GetCondition();
+			itm->ChangeCondition(deltaCondition);
+		}
+	}
+	else if (m_sSection.size() > 0)
+		m_fSectionCondition=value;
+	if (m_pConditionProgressBar->GetVisible())
+		m_pConditionProgressBar->SetProgressPos(value * 100);
+}
+
+float CUICellItem::GetAbsCellCondition() //always get 
+{
+	if (m_pData)
+	{
+		PIItem itm = static_cast<PIItem>(m_pData);
+		if (itm)
+			return itm->GetCondition();
+	}
+	if (m_sSection.size() > 0)
+		return m_fSectionCondition;
+	return -1.0f;
+}
+
+float CUICellItem::GetCellCondition() //only for showing
+{
+	float result = -1.0f;
+	CInventoryItem* itm = (CInventoryItem*)m_pData;
+	if (itm && (itm->m_bUIConditionShow || m_bForceConditionShow))
+		result = itm->GetCondition();
+	else if (m_sSection.size() > 0 && !fsimilar(m_fSectionCondition, -1.0f, EPS))
+		result = m_fSectionCondition;
+	return result;
 }
 
 void CUICellItem::Draw()
@@ -115,13 +160,11 @@ CUIDragItem* CUICellItem::CreateDragItem()
 bool CUICellItem::SetOwnerList(CUIDragDropListEx* p)	
 {
 	m_pParentList=p;
-	if (!m_pParentList || !m_pData)
+	if (!m_pParentList/* || !m_pData*/)
 		return false;
-	PIItem itm = static_cast<PIItem>(m_pData);
-	CWeapon* pWeapon = smart_cast<CWeapon*>(itm);
-	CCustomOutfit* pOutfit=smart_cast<CCustomOutfit*>(itm);
-	bool visible=false;
-	if ((pWeapon || pOutfit) && m_pParentList->GetShowConditionBar() && g_uCommonFlags.test(E_COMMON_FLAGS::uiShowConditions))
+	float condition = GetCellCondition();
+	bool visible = !fsimilar(condition, -1.0f, EPS);
+	if (visible && m_pParentList->GetShowConditionBar() && g_uCommonFlags.test(E_COMMON_FLAGS::uiShowConditions))
 	{
 		int x_size= GetGridSize().x * m_pParentList->CellSize().x;
 		int y_size= GetGridSize().y * m_pParentList->CellSize().y;
@@ -284,12 +327,13 @@ bool CUICellItem::SetOwnerList(CUIDragDropListEx* p)
 			m_pConditionProgressBar->m_UIBackgroundItem.SetHeight(height);
 			m_pConditionProgressBar->SetBackgroundPresent(true);
 		}
-		m_pConditionProgressBar->m_minColor.set(color_rgba(255,36,0,255));
-		m_pConditionProgressBar->m_maxColor.set(color_rgba(0,255,0,255));
+		// m_pConditionProgressBar->m_minColor.set(color_rgba(255,36,0,255));
+		// m_pConditionProgressBar->m_maxColor.set(color_rgba(0,255,0,255));
+		m_pConditionProgressBar->m_minColor.set(m_pParentList->cacheData.min_color);
+		m_pConditionProgressBar->m_maxColor.set(m_pParentList->cacheData.max_color);
 		m_pConditionProgressBar->m_bUseColor=true;
-		m_pConditionProgressBar->SetProgressPos(itm->GetCondition()*100);
+		m_pConditionProgressBar->SetProgressPos(condition*100);
 
-		visible=true;
 	}
 	m_pConditionProgressBar->Show(visible);
 	return visible;
