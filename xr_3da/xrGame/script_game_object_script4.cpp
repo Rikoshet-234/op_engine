@@ -122,53 +122,45 @@ void CScriptGameObject::SetPosition(const Fvector &pos)
 	}
 	object().ChangePosition(pos);
 }
+
 void CScriptGameObject::SetDirection(float x, float y, float z)
 {
 	SetDirection(Fvector().set(x, y, z));
 }
 
-void CScriptGameObject::SetDirection(const Fvector &dir)
+#pragma todo("winsor: не работает для объектов в онлайне... О_О")
+void CScriptGameObject::SetDirection(const Fvector &dir) 
 {
 	if (!g_pGameLevel)
 	{
 		Msg("Error! CScriptGameObject::SetDirection : game level doesn't exist.");
 		return;
 	}
-	SRotation rot;
-	dir.getHP(rot.yaw, rot.pitch);
-	rot.roll = 0;
-	SetRotation(rot);
-}
+	float h, p;
+	dir.getHP(h, p);
 
-void CScriptGameObject::SetRotation(const SRotation &rot)
-{
 	if (this->IsActor())
 	{
-		Actor()->Orientation() = rot;
+		SRotation &R = Actor()->Orientation();
+		R.pitch = p;
+		R.yaw = h;
+		R.roll = 0;
 	}
 	else
 	{
-		//Fmatrix m = object().XFORM();
-		//Fmatrix r = Fidentity;
-		//r.setHPB(rot.yaw, rot.pitch, rot.roll);			// set 3-axis direction 
-		//m.set(r.i, r.j, r.k, m.c);		// saved position in c		
-		//object().UpdateXFORM(m);		// apply to physic shell
-		//object().XFORM() = m;			// normal visual update
-		
-		object().Direction().setHP(rot.yaw, rot.pitch);
-
-		CKinematics *pK = PKinematics(object().Visual());
-		if (pK)
-		{
-			pK->CalculateBones_Invalidate();
-			pK->CalculateBones();
-		}
+		Fmatrix m = object().XFORM();
+		Fmatrix r = Fidentity;
+		r.setHPB(h, p, 0);				// set 2-axis direction 
+		m.set(r.i, r.j, r.k, m.c);
+		object().XFORM() = m; // only visual update
+		//					  object().UpdateXFORM(m);
 	}
+
+	// alpet: сохранение направления в серверный экземпляр
 	CSE_ALifeDynamicObject* se_obj = object().alife_object();
 	if (se_obj)
 	{
-		object().XFORM().getXYZ(se_obj->angle()); 
-		se_obj->synchronize_location();
+		se_obj->angle() = dir;
 	}
 }
 
@@ -836,7 +828,6 @@ class_<CScriptGameObject> &script_register_game_object3(class_<CScriptGameObject
 		//.def("set_direction", static_cast<void (CScriptGameObject::*)(const Fvector &dir,float)>(&CScriptGameObject::SetDirection))
 		.def("set_direction", static_cast<void (CScriptGameObject::*)(const Fvector &dir)>(&CScriptGameObject::SetDirection))
 		.def("set_direction", static_cast<void (CScriptGameObject::*)(float x,float y,float z)>(&CScriptGameObject::SetDirection))
-		.def("set_rotation", &CScriptGameObject::SetRotation) 
 		.def("get_ammo_left", &CScriptGameObject::GetAmmoLeft)
 		;
 

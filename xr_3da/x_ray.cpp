@@ -996,6 +996,7 @@ void CApplication::OnEvent(EVENT E, u64 P1, u64 P2)
 
 static	CTimer	phase_timer		;
 extern	ENGINE_API BOOL			g_appLoaded = FALSE;
+extern	ENGINE_API BOOL			g_bootComplete = FALSE;
 
 void CApplication::LoadBegin	()
 {
@@ -1005,7 +1006,7 @@ void CApplication::LoadBegin	()
 		Msg("Begin load");
 		ClearLogHistory();
 		g_appLoaded			= FALSE;
-
+		g_bootComplete = FALSE;
 #ifndef DEDICATED_SERVER
 		_InitializeFont		(pFontSystem,"ui_font_graffiti19_russian",0);
 
@@ -1039,6 +1040,7 @@ void CApplication::destroy_loading_shaders()
 	sh_progress.destroy		();
 	hProgressBar.destroy();
 	loadedTexts.clear();
+	g_bootComplete = TRUE;
 //.	::Sound->mute			(false);
 }
 

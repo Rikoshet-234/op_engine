@@ -1249,14 +1249,18 @@ BOOL CActor::renderable_ShadowGenerate	()
 	return inherited::renderable_ShadowGenerate();
 }
 
-void CActor::g_PerformDrop	( )
+void CActor::g_PerformDrop(CInventoryItem* dropItem)
 {
-	b_DropActivated			= FALSE;
-	PIItem pItem = inventory().ActiveItem();
-	if (0 == pItem)			return;
-	u32 s = inventory().GetActiveSlot();
-	if (inventory().m_slots[s].m_bPersistent)	return;
-	pItem->SetDropManual(TRUE);
+	b_DropActivated = FALSE;
+	if (dropItem == nullptr)
+		return;
+	if (dropItem == inventory().ActiveItem())
+	{
+		u32 s = inventory().GetActiveSlot();
+		if (inventory().m_slots[s].m_bPersistent)
+			return;
+	}
+	dropItem->SetDropManual(TRUE);
 }
 
 #ifdef DEBUG

@@ -339,9 +339,9 @@ bool CAI_Stalker::enough_ammo						(const CWeapon *new_weapon) const
 	TIItemContainer::const_iterator	I = inventory().m_all.begin();
 	TIItemContainer::const_iterator	E = inventory().m_all.end();
 	for ( ; I != E; ++I) {
+
 		if (std::find(new_weapon->m_ammoTypes.begin(),new_weapon->m_ammoTypes.end(),(*I)->object().cNameSect()) == new_weapon->m_ammoTypes.end())
 			continue;
-
 		++ammo_box_count;
 		if (ammo_box_count >= enough_ammo_box_count)
 			return			(true);

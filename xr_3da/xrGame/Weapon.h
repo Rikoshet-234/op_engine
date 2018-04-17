@@ -262,6 +262,15 @@ protected:
 	int	m_iSilencerX, m_iSilencerY;
 	int	m_iGrenadeLauncherX, m_iGrenadeLauncherY;
 
+	xr_vector<shared_str> m_sExcludeScopeBones;
+	xr_vector<shared_str> m_sExcludeSilencerBones;
+	xr_vector<shared_str> m_sExcludeGrenadeLauncherBones;
+
+	bool SetBoneVisible(CKinematics* model, shared_str bone_name, BOOL visibility, BOOL silent=TRUE);
+	bool SetBoneVisible(CKinematics* model, LPCSTR bone_name, BOOL visibility, BOOL silent = TRUE);
+	bool GetBoneVisible(CKinematics* model, LPCSTR bone_name, BOOL silent=TRUE);
+	void UpdateBonesVisibility(CKinematics* model, BOOL silent = TRUE);
+
 ///////////////////////////////////////////////////
 //	для режима приближения и снайперского прицела
 ///////////////////////////////////////////////////

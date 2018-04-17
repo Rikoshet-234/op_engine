@@ -52,12 +52,13 @@ void xrServer::Process_event_destroy	(NET_Packet& P, ClientID sender, u32 time, 
 	//---------------------------------------------
 	// check if we have children 
 	if (!e_dest->children.empty()) {
-		if (!pEventPack) pEventPack = &P2;
+		if (!pEventPack) 
+			pEventPack = &P2;
 
 		while (!e_dest->children.empty())
 			Process_event_destroy		(P,sender,time,*e_dest->children.begin(), pEventPack);
 	};
-
+	//Msg("Process_event_destroy %s", e_dest->name());
 	if (0xffff == parent_id && NULL == pEventPack) 
 	{
 		SendBroadcast				(BroadcastCID,P,MODE);
@@ -71,13 +72,14 @@ void xrServer::Process_event_destroy	(NET_Packet& P, ClientID sender, u32 time, 
 			tmpP.w_u16(id_dest);
 			tmpP.w_u8(1);
 		
-			if (!pEventPack) pEventPack = &P2;
-			
+			if (!pEventPack) 
+				pEventPack = &P2;
+#pragma todo("winsor: if destroy npc and npc has tooooo many items - code below produce engine crash.... to fix - need rework all events processing????")
 			pEventPack->w_u8(u8(tmpP.B.count));
 			pEventPack->w(&tmpP.B.data, tmpP.B.count);
 		};
 		
- 		game->u_EventGen(tmpP, GE_DESTROY, id_dest);
+		game->u_EventGen(tmpP, GE_DESTROY, id_dest);
 		
 		pEventPack->w_u8(u8(tmpP.B.count));
 		pEventPack->w(&tmpP.B.data, tmpP.B.count);
@@ -86,8 +88,8 @@ void xrServer::Process_event_destroy	(NET_Packet& P, ClientID sender, u32 time, 
 	if (NULL == pEPack && NULL != pEventPack)
 	{
 		SendBroadcast				(BroadcastCID, *pEventPack, MODE);
-	}
-
+	} 
+	
 	// Everything OK, so perform entity-destroy
 	if (e_dest->m_bALifeControl && ai().get_alife()) {
 		game_sv_Single				*_game = smart_cast<game_sv_Single*>(game);

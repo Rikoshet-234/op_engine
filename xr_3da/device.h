@@ -173,6 +173,8 @@ public:
 		if (I != seqParallel.end())
 			seqParallel.erase	(I);
 	}
+
+	IC		u32				frame_elapsed() { return frame_timer.GetElapsed_ms(); }
 };
 
 extern		ENGINE_API		CRenderDevice		Device;

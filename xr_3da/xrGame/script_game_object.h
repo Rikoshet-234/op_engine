@@ -628,9 +628,8 @@ public:
 	
 	void				SetPosition(const Fvector &pos);
 
-	void				SetDirection(const Fvector &dir);
+	void SetDirection(const Fvector &dir);
 	void SetDirection(float x, float y, float z);
-	void				SetRotation(const SRotation &rot);
 
 	u16 GetAmmoLeft();
 	void SetAmmoLeft(u16 count);

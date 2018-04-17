@@ -133,6 +133,11 @@ void DragDropListSetItem(CUIDragDropListEx* self, CScriptGameObject* item,bool f
 	self->SetItem(itm);
 }
 
+void DragDropListSetItem_wb(CUIDragDropListEx* self, CScriptGameObject* item)
+{
+	DragDropListSetItem(self, item, false);
+}
+
 void DragDropListCompact(CUIDragDropListEx* self)
 {
 	if (!self)
@@ -323,6 +328,7 @@ void CUIWindow::script_register(lua_State *L)
 			.def("SetCellsCapacity", static_cast<void (CUIDragDropListEx::*)(int, int)>(&CUIDragDropListEx::SetCellsCapacity))
 			.def("ItemsCount", &CUIDragDropListEx::ItemsCount)
 		
+			.def("SetItem", static_cast<void(*)(CUIDragDropListEx*, CScriptGameObject*)>(&DragDropListSetItem_wb))
 			.def("SetItem", static_cast<void(*)(CUIDragDropListEx*, CScriptGameObject*,bool)>(&DragDropListSetItem))
 			.def("SetItem", static_cast<void(*)(CUIDragDropListEx*, CUICellItem*)>(&DragDropListSetItem))
 			.def("Compact", static_cast<void(*)(CUIDragDropListEx*)>(&DragDropListCompact))

@@ -285,7 +285,7 @@ void CActor::IR_OnKeyboardRelease(int cmd)
 		switch(cmd)
 		{
 		case kJUMP:		mstate_wishful &=~mcJump;		break;
-		case kDROP:		if(GAME_PHASE_INPROGRESS == Game().Phase()) g_PerformDrop();				break;
+		case kDROP:		if(GAME_PHASE_INPROGRESS == Game().Phase()) g_PerformDrop(inventory().ActiveItem());				break;
 		case kCROUCH:	g_bAutoClearCrouch = true;g_bForceCrouch=false; break;
 		}
 	}

@@ -253,6 +253,19 @@ void CWeapon::ForceUpdateFireParticles()
 
 }
 
+void LoadExcludeBones(LPCSTR main_section, LPCSTR name_line, xr_vector<shared_str> *result)
+{
+	if (pSettings->line_exist(main_section, name_line))
+	{
+		string_path	tmp;
+		LPCSTR data = pSettings->r_string(main_section, name_line);
+		u32 count = _GetItemCount(data);
+		if (count)
+			for (u32 k = 0; k < count; ++k)
+				result->push_back(_GetItem(data, k, tmp));
+	}
+}
+
 void CWeapon::Load		(LPCSTR section)
 {
 	inherited::Load					(section);
@@ -377,6 +390,7 @@ void CWeapon::Load		(LPCSTR section)
 		m_sScopeName = pSettings->r_string(section,"scope_name");
 		m_iScopeX = pSettings->r_s32(section,"scope_x");
 		m_iScopeY = pSettings->r_s32(section,"scope_y");
+		LoadExcludeBones(section, "scope_exclude_bones", &m_sExcludeScopeBones);
 	}
 
 	
@@ -385,6 +399,7 @@ void CWeapon::Load		(LPCSTR section)
 		m_sSilencerName = pSettings->r_string(section,"silencer_name");
 		m_iSilencerX = pSettings->r_s32(section,"silencer_x");
 		m_iSilencerY = pSettings->r_s32(section,"silencer_y");
+		LoadExcludeBones(section, "silencer_exclude_bones", &m_sExcludeSilencerBones);
 	}
 
 	
@@ -393,6 +408,7 @@ void CWeapon::Load		(LPCSTR section)
 		m_sGrenadeLauncherName = pSettings->r_string(section,"grenade_launcher_name");
 		m_iGrenadeLauncherX = pSettings->r_s32(section,"grenade_launcher_x");
 		m_iGrenadeLauncherY = pSettings->r_s32(section,"grenade_launcher_y");
+		LoadExcludeBones(section, "grenade_launcher_exclude_bones", &m_sExcludeGrenadeLauncherBones);
 	}
 
 	InitAddons();
@@ -942,11 +958,6 @@ bool CWeapon::Action(s32 cmd, u32 flags)
 	return false;
 }
 
-
-
-
-
-
 void CWeapon::SpawnAmmo(u32 boxCurr, LPCSTR ammoSect, u32 ParentID) 
 {
 	if(!m_ammoTypes.size())			return;
@@ -1170,32 +1181,118 @@ LPCSTR wpn_silencer				= "wpn_silencer";
 LPCSTR wpn_grenade_launcher		= "wpn_grenade_launcher";
 LPCSTR wpn_launcher				= "wpn_launcher";
 
-bool SetBoneVisible(CKinematics* model,LPCSTR bone_name,BOOL visibility,BOOL silent=TRUE)
+bool CWeapon::SetBoneVisible(CKinematics* model, shared_str bone_name, BOOL visibility, BOOL silent)
 {
-	u16  bone_id;
-	bone_id = model->LL_BoneID(bone_name);
+	if (xr_strlen(bone_name) == 0)
+		return false;
+	return SetBoneVisible(model, bone_name.c_str(), visibility, silent);
+}
+
+bool CWeapon::SetBoneVisible(CKinematics* model,LPCSTR bone_name,BOOL visibility,BOOL silent)
+{
+	u16 bone_id = model->LL_BoneID(bone_name);
 	if (bone_id == BI_NONE)
 	{
 		if (silent)	return false;
-		R_ASSERT2(0, make_string("! ERROR model [%s] has no bone [%s]", model->dbg_name.c_str(), bone_name).c_str());
+		Msg("! ERROR for section[%s] model [%s] has no bone [%s] for rendering addon", cNameSect().c_str(), model->dbg_name.c_str(), bone_name);
+		FATAL("ENGINE crash! See log for detail!");
 	}
-	BOOL bVisibleNow = model->LL_GetBoneVisible(bone_id);
+	//BOOL bVisibleNow = model->LL_GetBoneVisible(bone_id);
 	//if (bVisibleNow != visibility)
-		model->LL_SetBoneVisible(bone_id, visibility, TRUE);
+	model->LL_SetBoneVisible(bone_id, visibility, TRUE);
 	return true;
+}
+
+bool CWeapon::GetBoneVisible(CKinematics* model, LPCSTR bone_name, BOOL silent)
+{
+	u16 bone_id = model->LL_BoneID(bone_name);
+	if (bone_id == BI_NONE)
+	{
+		if (silent)
+			return false;
+		Msg("! ERROR for section[%s] model [%s] has no bone [%s] for rendering addon", cNameSect().c_str(), model->dbg_name.c_str(), bone_name);
+		FATAL("ENGINE crash! See log for detail!");
+	}
+	return !!model->LL_GetBoneVisible(bone_id);
+}
+
+void CWeapon::UpdateBonesVisibility(CKinematics* model, BOOL silent)
+{
+	std::for_each(m_sExcludeScopeBones.begin(), m_sExcludeScopeBones.end(), [&](shared_str exclude_bone)
+	{
+		SetBoneVisible(model, exclude_bone, TRUE);
+	});
+	std::for_each(m_sExcludeSilencerBones.begin(), m_sExcludeSilencerBones.end(), [&](shared_str exclude_bone)
+	{
+		SetBoneVisible(model, exclude_bone, TRUE);
+	});
+	std::for_each(m_sExcludeGrenadeLauncherBones.begin(), m_sExcludeGrenadeLauncherBones.end(), [&](shared_str exclude_bone)
+	{
+		SetBoneVisible(model, exclude_bone, TRUE);
+	});
+	if (xr_strcmp(cNameSect(), "wpn_fot")==0)
+	{
+		int i = 0;
+	}
+	if (ScopeAttachable())
+		SetBoneVisible(model, wpn_scope, IsScopeAttached(), silent);
+	if (m_eScopeStatus == CSE_ALifeItemWeapon::eAddonDisabled)
+		SetBoneVisible(model, wpn_scope, FALSE);
+	else if (m_eScopeStatus == CSE_ALifeItemWeapon::eAddonPermanent)
+		SetBoneVisible(model, wpn_scope, TRUE, silent);
+	
+	if (SilencerAttachable())
+		SetBoneVisible(model, wpn_silencer, IsSilencerAttached(), silent);
+	if (m_eSilencerStatus == CSE_ALifeItemWeapon::eAddonDisabled)
+		SetBoneVisible(model, wpn_silencer, FALSE);
+	else if (m_eSilencerStatus == CSE_ALifeItemWeapon::eAddonPermanent)
+		SetBoneVisible(model, wpn_silencer, TRUE, silent);
+
+	LPCSTR bone_name = wpn_grenade_launcher;
+	if (GrenadeLauncherAttachable())
+		if (!SetBoneVisible(model, bone_name, IsGrenadeLauncherAttached()))
+		{
+			bone_name = wpn_launcher;
+			SetBoneVisible(model, bone_name, IsGrenadeLauncherAttached());
+		}
+	if (m_eGrenadeLauncherStatus == CSE_ALifeItemWeapon::eAddonDisabled)
+		SetBoneVisible(model, bone_name, FALSE);
+	else if (m_eGrenadeLauncherStatus == CSE_ALifeItemWeapon::eAddonPermanent)
+		SetBoneVisible(model, bone_name, TRUE);
+	
+
+	if (GetBoneVisible(model, wpn_scope))
+		std::for_each(m_sExcludeScopeBones.begin(), m_sExcludeScopeBones.end(), [&](shared_str exclude_bone)
+		{
+			SetBoneVisible(model, exclude_bone, FALSE);
+		});
+
+	if (GetBoneVisible(model, wpn_silencer))
+		std::for_each(m_sExcludeSilencerBones.begin(), m_sExcludeSilencerBones.end(), [&](shared_str exclude_bone)
+		{
+			SetBoneVisible(model, exclude_bone, FALSE);
+		});
+
+	if (GetBoneVisible(model, bone_name))
+		std::for_each(m_sExcludeGrenadeLauncherBones.begin(), m_sExcludeGrenadeLauncherBones.end(), [&](shared_str exclude_bone)
+		{
+			SetBoneVisible(model, exclude_bone, FALSE);
+		});
 }
 
 void CWeapon::UpdateHUDAddonsVisibility()
 {
 	if (!GetHUDmode())										return;
 
-	CKinematics* pHudVisual									= smart_cast<CKinematics*>(m_pHUD->Visual());
+	CKinematics* pHudVisual	= smart_cast<CKinematics*>(m_pHUD->Visual());
 	VERIFY(pHudVisual);
 	if (H_Parent() != Level().CurrentEntity()) 
 		pHudVisual	= nullptr;
-	if (!pHudVisual)return;
+	if (!pHudVisual)
+		return;
+	UpdateBonesVisibility(pHudVisual);
 
-	if(ScopeAttachable())
+	/*if(ScopeAttachable())
 	{
 		SetBoneVisible(pHudVisual, wpn_scope, IsScopeAttached());
 	}
@@ -1226,18 +1323,19 @@ void CWeapon::UpdateHUDAddonsVisibility()
 		SetBoneVisible(pHudVisual, bone_name, FALSE);
 	else
 	if(m_eGrenadeLauncherStatus==CSE_ALifeItemWeapon::eAddonPermanent)
-		SetBoneVisible(pHudVisual, bone_name, TRUE);
+		SetBoneVisible(pHudVisual, bone_name, TRUE);*/
 }
 
 void CWeapon::UpdateAddonsVisibility()
 {
 	CKinematics* pWeaponVisual = smart_cast<CKinematics*>(Visual()); R_ASSERT(pWeaponVisual);
-
-	u16  bone_id;
-	UpdateHUDAddonsVisibility								();	
+	UpdateHUDAddonsVisibility();	
 	pWeaponVisual->CalculateBones_Invalidate();
-	bone_id = pWeaponVisual->LL_BoneID(wpn_scope);
-	if(ScopeAttachable())
+
+	UpdateBonesVisibility(pWeaponVisual);
+
+	/*	u16 bone_id = pWeaponVisual->LL_BoneID(wpn_scope);
+	 if(ScopeAttachable())
 	{
 		if (bone_id==BI_NONE)
 		{
@@ -1298,7 +1396,7 @@ void CWeapon::UpdateAddonsVisibility()
 		}
 	}
 	if(m_eGrenadeLauncherStatus==CSE_ALifeItemWeapon::eAddonDisabled && bone_id!=BI_NONE && pWeaponVisual->LL_GetBoneVisible(bone_id) )
-		pWeaponVisual->LL_SetBoneVisible(bone_id,FALSE,TRUE);
+		pWeaponVisual->LL_SetBoneVisible(bone_id,FALSE,TRUE);*/
 	
 
 	pWeaponVisual->CalculateBones_Invalidate();

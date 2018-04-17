@@ -177,7 +177,7 @@ void CExoOutfit::OnMove()
 		UpdateCharge(-(m_fMovingDischarge / m_fCondition));
 	if (fsimilar(m_fCurrentCharge, 0, EPS) || !isBatteryPresent())
 	{
-		float power = float(m_fMovingDischarge / m_fCondition)* 200.0f;
+		float power = float(m_fMovingDischarge / m_fCondition)* 400.0f;
 		Actor()->conditions().ChangePower(-power);
 	}
 }

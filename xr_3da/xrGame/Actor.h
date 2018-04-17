@@ -191,7 +191,7 @@ public:
 
 	virtual float						GetMass				() ;
 	virtual float						Radius				() const;
-	virtual void						g_PerformDrop		();
+	virtual void						g_PerformDrop		(CInventoryItem* dropItem=nullptr);
 
 
 	virtual bool						NeedToDestroyObject()  const;

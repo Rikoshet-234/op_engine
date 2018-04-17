@@ -847,26 +847,31 @@ void CInventory::UpdateDropItem(PIItem pIItem)
 			P.w_u16						(u16(pIItem->object().ID()));
 			pIItem->object().u_EventSend(P);
 
+
 			//CObject *parent = pIItem->object().H_Parent();
-			//Fvector &pos = parent->Position();
-			//Fvector  dir = parent->Direction();
-			//dir.y = 0;
-			//dir.normalize();
-			//static float coef = 4.0f;
 			//CActor *owner = smart_cast<CActor*>(parent);
 			//if (owner)
 			//{
-			//	auto &R = owner->Orientation();
+			//	Fvector &pos = parent->Position();
+			//	Fvector  dir = parent->Direction();
+			//	dir.y = 0;
+			//	dir.normalize();
+			//	//static float coef = 4.0f;
+			//	SRotation &R = owner->Orientation();
 			//	dir.setHP(R.yaw, R.pitch);
-			//	float dist = 0.9f;// owner->GetDropPower() * coef + 0.5f;
+			//	float dist = 2.5f;// owner->GetDropPower() * coef + 0.5f;
 			//	dir.mul(dist);
+
+			//	/*if (pIItem->object().Visual())
+			//	{
+			//		dir.mul(pIItem->object().Radius());
+			//		Msg("Radius %3.2f", pIItem->object().Radius());
+			//	}*/
+			//	pos.add(dir);
+			//	//Msg("[%3.2f, %3.2f, %3.2f]", VPUSH(pos));
+			//	pIItem->object().ChangePosition(pos);
+			//	//pIItem->m_dropTarget = pos;
 			//}
-			//if (pIItem->object().Visual())
-			//	dir.mul(0.7f + pIItem->object().Radius() /** 2.0f*/);
-			//pos.add(dir);
-			//pos.y = pos.y + 0.3f;
-			//pIItem->object().ChangePosition(pos);
-			//pIItem->m_dropTarget = pos;
 		}
 	}// dropManual
 }

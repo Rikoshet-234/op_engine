@@ -174,7 +174,7 @@ public:
 	BOOL						m_bGameConfigStarted;
 	BOOL						game_configured;
 	NET_Queue_Event				*game_events;
-	//NET_Queue_Event				*spawn_events;
+	NET_Queue_Event				*spawn_events;
 	xr_deque<CSE_Abstract*>		game_spawn_queue;
 	xrServer*					Server;
 	GlobalFeelTouch				m_feel_deny;
@@ -242,6 +242,7 @@ public:
 	virtual void				OnRender				( );
 	void						cl_Process_Event		(u16 dest, u16 type, NET_Packet& P);
 	void						cl_Process_Spawn		(NET_Packet& P);
+	bool						PostponedSpawn(u16 id);
 	void						ProcessGameEvents		( );
 	void						ProcessGameSpawns		( );
 
