@@ -24,6 +24,10 @@
 #include "ui/UIInventoryWnd.h"
 #include "UIGameSP.h"
 #include "clsid_game.h"
+#include "ai_space.h"
+#include "alife_simulator.h"
+#include "alife_simulator_header.h"
+#include "alife_object_registry.h"
 
 CWeaponMagazined::CWeaponMagazined(LPCSTR name, ESoundTypes eSoundType) : CWeapon(name)
 {
@@ -50,6 +54,10 @@ CWeaponMagazined::CWeaponMagazined(LPCSTR name, ESoundTypes eSoundType) : CWeapo
 	m_bforceReloadAfterIdle = false;
 	m_bRequredDemandCheck = true;
 	m_pSoundAddonProc = nullptr;
+	m_fSilencerCondition = 1.0f;
+	m_fSilencerConditionDecreasePerShot = 0.0;
+	m_fSilencerConditionCriticalValue = 0.0f;
+	m_bSilencerBreak = false;
 }
 
 CWeaponMagazined::~CWeaponMagazined()
@@ -100,7 +108,11 @@ void CWeaponMagazined::net_Destroy()
 BOOL CWeaponMagazined::net_Spawn		(CSE_Abstract* DC)
 {
 	TSP_SCOPED(_, "CWeaponMagazined::net_Spawn", "spawn");
-	return inherited::net_Spawn(DC);
+	BOOL bResult = inherited::net_Spawn(DC);
+	CSE_Abstract					*e = (CSE_Abstract*)(DC);
+	CSE_ALifeItemWeaponMagazined  *E = smart_cast<CSE_ALifeItemWeaponMagazined*>(e);
+	m_fSilencerCondition = E->m_fSilencerCondition;
+	return bResult;
 }
 
 void CWeaponMagazined::Load(LPCSTR section)
@@ -199,9 +211,20 @@ void CWeaponMagazined::LoadFireModes(LPCSTR section)
 		m_bHasDifferentFireModes = false;
 	}
 }
-void CWeaponMagazined::FireStart		()
+void CWeaponMagazined::FireStart()
 {
-	if(IsValid() && !IsMisfire()) 
+	if (m_bSilencerBreak && m_fSilencerCondition<m_fSilencerConditionCriticalValue)
+	{
+		if (smart_cast<CActor*>(this->H_Parent()) && (Level().CurrentViewEntity() == H_Parent()))
+		{
+			SDrawStaticStruct* ss = HUD().GetUI()->AddInfoMessage("silencer_broken");
+			ss->m_static->SetText(CStringTable().translate(m_sSilncerCriticalMessage).c_str());
+			bMisfire = true;
+			//SwitchState(eMisfire);
+		}
+				
+	}
+	if(IsValid() && !IsMisfire())
 	{
 		if(!IsWorking() || AllowFireWhileWorking())
 		{
@@ -217,20 +240,39 @@ void CWeaponMagazined::FireStart		()
 			else
 				SwitchState(eFire);
 		}
-	} 
-	else 
+	}
+	else
 	{
 		if(eReload!=GetState() && eMisfire!=GetState()) OnMagazineEmpty();
 	}
 }
 
-void CWeaponMagazined::FireEnd() 
+void CWeaponMagazined::FireEnd()
 {
 	inherited::FireEnd();
 
 	CActor	*actor = smart_cast<CActor*>(H_Parent());
-	if(!iAmmoElapsed && actor && GetState()!=eReload)
-		Reload();
+	if (actor)
+	{
+		if (m_bSilencerBreak)
+		{
+			//try to update server entity... without net_Export/net_Import - UPDATE_Read/UPDATE_Write ... 
+			CSE_Abstract* se_obj = ai().alife().objects().object(ID(), true);
+			if (se_obj)
+			{
+				CSE_ALifeItemWeaponMagazined *se_weapon = smart_cast<CSE_ALifeItemWeaponMagazined*>(se_obj);
+				if (se_weapon)
+					se_weapon->m_fSilencerCondition = m_fSilencerCondition;
+			}
+			else
+				Msg("! WARNING server_entry for CWeaponMagazined for [%s] not found!", Name());
+		}
+
+		u32 curentState = GetState();
+		if (!iAmmoElapsed && curentState != eReload && curentState != eHidden)
+			Reload();
+	}
+
 }
 
 void CWeaponMagazined::Reload() 
@@ -678,6 +720,11 @@ void CWeaponMagazined::state_Fire	(float dt)
 		else
 			FireTrace		(m_vStartPos, m_vStartDir);
 	}
+	if (m_bSilencerBreak)
+	{
+		m_fSilencerCondition -= m_fSilencerConditionDecreasePerShot;
+		clamp(m_fSilencerCondition, 0.0f, 1.0f);
+	}
 	if(m_iShotNum == m_iQueueSize)
 		m_bStopedAfterQueueFired = true;
 
@@ -956,6 +1003,12 @@ bool CWeaponMagazined::Action(s32 cmd, u32 flags)
 			if(flags&CMD_START) 
 				if (iAmmoElapsed < iMagazineSize || IsMisfire() || m_ammoType != static_cast<u32>(m_iPropousedAmmoType))
 				{
+					if (GetSlot() != PISTOL_SLOT && g_actor && H_Parent() == g_actor)
+					{
+						SwitchState(eIdle);
+						g_actor->set_state_wishful(g_actor->get_state_wishful() & ~mcSprint);
+					}
+
 					m_bRequredDemandCheck = false;
 					switch2_Empty();//Reload();
 					m_bRequredDemandCheck = true;
@@ -1127,6 +1180,7 @@ bool CWeaponMagazined::Attach(PIItem pIItem, bool b_send_event)
 	   (m_sSilencerName == pIItem->object().cNameSect()))
 	{
 		m_flagsAddOnState |= CSE_ALifeItemWeapon::eWeaponAddonSilencer;
+		m_fSilencerCondition = pIItem->GetCondition();
 		result = true;
 	}
 	else if(pGrenadeLauncher &&
@@ -1157,7 +1211,7 @@ bool CWeaponMagazined::Attach(PIItem pIItem, bool b_send_event)
 }
 
 
-bool CWeaponMagazined::Detach(const char* item_section_name, bool b_spawn_item)
+bool CWeaponMagazined::Detach(const char* item_section_name, bool b_spawn_item, float item_condition )
 {
 	if(		m_eScopeStatus == CSE_ALifeItemWeapon::eAddonAttachable &&
 			0 != (m_flagsAddOnState&CSE_ALifeItemWeapon::eWeaponAddonScope) &&
@@ -1168,7 +1222,7 @@ bool CWeaponMagazined::Detach(const char* item_section_name, bool b_spawn_item)
 		UpdateAddonsVisibility();
 		InitAddons();
 
-		return CInventoryItemObject::Detach(item_section_name, b_spawn_item);
+		return CInventoryItemObject::Detach(item_section_name, b_spawn_item, item_condition);
 	}
 	else if(m_eSilencerStatus == CSE_ALifeItemWeapon::eAddonAttachable &&
 			0 != (m_flagsAddOnState&CSE_ALifeItemWeapon::eWeaponAddonSilencer) &&
@@ -1178,7 +1232,12 @@ bool CWeaponMagazined::Detach(const char* item_section_name, bool b_spawn_item)
 
 		UpdateAddonsVisibility();
 		InitAddons();
-		return CInventoryItemObject::Detach(item_section_name, b_spawn_item);
+		bool detachResult= CInventoryItemObject::Detach(item_section_name, b_spawn_item, m_fSilencerCondition);
+		m_fSilencerCondition = 1.0f;
+		if (bMisfire && GetState()!= eMisfire)
+			bMisfire = false;
+		m_bSilencerBreak = false;
+		return detachResult;
 	}
 	else if(m_eGrenadeLauncherStatus == CSE_ALifeItemWeapon::eAddonAttachable &&
 			0 != (m_flagsAddOnState&CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher) &&
@@ -1188,10 +1247,10 @@ bool CWeaponMagazined::Detach(const char* item_section_name, bool b_spawn_item)
 
 		UpdateAddonsVisibility();
 		InitAddons();
-		return CInventoryItemObject::Detach(item_section_name, b_spawn_item);
+		return CInventoryItemObject::Detach(item_section_name, b_spawn_item, item_condition);
 	}
 	else
-		return inherited::Detach(item_section_name, b_spawn_item);;
+		return inherited::Detach(item_section_name, b_spawn_item, item_condition);;
 }
 
 shared_str GenScopeTextureName(shared_str startTextureName,shared_str openPostfix,shared_str partPostfix)
@@ -1332,9 +1391,16 @@ void CWeaponMagazined::InitAddons()
 		m_sSmokeParticlesCurrent = m_sSilencerSmokeParticles;
 		m_pSndShotCurrent = &sndSilencerShot;
 
-
+		if (pSettings->line_exist(m_sSilencerName, "condition_shot_dec"))
+		{
+			m_fSilencerConditionDecreasePerShot = pSettings->r_float(m_sSilencerName, "condition_shot_dec");
+			m_fSilencerConditionCriticalValue = pSettings->r_float(m_sSilencerName, "condition_critical");
+			m_sSilncerCriticalMessage = pSettings->r_string(m_sSilencerName, "condition_critical_message");
+			m_bSilencerBreak = !fsimilar(m_fSilencerConditionDecreasePerShot, 0, EPS);
+		}
+		
 		//сила выстрела
-		LoadFireParams	(*cNameSect(), "");
+		LoadFireParams	(*cNameSect(), "silencer_");
 
 		//подсветка от выстрела
 		LoadLights		(*cNameSect(), "silencer_");
@@ -1345,6 +1411,7 @@ void CWeaponMagazined::InitAddons()
 		m_sFlameParticlesCurrent = m_sFlameParticles;
 		m_sSmokeParticlesCurrent = m_sSmokeParticles;
 		m_pSndShotCurrent = &sndShot;
+		m_fSilencerConditionDecreasePerShot = 0.0f;
 
 		//сила выстрела
 		LoadFireParams	(*cNameSect(), "");
@@ -1621,6 +1688,8 @@ void CWeaponMagazined::save(NET_Packet &output_packet)
 	if (m_iCurFireMode<0 || m_iCurFireMode>10)
 		m_iCurFireMode=0;
 	save_data		(m_iCurFireMode, output_packet);
+	/*Msg(" m_fSilencerCondition save_data [%f]", m_fSilencerCondition);
+	save_data(m_fSilencerCondition, output_packet);*/
 }
 
 void CWeaponMagazined::load(IReader &input_packet)
@@ -1631,6 +1700,11 @@ void CWeaponMagazined::load(IReader &input_packet)
 	load_data		(m_iCurFireMode, input_packet);
 	if (m_iCurFireMode<0 || m_iCurFireMode>10)
 		m_iCurFireMode=0;
+	/*if (ai().get_alife()->header().version() > 0x0006)
+	{
+		load_data(m_fSilencerCondition, input_packet);
+		Msg(" m_fSilencerCondition load_data [%f]", m_fSilencerCondition);
+	}*/
 }
 
 void CWeaponMagazined::net_Export	(NET_Packet& P)

@@ -17,6 +17,7 @@ class CWeaponMagazined: public CWeapon
 {
 private:
 	typedef CWeapon inherited;
+
 protected:
 	// Media :: sounds
 	HUD_SOUND		sndShow;
@@ -133,7 +134,7 @@ public:
 	bool AttachScopeSection(const char* item_section_name,bool singleAttach=true);
 	
 	virtual bool	Attach(PIItem pIItem, bool b_send_event);
-	virtual bool	Detach(const char* item_section_name, bool b_spawn_item);
+	virtual bool	Detach(const char* item_section_name, bool b_spawn_item, float item_condition = 1.0f);
 	virtual bool	CanAttach(PIItem pIItem);
 	virtual bool	CanDetach(const char* item_section_name);
 	bool			CanLoadAmmo			(CWeaponAmmo *pAmmo,bool checkFullMagazine=false) override;
@@ -192,6 +193,11 @@ protected:
 	//только разных типов патронов
 	bool m_bLockType;
 
+	float m_fSilencerCondition;
+	float m_fSilencerConditionDecreasePerShot;
+	float m_fSilencerConditionCriticalValue;
+	shared_str m_sSilncerCriticalMessage;
+	bool m_bSilencerBreak;
 	//////////////////////////////////////////////
 	// режим приближения
 	//////////////////////////////////////////////

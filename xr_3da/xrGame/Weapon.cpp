@@ -86,6 +86,7 @@ CWeapon::CWeapon(LPCSTR name)
 	m_iPropousedAmmoType=-1;
 	m_fScopeZoomStepCount=0;
 	m_fRTZoomFactor=g_fov;
+	m_bUseCrosshair = true;
 }
 
 CWeapon::~CWeapon		()
@@ -441,6 +442,8 @@ void CWeapon::Load		(LPCSTR section)
 		strconcat					(sizeof(temp),temp,"hit_probability_",get_token_name(difficulty_type_token,i));
 		m_hit_probability[i]		= READ_IF_EXISTS(pSettings,r_float,section,temp,1.f);
 	}
+	
+	m_bUseCrosshair= !!READ_IF_EXISTS(pSettings, r_bool, section, "use_crosshair", TRUE);
 }
 
 void CWeapon::LoadFireParams		(LPCSTR section, LPCSTR prefix)
@@ -599,6 +602,7 @@ void CWeapon::net_Export(NET_Packet& P)
 	P.w_u8					((u8)m_ammoType);
 	P.w_u8					((u8)GetState());
 	P.w_u8					((u8)m_bZoomMode);
+
 }
 
 void CWeapon::net_Import(NET_Packet& P)
@@ -1230,10 +1234,7 @@ void CWeapon::UpdateBonesVisibility(CKinematics* model, BOOL silent)
 	{
 		SetBoneVisible(model, exclude_bone, TRUE);
 	});
-	if (xr_strcmp(cNameSect(), "wpn_fot")==0)
-	{
-		int i = 0;
-	}
+
 	if (ScopeAttachable())
 		SetBoneVisible(model, wpn_scope, IsScopeAttached(), silent);
 	if (m_eScopeStatus == CSE_ALifeItemWeapon::eAddonDisabled)
@@ -1291,39 +1292,6 @@ void CWeapon::UpdateHUDAddonsVisibility()
 	if (!pHudVisual)
 		return;
 	UpdateBonesVisibility(pHudVisual);
-
-	/*if(ScopeAttachable())
-	{
-		SetBoneVisible(pHudVisual, wpn_scope, IsScopeAttached());
-	}
-	if(m_eScopeStatus==CSE_ALifeItemWeapon::eAddonDisabled)
-		SetBoneVisible(pHudVisual, wpn_scope, FALSE);
-	else if(m_eScopeStatus==CSE_ALifeItemWeapon::eAddonPermanent)
-		SetBoneVisible(pHudVisual, wpn_scope, TRUE);
-
-	if(SilencerAttachable())
-	{
-		SetBoneVisible(pHudVisual, wpn_silencer, IsSilencerAttached());
-	}
-	if(m_eSilencerStatus==CSE_ALifeItemWeapon::eAddonDisabled)
-		SetBoneVisible(pHudVisual, wpn_silencer, FALSE);
-	else if(m_eSilencerStatus==CSE_ALifeItemWeapon::eAddonPermanent)
-		SetBoneVisible(pHudVisual, wpn_silencer, TRUE);
-
-	LPCSTR bone_name = wpn_grenade_launcher;
-	if(GrenadeLauncherAttachable())
-	{
-		if (!SetBoneVisible(pHudVisual, bone_name, IsGrenadeLauncherAttached()))
-		{
-			bone_name = wpn_launcher;
-			SetBoneVisible(pHudVisual, bone_name, IsGrenadeLauncherAttached());
-		}
-	}
-	if(m_eGrenadeLauncherStatus==CSE_ALifeItemWeapon::eAddonDisabled)
-		SetBoneVisible(pHudVisual, bone_name, FALSE);
-	else
-	if(m_eGrenadeLauncherStatus==CSE_ALifeItemWeapon::eAddonPermanent)
-		SetBoneVisible(pHudVisual, bone_name, TRUE);*/
 }
 
 void CWeapon::UpdateAddonsVisibility()
@@ -1331,74 +1299,7 @@ void CWeapon::UpdateAddonsVisibility()
 	CKinematics* pWeaponVisual = smart_cast<CKinematics*>(Visual()); R_ASSERT(pWeaponVisual);
 	UpdateHUDAddonsVisibility();	
 	pWeaponVisual->CalculateBones_Invalidate();
-
 	UpdateBonesVisibility(pWeaponVisual);
-
-	/*	u16 bone_id = pWeaponVisual->LL_BoneID(wpn_scope);
-	 if(ScopeAttachable())
-	{
-		if (bone_id==BI_NONE)
-		{
-			Msg("! ERROR for section[%s] set scope status [%d], but no bone[%s] were found in visual[%s]!",cNameSect().c_str(),m_eScopeStatus,wpn_scope,pWeaponVisual->dbg_name.c_str());
-			FATAL("ENGINE crash! See log for detail!");
-		}
-		if(IsScopeAttached())
-		{
-			if(!pWeaponVisual->LL_GetBoneVisible(bone_id))
-				pWeaponVisual->LL_SetBoneVisible(bone_id,TRUE,TRUE);
-		}
-		else
-		{
-			if(pWeaponVisual->LL_GetBoneVisible(bone_id))
-				pWeaponVisual->LL_SetBoneVisible(bone_id,FALSE,TRUE);
-		}
-	}
-	if(m_eScopeStatus==CSE_ALifeItemWeapon::eAddonDisabled && bone_id!=BI_NONE && pWeaponVisual->LL_GetBoneVisible(bone_id) )
-		pWeaponVisual->LL_SetBoneVisible			(bone_id,FALSE,TRUE);
-
-	bone_id = pWeaponVisual->LL_BoneID(wpn_silencer);
-	if(SilencerAttachable())
-	{
-		if (bone_id==BI_NONE)
-		{
-			Msg("! ERROR for section[%s] set silencer status [%d], but no bone[%s] were found in visual[%s]!",cNameSect().c_str(),m_eSilencerStatus,wpn_silencer,pWeaponVisual->dbg_name.c_str());
-			FATAL("ENGINE crash! See log for detail!");
-		}
-		if(IsSilencerAttached())
-		{
-			if(!pWeaponVisual->LL_GetBoneVisible(bone_id))
-				pWeaponVisual->LL_SetBoneVisible(bone_id,TRUE,TRUE);
-		}
-		else
-		{
-			if( pWeaponVisual->LL_GetBoneVisible(bone_id))
-				pWeaponVisual->LL_SetBoneVisible(bone_id,FALSE,TRUE);
-		}
-	}
-	if(m_eSilencerStatus==CSE_ALifeItemWeapon::eAddonDisabled && bone_id!=BI_NONE && pWeaponVisual->LL_GetBoneVisible(bone_id) )
-		pWeaponVisual->LL_SetBoneVisible			(bone_id,FALSE,TRUE);
-
-	bone_id = pWeaponVisual->LL_BoneID					(wpn_launcher);
-	if(GrenadeLauncherAttachable())
-	{
-		if (bone_id==BI_NONE)
-		{
-			Msg("! ERROR for section[%s] set silencer status [%d], but no bone[%s] were found in visual[%s]!",cNameSect().c_str(),m_eGrenadeLauncherStatus,wpn_launcher,pWeaponVisual->dbg_name.c_str());
-			FATAL("ENGINE crash! See log for detail!");
-		}
-		if(IsGrenadeLauncherAttached())
-		{
-			if(!pWeaponVisual->LL_GetBoneVisible(bone_id))
-				pWeaponVisual->LL_SetBoneVisible(bone_id,TRUE,TRUE);
-		}else{
-			if(pWeaponVisual->LL_GetBoneVisible(bone_id))
-				pWeaponVisual->LL_SetBoneVisible(bone_id,FALSE,TRUE);
-		}
-	}
-	if(m_eGrenadeLauncherStatus==CSE_ALifeItemWeapon::eAddonDisabled && bone_id!=BI_NONE && pWeaponVisual->LL_GetBoneVisible(bone_id) )
-		pWeaponVisual->LL_SetBoneVisible(bone_id,FALSE,TRUE);*/
-	
-
 	pWeaponVisual->CalculateBones_Invalidate();
 	pWeaponVisual->CalculateBones();
 }

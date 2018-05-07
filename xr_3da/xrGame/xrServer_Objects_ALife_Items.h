@@ -204,7 +204,6 @@ SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemWeapon,CSE_ALifeItem)
 	u8								m_bZoom;
 	u32								m_ef_main_weapon_type;
 	u32								m_ef_weapon_type;
-
 									CSE_ALifeItemWeapon	(LPCSTR caSection);
 	virtual							~CSE_ALifeItemWeapon();
 	virtual void					OnEvent				(NET_Packet& P, u16 type, u32 time, ClientID sender );
@@ -228,6 +227,7 @@ add_to_type_list(CSE_ALifeItemWeapon)
 #pragma region CSE_ALifeItemWeaponMagazined
 SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemWeaponMagazined,CSE_ALifeItemWeapon)
 u8			m_u8CurFireMode;
+float m_fSilencerCondition;
 CSE_ALifeItemWeaponMagazined(LPCSTR caSection);
 virtual							~CSE_ALifeItemWeaponMagazined();
 

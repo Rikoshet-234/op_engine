@@ -419,7 +419,7 @@ void CInventoryItem::OnEvent (NET_Packet& P, u16 type)
 //процесс отсоединения вещи заключается в спауне новой вещи 
 //в инвентаре и установке соответствующих флагов в родительском
 //объекте, поэтому функция должна быть переопределена
-bool CInventoryItem::Detach(const char* item_section_name, bool b_spawn_item) 
+bool CInventoryItem::Detach(const char* item_section_name, bool b_spawn_item, float item_condition )
 {
 	if (OnClient()) return true;
 	if(b_spawn_item)
@@ -431,7 +431,9 @@ bool CInventoryItem::Detach(const char* item_section_name, bool b_spawn_item)
 		R_ASSERT			(l_tpALifeDynamicObject);
 		
 		l_tpALifeDynamicObject->m_tNodeID = (g_dedicated_server)?u32(-1):object().ai_location().level_vertex_id();
-			
+		CSE_ALifeInventoryItem *item= smart_cast<CSE_ALifeInventoryItem*>(l_tpALifeDynamicObject);
+		if (item)
+			item->m_fCondition = item_condition;
 		// Fill
 		D->s_name			=	item_section_name;
 		D->set_name_replace	("");
@@ -453,6 +455,7 @@ bool CInventoryItem::Detach(const char* item_section_name, bool b_spawn_item)
 		D->o_Position		=	object().Position();
 		D->s_flags.assign	(M_SPAWN_OBJECT_LOCAL);
 		D->RespawnTime		=	0;
+
 		// Send
 		NET_Packet			P;
 		D->Spawn_Write		(P,TRUE);

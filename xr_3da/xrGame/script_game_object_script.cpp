@@ -110,8 +110,8 @@ void CScriptGameObject::script_register(lua_State *L)
 				value("cell_focus_receive",			int(GameObject::OnDragDropListCellFocusReceive)),
 				value("cell_focus_lost",			int(GameObject::OnDragDropListCellFocusLost)),
 				value("cell_selected",				int(GameObject::OnDragDropListCellSelected)),
-				value("cell_dbl_click", int(GameObject::OnDragDropListDBLClickCell))
-				//value("on_inv_prop_show",		int(GameObject::eOnInventoryShowPropBox))
+				value("cell_dbl_click", int(GameObject::OnDragDropListDBLClickCell)),
+				value("on_ui_show_prop_box",		int(GameObject::eOnUIShowPropBox))
 
 			],
 

@@ -441,6 +441,7 @@ public:
 	bool has_grenadelauncher() const;
 	bool get_grenade_mode();
 	LPCSTR GetCurrentAmmoSection();
+	u32 GetCurrentAmmoType();
 	void FullUnloadWeapon();
 	LPCSTR detach_scope(luabind::object const &param);
 	LPCSTR detach_silencer(luabind::object const &param);

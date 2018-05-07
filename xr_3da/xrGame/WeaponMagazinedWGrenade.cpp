@@ -703,7 +703,7 @@ bool CWeaponMagazinedWGrenade::Attach(PIItem pIItem, bool b_send_event)
 		return inherited::Attach(pIItem, b_send_event);
 }
 
-bool CWeaponMagazinedWGrenade::Detach(const char* item_section_name, bool b_spawn_item)
+bool CWeaponMagazinedWGrenade::Detach(const char* item_section_name, bool b_spawn_item, float item_condition)
 {
 	if (CSE_ALifeItemWeapon::eAddonAttachable == m_eGrenadeLauncherStatus &&
 	   0 != (m_flagsAddOnState&CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher) &&
@@ -721,10 +721,9 @@ bool CWeaponMagazinedWGrenade::Detach(const char* item_section_name, bool b_spaw
 		PerformSwitchGL();
 		UpdateAddonsVisibility();
 		InitAddons();
-		return CInventoryItemObject::Detach(item_section_name, b_spawn_item);
+		return CInventoryItemObject::Detach(item_section_name, b_spawn_item, item_condition);
 	}
-	else
-		return inherited::Detach(item_section_name, b_spawn_item);
+	return inherited::Detach(item_section_name, b_spawn_item, item_condition);
 }
 
 void CWeaponMagazinedWGrenade::LoadCurrentZoomOffset()

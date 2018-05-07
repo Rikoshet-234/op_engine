@@ -25,6 +25,7 @@
 #include "../OPFuncs/utils.h"
 #include "../gbox.h"
 #include "../exooutfit.h"
+#include "../script_engine.h"
 
 
 void CUIInventoryWnd::EatItem(PIItem itm)
@@ -255,10 +256,40 @@ void CUIInventoryWnd::ActivatePropertiesBox()
 			UIPropertiesBox.AddItem("st_drop_all", reinterpret_cast<void*>(33), INVENTORY_DROP_ACTION);
 	}
 
-	/*CGameObject* GO = smart_cast<CGameObject*>(CurrentIItem()); 
-	if (GO)
-		Actor()->callback(GameObject::eOnInventoryShowPropBox)(&UIPropertiesBox,GO->lua_game_object());*/
+	//bool callback_result = false;
+	if (pSettings->line_exist("maingame_ui", "on_ui_show_prop_box"))
+	{
+		CGameObject* GO = smart_cast<CGameObject*>(CurrentIItem());
+		if (GO)
+		{
+			LPCSTR ui_show_prop_box = pSettings->r_string("maingame_ui", "on_ui_show_prop_box");
+			//luabind::functor<luabind::object> functor;
+			luabind::functor<void> functor;
+			if (!ai().script_engine().functor(ui_show_prop_box, functor))
+			{
+				Msg("! ERROR function [%s] not exist for on_ui_show_prop_box callback", ui_show_prop_box);
+			}
+			else
+			{
+				try
+				{
+					//luabind::object functor_result = functor(this, UIPropertiesBox, GO);
+					functor(this, &UIPropertiesBox, GO);
+					//if (!functor_result.is_valid())
+					//	Msg("! ERROR function [%s] did not return the expected value from on_ui_show_prop_box callback", ui_show_prop_box);
+					//if (functor_result.type() == LUA_TBOOLEAN)
+					//	callback_result = luabind::object_cast<bool>(functor_result);
+					//else
+					//	Msg("! ERROR function [%s] did not return the expected value from on_ui_show_prop_box callback", ui_show_prop_box);
+				}
+				catch (...)
+				{
+					Msg("! ERROR function [%s] cause unknown error.", ui_show_prop_box);
 
+				}
+			}
+		}
+	}
 
 	if(b_show)
 	{

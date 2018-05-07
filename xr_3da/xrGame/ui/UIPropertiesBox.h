@@ -31,7 +31,7 @@ public:
 
 
 	bool				AddItem								(const char*  str, void* pData = NULL, u32 tag_value = 0);
-	bool				AddItem_script						(const char*  str){return AddItem(str);};
+
 	//void				AddSubItem							(LPCSTR str,luabind::functor<void> &lua_function);
 	u32					GetItemsCount						() {return m_UIListWnd.GetSize();};
 	void				RemoveItemByTAG						(u32 tag_value);

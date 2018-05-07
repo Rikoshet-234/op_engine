@@ -13,7 +13,8 @@
 
 //0x0005 - CInventoryItem::m_cost && CInventoryItem::m_weight put to save
 //0x0006 - CInventoryItem::m_fActivePropertyRadiation put to save
-#define ALIFE_VERSION				0x0006
+//0x0006 - CWeaponMagazined::m_fSilencerCondition put to save
+#define ALIFE_VERSION				0x0007
 #define ALIFE_CHUNK_DATA			0x0000
 #define SPAWN_CHUNK_DATA			0x0001
 #define OBJECT_CHUNK_DATA			0x0002

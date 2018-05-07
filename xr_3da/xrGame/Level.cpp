@@ -16,7 +16,6 @@
 #include "PHdynamicdata.h"
 #include "Physics.h"
 #include "ShootingObject.h"
-//.#include "LevelFogOfWar.h"
 #include "Level_Bullet_Manager.h"
 #include "script_process.h"
 #include "script_engine.h"
@@ -42,7 +41,7 @@
 #include "game_cl_base_weapon_usage_statistic.h"
 #include "clsid_game.h"
 #include "MainMenu.h"
-#include "..\XR_IOConsole.h"
+#include "../XR_IOConsole.h"
 
 #ifdef DEBUG
 #	include "level_debug.h"
@@ -94,7 +93,7 @@ CLevel::CLevel():IPureClient	(Device.GetTimerGlobal())
 	game						= NULL;
 //	game						= xr_new<game_cl_GameState>();
 	game_events					= xr_new<NET_Queue_Event>();
-	spawn_events				= xr_new<NET_Queue_Event>();
+//	spawn_events				= xr_new<NET_Queue_Event>();
 
 	game_configured				= FALSE;
 	m_bGameConfigStarted		= FALSE;
@@ -266,7 +265,7 @@ CLevel::~CLevel()
 
 	xr_delete					(game);
 	xr_delete					(game_events);
-	xr_delete					(spawn_events);
+//	xr_delete					(spawn_events);
 
 	//by Dandy
 	//destroy fog of war
@@ -405,21 +404,21 @@ void CLevel::cl_Process_Event				(u16 dest, u16 type, NET_Packet& P)
 	}
 };
 
-bool CLevel::PostponedSpawn(u16 id)
-{
-	for (auto it = spawn_events->queue.begin(); it != spawn_events->queue.end(); ++it)
-	{
-		const NET_Event& E = *it;
-		NET_Packet P;
-		if (M_SPAWN != E.ID) continue;
-		E.implication(P);
-		u16 parent_id;
-		if (id == GetSpawnInfo(P, parent_id))
-			return true;
-	}
-
-	return false;
-}
+//bool CLevel::PostponedSpawn(u16 id)
+//{
+//	for (auto it = spawn_events->queue.begin(); it != spawn_events->queue.end(); ++it)
+//	{
+//		const NET_Event& E = *it;
+//		NET_Packet P;
+//		if (M_SPAWN != E.ID) continue;
+//		E.implication(P);
+//		u16 parent_id;
+//		if (id == GetSpawnInfo(P, parent_id))
+//			return true;
+//	}
+//
+//	return false;
+//}
 
 void CLevel::ProcessGameEvents		()
 {
@@ -432,42 +431,42 @@ void CLevel::ProcessGameEvents		()
 		if (!game_events->queue.empty())	
 			Msg("- d[%d],ts[%d] -- E[svT=%d],[evT=%d]",Device.dwTimeGlobal,timeServer(),svT,game_events->queue.begin()->timestamp);
 		*/
-#pragma region SPAWN_ANTIFREEZE
-		while (spawn_events->available(svT))
-		{
-			u16 ID, dest, type;
-			spawn_events->get(ID, dest, type, P);
-			game_events->insert(P);
-		}
-		u32 avail_time = 5;
-		u32 elps = Device.frame_elapsed();
-		if (elps < 30) avail_time = 33 - elps;
-		u32 work_limit = elps + avail_time;
+#pragma region SPAWN_ANTIFREEZE  //disabled due to strange bugged 
+		//while (spawn_events->available(svT))
+		//{
+		//	u16 ID, dest, type;
+		//	spawn_events->get(ID, dest, type, P);
+		//	game_events->insert(P);
+		//}
+		//u32 avail_time = 5;
+		//u32 elps = Device.frame_elapsed();
+		//if (elps < 30) avail_time = 33 - elps;
+		//u32 work_limit = elps + avail_time;
 #pragma endregion
 		while	(game_events->available(svT))
 		{
 			u16 ID,dest,type;
 			game_events->get	(ID,dest,type,P);
-#pragma region 
-			if (g_bootComplete && M_EVENT == ID && PostponedSpawn(dest))
-			{
-				spawn_events->insert(P);
-				continue;
-			}
-			if (g_bootComplete && M_SPAWN == ID && Device.frame_elapsed() > work_limit) // alpet: позволит плавнее выводить объекты в онлайн, без заметных фризов
-			{
-				u16 parent_id;
-				GetSpawnInfo(P, parent_id);
-				//-------------------------------------------------				
-				if (parent_id < 0xffff) // откладывать спавн только объектов в контейнеры
-				{
-					/*if (!spawn_events->available(svT))
-						Msg("* ProcessGameEvents, spawn event postponed. Events rest = %d", game_events->queue.size());*/
+#pragma region SPAWN_ANTIFREEZE
+			//if (g_bootComplete && M_EVENT == ID && PostponedSpawn(dest))
+			//{
+			//	spawn_events->insert(P);
+			//	continue;
+			//}
+			//if (g_bootComplete && M_SPAWN == ID && Device.frame_elapsed() > work_limit) // alpet: позволит плавнее выводить объекты в онлайн, без заметных фризов
+			//{
+			//	u16 parent_id;
+			//	GetSpawnInfo(P, parent_id);
+			//	//-------------------------------------------------				
+			//	if (parent_id < 0xffff) // откладывать спавн только объектов в контейнеры
+			//	{
+			//		/*if (!spawn_events->available(svT))
+			//			Msg("* ProcessGameEvents, spawn event postponed. Events rest = %d", game_events->queue.size());*/
 
-					spawn_events->insert(P);
-					continue;
-				}
-			}
+			//		spawn_events->insert(P);
+			//		continue;
+			//	}
+			//}
 #pragma endregion
 			switch (ID)
 			{

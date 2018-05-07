@@ -89,16 +89,38 @@ void CShootingObject::Light_Destroy		()
 	light_render.destroy		();
 }
 
+xr_string get_param_name(LPCSTR section,LPCSTR prefix,LPCSTR base_param)
+{
+	string64 param_to_read={0};
+	strcat(param_to_read, prefix);
+	strcat(param_to_read, base_param);
+	if (!pSettings->line_exist(section, param_to_read))
+		return xr_string(base_param);
+	return xr_string(param_to_read);
+}
+
 void CShootingObject::LoadFireParams	(LPCSTR section, LPCSTR prefix)
 {
-	string256	full_name;
 	string32	buffer;
 	shared_str	s_sHitPower;
 	//базовая дисперсия оружия
 	fireDispersionBase	= pSettings->r_float	(section,"fire_dispersion_base"	);
 	fireDispersionBase	= deg2rad				(fireDispersionBase);
+
 	//сила выстрела и его мощьность
-	s_sHitPower			= pSettings->r_string_wb(section,strconcat(sizeof(full_name),full_name, prefix, "hit_power"));//читаем строку силы хита пули оружия
+	s_sHitPower			= pSettings->r_string_wb(section,get_param_name(section,prefix, "hit_power").c_str());
+	fHitImpulse = pSettings->r_float(section, get_param_name(section, prefix, "hit_impulse").c_str());
+	//максимальное расстояние полета пули
+	fireDistance = pSettings->r_float(section, get_param_name(section, prefix, "fire_distance").c_str());
+	//начальная скорость пули
+	m_fStartBulletSpeed = pSettings->r_float(section, get_param_name(section, prefix, "bullet_speed").c_str());
+	m_bUseAimBullet = pSettings->r_bool(section, get_param_name(section, prefix, "use_aim_bullet").c_str());
+	if (m_bUseAimBullet)
+	{
+		m_fTimeToAim = pSettings->r_float(section, get_param_name(section, prefix, "time_to_aim").c_str());
+	}
+
+#pragma region calculate hit_power with game diff
 	fvHitPower[egdMaster]	= (float)atof(_GetItem(*s_sHitPower,0,buffer));//первый параметр - это хит для уровня игры мастер
 
 	fvHitPower[egdVeteran]	= fvHitPower[egdMaster];//изначально параметры для других уровней
@@ -118,19 +140,8 @@ void CShootingObject::LoadFireParams	(LPCSTR section, LPCSTR prefix)
 	{
 		fvHitPower[egdNovice]	= (float)atof(_GetItem(*s_sHitPower,3,buffer));//то вычитываем его для уровня новичка
 	}
+#pragma endregion	
 	
-	//fHitPower			= pSettings->r_float	(section,strconcat(full_name, prefix, "hit_power"));
-	fHitImpulse			= pSettings->r_float	(section,strconcat(sizeof(full_name),full_name, prefix, "hit_impulse"));
-	//максимальное расстояние полета пули
-	fireDistance		= pSettings->r_float	(section,strconcat(sizeof(full_name),full_name, prefix, "fire_distance"));
-	//начальная скорость пули
-	m_fStartBulletSpeed = pSettings->r_float	(section,strconcat(sizeof(full_name),full_name, prefix, "bullet_speed"));
-	m_bUseAimBullet		= pSettings->r_bool		(section,strconcat(sizeof(full_name),full_name, prefix, "use_aim_bullet"));
-	if (m_bUseAimBullet)
-	{
-		m_fTimeToAim		= pSettings->r_float	(section,strconcat(sizeof(full_name),full_name, prefix, "time_to_aim"));
-	}
-
 	LPCSTR	hit_type	= READ_IF_EXISTS (pSettings, r_string, section, "hit_type", "fire_wound");
 	m_eHitType= ALife::g_tfString2HitType(hit_type);
 }

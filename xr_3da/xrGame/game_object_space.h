@@ -56,7 +56,7 @@ namespace GameObject {
 
 		eOnObjectHit,
 
-		eOnInventoryShowPropBox,
+		eOnUIShowPropBox,
 
 		eOnCellItemDrop,
 		eOnCellItemAfterSelect,

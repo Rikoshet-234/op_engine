@@ -67,7 +67,6 @@ void CWeapon::FireTrace		(const Fvector& P, const Fvector& D)
 //	float Deterioration = GetWeaponDeterioration();
 //	Msg("Deterioration = %f", Deterioration);
 	ChangeCondition(-GetWeaponDeterioration()*l_cartridge.m_impair);
-
 	
 	float fire_disp				= GetFireDispersion(true);
 

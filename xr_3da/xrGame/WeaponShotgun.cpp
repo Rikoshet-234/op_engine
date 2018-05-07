@@ -7,6 +7,7 @@
 #include "inventory.h"
 #include "level.h"
 #include "actor.h"
+#include "xrServer_Objects_ALife_Items.h"
 
 CWeaponShotgun::CWeaponShotgun(void) : CWeaponCustomPistol("TOZ34")
 {
@@ -410,6 +411,28 @@ u8 CWeaponShotgun::AddCartridge		(u8 cnt)
 	return cnt;
 }
 
+#include "../xrCore/FTimerStat.h"
+BOOL	CWeaponShotgun::net_Spawn(CSE_Abstract* DC)
+{
+	TSP_SCOPED(_, "CWeaponMagazined::net_Spawn", "spawn");
+	BOOL bResult = inherited::net_Spawn(DC);
+	CSE_Abstract					*e = (CSE_Abstract*)(DC);
+	CSE_ALifeItemWeaponShotGun  *WS = smart_cast<CSE_ALifeItemWeaponShotGun*>(e);
+	if (WS->m_AmmoIDs.size()>0)
+	{
+		m_magazine.clear();
+		std::for_each(WS->m_AmmoIDs.begin(), WS->m_AmmoIDs.end(), [&](u8 at)
+		{
+			if (at > m_ammoTypes.size())
+				at = 0;
+			CCartridge l_cartridge;
+			l_cartridge.Load(*m_ammoTypes[at], at);
+			m_magazine.push_back(l_cartridge);
+		});
+	}
+	return bResult;
+}
+
 void	CWeaponShotgun::net_Export	(NET_Packet& P)
 {
 	inherited::net_Export(P);	
@@ -425,6 +448,8 @@ void	CWeaponShotgun::net_Import	(NET_Packet& P)
 {
 	inherited::net_Import(P);	
 	u8 AmmoCount = P.r_u8();
+	Msg("net_Import	[%s] [%d]", cName().c_str(), AmmoCount);
+	
 	for (u32 i=0; i<AmmoCount; i++)
 	{
 		u8 LocalAmmoType = P.r_u8();
@@ -437,4 +462,6 @@ void	CWeaponShotgun::net_Import	(NET_Packet& P)
 		l_cartridge.Load(*(m_ammoTypes[LocalAmmoType]), LocalAmmoType); 
 //		m_fCurrentCartirdgeDisp = m_DefaultCartridge.m_kDisp;		
 	}
+
+	
 }

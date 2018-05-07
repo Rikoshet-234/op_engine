@@ -78,17 +78,17 @@ void AddOne				(const char *split)
 			}
 
 			char buf[64]; 
-			if (OPFuncs::Dumper->isParamSet(OPFuncs::ExpandedCmdParams::KnownParams::pShowLogTime))
+			//if (OPFuncs::Dumper->isParamSet(OPFuncs::ExpandedCmdParams::KnownParams::pShowLogTime))
 			{
 				SYSTEMTIME lt;
 				GetLocalTime(&lt);
 
 				sprintf_s(buf, 64, "[%02d.%02d.%02d %02d:%02d:%02d.%03d] ", lt.wDay, lt.wMonth, lt.wYear % 100, lt.wHour, lt.wMinute, lt.wSecond, lt.wMilliseconds);						
 			}
-			else
-			{
-				buf[0]=0;
-			}
+			//else
+			//{
+			//	buf[0]=0;
+			//}
 			LogWriter->w_printf("%s%s\r\n", buf, split);
 			cached_log += xr_strlen(buf);
 			cached_log += xr_strlen(split) + 2;
