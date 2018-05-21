@@ -13,6 +13,7 @@
 #include "object_factory.h"
 #include "../xrCore/xr_ini.h"
 
+
 CScriptIniFile::CScriptIniFile		(IReader *F, LPCSTR path) :
 	inherited	(F,path)
 {

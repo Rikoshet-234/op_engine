@@ -12,6 +12,10 @@
 #include <luabind/luabind.hpp>
 #include <luabind/functor.hpp>
 
+struct ScriptPopupData
+{
+	luabind::functor<void> m_functor;
+};
 
 class CUIPropertiesBox: public CUIFrameWindow
 {

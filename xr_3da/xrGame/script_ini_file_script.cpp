@@ -8,6 +8,9 @@
 
 #include "pch_script.h"
 #include "script_ini_file.h"
+#include "script_engine.h"
+#include "script_game_object.h"
+#include "../xrCore/xr_ini.h"
 
 using namespace luabind;
 
@@ -22,6 +25,17 @@ CScriptIniFile *get_game_ini()
 	return	((CScriptIniFile*)pGameIni);
 }
 #endif // XRGAME_EXPORTS
+
+void iterate_sections(CScriptIniFile *pself, luabind::functor<void> functor)
+{
+	if (functor.is_valid())
+	{
+		std::for_each(pself->sections().begin(), pself->sections().end(), [&](CInifile::Sect* section)
+		{
+			functor(pself, section->Name.c_str());
+		});
+	}
+}
 
 bool r_line(CScriptIniFile *pself, LPCSTR S, int L,	xr_string &N, xr_string &V)
 {
@@ -40,6 +54,25 @@ bool r_line(CScriptIniFile *pself, LPCSTR S, int L,	xr_string &N, xr_string &V)
 	if (v)
 		V			= v;
 	return			(true);
+}
+
+void include_file(CScriptIniFile *pself, LPCSTR includeName)
+{
+	string_path	path, folder;
+	string_path			S1;
+	FS.update_path(S1, "$game_config$", includeName);
+	_splitpath(S1, path, folder, nullptr, nullptr);
+	strcat(path, folder);
+	IReader* R = FS.r_open(S1);
+	if (R) {
+		pself->Load(R, path);
+		FS.r_close(R);
+	}
+}
+
+void load(CScriptIniFile *pself)
+{
+	include_file(pself, pself->fname());
 }
 
 #pragma warning(push)
@@ -63,6 +96,7 @@ CScriptIniFile *open_ini_file(LPCSTR fileName,bool modeWrite)
 	return xr_new<CScriptIniFile>(modeWrite,fileName);
 }
 
+
 void close_ini_file(CScriptIniFile *file)
 {
 	file->save_as();
@@ -76,6 +110,10 @@ void CScriptIniFile::script_register(lua_State *L)
 	[
 		class_<CScriptIniFile>("ini_file")
 			.def(					constructor<LPCSTR>())
+			//.def(constructor<LPCSTR, BOOL,BOOL,BOOL>())
+			.def("iterate_sections", &iterate_sections)
+			.def("include_file", &include_file)
+			.def("load", &load)
 			.def("section_exist",	&CScriptIniFile::section_exist	)
 			.def("line_exist",		&CScriptIniFile::line_exist		)
 			.def("r_clsid",			&CScriptIniFile::r_clsid		)

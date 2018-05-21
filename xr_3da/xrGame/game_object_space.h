@@ -58,8 +58,8 @@ namespace GameObject {
 
 		eOnUIShowPropBox,
 
-		eOnCellItemDrop,
-		eOnCellItemAfterSelect,
+		eOnReserved1,
+		eOnReserved2,
 
 		OnInventoryItemPlaceChange,
 		OnKeyboardPress,

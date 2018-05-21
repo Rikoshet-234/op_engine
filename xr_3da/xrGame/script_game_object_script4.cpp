@@ -590,7 +590,7 @@ bool CScriptGameObject::has_grenadelauncher() const
 	return weapon->IsGrenadeLauncherAttached();
 }
 
-LPCSTR detach_local(CGameObject* object, CSE_ALifeItemWeapon::EWeaponAddonState addonType, luabind::object const &param)
+LPCSTR detach_addon_local(CGameObject* object, CSE_ALifeItemWeapon::EWeaponAddonState addonType, luabind::object const &param)
 {
 	CWeapon		*weapon = smart_cast<CWeapon*>(object);
 	if (!weapon) {
@@ -632,19 +632,84 @@ LPCSTR detach_local(CGameObject* object, CSE_ALifeItemWeapon::EWeaponAddonState 
 
 LPCSTR CScriptGameObject::detach_scope(luabind::object const &param)
 {
-	return detach_local(&object(), CSE_ALifeItemWeapon::EWeaponAddonState::eWeaponAddonScope, param);
+	return detach_addon_local(&object(), CSE_ALifeItemWeapon::EWeaponAddonState::eWeaponAddonScope, param);
 }
 
 LPCSTR CScriptGameObject::detach_silencer(luabind::object const &param)
 {
-	return detach_local(&object(), CSE_ALifeItemWeapon::EWeaponAddonState::eWeaponAddonSilencer, param);
+	return detach_addon_local(&object(), CSE_ALifeItemWeapon::EWeaponAddonState::eWeaponAddonSilencer, param);
 }
 
 LPCSTR CScriptGameObject::detach_grenadelauncher(luabind::object const &param)
 {
-	return detach_local(&object(), CSE_ALifeItemWeapon::EWeaponAddonState::eWeaponAddonGrenadeLauncher, param);
+	return detach_addon_local(&object(), CSE_ALifeItemWeapon::EWeaponAddonState::eWeaponAddonGrenadeLauncher, param);
 }
 
+bool attach_addon_local(CGameObject* object, CSE_ALifeItemWeapon::EWeaponAddonState addonType, LPCSTR addon_section, float addon_condition = 1.0f)
+{
+	CWeaponMagazined		*weapon = smart_cast<CWeaponMagazined*>(object);
+	if (!weapon)
+	{
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "call [attach_addon_local] for non-CWeaponMagazined object!");
+		return false;
+	}
+	u8 addonState = weapon->GetAddonsState();
+	bool attached = false;
+	switch (addonType)
+	{
+	case CSE_ALifeItemWeapon::eWeaponAddonScope:
+		if (weapon->GetScopeStatus() == CSE_ALifeItemWeapon::eAddonAttachable &&
+			(addonState&CSE_ALifeItemWeapon::eWeaponAddonScope) == 0 &&
+			(addon_section == weapon->GetScopeName()))
+		{
+			addonState |= CSE_ALifeItemWeapon::eWeaponAddonScope;
+			weapon->SetAddonsState(addonState);
+			attached = true;
+		}
+		break;
+	case CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher:
+		if (weapon->GetGrenadeLauncherStatus() == CSE_ALifeItemWeapon::eAddonAttachable &&
+			(addonState&CSE_ALifeItemWeapon::eWeaponAddonScope) == 0 &&
+			(addon_section == weapon->GetGrenadeLauncherName()))
+		{
+			addonState |= CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher;
+			weapon->SetAddonsState(addonState);
+			attached = true;
+		}
+		break;
+	case CSE_ALifeItemWeapon::eWeaponAddonSilencer:
+		if (weapon->GetSilencerStatus() == CSE_ALifeItemWeapon::eAddonAttachable &&
+			(addonState&CSE_ALifeItemWeapon::eWeaponAddonSilencer) == 0 &&
+			(addon_section == weapon->GetSilencerName()))
+		{
+			addonState |= CSE_ALifeItemWeapon::eWeaponAddonSilencer;
+			weapon->SetAddonsState(addonState);
+			weapon->SetSilencerCondition(addon_condition);
+			attached = true;
+		}
+		break;
+	default:;
+	}
+	if (attached)
+	{
+		weapon->UpdateAddonsVisibility();
+		weapon->InitAddons();
+	}
+	return attached;
+}
+
+bool CScriptGameObject::attach_scope(LPCSTR addon_section)
+{
+	return attach_addon_local(&object(),CSE_ALifeItemWeapon::eWeaponAddonScope, addon_section);
+}
+bool CScriptGameObject::attach_silencer(LPCSTR addon_section)
+{
+	return attach_addon_local(&object(), CSE_ALifeItemWeapon::eWeaponAddonSilencer, addon_section);;
+}
+bool CScriptGameObject::attach_grenadelauncher(LPCSTR addon_section)
+{
+	return attach_addon_local(&object(), CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher, addon_section);;
+}
 u32 CScriptGameObject::GetCurrentAmmoType()
 {
 	CWeapon		*weapon = smart_cast<CWeapon*>(&object());
@@ -718,6 +783,28 @@ u8 CScriptGameObject::GetWeaponAddonState() const
 	return 0;
 }
 
+float CScriptGameObject::GetSilencerCondition()
+{
+	CWeaponMagazined		*weapon = smart_cast<CWeaponMagazined*>(&object());
+	if (weapon)
+	{
+		return weapon->GetSilencerCondition();
+	}
+	ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "call [silencer_condition] for non-CWeaponMagazined object!");
+	return 0;
+}
+
+void CScriptGameObject::SetSilencerCondition(float condition)
+{
+	CWeaponMagazined		*weapon = smart_cast<CWeaponMagazined*>(&object());
+	if (weapon)
+	{
+		weapon->SetSilencerCondition(condition);
+		return;
+	}
+	ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "call [silencer_condition] for non-CWeaponMagazined object!");
+}
+
 bool CScriptGameObject::get_grenade_mode()
 {
 	CWeapon		*weapon = smart_cast<CWeapon*>(&object());
@@ -755,6 +842,15 @@ CExoOutfit* CScriptGameObject::GetExoOutfit() const
 		return nullptr;
 	}
 	return exo;
+}
+
+LPCSTR GetSpecificCharacterVisual(CScriptGameObject* pself)
+{
+	CAI_Stalker* stalker= smart_cast<CAI_Stalker*>(&(pself->object()));
+	if (stalker)
+		return stalker->SpecificCharacter().Visual();
+	log_script_error("! WARNING [%s] not CAI_Stalker", pself->object().Name());
+	return nullptr;
 }
 
 class_<CScriptGameObject> &script_register_game_object3(class_<CScriptGameObject> &instance)
@@ -833,12 +929,18 @@ class_<CScriptGameObject> &script_register_game_object3(class_<CScriptGameObject
 		.def("detach_scope", &CScriptGameObject::detach_scope)
 		.def("detach_silencer", &CScriptGameObject::detach_silencer)
 		.def("detach_grenadelauncher", &CScriptGameObject::detach_grenadelauncher)
+		.def("attach_scope", &CScriptGameObject::attach_scope)
+		.def("attach_silencer", &CScriptGameObject::attach_silencer)
+		.def("attach_grenadelauncher", &CScriptGameObject::attach_grenadelauncher)
 		.def("change_slot_state", &CScriptGameObject::ActivateSlot)
 		.def("set_position", &CScriptGameObject::SetPosition)
 		//.def("set_direction", static_cast<void (CScriptGameObject::*)(const Fvector &dir,float)>(&CScriptGameObject::SetDirection))
 		.def("set_direction", static_cast<void (CScriptGameObject::*)(const Fvector &dir)>(&CScriptGameObject::SetDirection))
 		.def("set_direction", static_cast<void (CScriptGameObject::*)(float x,float y,float z)>(&CScriptGameObject::SetDirection))
 		.def("get_ammo_left", &CScriptGameObject::GetAmmoLeft)
+		.def("silencer_condition", &CScriptGameObject::GetSilencerCondition)
+		.def("silencer_condition", &CScriptGameObject::SetSilencerCondition)
+		.def("get_sc_visual_name", &GetSpecificCharacterVisual)
 		;
 
 	return	(instance);

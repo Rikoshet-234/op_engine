@@ -113,6 +113,7 @@ protected:
 								eInvItemMove,
 								eInvSndMax};
 	ref_sound					sounds					[eInvSndMax];
+public:
 	void PlaySnd(eTradeSoundActions a);
 };
 

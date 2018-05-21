@@ -44,6 +44,7 @@ protected:
 
 	MotionSVec pre_anim_idle_moving;
 	MotionSVec pre_anim_idle_moving_empty;
+	MotionSVec pre_anim_idle_sprint_empty;
 
 
 	WWPMotions			mhud_pistol,mhud_pistol_r;

@@ -274,7 +274,7 @@ protected:
 ///////////////////////////////////////////////////
 //	для режима приближения и снайперского прицела
 ///////////////////////////////////////////////////
-protected:
+
 	//разрешение режима приближения
 	bool			m_bZoomEnabled;
 	//текущий фактор приближения
@@ -298,6 +298,9 @@ protected:
 	float			m_fZoomRotationFactor;
 	bool			m_bHideCrosshairInZoom;
 public:
+	ALife::EWeaponAddonStatus GetScopeStatus() const { return m_eScopeStatus; }
+	ALife::EWeaponAddonStatus GetSilencerStatus() const { return m_eSilencerStatus; }
+	ALife::EWeaponAddonStatus GetGrenadeLauncherStatus() const { return m_eGrenadeLauncherStatus; }
 
 	IC bool					IsZoomEnabled		()	const	{return m_bZoomEnabled;}
 	virtual	bool			ZoomInc				();

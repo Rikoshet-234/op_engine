@@ -717,8 +717,30 @@ void CUITradeWnd::SetCurrentItem(CUICellItem* itm)
 		bool ls=list->select_suitables_by_item(currentIItem);
 		processed=processed || ls;
 	});
-	if (Actor())
-		Actor()->callback(GameObject::ECallbackType::eOnCellItemAfterSelect)(this,CurrentItem(),processed);
+	if (pSettings->line_exist("maingame_ui", "on_cell_after_select"))
+	{
+		CGameObject* GO = smart_cast<CGameObject*>(CurrentIItem());
+		if (GO)
+		{
+			LPCSTR on_cell_after_select = pSettings->r_string("maingame_ui", "on_cell_after_select");
+			luabind::functor<void> functor;
+			if (!ai().script_engine().functor(on_cell_after_select, functor))
+			{
+				Msg("! ERROR function [%s] not exist for on_cell_after_select callback", on_cell_after_select);
+			}
+			else
+			{
+				try
+				{
+					functor(this, CurrentItem(), processed);
+				}
+				catch (...)
+				{
+					Msg("! ERROR function [%s] cause unknown error.", on_cell_after_select);
+				}
+			}
+		}
+	}
 }
 
 void CUITradeWnd::SetItemSelected(CUICellItem* itm)

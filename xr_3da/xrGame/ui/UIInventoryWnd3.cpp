@@ -256,14 +256,12 @@ void CUIInventoryWnd::ActivatePropertiesBox()
 			UIPropertiesBox.AddItem("st_drop_all", reinterpret_cast<void*>(33), INVENTORY_DROP_ACTION);
 	}
 
-	//bool callback_result = false;
 	if (pSettings->line_exist("maingame_ui", "on_ui_show_prop_box"))
 	{
 		CGameObject* GO = smart_cast<CGameObject*>(CurrentIItem());
 		if (GO)
 		{
 			LPCSTR ui_show_prop_box = pSettings->r_string("maingame_ui", "on_ui_show_prop_box");
-			//luabind::functor<luabind::object> functor;
 			luabind::functor<void> functor;
 			if (!ai().script_engine().functor(ui_show_prop_box, functor))
 			{
@@ -273,14 +271,7 @@ void CUIInventoryWnd::ActivatePropertiesBox()
 			{
 				try
 				{
-					//luabind::object functor_result = functor(this, UIPropertiesBox, GO);
-					functor(this, &UIPropertiesBox, GO);
-					//if (!functor_result.is_valid())
-					//	Msg("! ERROR function [%s] did not return the expected value from on_ui_show_prop_box callback", ui_show_prop_box);
-					//if (functor_result.type() == LUA_TBOOLEAN)
-					//	callback_result = luabind::object_cast<bool>(functor_result);
-					//else
-					//	Msg("! ERROR function [%s] did not return the expected value from on_ui_show_prop_box callback", ui_show_prop_box);
+					functor(this, &UIPropertiesBox, GO->lua_game_object());
 				}
 				catch (...)
 				{
@@ -311,16 +302,16 @@ void CUIInventoryWnd::ProcessPropertiesBoxClicked	()
 {
 	if(UIPropertiesBox.GetClickedItem())
 	{
-		switch(UIPropertiesBox.GetClickedItem()->GetTAG())
+		switch (UIPropertiesBox.GetClickedItem()->GetTAG())
 		{
-		case INVENTORY_TO_SLOT_ACTION:	
+		case INVENTORY_TO_SLOT_ACTION:
 			ToSlot(CurrentItem(), true);
 			break;
-		case INVENTORY_TO_BELT_ACTION:	
-			ToBelt(CurrentItem(),false);
+		case INVENTORY_TO_BELT_ACTION:
+			ToBelt(CurrentItem(), false);
 			break;
-		case INVENTORY_TO_BAG_ACTION:	
-			ToBag(CurrentItem(),false);
+		case INVENTORY_TO_BAG_ACTION:
+			ToBag(CurrentItem(), false);
 			break;
 		case INVENTORY_CHARGE_EXO:
 			if (CExoOutfit* exo = smart_cast<CExoOutfit*>(g_actor->GetOutfit()))
@@ -331,12 +322,12 @@ void CUIInventoryWnd::ProcessPropertiesBoxClicked	()
 				exo->RemoveFromBatterySlot(true);
 			break;
 		case INVENTORY_DROP_ACTION:
-			{
-				void* d = UIPropertiesBox.GetClickedItem()->GetData();
-				bool b_all = (d==(void*)33);
+		{
+			void* d = UIPropertiesBox.GetClickedItem()->GetData();
+			bool b_all = (d == (void*)33);
 
-				DropCurrentItem(b_all);
-			}break;
+			DropCurrentItem(b_all);
+		}break;
 		case INVENTORY_EAT_ACTION:
 			EatItem(CurrentIItem());
 			break;
@@ -356,44 +347,46 @@ void CUIInventoryWnd::ProcessPropertiesBoxClicked	()
 			(smart_cast<CWeapon*>(CurrentIItem()))->Action(kWPN_RELOAD, CMD_START);
 			break;
 		case INVENTORY_LOAD_MAGAZINE:
+		{
+			CWeaponMagazined*	weapon = static_cast<CWeaponMagazined*>(UIPropertiesBox.GetClickedItem()->GetData());
+			CWeaponAmmo*		ammo = static_cast<CWeaponAmmo*>(CurrentItem()->m_pData);
+			if (weapon && ammo)
 			{
-				CWeaponMagazined*	weapon	=static_cast<CWeaponMagazined*>(UIPropertiesBox.GetClickedItem()->GetData());
-				CWeaponAmmo*		ammo	=static_cast<CWeaponAmmo*>(CurrentItem()->m_pData);
-				if (weapon && ammo)
-				{
-					CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-					pGameSP->InventoryMenu->GetHolder()->StartStopMenu(pGameSP->InventoryMenu,true);
-					if (m_pInv->ActiveItem()!=weapon)
-						m_pInv->ProcessSlotAction(true,weapon->GetSlot());
-					weapon->LoadAmmo(ammo);
-				}
+				CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
+				pGameSP->InventoryMenu->GetHolder()->StartStopMenu(pGameSP->InventoryMenu, true);
+				if (m_pInv->ActiveItem() != weapon)
+					m_pInv->ProcessSlotAction(true, weapon->GetSlot());
+				weapon->LoadAmmo(ammo);
 			}
-			break;
+		}
+		break;
 		case INVENTORY_UNLOAD_MAGAZINE:
+		{
+			CUICellItem * itm = CurrentItem();
+			CWeapon* weapon = static_cast<CWeapon*>(itm->m_pData);
+			if (!weapon)
+				break;
+			CWeaponMagazined* wg = smart_cast<CWeaponMagazined*>(weapon);
+			if (!wg)
+				break;
+			wg->PlayEmptySnd();
+			OPFuncs::UnloadWeapon(wg);
+			for (size_t i = 0; i < itm->ChildsCount(); ++i)
 			{
-				CUICellItem * itm = CurrentItem();
-				CWeapon* weapon=static_cast<CWeapon*>(itm->m_pData);
-				if (!weapon)
-					break;
-				CWeaponMagazined* wg = smart_cast<CWeaponMagazined*>(weapon);
-				if (!wg)
-					break;
-				wg->PlayEmptySnd();
-				OPFuncs::UnloadWeapon(wg);
-				for(size_t i=0; i<itm->ChildsCount(); ++i)
-				{
-					CUICellItem * child_itm			= itm->Child(i);
-					OPFuncs::UnloadWeapon(smart_cast<CWeaponMagazined*>(static_cast<CWeapon*>(child_itm->m_pData)));
-				}
-
-			}break;
-		case INVENTORY_PROP_CALL_FUNC:
-			{
-				/*luabind::functor<void> &func=*static_cast<luabind::functor<void> *>(UIPropertiesBox.GetClickedItem()->GetData());
-				if (func && func.is_valid())
-					func();*/
+				CUICellItem * child_itm = itm->Child(i);
+				OPFuncs::UnloadWeapon(smart_cast<CWeaponMagazined*>(static_cast<CWeapon*>(child_itm->m_pData)));
 			}
-			break;
+
+		}break;
+		case POPUP_PROP_CALL_SCRIPT_FUNC:
+		{
+			CScriptCallbackEx<void> *functor = static_cast<CScriptCallbackEx<void>*>(UIPropertiesBox.GetClickedItem()->GetData());
+			if (functor)
+			{
+				(*functor)(this,CurrentIItem()->object().lua_game_object());
+			}
+		}
+		break;
 		}
 	}
 }

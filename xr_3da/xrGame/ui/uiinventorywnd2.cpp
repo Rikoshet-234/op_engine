@@ -59,8 +59,30 @@ void CUIInventoryWnd::SetCurrentItem(CUICellItem* itm)
 		bool ls=list->select_suitables_by_item(currentIItem);
 		processed=processed || ls;
 	});
-	if (Actor())
-		Actor()->callback(GameObject::ECallbackType::eOnCellItemAfterSelect)(this,CurrentItem(),processed);
+	if (pSettings->line_exist("maingame_ui", "on_cell_after_select"))
+	{
+		CGameObject* GO = smart_cast<CGameObject*>(CurrentIItem());
+		if (GO)
+		{
+			LPCSTR ui_show_prop_box = pSettings->r_string("maingame_ui", "on_cell_after_select");
+			luabind::functor<void> functor;
+			if (!ai().script_engine().functor(ui_show_prop_box, functor))
+			{
+				Msg("! ERROR function [%s] not exist for on_cell_after_select callback", ui_show_prop_box);
+			}
+			else
+			{
+				try
+				{
+					functor(this, CurrentItem(), processed);
+				}
+				catch (...)
+				{
+					Msg("! ERROR function [%s] cause unknown error.", ui_show_prop_box);
+				}
+			}
+		}
+	}
 }
 
 void CUIInventoryWnd::SendMessage(CUIWindow *pWnd, s16 msg, void *pData)
@@ -361,8 +383,32 @@ bool CUIInventoryWnd::OnItemDrop(CUICellItem* itm)
 			exo->PutToBatterySlot(draggedItem);
 			processed = true;
 		}
-		if (Actor())
-			Actor()->callback(GameObject::ECallbackType::eOnCellItemDrop)(this,old_owner,new_owner,itm,focusedCellItem,processed);
+		
+		if (pSettings->line_exist("maingame_ui", "on_cell_item_drop"))
+		{
+			CGameObject* GO = smart_cast<CGameObject*>(CurrentIItem());
+			if (GO)
+			{
+				LPCSTR on_cell_item_drop = pSettings->r_string("maingame_ui", "on_cell_item_drop");
+				luabind::functor<void> functor;
+				if (!ai().script_engine().functor(on_cell_item_drop, functor))
+				{
+					Msg("! ERROR function [%s] not exist for on_cell_item_drop callback", on_cell_item_drop);
+				}
+				else
+				{
+					try
+					{
+						functor(this, old_owner, new_owner, itm, focusedCellItem, processed);
+					}
+					catch (...)
+					{
+						Msg("! ERROR function [%s] cause unknown error.", on_cell_item_drop);
+					}
+				}
+			}
+		}
+
 		return true;
 	}
 	else if (t_new == t_old)
@@ -419,8 +465,31 @@ bool CUIInventoryWnd::OnItemDrop(CUICellItem* itm)
 	};
 
 	DropItem				(CurrentIItem(), new_owner);
-	if (Actor())
-			Actor()->callback(GameObject::ECallbackType::eOnCellItemDrop)(this,old_owner,new_owner,itm,focusedCellItem,processed);
+
+	if (pSettings->line_exist("maingame_ui", "on_cell_item_drop"))
+	{
+		CGameObject* GO = smart_cast<CGameObject*>(CurrentIItem());
+		if (GO)
+		{
+			LPCSTR on_cell_item_drop = pSettings->r_string("maingame_ui", "on_cell_item_drop");
+			luabind::functor<void> functor;
+			if (!ai().script_engine().functor(on_cell_item_drop, functor))
+			{
+				Msg("! ERROR function [%s] not exist for on_cell_item_drop callback", on_cell_item_drop);
+			}
+			else
+			{
+				try
+				{
+					functor(this, old_owner, new_owner, itm, focusedCellItem, processed);
+				}
+				catch (...)
+				{
+					Msg("! ERROR function [%s] cause unknown error.", on_cell_item_drop);
+				}
+			}
+		}
+	}
 	return true;
 }
 void CUIInventoryWnd::hideInventoryWnd(CInventoryItem* weapon) 

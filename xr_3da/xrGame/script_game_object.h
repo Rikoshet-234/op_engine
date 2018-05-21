@@ -443,9 +443,15 @@ public:
 	LPCSTR GetCurrentAmmoSection();
 	u32 GetCurrentAmmoType();
 	void FullUnloadWeapon();
+	float GetSilencerCondition();
+	void SetSilencerCondition(float condition);
 	LPCSTR detach_scope(luabind::object const &param);
 	LPCSTR detach_silencer(luabind::object const &param);
 	LPCSTR detach_grenadelauncher(luabind::object const &param);
+
+	bool attach_scope(LPCSTR addon_section);
+	bool attach_silencer(LPCSTR addon_section);
+	bool attach_grenadelauncher(LPCSTR addon_section);
 
 #pragma endregion
 #pragma region Callbacks			

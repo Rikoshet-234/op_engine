@@ -202,6 +202,12 @@ protected:
 	// режим приближения
 	//////////////////////////////////////////////
 public:
+	float GetSilencerCondition() const { return m_fSilencerCondition; }
+	void SetSilencerCondition(float condition)
+	{
+		clamp(condition, 0.0f, 1.0f);
+		m_fSilencerCondition= condition;
+	}
 	virtual void	OnZoomIn			();
 	virtual void	OnZoomOut			();
 	virtual	void	OnNextFireMode		();

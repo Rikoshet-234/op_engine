@@ -286,15 +286,31 @@ bool CInventory::DropItem(CGameObject *pObj)
 	return							true;
 }
 
-void callMovingCallback(CInventoryItem* item,InventoryPlaceChange::EnumItemPlaceChange placeChangeId)
+void callMovingCallback(CInventoryItem* item, InventoryPlaceChange::EnumItemPlaceChange placeChangeId)
 {
-	CObject* parent=item->object().H_Parent();
-	if (parent)
+	if (pSettings->line_exist("maingame_ui", "on_item_place_change"))
 	{
-		CEntityAlive* callParent=smart_cast<CEntityAlive*>(parent);
-		if (callParent)
+		LPCSTR on_item_place_change = pSettings->r_string("maingame_ui", "on_item_place_change");
+		luabind::functor<void> functor;
+		if (!ai().script_engine().functor(on_item_place_change, functor))
 		{
-			callParent->callback(GameObject::ECallbackType::OnInventoryItemPlaceChange)(item->object().lua_game_object(),placeChangeId);
+			Msg("! ERROR function [%s] not exist for on_item_place_change callback", on_item_place_change);
+		}
+		else
+		{
+			try
+			{
+				CObject* parent = item->object().H_Parent();
+				if (parent) 
+				{
+					CEntityAlive* callParent = smart_cast<CEntityAlive*>(parent);
+					functor(callParent->lua_game_object(),item->object().lua_game_object(), placeChangeId);
+				}
+			}
+			catch (...)
+			{
+				Msg("! ERROR function [%s] cause unknown error.", on_item_place_change);
+			}
 		}
 	}
 }

@@ -79,9 +79,14 @@ void CWeaponPistol::Load	(LPCSTR section)
 	}
 
 	LPCSTR animName = "anim_idle_moving_empty"; //пойдем на хитрости, дабы не добавлять анимацию для всего оружия
-	if (pSettings->line_exist(*hud_sect, "anim_idle_moving_empty"))
+	if (pSettings->line_exist(*hud_sect, animName))
 	{
 		animGet(pre_anim_idle_moving_empty, pSettings->r_string(*hud_sect, animName), *hud_sect, animName);
+	}
+	animName = "anim_idle_sprint_empty";
+	if (pSettings->line_exist(*hud_sect, animName))
+	{
+		animGet(pre_anim_idle_sprint_empty, pSettings->r_string(*hud_sect, animName), *hud_sect, animName);
 	}
 	pre_anim_idle_moving = mhud.anim_idle_moving; //закешируем обшие анимации
 }
@@ -135,8 +140,18 @@ void CWeaponPistol::PlayAnimIdle	()
 					mhud.anim_idle_moving.clear(); //дабы включилась движковая раскачка
 				else if (mhud.anim_idle_moving.empty()) //если есть - будем играть все, на всякий случай восстановим из кеша
 					mhud.anim_idle_moving = pre_anim_idle_moving;
+				anim = &pre_anim_idle_moving_empty; //попробуем проиграть анимацию движения с пустым стволом
 			}
-			anim = &pre_anim_idle_moving_empty; //попробуем проиграть анимацию движения с пустым стволом
+			else if (movingSprint) //при беге
+			{
+				if (pre_anim_idle_sprint_empty.empty()) //dirty hack если нет анимации для бега с пустым стволом - сбросим анимации для inherited::PlayAnimIdle() 
+					mhud.mhud_idle_sprint.clear(); //дабы включилась движковая раскачка при беге
+				else if (mhud.mhud_idle_sprint.empty()) //если есть - будем играть все, на всякий случай восстановим из кеша
+					mhud.mhud_idle_sprint = pre_anim_idle_sprint_empty;
+				anim = &pre_anim_idle_sprint_empty;
+			}
+
+			
 		}
 	}
 	else

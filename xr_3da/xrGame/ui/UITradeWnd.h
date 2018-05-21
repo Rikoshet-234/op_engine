@@ -154,8 +154,8 @@ protected:
 								eInvTradeDone,
 								eInvSndMax};
 	ref_sound					sounds					[eInvSndMax];
-	void PlaySnd(eTradeSoundActions a);
 
 public:
+	void PlaySnd(eTradeSoundActions a);
 	void						re_init();
 };

@@ -16,6 +16,8 @@ CUIListBoxItem::CUIListBoxItem()
 
 CUIListBoxItem::~CUIListBoxItem()
 {
+	if (tag == POPUP_PROP_CALL_SCRIPT_FUNC && pData)
+		xr_delete(pData);
 	delete_data			(fields);
 }
 

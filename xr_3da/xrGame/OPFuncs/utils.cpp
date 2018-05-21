@@ -80,7 +80,7 @@ namespace OPFuncs
 			item->object().u_EventSend(P);
 			_asm int 3;
 		};
-		item->Detach(addon_name, force_spawn, item->GetCondition());
+		item->Detach(addon_name, force_spawn);
 
 		CActor *pActor = smart_cast<CActor*>(Level().CurrentEntity());
 		if (pActor && item == pActor->inventory().ActiveItem())
