@@ -147,8 +147,8 @@ public:
 	_DECLARE_FUNCTION10(ID, u32);
 	_DECLARE_FUNCTION10(getVisible, BOOL);
 	_DECLARE_FUNCTION10(getEnabled, BOOL);
-	_DECLARE_FUNCTION10(story_id, ALife::_STORY_ID);
-
+	//_DECLARE_FUNCTION10(story_id, ALife::_STORY_ID);
+	int story_id();
 	LPCSTR				Name() const;
 	shared_str			cName() const;
 	LPCSTR				Section() const;

@@ -68,6 +68,7 @@ void game_sv_GameState::script_register(lua_State *L)
 		]
 		.def(						constructor<>()				)
 		.def(						constructor<const xrTime&>())
+		.def(constructor<long>())
 		.def(const_self <			xrTime()					)
 		.def(const_self <=			xrTime()					)
 		.def(const_self >			xrTime()					)

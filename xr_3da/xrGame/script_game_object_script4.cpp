@@ -853,6 +853,26 @@ LPCSTR GetSpecificCharacterVisual(CScriptGameObject* pself)
 	return nullptr;
 }
 
+void npc_take_item(CScriptGameObject* pself, CScriptGameObject* pItem)
+{
+	CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&(pself->object()));
+	if (stalker)
+	{
+		CInventoryItem* pIItem = smart_cast<CInventoryItem*>(&pItem->object());
+		if (pIItem)
+		{
+			NET_Packet P;
+			CGameObject::u_EventGen(P, GE_OWNERSHIP_TAKE, stalker->ID());
+			P.w_u16(pIItem->object().ID());
+			CGameObject::u_EventSend(P);
+		}
+		else
+			log_script_error("! WARNING npc_take_item: [%s] not CInventoryItem", pItem->object().Name());
+	}
+	else
+		log_script_error("! WARNING npc_take_item: [%s] not CAI_Stalker", pself->object().Name());
+}
+
 class_<CScriptGameObject> &script_register_game_object3(class_<CScriptGameObject> &instance)
 {
 	instance
@@ -941,6 +961,7 @@ class_<CScriptGameObject> &script_register_game_object3(class_<CScriptGameObject
 		.def("silencer_condition", &CScriptGameObject::GetSilencerCondition)
 		.def("silencer_condition", &CScriptGameObject::SetSilencerCondition)
 		.def("get_sc_visual_name", &GetSpecificCharacterVisual)
+		.def("npc_take_item", &npc_take_item)
 		;
 
 	return	(instance);

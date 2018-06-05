@@ -12,11 +12,15 @@
 #include "script_engine.h"
 #include "script_thread.h"
 #include "ai_space.h"
+#include "xr_time.h"
+#include "ui/UIInventoryUtilities.h"
 
 #define KEYVALS_V0 ((u8)0)
 #define KEYVALS_V1 ((u8)1) //small hack for skipped versions before begin versioning :)
-#define KEYVALS_V2 ((u8)2) //actual version
-#define CURRENT_KEYVALS_VERSION KEYVALS_V2
+#define KEYVALS_V2 ((u8)2) 
+#define KEYVALS_V3 ((u8)3) //actual version, add store xrTime to keyvals
+#define CURRENT_KEYVALS_VERSION KEYVALS_V3
+#define LUA_TXRTIME 9 //LUA_TTHREAD has 8 
 
 static void serialize(IWriter &memory_stream, const luabind::object& object)
 {
@@ -50,9 +54,18 @@ static void serialize(IWriter &memory_stream, const luabind::object& object)
 			}
 		}
 		break;
+	case LUA_TUSERDATA:
+		{
+			xrTime *time = luabind::object_cast<xrTime*>(object);
+			if (time)
+			{
+				memory_stream.w_u8(LUA_TXRTIME);
+				memory_stream.w_u64(time->get_m_time());
+				break;
+			}
+		}
 	case LUA_TLIGHTUSERDATA:
 	case LUA_TFUNCTION:
-	case LUA_TUSERDATA:
 	case LUA_TTHREAD:
 	default:
 		{
@@ -68,6 +81,12 @@ static void deserialize(IReader &memory_stream, luabind::object& container)
 	const u8 type = memory_stream.r_u8();
 	switch (type)
 	{
+		case LUA_TXRTIME:
+			{
+				u64 rtime = memory_stream.r_u64();
+				container = xrTime(rtime);
+			}
+			break;
 		case LUA_TNIL:
 			container = luabind::object();
 		break;
@@ -332,7 +351,7 @@ void CALifeKeyvalRegistry::load(IReader &memory_stream)
 		u8 version = memory_stream.r_u8();
 		R_ASSERT2(version <= CURRENT_KEYVALS_VERSION, "[keyvals] Can't load save with newer version of keyvals registry");
 		
-		if (version == KEYVALS_V2)
+		if (version == KEYVALS_V2 || version == KEYVALS_V3)
 		{
 			u32 count = memory_stream.r_u32();
 			if (count > 0)

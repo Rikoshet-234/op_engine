@@ -89,6 +89,7 @@ void CWeaponPistol::Load	(LPCSTR section)
 		animGet(pre_anim_idle_sprint_empty, pSettings->r_string(*hud_sect, animName), *hud_sect, animName);
 	}
 	pre_anim_idle_moving = mhud.anim_idle_moving; //закешируем обшие анимации
+	pre_anim_idle_sprint = mhud.mhud_idle_sprint; //закешируем обшие анимации
 }
 
 void CWeaponPistol::OnH_B_Chield		()
@@ -159,8 +160,22 @@ void CWeaponPistol::PlayAnimIdle	()
 		CActor* A = smart_cast<CActor*>(H_Parent());
 		if (A && A->Holder())
 			anim = (IsZoomed()) ? &wm_mhud_r.mhud_idle_aim : &wm_mhud_r.mhud_idle;
-		if (mhud.anim_idle_moving.empty()) //восстановим из кеша, если надо обычную анимацию движения
-			mhud.anim_idle_moving = pre_anim_idle_moving;
+		if (!anim || anim->empty())
+		{
+			if (movingNormal)
+			{
+				if (mhud.anim_idle_moving.empty()) //восстановим из кеша, если надо обычную анимацию движения
+					mhud.anim_idle_moving = pre_anim_idle_moving;
+				anim = &mhud.anim_idle_moving;
+			}
+			else if (movingSprint) //при беге
+			{
+				if (mhud.mhud_idle_sprint.empty()) //восстановим из кеша, если надо обычную анимацию движения
+					mhud.mhud_idle_sprint = pre_anim_idle_sprint;
+				anim = &mhud.mhud_idle_sprint;
+			}
+
+		}
 	}
 	if (anim && !anim->empty())
 		m_pHUD->animPlay(random_anim(*anim), TRUE, nullptr, GetState());

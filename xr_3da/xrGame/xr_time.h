@@ -12,6 +12,8 @@ public:
 	xrTime(const xrTime& other):m_time(other.m_time){}
 	xrTime(ALife::_TIME_ID t):m_time(t){}
 
+	ALife::_TIME_ID get_m_time() { return m_time; }
+
 	bool	operator <		(const xrTime& other)	const			{ return m_time < other.m_time;			}
 	bool	operator >		(const xrTime& other)	const			{ return m_time > other.m_time;			}
 	bool	operator >=		(const xrTime& other)	const			{ return m_time >= other.m_time;		}

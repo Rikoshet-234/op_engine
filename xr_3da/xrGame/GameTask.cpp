@@ -18,8 +18,6 @@
 #include "object_broker.h"
 #include "ui/uitexturemaster.h"
 
-ALife::_STORY_ID	story_id		(LPCSTR story_id);
-
 using namespace luabind;
 
 ALife::_STORY_ID	story_id	(LPCSTR story_id)

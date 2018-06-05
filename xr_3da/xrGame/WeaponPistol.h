@@ -43,6 +43,7 @@ protected:
 	};
 
 	MotionSVec pre_anim_idle_moving;
+	MotionSVec pre_anim_idle_sprint;
 	MotionSVec pre_anim_idle_moving_empty;
 	MotionSVec pre_anim_idle_sprint_empty;
 
