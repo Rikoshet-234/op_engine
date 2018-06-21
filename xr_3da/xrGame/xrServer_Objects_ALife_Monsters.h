@@ -374,7 +374,6 @@ SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeMonsterZombie,CSE_ALifeMonsterAbstract)
 	u16								u16HitInterval;
 	float							fAttackDistance;
 	float							fAttackAngle;
-
 									CSE_ALifeMonsterZombie	(LPCSTR caSection);				// constructor for variable initialization
 	virtual							~CSE_ALifeMonsterZombie	();
 SERVER_ENTITY_DECLARE_END

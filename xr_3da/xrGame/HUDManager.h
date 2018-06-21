@@ -3,9 +3,9 @@
 #include "../CustomHUD.h"
 #include "HitMarker.h"
 #include "UI.h"
+#include "HUDCrosshairManager.h"
 
 class CContextMenu;
-class CHUDTarget;
 
 struct CFontManager :public pureDeviceReset			{
 							CFontManager			();
@@ -44,8 +44,10 @@ class CHUDManager :
 private:
 	CUI*					pUI;
 	CHitMarker				HitMarker;
-	CHUDTarget*				m_pHUDTarget;
 	bool					b_online;
+	collide::rq_result		RQ;
+	collide::rq_results		RQR;
+	void UpdateRQ();
 public:
 							CHUDManager			();
 	virtual					~CHUDManager		();
@@ -78,4 +80,5 @@ public:
 	void			OnConnected			() override;
 	void OnHUDChanged() override;
 	virtual void			net_Relcase			(CObject *object);
+	CHUDCrosshairManager*	m_pHUDCrosshairManager;
 };

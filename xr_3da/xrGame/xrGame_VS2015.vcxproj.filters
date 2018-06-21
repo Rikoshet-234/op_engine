@@ -6573,12 +6573,6 @@
     <ClInclude Include="ui\UIVotingCategory.h">
       <Filter>UI\Multiplayer\Voting</Filter>
     </ClInclude>
-    <ClInclude Include="HUDCrosshair.h">
-      <Filter>UI\Cursor</Filter>
-    </ClInclude>
-    <ClInclude Include="HUDTarget.h">
-      <Filter>UI\Cursor</Filter>
-    </ClInclude>
     <ClInclude Include="UICursor.h">
       <Filter>UI\Cursor</Filter>
     </ClInclude>
@@ -6638,6 +6632,18 @@
     </ClInclude>
     <ClInclude Include="ui\UIExoBatteryStatic.h">
       <Filter>UI\UIWindows\Static</Filter>
+    </ClInclude>
+    <ClInclude Include="HUDCrosshairManager.h">
+      <Filter>UI\Cursor</Filter>
+    </ClInclude>
+    <ClInclude Include="color_defs.h">
+      <Filter>UI\Cursor</Filter>
+    </ClInclude>
+    <ClInclude Include="ArmedHUDCrosshair.h">
+      <Filter>UI\Cursor</Filter>
+    </ClInclude>
+    <ClInclude Include="UnArmedHUDCrosshair.h">
+      <Filter>UI\Cursor</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -9764,12 +9770,6 @@
     <ClCompile Include="ui\UIVotingCategory.cpp">
       <Filter>UI\Multiplayer\Voting</Filter>
     </ClCompile>
-    <ClCompile Include="HUDCrosshair.cpp">
-      <Filter>UI\Cursor</Filter>
-    </ClCompile>
-    <ClCompile Include="HUDTarget.cpp">
-      <Filter>UI\Cursor</Filter>
-    </ClCompile>
     <ClCompile Include="UICursor.cpp">
       <Filter>UI\Cursor</Filter>
     </ClCompile>
@@ -9862,6 +9862,15 @@
     </ClCompile>
     <ClCompile Include="ExoOutfit_script.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Outfit\ExoOutfit</Filter>
+    </ClCompile>
+    <ClCompile Include="HUDCrosshairManager.cpp">
+      <Filter>UI\Cursor</Filter>
+    </ClCompile>
+    <ClCompile Include="ArmedHUDCrosshair.cpp">
+      <Filter>UI\Cursor</Filter>
+    </ClCompile>
+    <ClCompile Include="UnArmedHUDCrosshair.cpp">
+      <Filter>UI\Cursor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

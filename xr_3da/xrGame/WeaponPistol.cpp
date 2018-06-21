@@ -121,7 +121,8 @@ void CWeaponPistol::PlayAnimIdle	()
 	MotionSVec *anim = nullptr;
 	bool movingSprint = false;
 	bool movingNormal = false;
-	if (CActor* pActor = smart_cast<CActor*>(H_Parent()))
+	CActor* pActor = smart_cast<CActor*>(H_Parent());
+	if (pActor)
 	{
 		if (pActor->is_sprint())
 			movingSprint = true;
@@ -150,15 +151,12 @@ void CWeaponPistol::PlayAnimIdle	()
 				else if (mhud.mhud_idle_sprint.empty()) //если есть - будем играть все, на всякий случай восстановим из кеша
 					mhud.mhud_idle_sprint = pre_anim_idle_sprint_empty;
 				anim = &pre_anim_idle_sprint_empty;
-			}
-
-			
+			}			
 		}
 	}
 	else
 	{
-		CActor* A = smart_cast<CActor*>(H_Parent());
-		if (A && A->Holder())
+		if (pActor && pActor->Holder())
 			anim = (IsZoomed()) ? &wm_mhud_r.mhud_idle_aim : &wm_mhud_r.mhud_idle;
 		if (!anim || anim->empty())
 		{
@@ -166,7 +164,8 @@ void CWeaponPistol::PlayAnimIdle	()
 			{
 				if (mhud.anim_idle_moving.empty()) //восстановим из кеша, если надо обычную анимацию движения
 					mhud.anim_idle_moving = pre_anim_idle_moving;
-				anim = &mhud.anim_idle_moving;
+				if (!IsZoomed()) //для прицеливания возьмем inherited анимацию
+					anim = &mhud.anim_idle_moving;
 			}
 			else if (movingSprint) //при беге
 			{

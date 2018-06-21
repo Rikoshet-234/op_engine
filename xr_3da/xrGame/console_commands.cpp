@@ -60,6 +60,8 @@
 #include <tlhelp32.h>
 #include "ui/UIDebugFonts.h"
 #include "../CBlinker.h"
+#include "HUDCrosshairManager.h"
+#include "UIGameSP.h"
 
 string_path		g_last_saved_game;
 
@@ -123,6 +125,8 @@ CUIOptConCom g_OptConCom;
 	ENGINE_API 	u32 engine_lua_memory_usage	();
 	extern		u32 game_lua_memory_usage	();
 #endif // SEVERAL_ALLOCATORS
+
+
 
 class CCC_MemStats : public IConsole_Command
 {
@@ -822,15 +826,6 @@ struct CCC_JumpToLevel : public IConsole_Command {
 		strcpy_s(I," jump to selected level"); 
 	}
 };
-
-//#include "ui/UIInventoryWnd.h"
-//class CCC_TexTest : public IConsole_Command {
-//public:
-//	CCC_TexTest(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = true; };
-//	virtual void Execute(LPCSTR args) {
-//		texName=args;		
-//	}
-//};
 
 class CCC_MainMenu : public IConsole_Command {
 public:
@@ -1617,6 +1612,53 @@ public:
 	}
 };
 
+class CCC_HUDUnarmedCrosshair: public CCC_SharedString
+{
+public:
+	CCC_HUDUnarmedCrosshair(LPCSTR N, shared_str *V) :CCC_SharedString(N, V) { }
+	void Execute(LPCSTR args) override
+	{
+		CCC_SharedString::Execute(args);
+		if (g_pGameLevel && Level().pHUD)
+		{
+			HUD().m_pHUDCrosshairManager->ReInitUnArmedCrosshair();
+			if (armed_crosshair_custom)
+				HUD().m_pHUDCrosshairManager->ReInitArmedCrosshair();
+		}
+	}
+};
+
+class CCC_HUDArmedCrosshair : public CCC_Bool
+{
+public:
+	CCC_HUDArmedCrosshair(LPCSTR N, bool* V) :CCC_Bool(N, V) { }
+	void Execute(LPCSTR args) override
+	{
+		CCC_Bool::Execute(args);
+		if (g_pGameLevel && Level().pHUD)
+			HUD().m_pHUDCrosshairManager->ReInitArmedCrosshair();
+	}
+};
+
+class CCC_HUDArmedScaleType : public CCC_Integer {
+public:
+	CCC_HUDArmedScaleType(LPCSTR N,int *V,int min,int max) : CCC_Integer(N, V, min, max) {};
+	void	Execute(LPCSTR args) override
+	{
+		int v = atoi(args);
+		if (v<GetMin() || v>GetMax())
+		{
+			Msg(" Armed scale type out of bound [%d-%d]",GetMin(),GetMax());
+		}
+		else
+		{
+			*value = v;
+			if (g_pGameLevel && Level().pHUD)
+				HUD().m_pHUDCrosshairManager->ReInitArmedCrosshair();
+		}
+	}
+};
+
 void CCC_RegisterCommands()
 {
 	// options
@@ -1643,7 +1685,6 @@ void CCC_RegisterCommands()
 	psHUD_Flags.set(HUD_DIALOG_NUMBERED,true);
 	psHUD_Flags.set(HUD_ARTEFACT_PANEL_VISIBLE, false);
 	psHUD_Flags.set(HUD_GAME_INDICATORS_VISIBLE, false);
-	
 
 	CMD3(CCC_Mask,				"hud_weapon",			&psHUD_Flags,	HUD_WEAPON);
 	CMD3(CCC_Mask,				"hud_info",				&psHUD_Flags,	HUD_INFO);
@@ -1653,8 +1694,6 @@ void CCC_RegisterCommands()
 	CMD3(CCC_Mask,				"hud_min_crosshair",	&psHUD_Flags,	HUD_MIN_CROSSHAIR);
 	CMD3(CCC_Mask,				"hud_art_panel_visible", &psHUD_Flags, HUD_ARTEFACT_PANEL_VISIBLE);
 	CMD3(CCC_Mask,				"dialog_numbered",		&psHUD_Flags,	HUD_DIALOG_NUMBERED);
-	//CMD1(CCC_TexTest,			"textest");
-
 
 	CMD1(CCC_DemoPlay,			"demo_play"				);
 	CMD1(CCC_DemoRecord,		"demo_record"			);
@@ -1668,11 +1707,6 @@ void CCC_RegisterCommands()
 	CMD3(CCC_Mask,				"cl_dynamiccrosshair",	&psHUD_Flags,	HUD_CROSSHAIR_DYNAMIC);
 	CMD1(CCC_MainMenu,			"main_menu"				);
 	CMD3(CCC_Mask,				"g_autopickup",			&psActorFlags,	AF_AUTOPICKUP);
-
-	//g_uCommonFlags.set(flAiUseTorchDynamicLights, TRUE);
-	//g_uCommonFlags.set(enShowObjectHit, FALSE);
-	//g_uCommonFlags.set(uiAllowOpTradeSB, FALSE);
-	//g_uCommonFlags.set(invReloadWeapon, FALSE);
 
 	CMD3(CCC_Mask,				"ai_use_torch_dynamic_lights",	&g_uCommonFlags,flAiUseTorchDynamicLights);
 	CMD3(CCC_Mask,				"engine_show_object_hit",		&g_uCommonFlags,enShowObjectHit);
@@ -1706,6 +1740,11 @@ void CCC_RegisterCommands()
 	// adjust mode support
 	CMD4(CCC_Integer, "hud_adjust_mode", &g_bHudAdjustMode, 0, 5);
 	CMD4(CCC_Float, "hud_adjust_value", &g_fHudAdjustValue, 0.0f, 1.0f);
+
+	CMD2(CCC_HUDArmedCrosshair, "hc_armed_custom", &armed_crosshair_custom);
+	CMD4(CCC_HUDArmedScaleType, "hc_armed_scale_type", &armed_scale_type,0,1);
+	CMD2(CCC_HUDUnarmedCrosshair, "hc_unarmed", &current_unarmed_crosshair);
+
 
 #ifndef MASTER_GOLD
 	CMD1(CCC_ALifeTimeFactor,		"al_time_factor"		);		// set time factor

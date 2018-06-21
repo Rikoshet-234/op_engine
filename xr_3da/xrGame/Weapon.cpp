@@ -779,7 +779,12 @@ void CWeapon::OnActiveItem ()
 	SetState					(eIdle);
 	SetNextState				(eIdle);
 	UpdateAddonsVisibility();
-	if (m_pHUD) m_pHUD->Show	();
+	if (m_pHUD)
+	{
+		m_pHUD->Show();
+		if (smart_cast<CActor*>(this->H_Parent()))
+			HUD().m_pHUDCrosshairManager->ReInitArmedCrosshair();
+	}
 }
 
 void CWeapon::OnHiddenItem ()

@@ -479,4 +479,33 @@ public:
 	virtual bool	allow			(LPCSTR cmd);
 };
 
+class ENGINE_API	CCC_SharedString : public IConsole_Command
+{
+protected:
+	shared_str *value;
+public:
+	CCC_SharedString(LPCSTR N, shared_str *V) :
+		IConsole_Command(N)
+	{
+		bLowerCaseArgs = true;
+		value = V;
+	};
 
+	void	Execute(LPCSTR args) override
+	{
+		*value = args;
+	}
+
+	void	Status(TStatus& S) override
+	{
+		if (value->size()>0)
+			strcpy_s(S, (*value).c_str());
+		else
+			strcpy_s(S, "default");
+	}
+
+	void	Info(TInfo& I) override
+	{
+		sprintf_s(I, sizeof(I), "section name of hud custom cursor");
+	}
+};

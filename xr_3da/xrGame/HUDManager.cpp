@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "HUDManager.h"
-#include "hudtarget.h"
 
 #include "actor.h"
 #include "Inventory.h"
@@ -131,15 +130,17 @@ void CFontManager::OnDeviceReset()
 //--------------------------------------------------------------------
 CHUDManager::CHUDManager()
 { 
-	pUI						= 0;
-	m_pHUDTarget			= xr_new<CHUDTarget>();
-	OnDisconnected			();
+	RQ.range = 0.f;
+	RQ.set(nullptr, 0.f, -1);
+	pUI						= nullptr;
+	m_pHUDCrosshairManager = xr_new<CHUDCrosshairManager>();
+	CHUDManager::OnDisconnected			();
 }
 //--------------------------------------------------------------------
 CHUDManager::~CHUDManager()
 {
 	xr_delete			(pUI);
-	xr_delete			(m_pHUDTarget);
+	xr_delete			(m_pHUDCrosshairManager);
 	b_online			= false;
 }
 
@@ -153,14 +154,56 @@ void CHUDManager::Load()
 	}
 	pUI					= xr_new<CUI> (this);
 	pUI->Load			(nullptr);
+	m_pHUDCrosshairManager->Load();
 	OnDisconnected		();
 }
 //--------------------------------------------------------------------
+
+ICF static BOOL pick_trace_callback(collide::rq_result& result, LPVOID params)
+{
+	collide::rq_result* RQ = static_cast<collide::rq_result*>(params);
+	if (result.O) {
+		*RQ = result;
+		return FALSE;
+	}
+	else {
+		//получить треугольник и узнать его материал
+		CDB::TRI* T = Level().ObjectSpace.GetStaticTris() + result.element;
+		if (GMLib.GetMaterialByIdx(T->material)->Flags.is(SGameMtl::flPassable))
+			return TRUE;
+	}
+	*RQ = result;
+	return FALSE;
+}
+
+#define NEAR_LIM	0.5f
+
+void CHUDManager::UpdateRQ()
+{
+	Fvector				p1, dir;
+
+	p1 = Device.vCameraPosition;
+	dir = Device.vCameraDirection;
+
+	// Render cursor
+	if (Level().CurrentEntity()) {
+		RQ.O = nullptr;
+		RQ.range = g_pGamePersistent->Environment().CurrentEnv.far_plane*0.99f;
+		RQ.element = -1;
+
+		collide::ray_defs	RD(p1, dir, RQ.range, CDB::OPT_CULL, collide::rqtBoth);
+		RQR.r_clear();
+		VERIFY(!fis_zero(RD.dir.square_magnitude()));
+		if (Level().ObjectSpace.RayQuery(RQR, RD, pick_trace_callback, &RQ, nullptr, Level().CurrentEntity()))
+			clamp(RQ.range, NEAR_LIM, RQ.range);
+	}
+}
+
 void CHUDManager::OnFrame()
 {
 	if(!b_online)					return;
 	if (pUI) pUI->UIOnFrame();
-	m_pHUDTarget->CursorOnFrame();
+	UpdateRQ();
 }
 //--------------------------------------------------------------------
 
@@ -232,7 +275,7 @@ void  CHUDManager::RenderUI()
 	}
 
 	if (psHUD_Flags.is(HUD_CROSSHAIR|HUD_CROSSHAIR_RT|HUD_CROSSHAIR_RT2) && !bAlready)	
-		m_pHUDTarget->Render();
+		m_pHUDCrosshairManager->RenderCrosshair();
 
 	draw_wnds_rects		();
 
@@ -257,17 +300,17 @@ void CHUDManager::OnEvent(EVENT E, u64 P1, u64 P2)
 
 collide::rq_result&	CHUDManager::GetCurrentRayQuery	() 
 {
-	return m_pHUDTarget->RQ;
+	return RQ;
 }
 
 void CHUDManager::SetCrosshairDisp	(float dispf, float disps)
 {	
-	m_pHUDTarget->HUDCrosshair.SetDispersion(psHUD_Flags.test(HUD_CROSSHAIR_DYNAMIC) ? dispf : disps);
+	m_pHUDCrosshairManager->SetArmedCrosshairDispersion(psHUD_Flags.test(HUD_CROSSHAIR_DYNAMIC) ? dispf : disps);
 }
 
-void  CHUDManager::ShowCrosshair	(bool show)
+void  CHUDManager::ShowCrosshair(bool show)
 {
-	m_pHUDTarget->m_bShowCrosshair = show;
+	m_pHUDCrosshairManager->m_bShowArmedCrosshair = show;
 }
 
 
@@ -329,7 +372,8 @@ void CHUDManager::OnHUDChanged()
 
 void CHUDManager::net_Relcase	(CObject *object)
 {
-	VERIFY						(m_pHUDTarget);
-	m_pHUDTarget->net_Relcase	(object);
+	if (RQ.O == object)
+		RQ.O = nullptr;
+	RQR.r_clear();
 }
 

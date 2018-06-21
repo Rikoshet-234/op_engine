@@ -514,8 +514,8 @@ void CUIDragDropListEx::ReinitScroll()
 		m_vScrollBar->Show			( h1 > h2 );
 		m_vScrollBar->Enable		( h1 > h2 );
 		m_vScrollBar->SetRange		(0, _max(0,iFloor(h1-h2)) );
-		m_vScrollBar->SetStepSize	(CellSize().y);
-		m_vScrollBar->SetPageSize	(iFloor(GetWndSize().y/float(CellSize().y)));
+		m_vScrollBar->SetStepSize(CellSize().y/3);
+		m_vScrollBar->SetPageSize(1);
 
 		m_container->SetWndPos		(0,0);
 		SetScrollPos	(pos); 
@@ -529,13 +529,16 @@ bool CUIDragDropListEx::OnMouse(float x, float y, EUIMessages mouse_action)
 	{
 		switch(mouse_action){
 		case WINDOW_MOUSE_WHEEL_DOWN:
-				m_vScrollBar->TryScrollInc();
+				//m_vScrollBar->TryScrollInc();
+				for (u8 i = 0; i < 4; ++i) { m_vScrollBar->TryScrollInc(); }
+
 				m_i_scroll_pos=m_vScrollBar->GetScrollPos();
 				return true;
 				break;
 
 		case WINDOW_MOUSE_WHEEL_UP:
-				m_vScrollBar->TryScrollDec();
+				//m_vScrollBar->TryScrollDec();
+				for (u8 i = 0; i < 4; ++i) { m_vScrollBar->TryScrollDec(); }
 				m_i_scroll_pos=m_vScrollBar->GetScrollPos();
 				return true;
 				break;

@@ -308,6 +308,7 @@ void CALifeSimulator__release					(CALifeSimulator *pself, CSE_Abstract *object,
 
 	THROW								(object);
 	CSE_ALifeObject						*alife_object = smart_cast<CSE_ALifeObject*>(object);
+
 	THROW								(alife_object);
 
 	if (!alife_object->m_bOnline) {

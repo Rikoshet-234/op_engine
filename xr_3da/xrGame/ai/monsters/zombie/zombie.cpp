@@ -9,6 +9,7 @@
 #include "../control_animation_base.h"
 #include "../control_movement_base.h"
 #include "../../../actor.h"
+#include "../../../xrServer_Objects_ALife_Monsters.h"
 
 #ifdef _DEBUG
 #include <dinput.h>
@@ -138,7 +139,6 @@ BOOL CZombie::net_Spawn (CSE_Abstract* DC)
 	TSP_SCOPED(_, "CZombie::net_Spawn", "spawn");
 	if (!inherited::net_Spawn(DC))
 		return(FALSE);
-
 	vfAssignBones	();
 	if (fakeDeathDist>0)
 	{

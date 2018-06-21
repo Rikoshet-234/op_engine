@@ -14,12 +14,9 @@
 #include "game_cl_base.h"
 #include "AI/Monsters/BaseMonster/base_monster.h"
 #include "../igame_persistent.h"
+#include "color_defs.h"
 
 #define RECT_SIZE	16
-
-extern u32 C_ON_ENEMY;
-extern u32 C_ON_NEUTRAL;
-extern u32 C_ON_FRIEND;
 
 struct FindVisObjByObject{
 	const CObject*			O;
@@ -149,7 +146,7 @@ void SBinocVisibleObj::Update()
 						if (our_ealive && others_ealive)
 						{
 							if (Game().IsEnemy(our_ealive, others_ealive))
-								clr = C_ON_ENEMY;
+								clr = C_ON_ENEMY
 							else
 								clr = C_ON_FRIEND;
 						}
